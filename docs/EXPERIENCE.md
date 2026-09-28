@@ -6,6 +6,35 @@ CM como identidade principal. Sem astronauta, lettering Artesopolis ou tema espa
 
 Cassiano pediu um resultado bonito, chique, fácil e vivo, com muitas animações. Isso vale para composição e uso real. Tokens e componentes preservam uma direção visual aprovada; não substituem essa direção.
 
+## Decisões confirmadas desta rodada
+
+A referência visual mais próxima do alvo mostrou uma composição em dois mundos, não uma home convencional com uma coleção de cards.
+
+**Desktop**
+
+- Header CM enxuto.
+- Área principal com o **Estúdio de Impressão 3D** à esquerda/centro.
+- Rádio acoplada à direita como uma superfície própria, não como um card genérico.
+- A rádio tem botão de expandir/recolher e pode ser redimensionada por divisor quando a interação for confortável.
+- O conteúdo 3D não precisa começar completo. A primeira versão pode ter hero + uma pequena entrada do estúdio e crescer conforme chegam fotos, materiais, peças e trabalhos reais.
+- Mini player persistente no rodapé da experiência pública.
+- A riqueza visual vem de mídia real, composição, tipografia e do player, não de quatro cards explicativos genéricos abaixo do hero.
+
+**Mobile**
+
+- Header compacto.
+- Mini player logo abaixo do header.
+- O conteúdo do **Estúdio de Impressão 3D** começa imediatamente abaixo do mini player.
+- A rádio grande abre sob demanda em uma superfície própria; não manter uma sidebar comprimida.
+- A ordem mobile é desenhada de propósito, não é o desktop empilhado.
+
+**Conteúdo**
+
+- A expressão **Estúdio de Impressão 3D** deve aparecer claramente na entrada pública.
+- Não criar produtos, materiais, números, depoimentos ou categorias falsas para completar composição.
+- Se ainda não houver conteúdo suficiente, mostrar menos seções com mais qualidade.
+- Produtos, materiais, fotos e projetos reais entram progressivamente sem exigir redesenho da base.
+
 ## Hipótese visual para apresentar
 
 Estúdio de objetos e música: acabamento preciso, peças bem fotografadas, tipografia com presença e rádio com personalidade de equipamento musical. Explorar grafite fosco, texto claro, azul/ciano e roxo pontual. Fundos neutros mais claros nas fotografias podem valorizar materiais. Paleta, fontes e proporção entre superfícies claras/escuras ainda serão aprovadas; dark mode para tudo não é uma obrigação.
@@ -23,7 +52,9 @@ A nostalgia de Winamp aparece no display, sequência de faixas, controles e visu
 | Player grande | Música atual, busca, biblioteca e fila fáceis de encontrar |
 | Music Inbox | Importar lote, identificar pendências, revisar e publicar |
 
-Uma grade comum com diferentes composições: galeria para objetos, linhas para músicas, amostras para materiais e formulário para gestão. Componentização não obriga a encaixar tudo em cartões nem a repetir seções alternando esquerda/direita.
+Uma grade comum com diferentes composições: fotografia/galeria para objetos, linhas para músicas, amostras para materiais e formulário para gestão. Componentização não obriga a encaixar tudo em cartões nem a repetir seções alternando esquerda/direita.
+
+O frontend deve rejeitar automaticamente o padrão visual de "quatro cards de benefícios" usado apenas para preencher espaço. Um card só existe quando agrupa conteúdo ou ação real. Informação simples pode viver diretamente na composição.
 
 Navegação e ações ficam legíveis antes do hover. Explorar o site não exige dar play. Botões usam verbos claros; filtros, seleções e causas de indisponibilidade ficam visíveis. Ações ambíguas recebem rótulo, além de nome acessível.
 
@@ -71,7 +102,20 @@ Respeitar preferência do sistema e dar controle sobre efeitos contínuos. A pol
 
 ## Artefato de aprovação da entrega 03
 
-Apresentar uma direção em contexto: tipografia, superfícies, ações, amostra de material, linha de música e mini player. Aplicar a mesma linguagem a home, produto, player grande e fluxo curto do Inbox em desktop/mobile. Especificar interação, além de imagens estáticas.
+O artefato final deve transformar a referência visual aprovada em especificação reproduzível, sem depender da interpretação de quem implementar.
+
+Precisa mostrar, no mínimo:
+
+- desktop em 1440 px com Estúdio + Rádio acoplada;
+- estado desktop com Rádio expandida;
+- mobile em aproximadamente 390 px com header -> mini player -> Estúdio;
+- mini player, full player, divisor/redimensionamento e ação de expandir;
+- hero contendo "Estúdio de Impressão 3D";
+- estado inicial do 3D com pouco conteúdo real, sem cards fictícios;
+- comportamento quando novos blocos de produtos/materiais forem adicionados futuramente;
+- grid, medidas relativas, hierarquia tipográfica, tokens, estados e motion.
+
+Aplicar a mesma linguagem ao Inbox somente no nível necessário para manter coerência; ele não deve atrasar a aprovação da experiência pública inicial.
 
 Handoff: grade, hierarquia, proporções, conteúdo disponível, fotos/capas, componentes mínimos, estados, mapa de tokens, motion, fallback, foco e comportamento responsivo. Registrar o que o frontend não pode inventar; vários agentes não podem decidir fontes, cores ou ornamentos independentemente.
 

@@ -10,35 +10,54 @@ The new site must have **CM identity**. Astronaut, Artesopolis lettering, cosmic
 
 ## What is worth reusing
 
-### 1. Player engine: reuse strongly
+### 1. Player behavior: reuse as reference, not as the new engine
 
-The current `PlayerProvider` already solves several real problems:
+The current player proves useful behavior:
 
-- persistent player state at root layout level;
-- `HTMLAudioElement` lifecycle;
+- persistent playback at root layout level;
 - remote audio from Cloudflare R2;
-- `crossOrigin = "anonymous"`;
 - play/pause;
 - previous;
 - skip;
-- shuffle logic;
+- shuffle;
 - history;
 - temporary blocking/retry of failed tracks;
 - automatic advance;
-- audio loading/error states;
-- Web Audio context lifecycle;
-- Meyda analysis;
-- equalizer frame generation;
-- multiple groups of visual bars registered by DOM refs.
+- loading/error handling.
 
-Files to use as technical source:
+These behaviors are worth preserving.
+
+The current implementation should **not** be ported wholesale.
+
+Problems found in the current source:
+
+- `PlayerProvider` owns playback, track selection, Web Audio lifecycle, analysis and visualizer DOM coordination at the same time;
+- the provider exposes `setBarRef()` and mutates visual bar styles directly on every animation frame;
+- the visualizer has a hard-coded 13-bar model;
+- Meyda `loudness.specific` + RMS are transformed into display levels through custom adaptive normalization;
+- this is a visualizer, not an audio equalizer;
+- presentation details leak into the audio engine;
+- the track model contains only `title` and `file`;
+- title/version grouping is inferred from filename regexes;
+- the playlist is a static `tracks.json` generated from a local folder.
+
+Files to use as **behavioral reference only**:
 
 - `src/lib/player-context.tsx`
 - `src/lib/audio-utils.ts`
 - `src/types/player.ts`
 - `src/app/layout.tsx`
 
-This should be **ported and cleaned**, not redesigned from zero.
+The CM player should be rebuilt with clear boundaries:
+
+1. playback engine;
+2. library/catalog data;
+3. queue and playback state;
+4. audio analysis;
+5. visualizer renderer;
+6. CM UI.
+
+For the first visualizer, prefer native Web Audio `AnalyserNode` frequency data unless a specific feature requires Meyda. If the product later includes a real user-controlled equalizer, implement that separately with audio filters such as `BiquadFilterNode`.
 
 ### 2. Control primitives: reuse selectively
 
@@ -46,15 +65,18 @@ This should be **ported and cleaned**, not redesigned from zero.
 
 Its final visual treatment must follow the CM design system.
 
-### 3. Track manifest / media pipeline: reuse concept
+### 3. R2 can remain; the track manifest should not
 
-The repository already has:
+The repository already uses R2 successfully as the audio origin. That is worth keeping as an option.
 
-- `public/tracks.json`;
-- a track-sync script;
-- R2 as the current audio origin.
+The current library pipeline should be replaced:
 
-We can keep the concept and decide later whether the production catalog stays manifest-based or moves to managed data.
+- do not use filenames as the primary metadata source;
+- do not maintain a static `tracks.json` as the canonical catalog;
+- do not encode versions such as `(1)`, `v2`, `v8` in business logic;
+- do not require manual renaming just to make the player understand a song.
+
+The new system needs a managed music library with stable IDs, metadata, versions, publication state and storage keys.
 
 ### 4. Next.js foundation: reuse patterns
 
@@ -127,17 +149,21 @@ For the migration, trust the current source code first. The current player uses 
 
 Do not copy the whole repository.
 
-Port by boundary:
+Use the old project as a behavior specification and rewrite the weak boundaries.
 
-1. player types;
-2. audio utilities;
-3. player engine/provider;
-4. neutral control primitives;
-5. track/media configuration;
-6. build a brand-new CM player UI on top;
-7. build the 3D experience independently.
+Sequence:
 
-Each ported module must remove Artesopolis-specific naming before entering the new codebase.
+1. document playback behaviors that must survive;
+2. define the new music library model;
+3. create a clean playback engine;
+4. create queue/playback state independent from UI;
+5. create an audio-analysis layer independent from DOM;
+6. build a temporary neutral visualizer;
+7. validate persistence and playback failure handling;
+8. build the CM player UI;
+9. build the 3D experience independently.
+
+Only small neutral primitives should be copied directly when they are already clean.
 
 ## CM identity boundary
 
@@ -158,11 +184,15 @@ Current direction:
 
 Before building the full UI:
 
-- port the audio engine;
-- make it play 3 to 5 real tracks;
+- implement the new music-library boundary;
+- import 3 to 5 real tracks through the new ingestion path;
+- implement a clean playback engine;
 - keep playback alive across two test routes;
 - render a temporary neutral player;
+- render a neutral spectrum visualizer without DOM refs living inside the playback provider;
 - verify desktop + mobile;
 - only then build the final CM player skin.
 
-This isolates the risky audio behavior from visual redesign.
+This validates the new architecture instead of carrying the old coupling forward.
+
+See also: [MUSIC_PIPELINE.md](MUSIC_PIPELINE.md).

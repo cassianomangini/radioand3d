@@ -17,7 +17,6 @@ A referência visual mais próxima do alvo mostrou uma composição em dois mund
 - Rádio acoplada à direita como uma superfície própria, não como um card genérico.
 - A rádio tem botão de expandir/recolher e pode ser redimensionada por divisor quando a interação for confortável.
 - O conteúdo 3D não precisa começar completo. A primeira versão pode ter hero + uma pequena entrada do estúdio e crescer conforme chegam fotos, materiais, peças e trabalhos reais.
-- Mini player persistente no rodapé da experiência pública.
 - A riqueza visual vem de mídia real, composição, tipografia e do player, não de quatro cards explicativos genéricos abaixo do hero.
 
 **Mobile**
@@ -48,7 +47,7 @@ A nostalgia de Winamp aparece no display, sequência de faixas, controles e visu
 | Home | Entender o que Cassiano cria, ver uma peça e encontrar catálogo e rádio |
 | Produto | Foto e uso, dimensões, opções válidas, disponibilidade e próximo passo |
 | Mostruário | Comparar cor e acabamento com nome e exemplo impresso |
-| Mini player | Faixa, comandos reconhecíveis e expansão, sem cobrir conteúdo |
+| Mini player mobile | Faixa e controles essenciais logo abaixo do header; ação para abrir a Rádio completa |
 | Player grande | Música atual, busca, biblioteca e fila fáceis de encontrar |
 | Music Inbox | Importar lote, identificar pendências, revisar e publicar |
 
@@ -58,7 +57,7 @@ O frontend deve rejeitar automaticamente o padrão visual de "quatro cards de be
 
 Navegação e ações ficam legíveis antes do hover. Explorar o site não exige dar play. Botões usam verbos claros; filtros, seleções e causas de indisponibilidade ficam visíveis. Ações ambíguas recebem rótulo, além de nome acessível.
 
-Definir desktop e mobile separadamente: ordem, densidade, área segura, foco e teclado aberto. O player não cobre controles. Recolher o compacto na rádio expandida quando houver duplicação visual, mantendo o motor. Página versus painel ainda depende da proposta aprovada.
+Definir desktop e mobile separadamente: ordem, densidade, área segura, foco e teclado aberto. No desktop existe somente a Rádio completa/acoplada, sem mini player duplicado. No mobile existe mini player logo abaixo do header e a Rádio completa abre sob demanda. O player não cobre controles.
 
 ## Escalas iniciais para avaliação
 
@@ -109,7 +108,7 @@ Precisa mostrar, no mínimo:
 - desktop em 1440 px com Estúdio + Rádio acoplada;
 - estado desktop com Rádio expandida;
 - mobile em aproximadamente 390 px com header -> mini player -> Estúdio;
-- mini player, full player, divisor/redimensionamento e ação de expandir;
+- mini player **mobile**, Rádio completa desktop/mobile, divisor/redimensionamento desktop e ação de expandir;
 - hero contendo "Estúdio de Impressão 3D";
 - estado inicial do 3D com pouco conteúdo real, sem cards fictícios;
 - comportamento quando novos blocos de produtos/materiais forem adicionados futuramente;

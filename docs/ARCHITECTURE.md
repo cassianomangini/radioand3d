@@ -90,7 +90,8 @@ Regras técnicas:
 - limites de largura impedem esmagar o conteúdo 3D ou a Rádio;
 - estado de largura pertence à apresentação, não ao playback engine;
 - expandir/recolher não troca `src`, não recria `HTMLAudioElement` e não zera fila/posição;
-- o mini player e o full player leem o mesmo controller;
+- o mini player mobile e a Rádio completa leem o mesmo controller; o mini player não é renderizado no desktop;
+- desktop não renderiza mini player adicional: o split já contém a Rádio completa;
 - mobile não replica o split: header -> mini player -> Estúdio, com full player aberto sob demanda;
 - sem alturas rígidas dependentes de viewport para sustentar a composição;
 - novas seções 3D entram abaixo da entrada inicial e não exigem alteração do shell da Rádio.

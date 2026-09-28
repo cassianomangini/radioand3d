@@ -1,0 +1,38 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+}
+
+.content {
+  width: min(100%, var(--content-reading));
+  display: grid;
+  gap: var(--space-4);
+}
+
+.content h1,
+.content p {
+  margin: 0;
+}
+
+.content h1 {
+  max-width: 14ch;
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.045em;
+}
+
+.content > p:last-child {
+  max-width: var(--measure-reading);
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+}
+
+.eyebrow {
+  color: var(--action-primary);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}

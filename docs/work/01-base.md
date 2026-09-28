@@ -1,6 +1,6 @@
 # Entrega 01: decisões de base e material piloto
 
-Responsável previsto: CM Planning, com CM Infra, CM Data e Cassiano para as decisões correspondentes. Estado no [roadmap](../ROADMAP.md). Checklist preparado; execução ainda não iniciada. Base documental: commit da reorganização que criou este arquivo.
+Responsável previsto: CM Planning, com CM Infra, CM Data e Cassiano para as decisões correspondentes. Estado no [roadmap](../ROADMAP.md). Execução iniciada. A base local foi delimitada para permitir o bootstrap sem conectar serviços remotos nem importar conteúdo privado. Base documental: commit da reorganização que criou este arquivo.
 
 ## Resultado
 
@@ -11,7 +11,7 @@ Leitura necessária: [plano](../PROJECT_PLAN.md), [arquitetura](../ARCHITECTURE.
 ## Checklist
 
 - [ ] Conferir HEAD e visibilidade efetiva do repositório com Cassiano; resolver E1 antes de importar conteúdo privado.
-- [ ] Validar e registrar stack, versões compatíveis, gerenciador de pacotes e ambiente local.
+- [x] Delimitar stack local inicial: Next.js 16.2.7, React 19.2.4, TypeScript estrito, Tailwind CSS 4, Node 22 e pnpm 10; versões registradas no bootstrap. Serviços externos continuam decisão separada.
 - [ ] Definir banco, autenticação do proprietário, storage, hospedagem e limites iniciais; registrar o que está autorizado remotamente.
 - [ ] Fixar contrato mínimo de leitura pública e identidades de música/versão; confirmar regras propostas de fila, shuffle e repeat.
 - [ ] Confirmar origem/atualização de produto, materiais, cores e disponibilidade, além do caminho de contato.
@@ -25,4 +25,4 @@ O executor seguinte sabe quais versões e ferramentas usar, como rodar sem produ
 
 ## Retomada
 
-Próxima ação: confirmar privacidade e decisões de stack/serviços antes do bootstrap. Testes de aplicação, upload, áudio e UI não se aplicam enquanto esta entrega apenas fecha decisões. Evidências e referências da aprovação serão preenchidas durante a execução.
+Próxima ação: confirmar privacidade efetiva, serviços remotos, origem dos dados 3D e material piloto. O bootstrap local pode avançar sem esses acessos e sem mídia privada. Testes de aplicação, upload, áudio e UI não se aplicam enquanto esta entrega apenas fecha decisões. Evidências e referências da aprovação serão preenchidas durante a execução.

@@ -31,9 +31,9 @@ Fora de escopo: identidade final, Motion, 3D, player, biblioteca musical, banco,
 - [x] Uma primitiva real consome tokens sem valores visuais locais.
 - [x] Vitrine de desenvolvimento protegida de produção.
 - [x] Workflow de CI preparado para lint, typecheck e build.
-- [ ] Instalação e build confirmados por ambiente com acesso ao registry.
-- [ ] Resultado do CI do PR registrado.
-- [ ] Diff final revisado e roadmap atualizado para `done` quando as verificações passarem.
+- [x] Instalação e build confirmados pelo GitHub Actions.
+- [x] CI do PR #1 verde: install, lint, typecheck e build.
+- [x] Diff revisado nesta etapa; o roadmap permanece `in_progress` até o PR ser aceito/mergeado.
 
 ## Evidência
 
@@ -43,9 +43,9 @@ Fora de escopo: identidade final, Motion, 3D, player, biblioteca musical, banco,
 | Tokens | `src/styles/tokens.css` | preparado |
 | Primitiva | `src/components/ui/button.tsx` + CSS Module | preparado |
 | Vitrine | `/dev/foundation` com `notFound()` em produção | preparado |
-| Qualidade | GitHub Actions | aguardando execução |
-| Build local | ambiente atual sem acesso ao registry npm | não executado |
+| Qualidade | GitHub Actions run 36424337283 | success |
+| Build local | ambiente atual sem acesso ao registry npm | não executado; substituído por CI reproduzível |
 
 ## Retomada
 
-Próxima ação: aguardar/inspecionar CI do PR. Se verde, corrigir apenas falhas técnicas desta fundação. A direção visual final continua bloqueada pela aprovação da entrega 03 e não deve ser inventada neste PR.
+Próxima ação: revisão/merge do PR #1. O CI está verde; corrigir apenas achados técnicos desta fundação. A direção visual final continua bloqueada pela aprovação da entrega 03 e não deve ser inventada neste PR.

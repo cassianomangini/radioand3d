@@ -138,7 +138,46 @@ Animacoes podem incluir:
 - player expandindo e recolhendo;
 - elementos reagindo a musica.
 
-## 5. Arquitetura proposta
+## 5. Reaproveitamento do artesopolis-landing
+
+Existe codigo aproveitavel no repositorio `cassianomangini/artesopolis-landing`, principalmente no motor da radio.
+
+A estrategia e **migracao seletiva**, nunca copiar o site inteiro.
+
+Reaproveitar como base tecnica:
+
+- `PlayerProvider`;
+- utilitarios de audio;
+- tipos do player;
+- integracao atual com R2;
+- analise com Meyda;
+- logica de shuffle, historico, retry e falha de faixa;
+- padrao de provider persistente no layout;
+- controles neutros que fizerem sentido.
+
+Redesenhar para CM:
+
+- toda a camada visual do player;
+- capa/arte;
+- tipografia;
+- cores finais;
+- composicao;
+- estados visuais;
+- linguagem de motion.
+
+Nao migrar identidade Artesopolis:
+
+- astronauta;
+- logos;
+- favicon;
+- copy;
+- elementos criados apenas para acomodar o mascote.
+
+A area atual de `impressoes` do Artesopolis e somente um placeholder visual. Portanto, o catalogo 3D do novo site sera construido como produto novo.
+
+Auditoria detalhada: [REUSE_AUDIT_ARTESOPOLIS_LANDING.md](REUSE_AUDIT_ARTESOPOLIS_LANDING.md).
+
+## 6. Arquitetura proposta
 
 Esta e uma proposta inicial, nao uma decisao irreversivel.
 
@@ -191,7 +230,7 @@ Definir desde cedo:
 - fallback;
 - direitos de uso.
 
-## 6. Estrutura de agentes
+## 7. Estrutura de agentes
 
 Os agentes devem ter papeis claros. Nao queremos varios agentes alterando a mesma area sem criterio.
 
@@ -275,7 +314,7 @@ Responsavel por:
 - comportamento real no navegador;
 - verificacao visual.
 
-## 7. Padroes de trabalho
+## 8. Padroes de trabalho
 
 Cada entrega deve ter:
 
@@ -299,10 +338,12 @@ Regras:
 - mobile precisa ser validado separadamente;
 - codigo novo precisa respeitar os limites entre catalogo, radio e infraestrutura.
 
-## 8. Fases
+## 9. Fases
 
 ### Fase 0 - Fundacao
 
+- auditar e portar seletivamente o motor do player do `artesopolis-landing`;
+- remover qualquer dependencia de identidade Artesopolis do codigo reaproveitado;
 - definir produto;
 - fechar naming e identidade;
 - definir stack;
@@ -363,7 +404,7 @@ Somente depois de validar necessidade:
 - analytics;
 - automacoes.
 
-## 9. Primeiro milestone
+## 10. Primeiro milestone
 
 **Milestone 01 - 3D + Radio funcionando como uma experiencia unica**
 
@@ -379,15 +420,17 @@ Aceite:
 - a pagina nao parece template generico;
 - nenhuma area critica depende de mock visual enganoso.
 
-## 10. Proximos passos
+## 11. Proximos passos
 
-1. criar estrutura de diretorios do projeto;
-2. definir stack final;
-3. fechar identidade visual inicial;
-4. definir modelo minimo de dados;
-5. escolher a primeira peca real;
-6. escolher as primeiras musicas;
-7. desenhar home + player;
-8. implementar a vertical slice;
-9. validar no navegador;
-10. somente depois expandir.
+1. portar o nucleo de audio reutilizavel do `artesopolis-landing` para uma camada neutra;
+2. provar persistencia do audio entre rotas;
+3. criar estrutura de diretorios do projeto;
+4. definir stack final;
+5. fechar identidade visual CM inicial;
+6. definir modelo minimo de dados;
+7. escolher a primeira peca real;
+8. escolher as primeiras musicas;
+9. desenhar home + player CM;
+10. implementar a vertical slice;
+11. validar no navegador;
+12. somente depois expandir.

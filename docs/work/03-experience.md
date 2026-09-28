@@ -78,13 +78,13 @@ Não adotar automaticamente:
 
 ### 03.4 Sistema visual
 
-- [ ] Escolher família tipográfica e pesos.
-- [ ] Fechar superfícies, texto, acentos e contraste.
-- [ ] Fechar escala de spacing, raio, borda e sombra.
-- [ ] Mapear tokens semânticos.
-- [ ] Definir família de ícones.
-- [ ] Definir motion de controles, resize, expansão e troca de faixa.
-- [ ] Definir reduced motion.
+- [x] Escolher família tipográfica e pesos: Manrope + IBM Plex Mono, proposta pendente de aprovação visual.
+- [x] Fechar proposta de superfícies, texto, acentos e contraste.
+- [x] Fechar escala de spacing, raio, borda e sombra.
+- [x] Mapear proposta de tokens semânticos.
+- [x] Definir Lucide/equivalente de traço consistente como direção.
+- [x] Definir motion de controles, resize, expansão e troca de faixa.
+- [x] Definir reduced motion.
 
 ### 03.5 Componentes mínimos
 
@@ -163,6 +163,6 @@ Comparar diretamente com o handoff. Qualquer desvio de composição, densidade, 
 
 `approved_by: null`
 
-`artifact_ref: docs/design/STUDIO_RADIO_HANDOFF_V1.md`
+`artifact_ref: docs/design/STUDIO_RADIO_HANDOFF_V1.md + docs/design/CM_VISUAL_SYSTEM_V1.md`
 
-Estrutura desktop/mobile e crescimento progressivo do 3D estão especificados no handoff V1. Tipografia, paleta, acabamento dos componentes e mock final ainda precisam ser fechados e aprovados.
+Estrutura e sistema visual V1 estão especificados. Falta produzir os mocks finais 1440 padrão, 1440 expandido e 390 mobile, receber ajustes de Cassiano e registrar aprovação.

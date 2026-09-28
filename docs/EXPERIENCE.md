@@ -101,7 +101,7 @@ Respeitar preferência do sistema e dar controle sobre efeitos contínuos. A pol
 
 ## Handoff estrutural
 
-A geometria, o shell responsivo, os limites da Rádio, a ordem mobile e a estratégia de crescimento progressivo do 3D estão documentados em [STUDIO_RADIO_HANDOFF_V1.md](design/STUDIO_RADIO_HANDOFF_V1.md). A proposta concreta de tipografia, paleta, superfícies, componentes e motion está em [CM_VISUAL_SYSTEM_V1.md](design/CM_VISUAL_SYSTEM_V1.md). Ambos permanecem sujeitos à aprovação visual de Cassiano.
+A geometria, o shell responsivo, os limites da Rádio, a ordem mobile e a estratégia de crescimento progressivo do 3D estão documentados em [STUDIO_RADIO_HANDOFF_V1.md](design/STUDIO_RADIO_HANDOFF_V1.md). A proposta de tipografia, paleta, superfícies e motion está em [CM_VISUAL_SYSTEM_V1.md](design/CM_VISUAL_SYSTEM_V1.md). Os estados, responsabilidades e limites dos componentes do primeiro recorte estão em [CM_COMPONENT_STATES_V1.md](design/CM_COMPONENT_STATES_V1.md). Os três artefatos permanecem sujeitos à aprovação visual de Cassiano.
 
 ## Artefato de aprovação da entrega 03
 

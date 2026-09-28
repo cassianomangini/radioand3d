@@ -78,6 +78,23 @@ A entrega 03b implementa tokens e somente as primitivas/combinações do piloto 
 
 A vitrine mostra componentes lado a lado e em contexto: botão/seleção de material, linha de música, player compacto e item de importação. Ela apoia revisão e regressão, não substitui aprovação de home/produto/rádio renderizados. A mesma implementação entra nas páginas; evitar recriar componentes só para a demonstração.
 
+### Shell público Estúdio + Rádio
+
+A composição pública inicial precisa preservar um único estado de reprodução, mesmo quando a Rádio muda de largura ou de superfície.
+
+No desktop, tratar a Rádio como região irmã do conteúdo do Estúdio, não como um componente absolutamente posicionado sobre a página. O layout pode usar CSS Grid com uma coluna do Estúdio e outra da Rádio. O divisor altera a proporção dentro de limites aprovados; a ação de expandir aplica um preset maior sem recriar o player.
+
+Regras técnicas:
+
+- arraste por Pointer Events, com alternativa acessível por botão e teclado;
+- limites de largura impedem esmagar o conteúdo 3D ou a Rádio;
+- estado de largura pertence à apresentação, não ao playback engine;
+- expandir/recolher não troca `src`, não recria `HTMLAudioElement` e não zera fila/posição;
+- o mini player e o full player leem o mesmo controller;
+- mobile não replica o split: header -> mini player -> Estúdio, com full player aberto sob demanda;
+- sem alturas rígidas dependentes de viewport para sustentar a composição;
+- novas seções 3D entram abaixo da entrada inicial e não exigem alteração do shell da Rádio.
+
 ### Movimento, mídia e desempenho
 
 CSS resolve feedback simples; Motion coordena transições que precisam dele. Não empilhar motores de animação. Carregar visualizador rico, player expandido e 3D sob demanda quando possível. Reservar proporção das imagens, servir tamanho adequado e manter foto/fallback útil enquanto a interação carrega.

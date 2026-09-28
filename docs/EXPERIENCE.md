@@ -99,6 +99,10 @@ CSS para feedback simples; Motion para coordenação; 3D apenas na interação a
 
 Respeitar preferência do sistema e dar controle sobre efeitos contínuos. A política alcança CSS, canvas e 3D, não somente Motion. Referência: [acessibilidade no Motion](https://motion.dev/docs/react-accessibility). Gráficos de áudio seguem [RADIO.md](RADIO.md).
 
+## Handoff estrutural
+
+A geometria, o shell responsivo, os limites da Rádio, a ordem mobile e a estratégia de crescimento progressivo do 3D estão documentados em [STUDIO_RADIO_HANDOFF_V1.md](design/STUDIO_RADIO_HANDOFF_V1.md). Esse documento é o artefato estrutural canônico desta rodada.
+
 ## Artefato de aprovação da entrega 03
 
 O artefato final deve transformar a referência visual aprovada em especificação reproduzível, sem depender da interpretação de quem implementar.

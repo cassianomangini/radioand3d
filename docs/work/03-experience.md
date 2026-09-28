@@ -12,9 +12,9 @@ Uma primeira experiência pública profissional e simples:
 
 **Desktop**
 
-`Header -> Estúdio de Impressão 3D + Rádio acoplada -> mini player persistente`
+`Header -> Estúdio de Impressão 3D + Rádio completa acoplada`
 
-O Estúdio domina a composição. A Rádio fica à direita, pode ser redimensionada dentro de limites aprovados e também possui ação explícita de expandir/recolher. Alterar a largura nunca reinicia a música.
+O Estúdio domina a composição. A Rádio completa fica à direita, pode ser redimensionada dentro de limites aprovados e também possui ação explícita de expandir/recolher. **Não existe mini player no desktop.** Alterar a largura nunca reinicia a música.
 
 **Mobile**
 
@@ -34,7 +34,7 @@ Adotar dela:
 - Rádio como superfície vertical própria;
 - contraste escuro com acentos CM;
 - fotografia grande como principal carga visual;
-- mini player persistente;
+- mini player apenas no mobile;
 - hierarquia forte no hero;
 - sensação de produto tecnológico premium sem cromado excessivo.
 
@@ -53,7 +53,6 @@ Não adotar automaticamente:
 - [ ] Definir grid desktop canônico e gutter.
 - [ ] Definir largura inicial da Rádio e limites mínimo/máximo.
 - [ ] Definir presets de Rádio compacta, padrão e expandida.
-- [ ] Definir posição e altura funcional do mini player desktop.
 - [ ] Definir ordem mobile: header, mini player, hero do Estúdio e conteúdo.
 - [ ] Definir como o full player abre no mobile.
 - [ ] Definir leitura e ação prioritárias no primeiro viewport.
@@ -69,7 +68,7 @@ Não adotar automaticamente:
 
 ### 03.3 Rádio
 
-- [ ] Definir mini player desktop e mobile.
+- [ ] Definir mini player **somente mobile**.
 - [ ] Definir full player padrão e expandido.
 - [ ] Definir biblioteca/lista, busca, transporte, progresso, volume e visualizador.
 - [ ] Definir divisor de resize e feedback de cursor/foco.
@@ -95,7 +94,7 @@ A base visual só precisa congelar componentes usados neste primeiro recorte:
 - [ ] Button e IconButton.
 - [ ] StudioHero.
 - [ ] MediaFrame/placeholder honesto.
-- [ ] MiniPlayer.
+- [ ] MiniPlayer mobile.
 - [ ] FullPlayer.
 - [ ] TrackRow.
 - [ ] TransportControls.

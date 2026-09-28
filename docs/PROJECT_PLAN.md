@@ -144,16 +144,24 @@ Existe codigo aproveitavel no repositorio `cassianomangini/artesopolis-landing`,
 
 A estrategia e **migracao seletiva**, nunca copiar o site inteiro.
 
-Reaproveitar como base tecnica:
+Reaproveitar como referencia de comportamento:
 
-- `PlayerProvider`;
-- utilitarios de audio;
-- tipos do player;
+- persistencia do player no layout;
 - integracao atual com R2;
-- analise com Meyda;
-- logica de shuffle, historico, retry e falha de faixa;
-- padrao de provider persistente no layout;
+- shuffle, historico, retry e falha de faixa;
+- ciclo de vida basico do audio;
 - controles neutros que fizerem sentido.
+
+Nao portar o `PlayerProvider` atual como arquitetura definitiva. Hoje ele mistura reproducao, fila, analise de audio e atualizacao direta das barras do visualizador.
+
+O novo player separara:
+
+- playback engine;
+- biblioteca de musicas;
+- fila/estado;
+- analise de audio;
+- visualizador;
+- UI CM.
 
 Redesenhar para CM:
 
@@ -203,11 +211,30 @@ O backend deve suportar:
 - combinacoes validas;
 - portfolio;
 - midia;
-- musicas;
+- biblioteca de musicas;
+- versoes de uma mesma musica;
 - playlists;
+- estado de publicacao;
 - configuracoes publicas.
 
+A biblioteca musical nao pode depender de `tracks.json` nem de convencoes de nome de arquivo.
+
 Se dados do Artesopolis Admin forem reaproveitados, o site deve consumir somente uma camada publica controlada. Nao conectar a vitrine diretamente a toda a operacao interna.
+
+### Pipeline de musica
+
+O fluxo inicial sera um **Music Inbox** privado:
+
+1. baixar faixas do Suno;
+2. enviar uma ou varias de uma vez;
+3. detectar duracao, formato e duplicidade;
+4. sugerir titulo/versao;
+5. revisar apenas o necessario;
+6. publicar.
+
+Publicar ou despublicar uma faixa nao deve exigir commit no Git.
+
+Detalhes: [MUSIC_PIPELINE.md](MUSIC_PIPELINE.md).
 
 ### Midia
 
@@ -342,8 +369,11 @@ Regras:
 
 ### Fase 0 - Fundacao
 
-- auditar e portar seletivamente o motor do player do `artesopolis-landing`;
-- remover qualquer dependencia de identidade Artesopolis do codigo reaproveitado;
+- auditar o player do `artesopolis-landing` como referencia de comportamento;
+- definir o novo modelo de biblioteca musical;
+- definir a ingestao Music Inbox;
+- reescrever o motor do player com boundaries separadas;
+- remover qualquer dependencia de identidade Artesopolis;
 - definir produto;
 - fechar naming e identidade;
 - definir stack;
@@ -422,15 +452,16 @@ Aceite:
 
 ## 11. Proximos passos
 
-1. portar o nucleo de audio reutilizavel do `artesopolis-landing` para uma camada neutra;
-2. provar persistencia do audio entre rotas;
-3. criar estrutura de diretorios do projeto;
-4. definir stack final;
-5. fechar identidade visual CM inicial;
-6. definir modelo minimo de dados;
-7. escolher a primeira peca real;
-8. escolher as primeiras musicas;
-9. desenhar home + player CM;
-10. implementar a vertical slice;
-11. validar no navegador;
-12. somente depois expandir.
+1. implementar o modelo minimo da biblioteca musical e o Music Inbox;
+2. importar 3 a 5 faixas reais sem `tracks.json`;
+3. implementar o novo playback engine e analyzer separados;
+4. provar persistencia do audio entre rotas;
+5. criar estrutura de diretorios do projeto;
+6. definir stack final;
+7. fechar identidade visual CM inicial;
+8. definir o modelo minimo de dados 3D;
+9. escolher a primeira peca real;
+10. desenhar home + player CM;
+11. implementar a vertical slice;
+12. validar no navegador;
+13. somente depois expandir.

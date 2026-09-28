@@ -1,23 +1,27 @@
 # CM 3D and Radio
 
-Site para apresentar as pecas e trabalhos em impressao 3D, cores e materiais disponiveis, projetos feitos para clientes e a experiencia **CM Radio**.
+Catálogo das criações em impressão 3D de Cassiano e experiência musical CM Radio, com player pequeno e grande compartilhando a mesma reprodução.
 
-O objetivo e unir duas areas que fazem parte do mesmo projeto criativo:
+## Comece aqui
 
-- **3D**: catalogo visual, materiais, cores, personalizacoes e trabalhos para clientes.
-- **Radio / Music**: player persistente, identidade propria e uma experiencia inspirada na nostalgia do Winamp, com tecnologia e UX atuais.
+1. [Plano do produto](docs/PROJECT_PLAN.md): escopo, decisões e limites.
+2. [Roadmap](docs/ROADMAP.md): estado real, dependências e próxima entrega.
+3. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
 
-## Estado atual
+## Mapa da documentação
 
-Projeto em fundacao. Antes de crescer em paginas e features, a primeira entrega precisa provar a experiencia central:
+| Documento | Responsabilidade exclusiva |
+| --- | --- |
+| [Arquitetura](docs/ARCHITECTURE.md) | Stack proposta, módulos, segurança, infraestrutura e decisões técnicas pendentes |
+| [Experiência CM](docs/EXPERIENCE.md) | Identidade, movimento, responsividade e aprovação visual |
+| [Catálogo 3D](docs/CATALOG_3D.md) | Peças, materiais, cores, disponibilidade e portfólio |
+| [Biblioteca musical](docs/MUSIC_PIPELINE.md) | Importação, versões, publicação, permissões e acervo antigo |
+| [Rádio](docs/RADIO.md) | Reprodução, fila, mini/full player e visualizador |
+| [Auditoria do legado](docs/REUSE_AUDIT_ARTESOPOLIS_LANDING.md) | Evidências e limites do reaproveitamento |
+| [Modelo de entrega](docs/work/TEMPLATE.md) | Checklist de execução, evidências e retomada |
 
-> A pessoa da play, abre uma peca, explora cores e detalhes e continua navegando sem interromper a musica.
+## Executar o projeto
 
-## Documentacao
+Ainda não há aplicação executável, dependências instaladas ou comandos de build neste repositório. Consulte o estado atual no roadmap. A entrega 02 deverá acrescentar aqui os comandos reais, os pré-requisitos e o exemplo de variáveis de ambiente.
 
-- [Plano do projeto](docs/PROJECT_PLAN.md)
-- [Regras para agentes](AGENTS.md)
-- [Auditoria de reaproveitamento do artesopolis-landing](docs/REUSE_AUDIT_ARTESOPOLIS_LANDING.md)
-- [Pipeline de musicas](docs/MUSIC_PIPELINE.md)
-
-A identidade visual e o logo ainda estao em definicao. Decisoes tecnicas marcadas como **propostas** no plano precisam ser validadas antes de virarem dependencia definitiva.
+Os perfis em `.github/agents/` são instruções versionadas, não agentes já executados nem infraestrutura provisionada. A configuração da ferramenta que os utiliza será verificada na entrega 02.

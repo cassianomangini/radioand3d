@@ -1,125 +1,50 @@
-# AGENTS.md
+# Regras de trabalho
 
-## Objetivo
+## Entrada e fonte de verdade
 
-Este repositorio contem o projeto CM 3D and Radio.
+Leia [README](README.md), [plano](docs/PROJECT_PLAN.md) e [roadmap](docs/ROADMAP.md). Depois leia somente o contrato da área e o checklist da entrega ativa. Não carregar todos os documentos por reflexo.
 
-O produto une catalogo 3D, trabalhos personalizados, cores e materiais, portfolio e uma experiencia de radio/musica persistente.
+O plano define o produto; contratos de domínio definem comportamento; o roadmap guarda o estado macro; o arquivo da entrega guarda os passos e evidências. Ao mudar uma decisão, altere sua fonte e remova orientações incompatíveis. Não copiar regras entre documentos.
 
-## Regra principal
+Documentação em português, código e identificadores técnicos em inglês. Propostas não viram decisões aprovadas apenas porque foram escritas. Não declarar código, teste, deploy, integração ou aprovação visual que não ocorreram.
 
-Nao tratar 3D e Radio como dois produtos desconectados.
+## Perfis e limites
 
-Toda decisao relevante deve considerar a experiencia completa de navegacao, especialmente a persistencia do player.
+| Perfil | Responsabilidade | Referência |
+| --- | --- | --- |
+| [CM Planning](.github/agents/cm-planning.agent.md) | Escopo, dependências, decisões e retomada | Plano + roadmap |
+| [CM Experience](.github/agents/cm-experience.agent.md) | Identidade, composição e movimento | Experiência |
+| [CM Frontend](.github/agents/cm-frontend.agent.md) | Interfaces e integração dos contratos | Arquitetura + experiência |
+| [CM Data](.github/agents/cm-data.agent.md) | Dados, autorização e ingestão | Biblioteca + catálogo |
+| [CM Audio](.github/agents/cm-audio.agent.md) | Motor, fila e análise de áudio | Rádio |
+| [CM Infra](.github/agents/cm-infra.agent.md) | Ambientes, mídia, deploy e recuperação | Arquitetura |
+| [CM Review](.github/agents/cm-review.agent.md) | Defeitos, regressões e evidências | Contratos afetados |
 
-## Antes de alterar
+Um responsável por entrega. Paralelizar somente após definir contratos e arquivos de cada um. Disputas sobre layout global, tipos públicos, schema ou configuração precisam ser resolvidas antes de editar em paralelo.
 
-1. leia `README.md`;
-2. leia `docs/PROJECT_PLAN.md`;
-3. identifique a area principal da mudanca;
-4. confirme dependencias;
-5. evite expandir o escopo sem necessidade.
+Os perfis não criam permissões nem garantem isolamento. As permissões reais pertencem à ferramenta e às contas conectadas. Não fixar um modelo de IA ou instalar serviços sem necessidade.
 
-## Papeis
+## Ciclo de uma entrega
 
-- Planning / Architecture
-- Experience / Motion
-- Frontend
-- Backend / Data
-- Audio / Media
-- Infra
-- Review / QA
+1. Conferir branch, HEAD, diff local, instruções vigentes e dependências. Preservar trabalho alheio.
+2. Assumir uma entrega disponível no roadmap. Usar [o modelo](docs/work/TEMPLATE.md) apenas para a entrega atual; não abrir dezenas de checklists vazios.
+3. Registrar objetivo, limites, responsável, contratos lidos e critérios de aceite antes de implementar.
+4. Marcar passos conforme são realmente verificados. Registrar bloqueio e próximo passo exato antes de encerrar a sessão.
+5. Executar verificações pertinentes e revisar o diff. Mudança visual exige página renderizada; build não prova qualidade visual.
+6. Atualizar contratos alterados e estado no roadmap. Informar commit/PR, evidência e pendências reais ao usuário.
 
-Uma entrega deve ter um responsavel principal.
+Usar branches e PRs para implementação. Organização documental solicitada pode ser um commit atômico, sem reescrever histórico. Nunca usar force push ou sobrescrever arquivos concorrentes. Um PR deve ter um resultado verificável; dividir por dependência funcional quando ficar difícil revisar, não por número arbitrário de linhas.
 
-## Identidade CM
+## Critério de conclusão
 
-- este projeto nao e uma continuacao visual do Artesopolis;
-- nao usar astronauta, logos, favicon ou copy Artesopolis;
-- nao introduzir tema espacial/orbital por reflexo do projeto antigo;
-- codigo reaproveitado deve entrar com naming neutro ou CM;
-- comportamento pode ser migrado, identidade visual deve ser redesenhada;
-- consultar `docs/REUSE_AUDIT_ARTESOPOLIS_LANDING.md` antes de portar codigo do projeto antigo.
+Estados: `ready`, `in_progress`, `blocked`, `done`, `dropped`. `done` exige artefato, evidência pertinente e pendências bloqueantes resolvidas. Desenho novo requer aprovação de Cassiano antes da interface final. Autorrevisão deve ser identificada como tal; não inventar revisão independente.
 
-## Padroes
+Fixtures e protótipos são permitidos para desenvolvimento e testes quando identificados. Não apresentá-los como dados reais nem publicá-los silenciosamente. A prova integrada exige arquivos e produtos autorizados.
 
-- TypeScript estrito;
-- componentes reutilizaveis;
-- responsabilidades separadas;
-- sem duplicar regras de negocio entre frontend e backend;
-- sem conectar UI publica diretamente a dados internos sensiveis;
-- acessibilidade nao e opcional;
-- mobile deve ser tratado como experiencia propria;
-- animacao deve ter funcao, nao ser decoracao aleatoria;
-- respeitar reduced motion;
-- evitar dependencias pesadas sem justificativa;
-- nao introduzir 3D real onde CSS/motion resolve melhor;
-- nao interromper audio em navegacao interna;
-- nao usar mocks permanentes como solucao final.
+## Segurança e escopo
 
-## UI e motion
+Não alterar o Artesopolis Admin nem o landing antigo nesta iniciativa sem pedido específico. Consultas não autorizam migração de dados, publicação de ativos ou exclusão do original.
 
-Toda mudanca visual relevante precisa ser verificada no navegador.
+Antes de incorporar código privado, ativos, segredos ou dados, conferir visibilidade do destino e autorizações. Nenhuma credencial em documentos, commits, logs ou frontend. Provisionamento pago, migração remota e publicação em produção exigem alvo confirmado e autorização.
 
-Validar:
-
-- desktop;
-- mobile;
-- loading;
-- empty;
-- error;
-- hover/focus;
-- reduced motion;
-- performance basica.
-
-## Audio
-
-Mudancas no player precisam verificar:
-
-- play/pause;
-- progresso;
-- volume;
-- troca de faixa;
-- navegacao entre paginas;
-- refresh;
-- mobile;
-- comportamento quando o navegador bloqueia autoplay;
-- sincronizacao entre mini player e full player;
-- abrir/fechar o full player sem reiniciar a faixa;
-- selecao manual de musica;
-- shuffle ligado e desligado;
-- uma unica instancia real de playback para as duas interfaces.
-
-## Dados
-
-Separar:
-
-- produto;
-- material;
-- cor;
-- combinacao permitida;
-- disponibilidade;
-- estoque pronto;
-- item sob producao.
-
-Nunca assumir que uma cor disponivel significa uma peca pronta naquela cor.
-
-## Entregas
-
-Cada PR deve deixar claro:
-
-- o que foi feito;
-- por que;
-- como validar;
-- riscos;
-- pendencias reais.
-
-Evitar PRs gigantes quando a mudanca puder ser separada por fronteira funcional.
-
-## Fonte canonica
-
-- visao e roadmap: `docs/PROJECT_PLAN.md`;
-- regras de agentes: `AGENTS.md`;
-- setup e entrada do repositorio: `README.md`.
-
-Nao repetir o mesmo conteudo em varios arquivos.
+Invariantes do produto estão no plano; regras de áudio, publicação e estoque ficam nos contratos de domínio. Não transformar este arquivo em uma segunda especificação.

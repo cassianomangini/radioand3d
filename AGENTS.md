@@ -32,6 +32,15 @@ Toda decisao relevante deve considerar a experiencia completa de navegacao, espe
 
 Uma entrega deve ter um responsavel principal.
 
+## Identidade CM
+
+- este projeto nao e uma continuacao visual do Artesopolis;
+- nao usar astronauta, logos, favicon ou copy Artesopolis;
+- nao introduzir tema espacial/orbital por reflexo do projeto antigo;
+- codigo reaproveitado deve entrar com naming neutro ou CM;
+- comportamento pode ser migrado, identidade visual deve ser redesenhada;
+- consultar `docs/REUSE_AUDIT_ARTESOPOLIS_LANDING.md` antes de portar codigo do projeto antigo.
+
 ## Padroes
 
 - TypeScript estrito;

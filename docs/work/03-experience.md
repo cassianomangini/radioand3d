@@ -68,13 +68,13 @@ Não adotar automaticamente:
 
 ### 03.3 Rádio
 
-- [ ] Definir mini player **somente mobile**.
-- [ ] Definir full player padrão e expandido.
-- [ ] Definir biblioteca/lista, busca, transporte, progresso, volume e visualizador.
-- [ ] Definir divisor de resize e feedback de cursor/foco.
-- [ ] Definir alternativa ao arraste por botão e teclado.
-- [ ] Definir comportamento do layout ao expandir/recolher sem alterar playback.
-- [ ] Definir estado com 0, 1 e muitas faixas.
+- [x] Definir mini player **somente mobile**.
+- [x] Definir full player padrão e expandido.
+- [x] Definir biblioteca/lista, busca, transporte, progresso, volume e visualizador.
+- [x] Definir divisor de resize e feedback de cursor/foco.
+- [x] Definir alternativa ao arraste por botão e teclado.
+- [x] Definir comportamento do layout ao expandir/recolher sem alterar playback.
+- [x] Definir estado com 0, 1 e muitas faixas.
 
 ### 03.4 Sistema visual
 
@@ -90,16 +90,16 @@ Não adotar automaticamente:
 
 A base visual só precisa congelar componentes usados neste primeiro recorte:
 
-- [ ] Header/Nav.
-- [ ] Button e IconButton.
-- [ ] StudioHero.
-- [ ] MediaFrame/placeholder honesto.
-- [ ] MiniPlayer mobile.
-- [ ] FullPlayer.
-- [ ] TrackRow.
-- [ ] TransportControls.
-- [ ] RadioResizeHandle.
-- [ ] SearchField.
+- [x] Header/Nav.
+- [x] Button e IconButton.
+- [x] StudioHero.
+- [x] MediaFrame/placeholder honesto.
+- [x] MiniPlayer mobile.
+- [x] FullPlayer.
+- [x] TrackRow.
+- [x] TransportControls.
+- [x] RadioResizeHandle.
+- [x] SearchField.
 
 Produto, MaterialSwatch, galerias complexas e outros componentes entram somente quando houver conteúdo real que os exija.
 
@@ -163,6 +163,6 @@ Comparar diretamente com o handoff. Qualquer desvio de composição, densidade, 
 
 `approved_by: null`
 
-`artifact_ref: docs/design/STUDIO_RADIO_HANDOFF_V1.md + docs/design/CM_VISUAL_SYSTEM_V1.md`
+`artifact_ref: docs/design/STUDIO_RADIO_HANDOFF_V1.md + docs/design/CM_VISUAL_SYSTEM_V1.md + docs/design/CM_COMPONENT_STATES_V1.md`
 
-Estrutura e sistema visual V1 estão especificados. Falta produzir os mocks finais 1440 padrão, 1440 expandido e 390 mobile, receber ajustes de Cassiano e registrar aprovação.
+Estrutura, sistema visual, Rádio e componentes mínimos V1 estão especificados. A copy pública final continua pendente de passe editorial. Para liberar frontend ainda faltam o artefato visual final aprovado por Cassiano e o registro `ready_for_frontend: yes`.

@@ -1,16 +1,21 @@
 # Contrato da CM Radio
 
-## Uma reprodução, duas interfaces
+## Uma reprodução, superfícies responsivas
 
-Mini player e player grande compartilham um motor e uma fila por instância da aplicação no navegador. Abrir, recolher ou navegar internamente preserva versão da faixa, posição, volume e modos. Nenhuma interface cria outro elemento de áudio.
+Existe um único motor e uma única fila por instância da aplicação no navegador.
+
+- **Desktop:** a interface visível é a Rádio completa/acoplada. Não existe mini player adicional no rodapé.
+- **Mobile:** existe mini player persistente logo abaixo do header; a Rádio completa abre sob demanda.
+
+Trocar entre estados de largura da Rádio, abrir a Rádio completa no mobile ou navegar internamente preserva versão da faixa, posição, volume e modos. Nenhuma interface cria outro elemento de áudio.
 
 Isso cobre navegação interna, não continuidade sonora durante refresh, fechamento do navegador ou entre dispositivos. Recuperação de preferências após recarga é uma melhoria separada; não prometer autoplay. Controles de sistema e reprodução em segundo plano dependem de suporte e testes reais.
 
 ## Interfaces da primeira versão
 
-Mini player: faixa/capa ou fallback CM, play/pause, anterior/próxima, indicação de progresso e shuffle, ação de expandir. Volume e outros controles podem ficar no expandido quando faltar espaço no mobile.
+Mini player **mobile**: faixa/capa ou fallback CM, play/pause, anterior/próxima, indicação de progresso e ação de abrir a Rádio completa. Volume, biblioteca e controles adicionais ficam na Rádio completa quando faltar espaço.
 
-Player grande: biblioteca publicada, busca simples por título, seleção direta, playlist/fila atual, posição/duração, seek, volume quando suportado, shuffle e repetição. Tocar uma faixa atualiza imediatamente a seleção nas duas interfaces; o estado tocando só aparece após confirmação do motor.
+Rádio completa: no desktop fica acoplada à composição e pode ser redimensionada/expandida; no mobile abre sob demanda. Contém biblioteca publicada, busca simples por título, seleção direta, playlist/fila atual, posição/duração, seek, volume quando suportado, shuffle e repetição. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
 
 Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, painel de histórico, favoritos e equalização sonora avançada são evoluções. O histórico mínimo para o botão anterior faz parte do motor inicial.
 
@@ -57,6 +62,6 @@ Pausar loops quando não houver visualização ativa, aba visível ou movimento 
 
 ## Aceite da rádio
 
-Testar zero, uma e várias faixas; seleção com shuffle ligado/desligado; término em cada modo; histórico; seek; pausa; erro real; bloqueio do navegador; cliques rápidos; capa/título ausentes; volume conforme suporte. Abrir/recolher e navegar entre duas rotas repetidamente sem recriar áudio, duplicar som ou perder posição.
+Testar zero, uma e várias faixas; seleção com shuffle ligado/desligado; término em cada modo; histórico; seek; pausa; erro real; bloqueio do navegador; cliques rápidos; capa/título ausentes; volume conforme suporte. Redimensionar/expandir a Rádio no desktop, abrir/fechar a Rádio completa no mobile e navegar entre duas rotas repetidamente sem recriar áudio, duplicar som ou perder posição.
 
 Validar com mídia real, storage e CORS do ambiente, não apenas mocks. Automação testa estados; escuta e navegador real verificam som e continuidade. Registrar resultados separados para desktop e mobile. Fallback visual não pode interromper a música.

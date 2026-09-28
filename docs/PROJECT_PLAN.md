@@ -93,8 +93,12 @@ Direcao:
 - visual retrofuturista;
 - controles modernos;
 - desktop e mobile pensados separadamente;
-- player persistente;
+- player pequeno persistente em todo o site;
+- player grande dedicado para explorar a radio;
+- biblioteca navegavel para escolher uma musica especifica;
 - playlist;
+- shuffle opcional, nao obrigatorio;
+- estado unico compartilhado entre player pequeno e grande;
 - progresso;
 - volume;
 - shuffle;
@@ -112,7 +116,8 @@ Possiveis evolucoes:
 - transicoes;
 - historico;
 - playlists tematicas;
-- modo tela cheia.
+- modo tela cheia;
+- busca/filtros da biblioteca quando o volume de musicas justificar.
 
 ## 4. Direcao visual
 
@@ -392,7 +397,10 @@ Construir uma vertical slice completa:
 - algumas cores;
 - fotos reais;
 - 3 a 5 musicas;
-- player persistente;
+- player pequeno persistente;
+- player grande capaz de listar e selecionar musicas;
+- selecao manual de faixa alem do shuffle;
+- sincronizacao entre player pequeno e grande;
 - navegacao sem interromper o audio;
 - desktop;
 - mobile;
@@ -445,7 +453,10 @@ Aceite:
 - a peca possui fotos, medidas e cores validas;
 - existe uma radio funcional com musicas reais do projeto;
 - o audio continua tocando durante a navegacao;
-- o player funciona em desktop e mobile;
+- o player pequeno funciona em desktop e mobile;
+- o player grande permite escolher uma faixa especifica;
+- abrir/fechar o player grande nao reinicia a musica;
+- shuffle pode ser ligado ou desligado sem impedir selecao manual;
 - existe pelo menos uma animacao de assinatura;
 - a pagina nao parece template generico;
 - nenhuma area critica depende de mock visual enganoso.

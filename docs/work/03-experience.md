@@ -50,21 +50,21 @@ Não adotar automaticamente:
 
 ### 03.1 Estrutura e hierarquia
 
-- [ ] Definir grid desktop canônico e gutter.
-- [ ] Definir largura inicial da Rádio e limites mínimo/máximo.
-- [ ] Definir presets de Rádio compacta, padrão e expandida.
-- [ ] Definir ordem mobile: header, mini player, hero do Estúdio e conteúdo.
-- [ ] Definir como o full player abre no mobile.
-- [ ] Definir leitura e ação prioritárias no primeiro viewport.
+- [x] Definir grid desktop canônico e gutter.
+- [x] Definir largura inicial da Rádio e limites mínimo/máximo.
+- [x] Definir presets de Rádio padrão, expandida e personalizada.
+- [x] Definir ordem mobile: header, mini player, hero do Estúdio e conteúdo.
+- [x] Definir como o full player abre no mobile.
+- [x] Definir leitura e ação prioritárias no primeiro viewport.
 
 ### 03.2 Conteúdo inicial do 3D
 
-- [ ] Hero identifica explicitamente **Estúdio de Impressão 3D**.
+- [x] Hero identifica explicitamente **Estúdio de Impressão 3D**.
 - [ ] Definir copy mínima provisória para composição, sem transformá-la em copy final.
-- [ ] Definir uma área de mídia principal preparada para foto real.
-- [ ] Definir no máximo os blocos realmente necessários para o lançamento inicial.
-- [ ] Definir como produtos, materiais, fotos e trabalhos entram depois sem mudar a grade principal.
-- [ ] Registrar estados para "ainda não há conteúdo publicado" sem fingir catálogo.
+- [x] Definir uma área de mídia principal preparada para foto real.
+- [x] Definir no máximo os blocos realmente necessários para o lançamento inicial.
+- [x] Definir como produtos, materiais, fotos e trabalhos entram depois sem mudar a grade principal.
+- [x] Registrar estados para "ainda não há conteúdo publicado" sem fingir catálogo.
 
 ### 03.3 Rádio
 
@@ -163,6 +163,6 @@ Comparar diretamente com o handoff. Qualquer desvio de composição, densidade, 
 
 `approved_by: null`
 
-`artifact_ref: null`
+`artifact_ref: docs/design/STUDIO_RADIO_HANDOFF_V1.md`
 
-Direção de composição aceita; especificação final e valores visuais ainda precisam ser fechados e aprovados.
+Estrutura desktop/mobile e crescimento progressivo do 3D estão especificados no handoff V1. Tipografia, paleta, acabamento dos componentes e mock final ainda precisam ser fechados e aprovados.

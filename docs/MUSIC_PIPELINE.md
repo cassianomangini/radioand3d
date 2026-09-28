@@ -131,6 +131,49 @@ After the web Music Inbox works, an optional local helper can reduce the workflo
 
 The deployed web application cannot watch a local PC folder by itself, so this should be a separate optional helper, not hidden inside the website architecture.
 
+## Player surfaces
+
+The radio has two synchronized presentation modes over the same playback engine.
+
+### Mini player
+
+Persistent across the site.
+
+Purpose:
+
+- show the current track;
+- play/pause;
+- previous/next;
+- expose shuffle state;
+- show essential progress/status;
+- provide a clear action to open the full player.
+
+The mini player must never own a second audio element or a separate queue.
+
+### Full player
+
+Dedicated radio experience.
+
+It must allow the listener to:
+
+- browse the published music library;
+- choose an exact song manually;
+- play from a playlist;
+- turn shuffle on or off;
+- see the current queue/history when useful;
+- control progress and volume;
+- use repeat modes;
+- view cover/metadata;
+- access the richer visualizer experience.
+
+Manual song selection and shuffle are complementary. Shuffle is a playback mode, not the only navigation model.
+
+Opening the full player must not restart the current track. Closing it must return to the mini player with the same track, position, queue and playback state.
+
+Selecting a song in the full player must immediately become the current track shown by the mini player.
+
+The public library should normally expose the published primary version of each song. Alternate versions/remixes can be published as distinct selectable entries when intentionally exposed, but raw generation versions should not leak into the listener UI by default.
+
 ## Audio analysis and visualizer
 
 Playback and visualization must be separate.
@@ -196,4 +239,9 @@ The pipeline is acceptable when:
 - publishing makes it available to the radio without a Git commit;
 - unpublishing removes it from the public radio without deleting the audio;
 - the player receives stable IDs and metadata from the library;
-- no filename regex is required for normal playback.
+- no filename regex is required for normal playback;
+- the mini player and full player share one playback state;
+- opening the full player does not restart the song;
+- a listener can choose a specific published song;
+- shuffle can be enabled or disabled independently from manual song selection;
+- selecting a song in the full player updates the mini player immediately.

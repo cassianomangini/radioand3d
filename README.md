@@ -17,5 +17,6 @@ Projeto em fundacao. Antes de crescer em paginas e features, a primeira entrega 
 
 - [Plano do projeto](docs/PROJECT_PLAN.md)
 - [Regras para agentes](AGENTS.md)
+- [Auditoria de reaproveitamento do artesopolis-landing](docs/REUSE_AUDIT_ARTESOPOLIS_LANDING.md)
 
 A identidade visual e o logo ainda estao em definicao. Decisoes tecnicas marcadas como **propostas** no plano precisam ser validadas antes de virarem dependencia definitiva.

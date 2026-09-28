@@ -8,15 +8,15 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, está em andamento na definição de estratégia, tokens e componentes. Próximo passo: proposta visual para Cassiano; [checklist](work/03-experience.md). **01, decisões de base**, permanece disponível em paralelo. Limite de três entregas simultâneas; atualizar responsável e arquivo de trabalho ao assumir uma.
+**02, fundação executável**, começa em branch própria com scaffold local, tokens semânticos provisórios e CI. **03, direção visual CM**, continua em paralelo sem autorizar UI final; [checklist](work/03-experience.md). **01** permanece em andamento apenas para serviços, dados piloto e acessos externos. Limite de três entregas simultâneas.
 
 ## Sequência única
 
 | ID | Entrega | Responsável principal | Dependências | Estado | Saída verificável |
 | --- | --- | --- | --- | --- | --- |
 | 00 | Revisar e organizar documentação | CM Planning | Nenhuma | done | Contratos separados, perfis, links e inconsistências revisados; commit da reorganização |
-| 01 | Fechar base técnica e material piloto | CM Planning | 00 | ready | Decisões registradas e bloqueios externos resolvidos ou delimitados; [checklist](work/01-base.md) |
-| 02 | Criar aplicação e verificações mínimas | CM Infra | 01 | blocked | Setup local reproduzível, lockfile, lint, tipos, testes, build e CI; README com comandos reais |
+| 01 | Fechar base técnica e material piloto | CM Planning | 00 | in_progress | Stack local delimitada; serviços, privacidade efetiva e material piloto continuam pendentes; [checklist](work/01-base.md) |
+| 02 | Criar aplicação e verificações mínimas | CM Infra | 01: stack local | in_progress | App Router, lockfile, lint, tipos, build e CI em PR; integrações externas ficam fora deste recorte; [checklist](work/02-bootstrap.md) |
 | 03 | Aprovar direção visual CM | CM Experience | Requisitos do produto | in_progress | Composição desktop/mobile, mapa de tokens, componentes/estados e motion aprovados por Cassiano; [checklist](work/03-experience.md) |
 | 03b | Construir base visual compartilhada | CM Frontend | 02 + 03 | blocked | Tokens, componentes do piloto e vitrine local/preview implementados; revisão renderizada em contexto |
 | 04 | Biblioteca e ingestão seguras | CM Data | 02 + decisões de dados/serviços da 01 | blocked | Modelo, autorização, importação e publicação testados por serviço/API, incluindo falhas e rascunhos |

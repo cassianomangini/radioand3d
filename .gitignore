@@ -1,0 +1,29 @@
+# dependencies
+/node_modules
+
+# next
+/.next/
+/out/
+
+# production
+/build
+
+# environment
+.env*
+!.env.example
+
+# platform
+.vercel
+.wrangler/
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local/editor
+.DS_Store
+*.pem
+*.tsbuildinfo
+next-env.d.ts

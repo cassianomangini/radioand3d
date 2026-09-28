@@ -83,7 +83,12 @@ Mudancas no player precisam verificar:
 - navegacao entre paginas;
 - refresh;
 - mobile;
-- comportamento quando o navegador bloqueia autoplay.
+- comportamento quando o navegador bloqueia autoplay;
+- sincronizacao entre mini player e full player;
+- abrir/fechar o full player sem reiniciar a faixa;
+- selecao manual de musica;
+- shuffle ligado e desligado;
+- uma unica instancia real de playback para as duas interfaces.
 
 ## Dados
 

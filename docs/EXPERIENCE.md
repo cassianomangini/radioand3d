@@ -2,32 +2,89 @@
 
 ## Direção confirmada
 
-CM como identidade principal. Sem astronauta, lettering Artesopolis ou tema espacial herdado. O logo deve manter o monograma livre de cubos, bicos de impressão ou outros símbolos inseridos dentro do CM. As versões pesadas, cromadas e com excesso de adereços foram rejeitadas. O arquivo final ainda requer escolha explícita.
+CM como identidade principal. Sem astronauta, lettering Artesopolis ou tema espacial herdado. O monograma fica livre de cubos, bicos de impressão ou outros símbolos internos. As versões pesadas, cromadas e cheias de adereços foram rejeitadas. O logo final ainda requer escolha explícita.
 
-Base tecnológica, leve e legível. Azul, ciano e roxo são uma direção de acento em avaliação, não uma paleta final já aprovada. A nostalgia de Winamp pertence aos controles, display, playlist e resposta da rádio; o catálogo deve destacar objetos, texturas e cores reais.
+Cassiano pediu um resultado bonito, chique, fácil e vivo, com muitas animações. Isso vale para composição e uso real. Tokens e componentes preservam uma direção visual aprovada; não substituem essa direção.
 
-## Composição a desenhar na entrega 03
+## Hipótese visual para apresentar
 
-Home com entrada clara para peças e música. Página de produto com fotos grandes, dimensões legíveis, opções válidas e próximo passo explícito. Mostruário que distingue cor de acabamento. Player compacto discreto, fácil de expandir; player grande com lista navegável e identidade de equipamento musical. Inbox privado priorizando rapidez para importar e revisar em lote.
+Estúdio de objetos e música: acabamento preciso, peças bem fotografadas, tipografia com presença e rádio com personalidade de equipamento musical. Explorar grafite fosco, texto claro, azul/ciano e roxo pontual. Fundos neutros mais claros nas fotografias podem valorizar materiais. Paleta, fontes e proporção entre superfícies claras/escuras ainda serão aprovadas; dark mode para tudo não é uma obrigação.
 
-Definir desktop e mobile separadamente, incluindo área segura do player fixo, navegação, foco e posição dos controles. O player não pode cobrir botões, conteúdo ou teclado. O formato final da rádio expandida, página ou painel sobre a página, depende da proposta aprovada; o contrato de reprodução permanece o mesmo.
+A nostalgia de Winamp aparece no display, sequência de faixas, controles e visualizador, com leitura e toque confortáveis. Concentrar riqueza visual na rádio e nas peças; navegação, textos e formulários ficam claros. A assinatura CM nasce da combinação de tipografia, recortes, acabamento, fotografia e resposta dos controles, não de gradientes aplicados a tudo.
+
+## Composição e facilidade
+
+| Superfície | Prioridade de leitura e ação |
+| --- | --- |
+| Home | Entender o que Cassiano cria, ver uma peça e encontrar catálogo e rádio |
+| Produto | Foto e uso, dimensões, opções válidas, disponibilidade e próximo passo |
+| Mostruário | Comparar cor e acabamento com nome e exemplo impresso |
+| Mini player | Faixa, comandos reconhecíveis e expansão, sem cobrir conteúdo |
+| Player grande | Música atual, busca, biblioteca e fila fáceis de encontrar |
+| Music Inbox | Importar lote, identificar pendências, revisar e publicar |
+
+Uma grade comum com diferentes composições: galeria para objetos, linhas para músicas, amostras para materiais e formulário para gestão. Componentização não obriga a encaixar tudo em cartões nem a repetir seções alternando esquerda/direita.
+
+Navegação e ações ficam legíveis antes do hover. Explorar o site não exige dar play. Botões usam verbos claros; filtros, seleções e causas de indisponibilidade ficam visíveis. Ações ambíguas recebem rótulo, além de nome acessível.
+
+Definir desktop e mobile separadamente: ordem, densidade, área segura, foco e teclado aberto. O player não cobre controles. Recolher o compacto na rádio expandida quando houver duplicação visual, mantendo o motor. Página versus painel ainda depende da proposta aprovada.
+
+## Escalas iniciais para avaliação
+
+Pontos de partida, não valores finais aprovados:
+
+- Texto principal em torno de 16 a 18 px; interface de 14 a 16 px, implementados com unidades relativas. Informação decisiva não vira microtexto.
+- Uma família principal por leitura/personalidade; complementar somente se ajudar display e tempo. Testar acentos, numerais e títulos longos; verificar licença antes de adotar.
+- Texto entre 55 e 70 caracteres por linha; grade ampla de referência até 1280 px. Imagens e listas não ficam artificialmente limitadas à largura do texto.
+- Espaçamento baseado em 4/8, com gutters e intervalos por função. Alturas nascem do conteúdo, não de um viewport obrigatório por seção.
+- Poucos níveis de raio, borda e elevação. Pílulas para controles/etiquetas adequados, não para toda superfície.
+
+Os valores finais, escalas fluidas e exceções aparecem no artefato. A implementação centralizada segue [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Tokens: vocabulário obrigatório
+
+Separar valores-base, papéis semânticos e poucas variáveis específicas de componente. Exemplo: azul da paleta alimenta ação primária; botão consome ação primária, não escolhe outro azul localmente.
+
+| Família | Papéis a definir e visualizar |
+| --- | --- |
+| Superfícies | Página, painel, elevação, mídia e sobreposição |
+| Texto | Principal, secundário legível, texto sobre acento, link e indisponível |
+| Ação/estado | Primária, hover, pressionado, selecionado, foco, sucesso, aviso, erro e loading |
+| Tipografia | Família, peso, tamanho, entrelinha, medida de leitura e numerais |
+| Layout | Espaçamento, gutters, larguras, controles e limites responsivos |
+| Forma/camada | Raios, bordas, sombras e ordem de navegação/player/menu/diálogo |
+| Movimento | Duração, curva, distância, expansão e alternativa reduzida |
+
+Mostrar pares reais de fundo/texto e estados, não só bolinhas de paleta. Seleção combina forma/texto e cor. Filamentos e capas são conteúdo: suas cores não são alteradas para caber na paleta da interface.
 
 ## Movimento como linguagem
 
-O movimento faz parte da primeira entrega, não de um polimento remoto. Projetar três escalas: resposta imediata dos controles; transições de player, listas e seleção de cores; um momento de assinatura que relacione objeto e música sem disputar atenção com tudo ao mesmo tempo.
+Movimento entra na primeira entrega. Projetar resposta de controles, transições de player/listas/seleções e um momento de assinatura. Uma cena expressiva pode coexistir com áreas quietas; vários detalhes responsivos não exigem atrações competindo simultaneamente.
 
-Para cada animação, definir gatilho, finalidade, duração, interrupção, estado parado e alternativa com movimento reduzido. Dar feedback também por texto/forma/foco, não somente por cor ou animação. Não bloquear a leitura até uma sequência terminar.
+Referência para testar: 120 a 180 ms para resposta curta, 200 a 320 ms para transições e 400 a 650 ms para assinatura. São propostas, não limites da análise contínua de áudio. A ação e o texto respondem sem esperar a animação acabar.
 
-Suspender efeitos invisíveis ou ociosos. Adaptar qualidade de canvas/3D ao dispositivo e manter fallback com imagem. Desligar efeitos visuais não pode parar a música. Os gráficos de áudio devem corresponder à análise real, conforme [RADIO.md](RADIO.md).
+Cada efeito tem gatilho, finalidade, duração, interrupção, estado parado e alternativa reduzida. Preservar scroll nativo, foco e orientação. Evitar cursor personalizado, rolagem sequestrada, animação obrigatória de cada linha e conteúdo escondido até uma sequência terminar.
 
-## Artefato de aprovação
+CSS para feedback simples; Motion para coordenação; 3D apenas na interação aprovada. Preferir transform/opacity quando adequados e medir o resultado. Suspender efeitos invisíveis/ociosos, adaptar canvas/3D e manter fallback com imagem. Reduzir efeitos não para a música.
 
-Registrar composição, tipografia, tokens, amostras reais disponíveis, controles, loading/empty/error, teclado e comportamento responsivo. O artefato precisa mostrar home, produto, mini/full player e Inbox; pode ser um protótipo ou documento visual, não obrigatoriamente uma imagem gerada.
+Respeitar preferência do sistema e dar controle sobre efeitos contínuos. A política alcança CSS, canvas e 3D, não somente Motion. Referência: [acessibilidade no Motion](https://motion.dev/docs/react-accessibility). Gráficos de áudio seguem [RADIO.md](RADIO.md).
 
-Antes da interface final, registrar `artifact_ref`, `approved_by: Cassiano` e a aprovação efetivamente recebida. Não preencher aprovação automaticamente. Provas técnicas neutras são permitidas antes disso, identificadas e fora de produção.
+## Artefato de aprovação da entrega 03
 
-## Verificação visual
+Apresentar uma direção em contexto: tipografia, superfícies, ações, amostra de material, linha de música e mini player. Aplicar a mesma linguagem a home, produto, player grande e fluxo curto do Inbox em desktop/mobile. Especificar interação, além de imagens estáticas.
 
-Renderizar desktop e mobile, testar toque/teclado, título longo, capa ausente, lista vazia, carregamento e erro. Verificar contraste, foco, zoom, legibilidade e movimento reduzido. Comparar a página ao artefato aprovado e registrar evidência. Revisar desempenho com áudio e efeitos ativos simultaneamente; não chamar uma captura estática de teste de animação.
+Handoff: grade, hierarquia, proporções, conteúdo disponível, fotos/capas, componentes mínimos, estados, mapa de tokens, motion, fallback, foco e comportamento responsivo. Registrar o que o frontend não pode inventar; vários agentes não podem decidir fontes, cores ou ornamentos independentemente.
 
-Rejeição visual reabre primeiro a composição ou fidelidade responsável. Não responder a uma rejeição empilhando brilhos, ícones ou mais animações sobre o problema.
+Registrar `ready_for_frontend: yes|no`, `artifact_ref`, `approved_by` e referência da aprovação recebida. Até Cassiano aprovar, manter `ready_for_frontend: no`. Provas técnicas neutras ficam fora de produção. Construir a base visual aprovada antes de multiplicar páginas.
+
+## Verificação e rejeição
+
+Revisar render em 360/390 px, faixa intermediária e 1440 px; zoom de texto de 200%; toque, teclado, foco, títulos longos, capa ausente, zero/muitas faixas e loading/empty/error. Contraste precisa funcionar no estado normal, não apenas no hover.
+
+Meta: WCAG 2.2 AA, incluindo contraste de 4,5:1 para texto comum e 3:1 para texto grande conforme o critério. Meta própria para controles frequentes de toque: área acionável de 44 x 44 CSS px mesmo com ícone menor; essa meta não deve ser confundida com o mínimo AA de tamanho e suas exceções. Referências: [contraste](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) e [alvos de toque](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
+
+Reprovar texto apagado, cartões aninhados sem função, grade de cartões para tudo, espaços enormes sem valor, controles dependentes de hover, inconsistência de cores/raios, títulos brigando com imagens, brilho/cromado excessivo, fontes difíceis e ornamentos genéricos ocupando o lugar de peças e músicas. Cartões, gradientes e profundidade são permitidos quando coerentes com a composição.
+
+Fotos precisam de enquadramento, resolução e luz adequados. Placeholder não comprova qualidade da mídia final. Testar desempenho com áudio, navegação e efeitos simultâneos; captura estática não valida animação. Revisar a base de componentes também em páginas reais.
+
+Comparar com o artefato aprovado. Aprovação final exige Cassiano ou revisão independente identificada, não declaração automática do autor. Rejeição reabre composição ou fidelidade, em vez de empilhar efeitos sobre o problema.

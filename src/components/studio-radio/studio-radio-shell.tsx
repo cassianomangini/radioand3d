@@ -213,7 +213,7 @@ export function StudioRadioShell() {
   const [visualPlaying, setVisualPlaying] = useState(false);
 
   const shellStyle = useMemo(
-    () => ({ "--radio-width": `${radioWidth}px` }) as React.CSSProperties,
+    () => ({ "--radio-width": `${radioWidth}px` }) as CSSProperties,
     [radioWidth]
   );
 

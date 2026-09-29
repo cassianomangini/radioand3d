@@ -122,7 +122,7 @@ Aplicar a mesma linguagem ao Inbox somente no nível necessário para manter coe
 
 Handoff: grade, hierarquia, proporções, conteúdo disponível, fotos/capas, componentes mínimos, estados, mapa de tokens, motion, fallback, foco e comportamento responsivo. Registrar o que o frontend não pode inventar; vários agentes não podem decidir fontes, cores ou ornamentos independentemente.
 
-Registrar `ready_for_frontend: yes|no`, `artifact_ref`, `approved_by` e referência da aprovação recebida. Até Cassiano aprovar, manter `ready_for_frontend: no`. Provas técnicas neutras ficam fora de produção. Construir a base visual aprovada antes de multiplicar páginas.
+Registrar `ready_for_frontend: yes|no`, `artifact_ref`, `approved_by` e referência da aprovação recebida. O pacote consolidado de decisão está em [STUDIO_RADIO_APPROVAL_PACKAGE_V1.md](design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md). Até Cassiano aprovar, manter `ready_for_frontend: no`. Provas técnicas neutras ficam fora de produção. Construir a base visual aprovada antes de multiplicar páginas.
 
 ## Verificação e rejeição
 

@@ -21,12 +21,12 @@ Artefato aprovado: `docs/design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md`.
 - [x] Usar somente a faixa real de referência `Limite Elástico`, identificada como prévia.
 - [x] Usar placeholder editorial para mídia 3D ainda não publicada.
 - [x] Não criar produtos, materiais ou categorias fictícios.
-- [ ] CI: lint.
-- [ ] CI: typecheck.
-- [ ] CI: build.
-- [ ] Render real em 1440 px.
+- [x] CI: lint.
+- [x] CI: typecheck.
+- [x] CI: build.
+- [x] Render real em 1440 px.
 - [ ] Render real com Rádio expandida.
-- [ ] Render real em ~390 px.
+- [x] Render real em ~390 px.
 - [ ] Revisão visual independente/Cassiano.
 
 ## Limite desta entrega
@@ -41,4 +41,4 @@ Não considerar esta entrega concluída apenas por CI verde. O merge visual exig
 
 `experience_review_status: incomplete`
 
-`reviewed_by: null`
+`reviewed_by: implementação + captura automatizada; aguardando Cassiano/independente`

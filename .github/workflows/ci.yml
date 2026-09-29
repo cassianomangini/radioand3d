@@ -72,6 +72,8 @@ jobs:
 
           "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --window-size=1440,1000             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-1440.png"             http://127.0.0.1:3000/
 
+          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --window-size=1760,824             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-short-1760x824.png"             http://127.0.0.1:3000/
+
           "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --window-size=390,844             --screenshot="$GITHUB_WORKSPACE/visual-review/mobile-390.png"             http://127.0.0.1:3000/
 
       - name: Upload visual review

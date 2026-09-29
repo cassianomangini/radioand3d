@@ -344,6 +344,8 @@ export function StudioRadioShell() {
           <a href="#studio-about">Sobre</a>
         </nav>
 
+        <span className={styles.headerBalance} aria-hidden="true" />
+
         <button
           type="button"
           className={styles.menuButton}

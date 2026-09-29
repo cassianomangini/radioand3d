@@ -102,10 +102,10 @@ Frontend visual final só pode começar depois de uma manifestação explícita 
 
 Enquanto isso:
 
-`ready_for_frontend: no`
+`ready_for_frontend: yes`
 
-`approved_by: null`
+`approved_by: Cassiano`
 
 `artifact_ref: docs/design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md`
 
-Quando aprovado, atualizar os três campos no mesmo PR ou em um PR curto de gate antes de iniciar a implementação.
+Aprovado por Cassiano na conversa em 29/09/2026 para seguir à implementação visual do primeiro recorte.

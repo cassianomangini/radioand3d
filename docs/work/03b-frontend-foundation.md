@@ -42,3 +42,24 @@ Não considerar esta entrega concluída apenas por CI verde. O merge visual exig
 `experience_review_status: incomplete`
 
 `reviewed_by: implementação + captura automatizada; aguardando Cassiano/independente`
+
+
+## Revisão humana de 29/09/2026
+
+Cassiano revisou o front real em desktop e encontrou dois defeitos de fidelidade/implementação:
+
+- a CM Rádio lateral não cabia inteira na altura útil e exigia scroll do painel;
+- a navegação desktop ficou deslocada para a extrema direita, deixando a navbar visualmente desequilibrada.
+
+Correção aberta em `fix/desktop-radio-fit-navbar`:
+
+- [x] centralizar a navegação desktop dentro da navbar;
+- [x] remover scroll do painel lateral da Rádio;
+- [x] adaptar capa, gaps, controles e visualizador à altura útil do viewport;
+- [x] manter eventual overflow futuro restrito à lista de faixas, não ao player inteiro;
+- [ ] validar captura desktop em altura curta próxima ao caso reportado;
+- [ ] receber nova revisão de Cassiano.
+
+`experience_review_status: changes_required`
+
+`reviewed_by: Cassiano`

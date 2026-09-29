@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import {
   useEffect,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent
 } from "react";
@@ -22,6 +24,29 @@ const previewTrack = {
   artist: "CM",
   duration: "3:52"
 } as const;
+
+const visualizerHeights = [27, 52, 36, 75, 43, 68, 88, 60, 33, 79, 54, 41, 71, 93, 51, 30, 58, 82, 47, 64, 37, 73, 55, 89, 44, 67, 34, 78, 52, 40, 69, 86, 48, 62, 31, 72];
+
+type IconName = "expand" | "close" | "heart" | "more" | "shuffle" | "previous" | "play" | "pause" | "next" | "repeat" | "search" | "bars";
+
+function Icon({ name }: { name: IconName }) {
+  const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
+  const paths: Record<IconName, ReactNode> = {
+    expand: <><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" /><path d="m4 4 5 5m11-5-5 5M4 20l5-5m11 5-5-5" /></>,
+    close: <><path d="M5 5l14 14M19 5 5 19" /></>,
+    heart: <path d="M20.8 8.6c0 4.2-8.8 10-8.8 10s-8.8-5.8-8.8-10a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z" />,
+    more: <><circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" /></>,
+    shuffle: <><path d="M4 7h3c4 0 6 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.7 0 3-1.7 4.3-3.7M16 7h4m-3-3 3 3-3 3" /></>,
+    previous: <><path d="M5 5v14M19 5 7 12l12 7V5Z" fill="currentColor" stroke="none" /></>,
+    play: <path d="m8 5 11 7-11 7V5Z" fill="currentColor" stroke="none" />,
+    pause: <><rect x="7" y="5" width="3.5" height="14" rx=".6" fill="currentColor" stroke="none" /><rect x="13.5" y="5" width="3.5" height="14" rx=".6" fill="currentColor" stroke="none" /></>,
+    next: <><path d="M19 5v14M5 5l12 7-12 7V5Z" fill="currentColor" stroke="none" /></>,
+    repeat: <><path d="M18 7H7a3 3 0 0 0-3 3v2m0-5 3-3M4 7 1 4m5 13h11a3 3 0 0 0 3-3v-2m0 5-3 3m3-3 3 3" /></>,
+    search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></>,
+    bars: <><path d="M4 19v-5m4 5V9m4 10V5m4 14V8m4 11v-7" /></>
+  };
+  return <svg {...common}>{paths[name]}</svg>;
+}
 
 function clampRadioWidth(shellWidth: number, requested: number) {
   const availableMaximum = Math.max(
@@ -65,10 +90,7 @@ function RadioContent({
   return (
     <div className={styles.radioContent}>
       <div className={styles.radioHeader}>
-        <div>
-          <span className={styles.radioKicker}>PRÉVIA VISUAL</span>
-          <h2>CM RÁDIO</h2>
-        </div>
+        <h2><span>CM</span> RÁDIO</h2>
 
         {mobile ? (
           <button
@@ -77,7 +99,7 @@ function RadioContent({
             onClick={onClose}
             aria-label="Fechar rádio"
           >
-            Fechar
+            <Icon name="close" />
           </button>
         ) : (
           <button
@@ -85,24 +107,27 @@ function RadioContent({
             className={styles.iconButton}
             onClick={onExpand}
             aria-label={expanded ? "Recolher rádio" : "Expandir rádio"}
+            title={expanded ? "Recolher rádio" : "Expandir rádio"}
           >
-            {expanded ? "Recolher" : "Expandir"}
+            <Icon name="expand" />
           </button>
         )}
       </div>
 
-      <div className={styles.coverFallback} aria-label="Capa provisória CM">
-        <span>CM</span>
-        <small>CAPA ENTRA COM O ACERVO</small>
+      <div className={styles.coverArt}>
+        <Image src="/images/cm-radio-preview-art.png" alt="Arte ilustrativa da prévia da CM Rádio" fill sizes="(min-width: 1180px) 390px, 100vw" priority />
+        <div className={styles.coverSignature} aria-hidden="true"><strong>CM<span>3D</span></strong><small>RÁDIO</small></div>
       </div>
 
       <div className={styles.nowPlaying}>
-        <div>
-          <span className={styles.nowLabel}>FAIXA DE REFERÊNCIA</span>
+        <span className={styles.trackThumb}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="48px" /></span>
+        <div className={styles.nowMeta}>
           <strong>{previewTrack.title}</strong>
           <span>{previewTrack.artist}</span>
         </div>
-        <span className={styles.duration}>{previewTrack.duration}</span>
+        <span className={styles.previewBadge}>PRÉVIA</span>
+        <button type="button" className={styles.smallIcon} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos indisponíveis nesta prévia"><Icon name="heart" /></button>
+        <button type="button" className={styles.smallIcon} disabled aria-label="Mais opções indisponíveis nesta prévia" title="Mais opções indisponíveis nesta prévia"><Icon name="more" /></button>
       </div>
 
       <div className={styles.progressBlock}>
@@ -117,15 +142,14 @@ function RadioContent({
           <span className={styles.progressFill} />
         </div>
         <div className={styles.progressTimes}>
-          <span>1:22</span>
+          <span>1:24</span>
           <span>{previewTrack.duration}</span>
         </div>
       </div>
 
       <div className={styles.transport} aria-label="Controles de prévia da rádio">
-        <button type="button" disabled aria-label="Faixa anterior indisponível">
-          Anterior
-        </button>
+        <button type="button" disabled aria-label="Shuffle indisponível nesta prévia"><Icon name="shuffle" /></button>
+        <button type="button" disabled aria-label="Faixa anterior indisponível"><Icon name="previous" /></button>
         <button
           type="button"
           className={styles.playButton}
@@ -137,43 +161,30 @@ function RadioContent({
               : "Ativar estado visual de reprodução"
           }
         >
-          {visualPlaying ? "Pausar" : "Tocar"}
+          <Icon name={visualPlaying ? "pause" : "play"} />
         </button>
-        <button type="button" disabled aria-label="Próxima faixa indisponível">
-          Próxima
-        </button>
+        <button type="button" disabled aria-label="Próxima faixa indisponível"><Icon name="next" /></button>
+        <button type="button" disabled aria-label="Repetição indisponível nesta prévia"><Icon name="repeat" /></button>
       </div>
 
       <div className={styles.visualizer} aria-label="Fallback estático do visualizador">
-        <span style={{ height: "28%" }} />
-        <span style={{ height: "52%" }} />
-        <span style={{ height: "38%" }} />
-        <span style={{ height: "72%" }} />
-        <span style={{ height: "46%" }} />
-        <span style={{ height: "82%" }} />
-        <span style={{ height: "58%" }} />
-        <span style={{ height: "67%" }} />
-        <span style={{ height: "42%" }} />
-        <span style={{ height: "76%" }} />
-        <span style={{ height: "54%" }} />
-        <span style={{ height: "34%" }} />
+        {visualizerHeights.map((height, index) => <span key={index} style={{ height: `${height}%` }} />)}
       </div>
-      <p className={styles.visualizerNote}>
-        Visualizador estático nesta etapa. O áudio real entra no motor da Rádio.
-      </p>
 
       <div className={styles.libraryHeader}>
-        <strong>Biblioteca</strong>
-        <span>1 faixa de referência</span>
+        <button type="button" className={styles.activeTab} aria-current="page">Playlist</button>
+        <button type="button" disabled>Favoritas</button>
+        <button type="button" disabled>Recentes</button>
       </div>
 
       <label className={styles.searchField}>
         <span className={styles.srOnly}>Buscar música na prévia</span>
+        <Icon name="search" />
         <input
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Buscar música..."
+          placeholder="Buscar músicas..."
         />
       </label>
 
@@ -185,20 +196,19 @@ function RadioContent({
             aria-current="true"
             onClick={onToggleVisualPlaying}
           >
-            <span className={styles.trackFallback}>CM</span>
+            <span className={styles.trackThumb}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="48px" /></span>
             <span className={styles.trackMeta}>
               <strong>{previewTrack.title}</strong>
               <small>{previewTrack.artist}</small>
             </span>
-            <span className={styles.trackState}>
-              {visualPlaying ? "em prévia" : "selecionada"}
-            </span>
+            <span className={styles.trackState}><Icon name="bars" /></span>
             <span className={styles.duration}>{previewTrack.duration}</span>
           </button>
         ) : (
           <p className={styles.emptyState}>Nenhuma faixa de prévia encontrada.</p>
         )}
       </div>
+      <p className={styles.libraryNote}>1 faixa real de referência · Arte e reprodução em prévia visual</p>
     </div>
   );
 }
@@ -327,7 +337,7 @@ export function StudioRadioShell() {
   }
 
   return (
-    <div id="top" className={styles.site}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined}>
       <header className={styles.siteHeader}>
         <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início">
           <span className={styles.brandMark}>CM</span>
@@ -385,7 +395,7 @@ export function StudioRadioShell() {
       </header>
 
       <div className={styles.mobileMiniPlayer}>
-        <span className={styles.miniCover}>CM</span>
+        <span className={styles.miniCover}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="44px" /></span>
         <span className={styles.miniMeta}>
           <strong>{previewTrack.title}</strong>
           <small>{previewTrack.artist}</small>
@@ -413,7 +423,6 @@ export function StudioRadioShell() {
       <div
         ref={shellRef}
         className={styles.desktopShell}
-        style={shellStyle}
         data-dragging={dragging ? "true" : undefined}
       >
         <main id="studio" className={styles.studio}>

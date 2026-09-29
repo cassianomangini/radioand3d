@@ -27,3 +27,7 @@ yarn-error.log*
 *.pem
 *.tsbuildinfo
 next-env.d.ts
+
+# local visual review artifacts
+/.playwright-cli/
+/output/

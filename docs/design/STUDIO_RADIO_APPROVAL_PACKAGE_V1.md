@@ -42,9 +42,10 @@ Este é o ponto de decisão antes de liberar frontend visual final.
 ### Desktop
 
 ```text
-Header
 ┌──────────────────────────────────────────────┬─────────────────┐
-│ ESTÚDIO DE IMPRESSÃO 3D                     │ CM RÁDIO        │
+│ Header do Estúdio                            │ CM RÁDIO        │
+├──────────────────────────────────────────────┤ desde o topo   │
+│ ESTÚDIO DE IMPRESSÃO 3D                     │ da tela        │
 │ Ideias que ganham forma.                    │ full player     │
 │ copy + CTA                                  │ biblioteca      │
 │ mídia real / placeholder editorial           │ visualizador    │
@@ -56,6 +57,8 @@ Header
 ```
 
 Não existe mini player no desktop.
+
+Ajuste de Cassiano em 29/09/2026: a Rádio ocupa a altura inteira desde o topo do viewport e fica parada durante a rolagem do Estúdio. O header não atravessa a área da Rádio.
 
 ### Mobile
 

@@ -63,3 +63,26 @@ Correção aberta em `fix/desktop-radio-fit-navbar`:
 `experience_review_status: changes_required`
 
 `reviewed_by: Cassiano`
+
+## Ajuste de fidelidade da Rádio em 29/09/2026
+
+Cassiano apontou o mockup da Rádio como alvo visual e confirmou que ela pode ocupar a tela inteira desde o topo, permanecendo parada enquanto o Estúdio rola.
+
+- [x] mover o header do Estúdio para somente a coluna esquerda;
+- [x] fixar a Rádio no topo com altura de viewport;
+- [x] limitar a rolagem interna à lista de faixas;
+- [x] refazer capa de prévia, controles, visualizador, abas, busca e linha da faixa segundo o mockup;
+- [x] abrir a Rádio mobile em superfície de tela inteira;
+- [x] manter apenas `Limite Elástico` como faixa real de referência e identificar arte/reprodução como prévia;
+- [x] validar render em 1440 × 824, Rádio expandida e 390 × 844;
+- [x] validar visualmente a Rádio fixa após rolar o Estúdio;
+- [x] lint, typecheck e build;
+- [ ] receber revisão visual de Cassiano para o ajuste.
+
+Autorrevisão por captura Playwright. A arte de prévia foi gerada para esta interface; não é capa oficial da faixa. O motor de áudio, biblioteca real e análise sincronizada continuam nas entregas próprias.
+
+Capturas: [desktop](evidence/03b-radio-desktop.png), [expandida](evidence/03b-radio-expanded.png), [após rolar o Estúdio](evidence/03b-radio-scroll.png), [mobile](evidence/03b-radio-mobile.png).
+
+`experience_review_status: changes_required`
+
+`reviewed_by: implementação + captura automatizada; aguardando Cassiano`

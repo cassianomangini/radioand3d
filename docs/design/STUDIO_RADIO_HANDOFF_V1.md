@@ -28,15 +28,17 @@ Abaixo disso entra o comportamento compacto/mobile, sem tentar esmagar o Estúdi
 Estrutura:
 
 ```text
-Header
 ┌─────────────────────────────────────────────┬───────────────┐
-│ Estúdio de Impressão 3D                     │ CM Rádio      │
-│                                             │ completa      │
+│ Header do Estúdio                           │ CM Rádio      │
+├─────────────────────────────────────────────┤ desde o topo  │
+│ Estúdio de Impressão 3D                     │ da tela       │
 │ hero + conteúdo 3D real disponível          │               │
 └─────────────────────────────────────────────┴───────────────┘
 ```
 
 **Não existe mini player no desktop.**
+
+A Rádio começa no topo do viewport, ocupa toda a altura útil e permanece fixa enquanto o Estúdio rola. O header pertence apenas à coluna do Estúdio. Quando houver muitas faixas, somente a lista interna da Rádio rola; o player completo continua visível.
 
 ### Header
 
@@ -140,7 +142,7 @@ A Rádio é uma **região da experiência**, não um card dentro da home.
 
 Ordem visual padrão:
 
-1. cabeçalho CM Rádio + ação Expandir/Recolher;
+1. cabeçalho CM Rádio no topo da tela + ação Expandir/Recolher;
 2. capa/arte da faixa;
 3. faixa atual e metadados;
 4. progresso;
@@ -201,7 +203,7 @@ Não tentar colocar a biblioteca completa no mini player.
 
 ### Rádio completa no mobile
 
-Abre sob demanda como superfície dedicada de largura total dentro do shell persistente.
+Abre sob demanda como superfície dedicada de largura e altura totais da tela dentro do shell persistente.
 
 Precisa preservar:
 

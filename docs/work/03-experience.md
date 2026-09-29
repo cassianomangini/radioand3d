@@ -111,8 +111,8 @@ Produto, MaterialSwatch, galerias complexas e outros componentes entram somente 
 - [ ] Mostrar pelo menos normal, hover/focus, loading e empty onde relevante.
 - [x] Anotar medidas relativas e tokens diretamente no handoff.
 - [x] Registrar o que frontend não pode alterar por conta própria.
-- [ ] Receber ajustes de Cassiano.
-- [ ] Registrar aprovação final.
+- [x] Receber ajustes de Cassiano.
+- [x] Registrar aprovação final.
 
 ## Regras anti "design de IA"
 
@@ -159,10 +159,10 @@ Comparar diretamente com o handoff. Qualquer desvio de composição, densidade, 
 
 ## Estado atual
 
-`ready_for_frontend: no`
+`ready_for_frontend: yes`
 
-`approved_by: null`
+`approved_by: Cassiano`
 
 `artifact_ref: docs/design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md`
 
-Estrutura, sistema visual, Rádio, componentes e copy pública V1 estão reunidos no pacote de aprovação. Para liberar frontend falta apenas a aprovação explícita de Cassiano e o registro `ready_for_frontend: yes`.
+Estrutura, sistema visual, Rádio, componentes e copy pública V1 foram aprovados por Cassiano. A entrega 03 pode alimentar a implementação 03b.

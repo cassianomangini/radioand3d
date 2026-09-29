@@ -1,5 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import { IBM_Plex_Mono, Manrope } from "next/font/google";
 import "./globals.css";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope"
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-ibm-plex-mono"
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -7,8 +19,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "CM 3D and Radio",
-  description: "CM 3D and Radio em construção.",
+  title: "CM 3D & Radio | Estúdio de Impressão 3D",
+  description:
+    "Estúdio de Impressão 3D e CM Rádio em uma experiência integrada.",
   robots: {
     index: false,
     follow: false
@@ -22,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body className={`${manrope.variable} ${plexMono.variable}`}>{children}</body>
     </html>
   );
 }

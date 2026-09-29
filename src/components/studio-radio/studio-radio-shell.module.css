@@ -9,7 +9,8 @@
   top: 0;
   z-index: var(--layer-nav);
   min-height: var(--header-height);
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: var(--space-6);
   padding: 0 var(--gutter);
@@ -19,6 +20,7 @@
 }
 
 .brand {
+  justify-self: start;
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
@@ -62,10 +64,16 @@
 }
 
 .desktopNav {
+  justify-self: center;
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  margin-left: auto;
+  margin: 0;
+}
+
+.headerBalance {
+  display: block;
+  min-width: 1px;
 }
 
 .desktopNav a {
@@ -310,7 +318,7 @@
   top: var(--header-height);
   min-width: 0;
   height: calc(100dvh - var(--header-height));
-  overflow: auto;
+  overflow: hidden;
   background: var(--surface-radio);
 }
 
@@ -629,6 +637,135 @@
   border: 0;
 }
 
+@media (min-width: 73.75rem) {
+  .radioContent {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+      auto
+      auto
+      auto
+      auto
+      auto
+      auto
+      auto
+      auto
+      auto
+      minmax(3rem, 1fr);
+    gap: clamp(0.4rem, 1.05dvh, 1rem);
+    padding: clamp(0.75rem, 1.5dvh, 1.35rem) var(--space-4);
+    overflow: hidden;
+  }
+
+  .coverFallback {
+    height: clamp(7rem, 21dvh, 12rem);
+    aspect-ratio: auto;
+    padding: clamp(0.75rem, 1.4dvh, 1.25rem) var(--space-4);
+  }
+
+  .coverFallback > span {
+    font-size: clamp(3.25rem, 4.8vw, 5rem);
+  }
+
+  .visualizer {
+    height: clamp(2.75rem, 7dvh, 4.5rem);
+    padding-top: 0;
+  }
+
+  .trackList {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (min-width: 73.75rem) and (max-height: 48rem) {
+  .radioContent {
+    gap: 0.42rem;
+    padding: 0.65rem var(--space-4);
+  }
+
+  .radioHeader h2 {
+    margin-top: 0.1rem;
+    font-size: 1rem;
+  }
+
+  .iconButton {
+    min-height: 2.25rem;
+  }
+
+  .coverFallback {
+    height: clamp(6rem, 17dvh, 8.5rem);
+    padding: 0.65rem var(--space-4);
+  }
+
+  .coverFallback > span {
+    font-size: 3.2rem;
+  }
+
+  .coverFallback small {
+    font-size: 0.68rem;
+  }
+
+  .nowPlaying strong {
+    font-size: 1rem;
+  }
+
+  .progressBlock {
+    gap: 0.2rem;
+  }
+
+  .transport button {
+    min-width: 4rem;
+    min-height: 2.25rem;
+  }
+
+  .transport .playButton {
+    min-width: 4.5rem;
+  }
+
+  .visualizer {
+    height: 2.65rem;
+  }
+
+  .visualizerNote {
+    display: none;
+  }
+
+  .libraryHeader {
+    padding-top: 0.2rem;
+  }
+
+  .searchField input {
+    min-height: 2.25rem;
+  }
+
+  .trackRow {
+    min-height: 3rem;
+  }
+}
+
+@media (min-width: 73.75rem) and (max-height: 40rem) {
+  .coverFallback {
+    height: 5rem;
+  }
+
+  .coverFallback small,
+  .libraryHeader span {
+    display: none;
+  }
+
+  .radioKicker,
+  .nowLabel {
+    font-size: 0.65rem;
+  }
+
+  .visualizer {
+    height: 2rem;
+  }
+}
+
 @media (max-width: 81.25rem) and (min-width: 73.75rem) {
   .hero {
     grid-template-columns: 1fr;
@@ -646,8 +783,13 @@
 
   .siteHeader {
     min-height: var(--header-height);
+    display: flex;
     justify-content: space-between;
     padding-inline: var(--space-4);
+  }
+
+  .headerBalance {
+    display: none;
   }
 
   .brandMark {

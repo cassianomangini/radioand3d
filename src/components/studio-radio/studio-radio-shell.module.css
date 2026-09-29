@@ -105,10 +105,7 @@
 
 .desktopShell {
   display: grid;
-  grid-template-columns:
-    minmax(MIN_STUDIO_WIDTH, 1fr)
-    RESIZE_GUTTER
-    var(--radio-width);
+  grid-template-columns: minmax(40rem, 1fr) 1rem var(--radio-width);
   min-width: 0;
   align-items: start;
 }

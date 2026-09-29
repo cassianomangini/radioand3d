@@ -60,7 +60,7 @@ Não adotar automaticamente:
 ### 03.2 Conteúdo inicial do 3D
 
 - [x] Hero identifica explicitamente **Estúdio de Impressão 3D**.
-- [ ] Definir copy mínima provisória para composição, sem transformá-la em copy final.
+- [x] Definir copy pública V1 para composição e aprovação editorial.
 - [x] Definir uma área de mídia principal preparada para foto real.
 - [x] Definir no máximo os blocos realmente necessários para o lançamento inicial.
 - [x] Definir como produtos, materiais, fotos e trabalhos entram depois sem mudar a grade principal.
@@ -109,8 +109,8 @@ Produto, MaterialSwatch, galerias complexas e outros componentes entram somente 
 - [ ] Produzir desktop 1440 com Rádio expandida.
 - [ ] Produzir mobile ~390 com mini player acima do Estúdio.
 - [ ] Mostrar pelo menos normal, hover/focus, loading e empty onde relevante.
-- [ ] Anotar medidas relativas e tokens diretamente no handoff.
-- [ ] Registrar o que frontend não pode alterar por conta própria.
+- [x] Anotar medidas relativas e tokens diretamente no handoff.
+- [x] Registrar o que frontend não pode alterar por conta própria.
 - [ ] Receber ajustes de Cassiano.
 - [ ] Registrar aprovação final.
 
@@ -163,6 +163,6 @@ Comparar diretamente com o handoff. Qualquer desvio de composição, densidade, 
 
 `approved_by: null`
 
-`artifact_ref: docs/design/STUDIO_RADIO_HANDOFF_V1.md + docs/design/CM_VISUAL_SYSTEM_V1.md + docs/design/CM_COMPONENT_STATES_V1.md`
+`artifact_ref: docs/design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md`
 
-Estrutura, sistema visual, Rádio e componentes mínimos V1 estão especificados. A copy pública final continua pendente de passe editorial. Para liberar frontend ainda faltam o artefato visual final aprovado por Cassiano e o registro `ready_for_frontend: yes`.
+Estrutura, sistema visual, Rádio, componentes e copy pública V1 estão reunidos no pacote de aprovação. Para liberar frontend falta apenas a aprovação explícita de Cassiano e o registro `ready_for_frontend: yes`.

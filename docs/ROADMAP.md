@@ -8,7 +8,7 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, agora tem um recorte claro: Estúdio de Impressão 3D + Rádio acoplada no desktop e mini player acima do 3D no mobile. A próxima saída é o handoff visual reproduzível; [checklist](work/03-experience.md). **02** fornece a fundação técnica. **01** continua apenas para serviços, dados piloto e acessos externos.
+**03, direção visual CM**, chegou ao gate de aprovação: estrutura, Rádio, componentes, sistema visual e copy V1 estão reunidos em um pacote único para decisão de Cassiano; [checklist](work/03-experience.md). **03b** continua bloqueada até `ready_for_frontend: yes`.
 
 ## Sequência única
 

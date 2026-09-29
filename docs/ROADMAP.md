@@ -8,7 +8,7 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, chegou ao gate de aprovação: estrutura, Rádio, componentes, sistema visual e copy V1 estão reunidos em um pacote único para decisão de Cassiano; [checklist](work/03-experience.md). **03b** continua bloqueada até `ready_for_frontend: yes`.
+**03, direção visual CM**, foi aprovada por Cassiano e liberou o frontend. **03b, base visual compartilhada**, entra em execução com o primeiro recorte Estúdio + Rádio; [checklist](work/03-experience.md).
 
 ## Sequência única
 
@@ -17,8 +17,8 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 | 00 | Revisar e organizar documentação | CM Planning | Nenhuma | done | Contratos separados, perfis, links e inconsistências revisados; commit da reorganização |
 | 01 | Fechar base técnica e material piloto | CM Planning | 00 | in_progress | Stack local delimitada; serviços, privacidade efetiva e material piloto continuam pendentes; [checklist](work/01-base.md) |
 | 02 | Criar aplicação e verificações mínimas | CM Infra | 01: stack local | in_progress | App Router, lockfile, lint, tipos, build e CI em PR; integrações externas ficam fora deste recorte; [checklist](work/02-bootstrap.md) |
-| 03 | Fechar contrato visual Estúdio + Rádio | CM Experience | Requisitos do produto | in_progress | Handoff desktop/mobile com referência, grid, split da rádio, mini player somente mobile, tokens, estados e motion aprovado por Cassiano; [checklist](work/03-experience.md) |
-| 03b | Construir base visual compartilhada | CM Frontend | 02 + 03 | blocked | Tokens, componentes do piloto e vitrine local/preview implementados; revisão renderizada em contexto |
+| 03 | Fechar contrato visual Estúdio + Rádio | CM Experience | Requisitos do produto | done | Handoff desktop/mobile com referência, grid, split da rádio, mini player somente mobile, tokens, estados e motion aprovado por Cassiano; [checklist](work/03-experience.md) |
+| 03b | Construir base visual compartilhada | CM Frontend | 02 + 03 | in_progress | Tokens, componentes do piloto e vitrine local/preview implementados; revisão renderizada em contexto |
 | 04 | Biblioteca e ingestão seguras | CM Data | 02 + decisões de dados/serviços da 01 | blocked | Modelo, autorização, importação e publicação testados por serviço/API, incluindo falhas e rascunhos |
 | 05 | Music Inbox utilizável | CM Frontend | 03b + 04 | blocked | Upload em lote, revisão e publicação de três a cinco faixas reais sem JSON manual |
 | 06 | Motor de rádio e análise isolados | CM Audio | 02 + contrato de leitura da biblioteca | blocked | Prova técnica entre duas rotas e testes de fila/falhas; fixtures identificadas permitidas |

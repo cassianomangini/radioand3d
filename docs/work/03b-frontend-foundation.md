@@ -57,7 +57,7 @@ Correção aberta em `fix/desktop-radio-fit-navbar`:
 - [x] remover scroll do painel lateral da Rádio;
 - [x] adaptar capa, gaps, controles e visualizador à altura útil do viewport;
 - [x] manter eventual overflow futuro restrito à lista de faixas, não ao player inteiro;
-- [ ] validar captura desktop em altura curta próxima ao caso reportado;
+- [x] validar captura desktop em altura curta próxima ao caso reportado (1760x824);
 - [ ] receber nova revisão de Cassiano.
 
 `experience_review_status: changes_required`

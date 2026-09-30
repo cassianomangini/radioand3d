@@ -78,6 +78,10 @@ function formatTime(seconds: number) {
   return `${Math.floor(rounded / 60)}:${String(rounded % 60).padStart(2, "0")}`;
 }
 
+function formatTrackDuration(seconds?: number) {
+  return seconds && Number.isFinite(seconds) && seconds > 0 ? formatTime(seconds) : "—";
+}
+
 function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?: () => void }) {
   const radio = useRadio();
   const [query, setQuery] = useState("");
@@ -142,7 +146,7 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
         />
         <div className={styles.progressTimes}>
           <span>{formatTime(radio.position)}</span>
-          <span>{canPlay ? formatTime(radio.duration) : previewTrack.duration}</span>
+          <span>{canPlay ? formatTrackDuration(radio.duration) : previewTrack.duration}</span>
         </div>
       </div>
 
@@ -196,7 +200,7 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
               <span className={styles.trackThumb}><Image src={track.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="48px" unoptimized /></span>
               <span className={styles.trackMeta}><strong>{track.title}</strong><small>{track.artist}</small></span>
               <span className={styles.trackState}>{activeTab === "upcoming" ? String(index + 1).padStart(2, "0") : track.id === radio.currentTrack?.id ? <Icon name="bars" /> : null}</span>
-              <span className={styles.duration}>{formatTime(track.durationSeconds ?? 0)}</span>
+              <span className={styles.duration}>{formatTrackDuration(track.durationSeconds ?? (track.id === radio.currentTrack?.id ? radio.duration : undefined))}</span>
             </button>
           </li>
         ))}

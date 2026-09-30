@@ -8,7 +8,7 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, foi aprovada por Cassiano e liberou o frontend. **03b, base visual compartilhada**, entra em execução com o primeiro recorte Estúdio + Rádio; [checklist](work/03-experience.md).
+**03, direção visual CM**, foi aprovada por Cassiano. A Home da **03b** e a ponte R2 da **06** estão implementadas em PRs com verificações de código aprovadas. Cassiano ainda precisa revisar a Rádio em desktop e mobile, ouvir a reprodução e conferir as interações antes de concluir essas entregas; [checklist visual](work/03b-frontend-foundation.md) e [checklist de áudio](work/06-radio-engine.md).
 
 ## Sequência única
 

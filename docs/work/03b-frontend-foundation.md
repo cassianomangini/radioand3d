@@ -37,7 +37,7 @@ A Home continua `noindex` enquanto o marco integrado não estiver pronto.
 
 ## Aceite
 
-Não considerar esta entrega concluída apenas por CI verde. O merge visual exige render real e aprovação da experiência.
+Não considerar esta entrega concluída apenas por CI verde. O merge visual exige validação do frontend por Cassiano.
 
 `experience_review_status: incomplete`
 
@@ -86,3 +86,67 @@ Capturas: [desktop](evidence/03b-radio-desktop.png), [expandida](evidence/03b-ra
 `experience_review_status: changes_required`
 
 `reviewed_by: implementação + captura automatizada; aguardando Cassiano`
+
+## Revisão da estrutura do Estúdio em 29/09/2026
+
+Cassiano forneceu o logo CM 3D and Radio e rejeitou a estrutura anterior do Estúdio: fundo azulado, CTA preenchido, texto sem acento, placeholder grande e faixa de separação entre Estúdio e Rádio. Pediu também o logo menor na navbar e apontou o puxador/duas linhas do divisor como defeito.
+
+- [x] incorporar o arquivo exato do logo fornecido, sem recriá-lo;
+- [x] usar logo pequeno na navbar e logo de escala moderada na abertura;
+- [x] centralizar “ESTÚDIO DE IMPRESSÃO 3D & MÚSICAS” logo abaixo da imagem;
+- [x] usar “ESTÚDIO 3D” e substituir o lead pelo texto fornecido por Cassiano;
+- [x] refazer o hero sem card grande de mídia provisória;
+- [x] usar fundo quase preto, acento azul/violeta no título e CTA contornado;
+- [x] remover a faixa visual e manter somente a borda fina da Rádio;
+- [x] manter a área de arraste transparente, com resize por pointer e teclado verificados;
+- [x] revisar render desktop padrão, expandido e mobile;
+- [x] remover somente os blocos inferiores “O ESTÚDIO” e “PRÓXIMAS ENTRADAS” da home;
+- [x] restaurar o botão “Conheça mais sobre” e o item “Sobre” visíveis, desativados até existir a página do Estúdio;
+- [ ] receber aprovação visual de Cassiano para esta revisão.
+
+Capturas desta revisão: [desktop](evidence/03b-studio-desktop-v2.png), [expandida](evidence/03b-studio-expanded-v2.png), [mobile](evidence/03b-studio-mobile-v2.png). Autorrevisão, sem aprovação visual presumida.
+
+Após a correção, a home foi conferida em [1440 × 824](evidence/03b-home-cleanup-desktop.png) e [390 × 844](evidence/03b-home-cleanup-mobile.png). O botão “Conheça mais sobre” aparece nas duas larguras; os dois blocos removidos não aparecem. O menu mobile mostra “Sobre” desativado. `pnpm lint` e `pnpm typecheck` passaram. Autorrevisão, sem nova aprovação visual presumida.
+
+`experience_review_status: changes_required`
+
+`reviewed_by: implementação + captura automatizada; aguardando Cassiano`
+
+## Imagem escolhida para a Rádio em 29/09/2026
+
+Cassiano identificou `output/dj2.png` como a imagem correta para a Rádio e pediu a retirada do logo CM 3D and Radio sobreposto à capa. A cópia em `public/images/cm-radio-preview-art.png` substitui a arte anterior na capa de prévia e nas miniaturas. O enquadramento da imagem horizontal foi ajustado para essas superfícies.
+
+- [x] usar o arquivo escolhido sem alterar sua arte;
+- [x] remover o logo sobreposto à imagem da Rádio;
+- [ ] Cassiano conferir render desktop e mobile com o novo enquadramento.
+
+## Correção de definição das imagens em 29/09/2026
+
+Objetivo: exibir o logo fornecido por Cassiano e a arte `output/dj2.png` com a definição máxima dos arquivos disponíveis. Responsável: CM Frontend. Contratos lidos: `docs/EXPERIENCE.md` e estratégia de mídia em `docs/ARCHITECTURE.md`.
+
+Limite: corrigir somente o carregamento das imagens desta Home; preservar os originais e o enquadramento para revisão. Aceite técnico: o componente aponta diretamente para os PNGs originais no hero, no cabeçalho, na capa e nas miniaturas; lint, tipos e build passam. Cassiano confirma a qualidade visual em desktop e mobile. A definição não pode ultrapassar a do arquivo de origem.
+
+- [x] servir os PNGs originais sem recompressão nem escolha de variante abaixo do tamanho exibido;
+- [x] conferir dimensões dos arquivos de origem: logo 1983 × 793 px; Rádio 1813 × 868 px;
+- [x] executar lint e typecheck;
+- [x] executar build;
+- [ ] Cassiano conferir a definição no desktop e mobile.
+
+Evidência técnica: `pnpm lint`, `pnpm typecheck` e `pnpm build` passaram. O HTML estático gerado referencia `/images/cm-3d-radio-logo.png` e `/images/cm-radio-preview-art.png` diretamente, sem `srcset` de variantes processadas. Nenhuma validação visual foi feita nesta correção; a conferência da definição na interface fica com Cassiano.
+
+## Largura e movimento da Rádio em 29/09/2026
+
+Cassiano considerou a barra lateral estreita e pediu que seu layout combine com o restante do site, com botão de expansão dentro dela, animação da expansão e cursor de mão sobre o botão. O ajuste fica restrito ao painel lateral e à expansão.
+
+- [x] ampliar o preset para 480 px em 1440 px e ajustar proporcionalmente até 400 px perto de 1180 px;
+- [x] deixar Expandir/Recolher visível no cabeçalho da Rádio;
+- [x] animar a mudança de largura por botão e desligar easing durante o arraste;
+- [x] mostrar cursor de mão sobre o botão e respeitar movimento reduzido na expansão;
+- [x] conferir render em 1440 × 824 nos estados [padrão](evidence/03b-radio-sidebar-default.png) e [expandido](evidence/03b-radio-sidebar-expanded.png);
+- [x] conferir a proporção da barra em [1180 × 824](evidence/03b-radio-sidebar-1180.png);
+- [x] verificar no navegador cursor `pointer`, transição de 260 ms e largura intermediária durante o recolhimento;
+- [x] executar `pnpm check` (lint, typecheck e build);
+- [ ] Cassiano conferir render e interação em desktop padrão, expandido e mobile;
+- [ ] receber revisão visual de Cassiano.
+
+A nova imagem da Rádio foi conferida também em [390 × 844](evidence/03b-radio-dj2-mobile.png). Estas capturas são autorrevisão; não registram aprovação visual de Cassiano.

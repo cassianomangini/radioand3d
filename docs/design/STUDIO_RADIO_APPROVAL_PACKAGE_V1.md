@@ -45,14 +45,11 @@ Este é o ponto de decisão antes de liberar frontend visual final.
 ┌──────────────────────────────────────────────┬─────────────────┐
 │ Header do Estúdio                            │ CM RÁDIO        │
 ├──────────────────────────────────────────────┤ desde o topo   │
-│ ESTÚDIO DE IMPRESSÃO 3D                     │ da tela        │
+│ logo + ESTÚDIO DE IMPRESSÃO 3D & MÚSICAS    │ da tela        │
 │ Ideias que ganham forma.                    │ full player     │
-│ copy + CTA                                  │ biblioteca      │
-│ mídia real / placeholder editorial           │ visualizador    │
+│ ESTÚDIO 3D + texto fornecido                │ biblioteca      │
+│ mídia real quando autorizada                 │ visualizador    │
 │                                              │ resize/expand   │
-├──────────────────────────────────────────────┤                 │
-│ Do arquivo ao objeto real.                  │                 │
-│ conteúdo 3D real quando existir              │                 │
 └──────────────────────────────────────────────┴─────────────────┘
 ```
 
@@ -65,14 +62,15 @@ Ajuste de Cassiano em 29/09/2026: a Rádio ocupa a altura inteira desde o topo d
 ```text
 Header
 MiniPlayer
-ESTÚDIO DE IMPRESSÃO 3D
+Logo + ESTÚDIO DE IMPRESSÃO 3D & MÚSICAS
 Ideias que ganham forma.
 mídia
-Do arquivo ao objeto real.
-conteúdo 3D real quando existir
+ESTÚDIO 3D + texto fornecido
 ```
 
 A Rádio completa abre sob demanda.
+
+Revisão de Cassiano em 29/09/2026: logo fornecido na navbar em escala pequena e no hero em escala moderada; frase única centralizada logo abaixo da imagem, fundo próximo do preto e palavra colorida no título. Entre Estúdio e Rádio há somente a borda fina da Rádio, com área de arraste transparente. O marcador e o lead do hero agora são “ESTÚDIO 3D” e o texto fornecido por Cassiano. Os blocos inferiores saíram da home; o botão “Conheça mais sobre” e o item “Sobre” permanecem visíveis, desativados até existir a página do Estúdio.
 
 ## Decisões que ficam congeladas com a aprovação
 

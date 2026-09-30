@@ -8,7 +8,9 @@ A copy deste recorte precisa orientar alguém que chega sem contexto. Ela evita 
 
 ### Eyebrow
 
-**ESTÚDIO DE IMPRESSÃO 3D**
+**ESTÚDIO DE IMPRESSÃO 3D & MÚSICAS**
+
+Centralizado logo abaixo da imagem do logo, em uma linha quando houver espaço.
 
 ### Headline
 
@@ -16,29 +18,21 @@ A copy deste recorte precisa orientar alguém que chega sem contexto. Ela evita 
 
 ### Lead
 
-Peças úteis, decorativas e personalizadas, criadas do projeto à impressão com atenção ao acabamento.
+Marcador: **ESTÚDIO 3D**
+
+Descubra mais sobre nosso estúdio, peças, materiais, cores e muito mais para voce explorar..
 
 ### CTA principal
 
-**Conhecer o estúdio**
+**Conheça mais sobre**
+
+O botão permanece visível. Levará à página do Estúdio quando ela existir; até lá, fica desativado.
 
 ### CTA secundário
 
 **Falar sobre uma ideia**
 
 O CTA secundário só entra quando o caminho de contato estiver definido. Não usar “Ver materiais” enquanto a seção de materiais ainda não tiver conteúdo real.
-
-## Bloco editorial inicial do Estúdio
-
-### Título
-
-**Do arquivo ao objeto real.**
-
-### Texto
-
-Cada peça passa por decisões de formato, material, impressão e acabamento até virar algo físico, pronto para uso.
-
-Esse bloco pode existir mesmo antes de haver catálogo completo. Ele explica o trabalho sem inventar produtos.
 
 ## CM Rádio
 
@@ -62,11 +56,7 @@ A Rádio já fica aberta e utilizável no desktop. Não precisa de CTA separado 
 
 Não renderizar títulos como “Produtos”, “Materiais” ou “Categorias” vazios.
 
-Quando houver pouco conteúdo, a home pode terminar após:
-
-1. Hero do Estúdio.
-2. Bloco “Do arquivo ao objeto real”.
-3. Contato/orçamento, se estiver definido.
+Os blocos “O ESTÚDIO / Do arquivo ao objeto real” e “PRÓXIMAS ENTRADAS” foram retirados da home a pedido de Cassiano. O botão “Conheça mais sobre” e o item “Sobre” permanecem visíveis, desativados até existir a página do Estúdio.
 
 ## Estado sem músicas publicadas
 

@@ -13,11 +13,11 @@ import {
 } from "react";
 import styles from "./studio-radio-shell.module.css";
 
-const DEFAULT_RADIO_WIDTH = 390;
-const MIN_RADIO_WIDTH = 320;
+const DEFAULT_RADIO_WIDTH = 480;
+const MIN_RADIO_WIDTH = 400;
 const MAX_RADIO_WIDTH = 720;
 const MIN_STUDIO_WIDTH = 640;
-const RESIZE_GUTTER = 16;
+const RESIZE_GUTTER = 68;
 
 const previewTrack = {
   title: "Limite Elástico",
@@ -60,25 +60,28 @@ function clampRadioWidth(shellWidth: number, requested: number) {
   );
 }
 
+function getDefaultWidth(shellWidth: number) {
+  return clampRadioWidth(
+    shellWidth,
+    Math.min(DEFAULT_RADIO_WIDTH, Math.round(shellWidth / 3))
+  );
+}
+
 function getExpandedWidth(shellWidth: number) {
   return clampRadioWidth(shellWidth, shellWidth * 0.48);
 }
 
 interface RadioContentProps {
-  expanded?: boolean;
   mobile?: boolean;
   visualPlaying: boolean;
   onToggleVisualPlaying: () => void;
-  onExpand?: () => void;
   onClose?: () => void;
 }
 
 function RadioContent({
-  expanded = false,
   mobile = false,
   visualPlaying,
   onToggleVisualPlaying,
-  onExpand,
   onClose
 }: RadioContentProps) {
   const [query, setQuery] = useState("");
@@ -101,26 +104,15 @@ function RadioContent({
           >
             <Icon name="close" />
           </button>
-        ) : (
-          <button
-            type="button"
-            className={styles.iconButton}
-            onClick={onExpand}
-            aria-label={expanded ? "Recolher rádio" : "Expandir rádio"}
-            title={expanded ? "Recolher rádio" : "Expandir rádio"}
-          >
-            <Icon name="expand" />
-          </button>
-        )}
+        ) : null}
       </div>
 
       <div className={styles.coverArt}>
-        <Image src="/images/cm-radio-preview-art.png" alt="Arte ilustrativa da prévia da CM Rádio" fill sizes="(min-width: 1180px) 390px, 100vw" priority />
-        <div className={styles.coverSignature} aria-hidden="true"><strong>CM<span>3D</span></strong><small>RÁDIO</small></div>
+        <Image src="/images/cm-radio-preview-art.png" alt="DJ de fones sob luzes azuis e violetas" fill sizes="(min-width: 1180px) 720px, 100vw" priority unoptimized />
       </div>
 
       <div className={styles.nowPlaying}>
-        <span className={styles.trackThumb}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="48px" /></span>
+        <span className={styles.trackThumb}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="48px" unoptimized /></span>
         <div className={styles.nowMeta}>
           <strong>{previewTrack.title}</strong>
           <span>{previewTrack.artist}</span>
@@ -196,7 +188,7 @@ function RadioContent({
             aria-current="true"
             onClick={onToggleVisualPlaying}
           >
-            <span className={styles.trackThumb}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="48px" /></span>
+            <span className={styles.trackThumb}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="48px" unoptimized /></span>
             <span className={styles.trackMeta}>
               <strong>{previewTrack.title}</strong>
               <small>{previewTrack.artist}</small>
@@ -216,7 +208,12 @@ function RadioContent({
 export function StudioRadioShell() {
   const shellRef = useRef<HTMLDivElement>(null);
   const mobileDialogRef = useRef<HTMLDialogElement>(null);
-  const [radioWidth, setRadioWidth] = useState(DEFAULT_RADIO_WIDTH);
+  const customWidthRef = useRef(false);
+  const dragOffsetRef = useRef(0);
+  const dragStartXRef = useRef(0);
+  const pointerActiveRef = useRef(false);
+  const pointerMovedRef = useRef(false);
+  const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [radioExpanded, setRadioExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
@@ -224,7 +221,10 @@ export function StudioRadioShell() {
   const [visualPlaying, setVisualPlaying] = useState(false);
 
   const shellStyle = useMemo(
-    () => ({ "--radio-width": `${radioWidth}px` }) as CSSProperties,
+    () =>
+      (radioWidth === null
+        ? {}
+        : { "--radio-width": `${radioWidth}px` }) as CSSProperties,
     [radioWidth]
   );
 
@@ -243,6 +243,27 @@ export function StudioRadioShell() {
     }
   }, [mobileRadioOpen]);
 
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      const width = shell.getBoundingClientRect().width;
+      setRadioWidth((current) =>
+        radioExpanded
+          ? getExpandedWidth(width)
+          : customWidthRef.current
+            ? clampRadioWidth(width, current ?? getDefaultWidth(width))
+            : getDefaultWidth(width)
+      );
+    });
+
+    observer.observe(shell);
+    return () => observer.disconnect();
+  }, [radioExpanded]);
+
   function updateRadioWidth(requested: number) {
     const shell = shellRef.current;
     if (!shell) {
@@ -260,9 +281,10 @@ export function StudioRadioShell() {
     }
 
     const shellWidth = shell.getBoundingClientRect().width;
+    customWidthRef.current = false;
 
     if (radioExpanded) {
-      updateRadioWidth(DEFAULT_RADIO_WIDTH);
+      setRadioWidth(getDefaultWidth(shellWidth));
       setRadioExpanded(false);
       return;
     }
@@ -272,12 +294,22 @@ export function StudioRadioShell() {
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    const shell = shellRef.current;
+    if (!shell) {
+      return;
+    }
+
+    const rect = shell.getBoundingClientRect();
+    dragOffsetRef.current = rect.right - event.clientX - (radioWidth ?? getDefaultWidth(rect.width));
+    dragStartXRef.current = event.clientX;
+    pointerActiveRef.current = true;
+    pointerMovedRef.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
   }
 
   function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!dragging) {
+    if (!pointerActiveRef.current || Math.abs(event.clientX - dragStartXRef.current) < 4) {
       return;
     }
 
@@ -287,7 +319,9 @@ export function StudioRadioShell() {
     }
 
     const rect = shell.getBoundingClientRect();
-    const requested = rect.right - event.clientX;
+    const requested = rect.right - event.clientX - dragOffsetRef.current;
+    pointerMovedRef.current = true;
+    customWidthRef.current = true;
     updateRadioWidth(requested);
     setRadioExpanded(false);
   }
@@ -296,7 +330,12 @@ export function StudioRadioShell() {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+    const shouldToggle = event.type === "pointerup" && pointerActiveRef.current && !pointerMovedRef.current;
+    pointerActiveRef.current = false;
     setDragging(false);
+    if (shouldToggle) {
+      toggleRadioExpanded();
+    }
   }
 
   function handleResizeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
@@ -307,26 +346,36 @@ export function StudioRadioShell() {
 
     const step = event.shiftKey ? 48 : 16;
 
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleRadioExpanded();
+      return;
+    }
+
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      updateRadioWidth(radioWidth + step);
+      customWidthRef.current = true;
+      updateRadioWidth((radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width)) + step);
       setRadioExpanded(false);
     }
 
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      updateRadioWidth(radioWidth - step);
+      customWidthRef.current = true;
+      updateRadioWidth((radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width)) - step);
       setRadioExpanded(false);
     }
 
     if (event.key === "Home") {
       event.preventDefault();
+      customWidthRef.current = true;
       updateRadioWidth(MIN_RADIO_WIDTH);
       setRadioExpanded(false);
     }
 
     if (event.key === "End") {
       event.preventDefault();
+      customWidthRef.current = false;
       setRadioWidth(getExpandedWidth(shell.getBoundingClientRect().width));
       setRadioExpanded(true);
     }
@@ -337,21 +386,19 @@ export function StudioRadioShell() {
   }
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined}>
       <header className={styles.siteHeader}>
         <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início">
-          <span className={styles.brandMark}>CM</span>
-          <span className={styles.brandSuffix}>
-            <strong>3D</strong>
-            <small>&amp; RADIO</small>
-          </span>
+          <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
         </a>
 
         <nav className={styles.desktopNav} aria-label="Navegação principal">
           <a href="#top">Início</a>
           <a href="#studio">Estúdio</a>
           <a href="#radio">Rádio</a>
-          <a href="#studio-about">Sobre</a>
+          <button type="button" className={styles.pendingNav} disabled title="Página do Estúdio em breve">
+            Sobre
+          </button>
         </nav>
 
         <span className={styles.headerBalance} aria-hidden="true" />
@@ -387,15 +434,15 @@ export function StudioRadioShell() {
             >
               Rádio
             </button>
-            <a href="#studio-about" onClick={closeMobileMenu}>
+            <button type="button" disabled title="Página do Estúdio em breve">
               Sobre
-            </a>
+            </button>
           </nav>
         ) : null}
       </header>
 
       <div className={styles.mobileMiniPlayer}>
-        <span className={styles.miniCover}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="44px" /></span>
+        <span className={styles.miniCover}><Image src="/images/cm-radio-preview-art.png" alt="" fill sizes="44px" unoptimized /></span>
         <span className={styles.miniMeta}>
           <strong>{previewTrack.title}</strong>
           <small>{previewTrack.artist}</small>
@@ -427,51 +474,47 @@ export function StudioRadioShell() {
       >
         <main id="studio" className={styles.studio}>
           <section className={styles.hero} aria-labelledby="studio-title">
-            <div className={styles.heroCopy}>
-              <p className={styles.eyebrow}>ESTÚDIO DE IMPRESSÃO 3D</p>
-              <h1 id="studio-title">Ideias que ganham forma.</h1>
-              <p className={styles.lead}>
-                Peças úteis, decorativas e personalizadas, criadas do projeto à
-                impressão com atenção ao acabamento.
-              </p>
-              <div className={styles.heroActions}>
-                <a className={styles.primaryAction} href="#studio-about">
-                  Conhecer o estúdio
-                </a>
+            <div className={styles.heroIdentity}>
+              <div className={styles.heroLogo}>
+                <Image
+                  src="/images/cm-3d-radio-logo.png"
+                  alt="Logo CM 3D and Radio"
+                  width={1983}
+                  height={793}
+                  sizes="(min-width: 1180px) 704px, 110vw"
+                  priority
+                  unoptimized
+                />
+              </div>
+              <div className={styles.heroTopline}>
+                <p className={styles.eyebrow}>ESTÚDIO DE IMPRESSÃO 3D &amp; MÚSICAS</p>
               </div>
             </div>
-
-            <div className={styles.mediaFrame} aria-label="Mídia do estúdio ainda não publicada">
-              <div>
-                <span>MÍDIA DO ESTÚDIO</span>
-                <strong>Foto real entra aqui.</strong>
-                <p>
-                  A estrutura já reserva o enquadramento principal sem inventar um
-                  produto para preencher a tela.
+            <div className={styles.heroBody}>
+              <div className={styles.heroCopy}>
+                <h1 id="studio-title" aria-label="Ideias que ganham forma.">Ideias que<br />ganham <span>forma.</span></h1>
+              </div>
+              <div className={styles.heroDetails}>
+                <span className={styles.heroNumber}>ESTÚDIO 3D</span>
+                <p className={styles.lead}>
+                  Descubra mais sobre nosso estúdio, peças, materiais, cores e
+                  muito mais para voce explorar..
                 </p>
+                <button
+                  type="button"
+                  className={styles.primaryAction}
+                  disabled
+                  title="Página do Estúdio em breve"
+                  aria-label="Conheça mais sobre — página do Estúdio em breve"
+                >
+                  <span>Conheça mais</span>
+                  <span aria-hidden="true">→</span>
+                </button>
               </div>
             </div>
-          </section>
-
-          <section
-            id="studio-about"
-            className={styles.aboutStudio}
-            aria-labelledby="about-studio-title"
-          >
-            <p className={styles.sectionLabel}>O ESTÚDIO</p>
-            <h2 id="about-studio-title">
-              Do arquivo ao <span>objeto real.</span>
-            </h2>
-            <p>
-              Cada peça passa por decisões de formato, material, impressão e
-              acabamento até virar algo físico, pronto para uso.
-            </p>
-            <div className={styles.futureContent}>
-              <span>PRÓXIMAS ENTRADAS</span>
-              <p>
-                Produtos, materiais, fotos e trabalhos aparecem aqui conforme o
-                conteúdo real for publicado.
-              </p>
+            <div className={styles.heroFootline} aria-hidden="true">
+              <span>PROJETO&nbsp; / &nbsp;IMPRESSÃO&nbsp; / &nbsp;ACABAMENTO</span>
+              <span>CM — 3D &amp; RADIO</span>
             </div>
           </section>
         </main>
@@ -479,29 +522,26 @@ export function StudioRadioShell() {
         <div
           className={styles.resizeHandle}
           role="separator"
-          aria-label="Redimensionar CM Rádio"
+          aria-label="Redimensionar ou expandir CM Rádio"
           aria-orientation="vertical"
           aria-valuemin={MIN_RADIO_WIDTH}
           aria-valuemax={MAX_RADIO_WIDTH}
-          aria-valuenow={Math.round(radioWidth)}
+          aria-valuenow={Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)}
           tabIndex={0}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={stopDragging}
           onPointerCancel={stopDragging}
           onKeyDown={handleResizeKeyDown}
-        >
-          <span aria-hidden="true" />
-        </div>
+          title="Clique para expandir ou recolher; arraste para ajustar a largura"
+        />
 
         <aside id="radio" className={styles.radioPanel} aria-label="CM Rádio">
           <RadioContent
-            expanded={radioExpanded}
             visualPlaying={visualPlaying}
             onToggleVisualPlaying={() =>
               setVisualPlaying((playing) => !playing)
             }
-            onExpand={toggleRadioExpanded}
           />
         </aside>
       </div>

@@ -55,6 +55,6 @@ Essas possibilidades não estão descartadas. Entram no roadmap somente quando h
 
 ## Decisões ainda abertas
 
-A entrega 01 deve fechar stack e versões, serviços/ambientes, autenticação do proprietário, origem dos dados 3D, arquivos piloto, direitos de publicação e caminho de contato. O logo final e a composição do site dependem da entrega visual 03. A escolha de fornecedor não autoriza gastos nem conexão a produção.
+A entrega 01 deve fechar stack e versões, serviços/ambientes, autenticação do proprietário, origem dos dados 3D, arquivos piloto, direitos de publicação e caminho de contato. O logo fornecido por Cassiano e a composição em revisão ficam na [experiência](EXPERIENCE.md). A escolha de fornecedor não autoriza gastos nem conexão a produção.
 
 As propostas técnicas estão em [ARCHITECTURE.md](ARCHITECTURE.md). A auditoria do legado é uma referência histórica, não um segundo plano de execução.

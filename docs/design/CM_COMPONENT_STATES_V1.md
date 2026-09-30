@@ -79,7 +79,7 @@ Regras:
 
 - loading preserva largura do botão;
 - ícone nunca é o único significado de ação ambígua;
-- botão comum não vira pill;
+- o CTA do hero do Estúdio usa a cápsula contornada da referência de Cassiano, inclusive enquanto aguarda o destino; os demais botões seguem sua variante;
 - gradiente não é obrigatório no CTA principal.
 
 ---
@@ -91,7 +91,7 @@ Responsabilidade:
 - identificar o **Estúdio de Impressão 3D**;
 - dizer em poucas linhas o que existe ali;
 - carregar a principal mídia 3D da primeira dobra;
-- oferecer 1 CTA principal e no máximo 1 secundário.
+- preservar o CTA principal no hero, desativado até existir a página do Estúdio, e oferecer no máximo 1 secundário.
 
 Estrutura:
 
@@ -99,7 +99,7 @@ Estrutura:
 eyebrow
 headline
 lead
-[CTA principal] [CTA secundário opcional]
+[CTA principal, desativado até existir a página do Estúdio] [CTA secundário opcional]
 mídia do estúdio
 ```
 

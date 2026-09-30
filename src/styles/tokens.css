@@ -1,14 +1,14 @@
 :root {
-  --surface-page: #080b12;
-  --surface-studio: #0b1019;
-  --surface-radio: #0d1420;
-  --surface-panel: #111a28;
-  --surface-elevated: #162131;
+  --surface-page: #020305;
+  --surface-studio: #020305;
+  --surface-radio: #03050a;
+  --surface-panel: #0a101b;
+  --surface-elevated: #111827;
   --surface-media: #e9edf2;
   --surface-overlay: rgb(4 7 12 / 86%);
 
-  --text-primary: #f5f7fb;
-  --text-secondary: #b1bbc8;
+  --text-primary: #f7f8fb;
+  --text-secondary: #c0c7d2;
   --text-muted: #7e8998;
   --text-disabled: #596373;
   --text-on-accent: #08111c;

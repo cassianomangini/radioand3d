@@ -54,15 +54,17 @@ A Rádio começa no topo do viewport, ocupa toda a altura útil e permanece fixa
 Em 1440 px:
 
 - gutter externo: 24-32 px;
-- Rádio padrão: **360-400 px**;
+- Rádio padrão: **480 px em 1440 px**, reduzindo proporcionalmente até 400 px perto do limite desktop;
 - Estúdio usa todo o restante;
 - divisor visual: 1 px;
 - área interativa do divisor: 16 px.
 
+O divisor visual é a própria borda da Rádio: não há coluna ou faixa escura entre as duas superfícies. A área interativa de 16 px fica transparente e centrada nessa borda; não mostrar puxador permanente.
+
 A largura não deve ser tratada como valor rígido. Usar limites:
 
-- Rádio mínima: **320 px**;
-- Rádio padrão: **clamp(360px, 28vw, 420px)**;
+- Rádio mínima: **400 px**;
+- Rádio padrão: **min(480 px, 1/3 da largura)**, com mínimo de 400 px e respeitando o espaço do Estúdio;
 - Rádio expandida: **clamp(560px, 48vw, 720px)**;
 - o Estúdio nunca pode cair abaixo de aproximadamente **640 px** no modo split.
 
@@ -86,11 +88,13 @@ O estado da largura pertence ao layout. Não altera fila, faixa, posição ou el
 
 Três estados de apresentação:
 
-1. **Padrão**: Rádio em 360-400 px.
+1. **Padrão**: Rádio em 400-480 px conforme a largura desktop.
 2. **Expandida**: Rádio em aproximadamente 48% da largura, respeitando 720 px.
 3. **Personalizada**: largura deixada pelo usuário dentro dos limites.
 
 O botão expandir alterna entre Padrão e Expandida. Se o usuário arrastar depois, entra em Personalizada.
+
+Na revisão de Cassiano em 29/09/2026, a largura inicial de 390 px foi considerada fina. A Rádio passa a abrir em 480 px em 1440 px, diminuindo proporcionalmente até 400 px perto de 1180 px para preservar o Estúdio. O botão Expandir/Recolher fica visível no próprio cabeçalho. A mudança de largura por botão anima em 260 ms; o arraste responde diretamente ao ponteiro.
 
 ---
 
@@ -108,27 +112,22 @@ O visitante deve entender em poucos segundos:
 
 Obrigatório:
 
-- label visível: **ESTÚDIO DE IMPRESSÃO 3D**;
+- label visível, centralizado logo abaixo do logo: **ESTÚDIO DE IMPRESSÃO 3D & MÚSICAS**;
 - headline forte, curta e legível;
-- texto de apoio com no máximo 3 linhas em desktop;
-- 1 CTA primário;
+- texto de apoio curto e legível na largura disponível;
+- CTA primário quando houver destino funcional;
 - no máximo 1 CTA secundário;
 - uma imagem principal forte quando houver mídia real aprovada.
 
 A fotografia deve carregar mais peso visual que ornamentos de interface.
 
-Até existir foto definitiva, usar placeholder neutro identificado. Não fabricar peça ou produto fictício e apresentá-lo como real.
+Até existir foto definitiva, o primeiro viewport usa o logo fornecido por Cassiano como âncora visual, junto de título e texto. Não ocupar metade da abertura com um card de placeholder. Não fabricar peça ou produto fictício e apresentá-lo como real.
 
 ### Depois do hero
 
 Na primeira versão, manter somente conteúdo que exista.
 
-Ordem sugerida quando ainda há pouco acervo:
-
-1. Hero do Estúdio.
-2. Pequeno bloco **Sobre o estúdio / o que fazemos**.
-3. CTA de contato/orçamento, se o caminho já estiver definido.
-4. Conteúdo real disponível.
+Cassiano substituiu o marcador e o lead do hero por **ESTÚDIO 3D** e “Descubra mais sobre nosso estúdio, peças, materiais, cores e muito mais para voce explorar..”. Os blocos adicionais “O ESTÚDIO / Do arquivo ao objeto real” e “PRÓXIMAS ENTRADAS” saem da home. O botão “Conheça mais sobre” permanece e levará à página do Estúdio quando ela existir. Até lá, ele e o item “Sobre” ficam visíveis, mas desativados; não criar uma rota por inferência.
 
 Não renderizar seção de produtos, materiais, categorias ou trabalhos se a fonte estiver vazia.
 

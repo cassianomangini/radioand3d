@@ -11,7 +11,7 @@ Leitura necessária: [plano](../PROJECT_PLAN.md), [arquitetura](../ARCHITECTURE.
 ## Checklist
 
 - [ ] Conferir HEAD e visibilidade efetiva do repositório com Cassiano; resolver E1 antes de importar conteúdo privado.
-- [x] Delimitar stack local inicial: Next.js 16.2.7, React 19.2.4, TypeScript estrito, Tailwind CSS 4, Node 22 e pnpm 10; versões registradas no bootstrap. Serviços externos continuam decisão separada.
+- [x] Delimitar stack local inicial: Next.js 16.3.7, React 19.2.4, TypeScript estrito, Tailwind CSS 4, Node 22 e pnpm 10. O bootstrap registrou 16.2.7; a linha ativa passou a 16.3.7 para cobrir os avisos de segurança publicados nessa série. Serviços externos continuam decisão separada.
 - [ ] Definir banco, autenticação do proprietário, storage, hospedagem e limites iniciais; registrar o que está autorizado remotamente.
 - [ ] Fixar contrato mínimo de leitura pública e identidades de música/versão; confirmar regras propostas de fila, shuffle e repeat.
 - [ ] Confirmar origem/atualização de produto, materiais, cores e disponibilidade, além do caminho de contato.

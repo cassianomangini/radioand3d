@@ -19,7 +19,7 @@ Aceite técnico: com equalizador desligado ou zerado, os ganhos aplicados são n
 - [x] Implementar painel acessível e responsivo como proposta visual.
 - [x] Executar testes, lint, tipos, build e revisar diff.
 - [ ] Cassiano revisar interface renderizada e escuta com áudio real.
-- [ ] Atualizar evidência, roadmap e PR.
+- [x] Atualizar evidência, roadmap e PR.
 
 ## Evidência
 
@@ -27,4 +27,4 @@ Aceite técnico: com equalizador desligado ou zerado, os ganhos aplicados são n
 
 ## Retomada
 
-Último ponto verificado: grafo, controles e verificações técnicas implementados nesta branch. Pendências: Cassiano revisar painel, teclado/toque e escutar ganho, bypass e continuidade em desktop/mobile; verificar fallback com falha real de Web Audio. Próxima ação: abrir PR de rascunho e pedir revisão visual e de áudio. PR: ainda não aberto.
+Último ponto verificado: grafo, controles, verificações técnicas e PR de rascunho [#9](https://github.com/cassianomangini/radioand3d/pull/9) sobre o PR #8. Pendências: Cassiano revisar painel, teclado/toque e escutar ganho, bypass e continuidade em desktop/mobile; verificar fallback com falha real de Web Audio. Próxima ação: revisão visual e escuta por Cassiano; registrar os resultados antes de concluir a entrega.

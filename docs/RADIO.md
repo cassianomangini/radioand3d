@@ -25,7 +25,13 @@ Na Rádio completa, o título **A seguir** e o campo de busca ocupam a mesma lin
 
 Com **Repetir faixa** ligado, a faixa atual aparece como próxima e volta a tocar ao terminar. O botão **Próxima faixa** avança para uma entrada ainda não percorrida quando existe. Desligar a repetição restaura a sequência restante.
 
-Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, painel de histórico, favoritos e equalização sonora avançada são evoluções. O histórico mínimo para o botão anterior faz parte do motor inicial.
+Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, painel de histórico e favoritos são evoluções. O histórico mínimo para o botão anterior faz parte do motor inicial.
+
+## Equalizador sonoro
+
+Cassiano pediu o equalizador como próxima etapa em 30/09/2026. O primeiro recorte oferece dez bandas de 31 Hz a 16 kHz, cada uma de -12 a +12 dB, com ativação explícita e ação **Zerar**. Desligar o equalizador preserva os ajustes visíveis e aplica ganho neutro às bandas; ligar restaura os ajustes. Zerar põe todas as bandas em 0 dB. O volume continua independente. O estado pertence ao motor compartilhado e persiste entre Rádio completa e mini player durante navegação interna, sem prometer persistência após recarga.
+
+O grafo usa uma única fonte de áudio e encadeia filtros antes do `AnalyserNode` e da saída. A análise reflete o som processado. Se a criação dos filtros falhar, o áudio deve continuar pelo caminho direto, sem apresentar uma alteração sonora inexistente como ativa. A interface informa indisponibilidade quando Web Audio não puder fornecer equalização. A posição visual do painel é proposta para revisão de Cassiano antes de considerar a interface final.
 
 ## Regras propostas da fila
 
@@ -50,7 +56,7 @@ Para a prova com o acervo R2 indicado por Cassiano, o servidor lista todas as p�
 | --- | --- | --- |
 | Playback engine | Elemento de áudio, fonte, play/pause, seek, volume e eventos | Componentes, cores, barras e banco de dados |
 | Queue/controller | IDs, ordem, shuffle, repeat, histórico e decisões de avanço | DOM e fórmulas de visualização |
-| Audio graph/analyzer | Contexto e dados de frequência/tempo | Ref de botão ou posição de painel |
+| Audio graph/analyzer | Contexto, filtros de equalização e dados de frequência/tempo | Ref de botão ou posição de painel |
 | Renderer | Traduzir dados em barras/waveform e controlar seu ciclo visual | Regras de publicação e escolha de faixa |
 | UI CM | Composição, ações acessíveis e estado apresentado | Credenciais e acesso interno ao storage |
 
@@ -70,7 +76,7 @@ Proposta inicial: `AnalyserNode` nativo para dados de frequência e tempo. A API
 
 Meyda, suavização e renderização imperativa não são proibidos por princípio. Reutilizar somente quando houver função justificada, fronteiras limpas e testes. DOM refs ou canvas podem existir no renderer, nunca como contrato do provider de reprodução. Não disparar renderizações da página inteira a cada frame.
 
-Pausar loops quando não houver visualização ativa, aba visível ou movimento permitido; não parar a música por isso. Tolerar falha de canvas/análise sem derrubar reprodução. Testar silêncio e sinal conhecido para evitar barras que pulam sem correspondência ao áudio. Equalizador que modifica frequências é outro recurso, fora do marco inicial.
+Pausar loops quando não houver visualização ativa, aba visível ou movimento permitido; não parar a música por isso. Tolerar falha de canvas/análise sem derrubar reprodução. Testar silêncio e sinal conhecido para evitar barras que pulam sem correspondência ao áudio. O equalizador que modifica frequências usa o mesmo grafo, mas seus controles e verificações pertencem à entrega 06a.
 
 ## Aceite da rádio
 

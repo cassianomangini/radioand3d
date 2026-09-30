@@ -36,7 +36,7 @@ A V1 proposta é pública para ouvir e explorar; somente a gestão exige login d
 
 O primeiro marco visível não depende de um catálogo 3D completo. Ele entrega duas coisas bem acabadas:
 
-1. **CM Rádio funcional e visualmente pronta**, com Rádio completa no desktop e mini player no mobile compartilhando a mesma reprodução, seleção manual de músicas, shuffle e visualizador.
+1. **CM Rádio funcional e visualmente pronta**, com Rádio completa no desktop e mini player no mobile compartilhando a mesma reprodução, seleção manual de músicas, shuffle, visualizador e equalizador sonoro solicitado por Cassiano em 30/09/2026.
 2. **Entrada pública do Estúdio de Impressão 3D**, com hero, identidade, navegação e estrutura preparada para receber conteúdo real progressivamente.
 
 Desktop: o Estúdio ocupa a área principal e a Rádio completa aparece acoplada à direita, com ação de expandir/recolher e redimensionamento quando suportado pela interação aprovada. **Não existe mini player adicional no desktop.**
@@ -49,7 +49,7 @@ O marco exige validação de ponta a ponta em desktop e mobile: reprodução, co
 
 ## Fora do primeiro marco
 
-Checkout, gestão financeira ou de produção, contas de ouvintes, app nativo, sincronizador local de pastas, scraping do Suno, transmissão ao vivo, múltiplas skins, equalizador que altera o som e catálogo completo com configurador 3D.
+Checkout, gestão financeira ou de produção, contas de ouvintes, app nativo, sincronizador local de pastas, scraping do Suno, transmissão ao vivo, múltiplas skins e catálogo completo com configurador 3D.
 
 Essas possibilidades não estão descartadas. Entram no roadmap somente quando houver necessidade e decisão explícita; não devem atrasar a prova inicial.
 

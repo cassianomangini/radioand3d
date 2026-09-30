@@ -26,6 +26,8 @@ Na mesma revisão, Cassiano definiu que a playlist já abre aleatória e não re
 
 Na revisão seguinte, Cassiano pediu mais altura inicial para a fila, com três músicas completas visíveis em uma tela comum. **A seguir** e a busca ficam lado a lado; a interface não mostra contador de músicas ao lado do título. A lista continua rolável com toda a ordem restante.
 
+Cassiano pediu em seguida o equalizador sonoro como próxima etapa. Proposta de composição pendente de revisão visual: um botão **EQ** junto ao visualizador abre um painel de dez bandas, com ativação e Zerar. O painel não muda a fileira de sete controles nem remove a lista **A seguir**; quando fechado, a fila conserva o espaço de rolagem. A aparência e os estados renderizados ainda precisam da aprovação de Cassiano.
+
 **Desktop**
 
 - Header CM enxuto.

@@ -11,6 +11,12 @@ import {
   type ReactNode
 } from "react";
 import { createShuffledQueue } from "./queue";
+import {
+  EQUALIZER_FREQUENCIES,
+  clampEqualizerGain,
+  connectEqualizer,
+  updateEqualizer
+} from "./equalizer";
 
 export interface RadioTrack {
   id: string;
@@ -45,6 +51,9 @@ interface RadioContextValue {
   canSkipNext: boolean;
   hasPrevious: boolean;
   analyserReady: boolean;
+  equalizerAvailable: boolean;
+  equalizerEnabled: boolean;
+  equalizerGains: readonly number[];
   play: () => void;
   pause: () => void;
   toggle: () => void;
@@ -58,6 +67,9 @@ interface RadioContextValue {
   reshuffle: () => void;
   retry: () => void;
   getAnalyser: () => AnalyserNode | null;
+  toggleEqualizer: () => void;
+  setEqualizerBand: (index: number, gain: number) => void;
+  resetEqualizer: () => void;
 }
 
 const RadioContext = createContext<RadioContextValue | null>(null);
@@ -74,6 +86,9 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const audioRef = useRef<HTMLAudioElement>(null);
   const graphRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const equalizerFiltersRef = useRef<BiquadFilterNode[]>([]);
+  const equalizerEnabledRef = useRef(false);
+  const equalizerGainsRef = useRef<number[]>(EQUALIZER_FREQUENCIES.map(() => 0));
   const requestRef = useRef(0);
   const [currentId, setCurrentId] = useState(queue.currentId);
   const [upcomingIds, setUpcomingIds] = useState(() => queue.upcoming(tracks.length));
@@ -87,6 +102,9 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const [canSkipNext, setCanSkipNext] = useState(queue.hasNextManual);
   const [hasPrevious, setHasPrevious] = useState(false);
   const [analyserReady, setAnalyserReady] = useState(false);
+  const [equalizerAvailable, setEqualizerAvailable] = useState(true);
+  const [equalizerEnabled, setEqualizerEnabled] = useState(false);
+  const [equalizerGains, setEqualizerGains] = useState<readonly number[]>(() => EQUALIZER_FREQUENCIES.map(() => 0));
 
   const trackById = useMemo(
     () => new Map(tracks.map((track) => [track.id, track])),
@@ -115,18 +133,51 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
       void context.resume().then(() => {
         if (graphRef.current !== context || !audio.isConnected) return;
         const source = context.createMediaElementSource(audio);
-        const analyser = context.createAnalyser();
-        analyser.fftSize = 1024;
-        analyser.smoothingTimeConstant = 0.75;
-        source.connect(context.destination);
-        source.connect(analyser);
-        analyserRef.current = analyser;
-        setAnalyserReady(true);
+        let analyser: AnalyserNode | null = null;
+        try {
+          analyser = context.createAnalyser();
+          analyser.fftSize = 1024;
+          analyser.smoothingTimeConstant = 0.75;
+          equalizerFiltersRef.current = connectEqualizer(
+            context,
+            source,
+            analyser,
+            equalizerGainsRef.current,
+            equalizerEnabledRef.current
+          );
+          analyserRef.current = analyser;
+          setAnalyserReady(true);
+        } catch {
+          source.disconnect();
+          analyser?.disconnect();
+          try {
+            if (analyser) {
+              source.connect(analyser);
+              analyser.connect(context.destination);
+              analyserRef.current = analyser;
+              setAnalyserReady(true);
+            } else {
+              source.connect(context.destination);
+            }
+          } catch {
+            source.disconnect();
+            source.connect(context.destination);
+          }
+          equalizerEnabledRef.current = false;
+          setEqualizerEnabled(false);
+          setEqualizerAvailable(false);
+        }
       }).catch(() => {
         if (graphRef.current === context) graphRef.current = null;
+        equalizerEnabledRef.current = false;
+        setEqualizerEnabled(false);
+        setEqualizerAvailable(false);
         void context.close();
       });
     } catch {
+      equalizerEnabledRef.current = false;
+      setEqualizerEnabled(false);
+      setEqualizerAvailable(false);
       // Audio playback must continue if analysis is unavailable.
     }
   }, []);
@@ -270,6 +321,30 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
 
   const getAnalyser = useCallback(() => analyserRef.current, []);
 
+  const toggleEqualizer = useCallback(() => {
+    if (!equalizerAvailable) return;
+    const enabled = !equalizerEnabledRef.current;
+    equalizerEnabledRef.current = enabled;
+    setEqualizerEnabled(enabled);
+    updateEqualizer(equalizerFiltersRef.current, equalizerGainsRef.current, enabled, graphRef.current?.currentTime ?? 0);
+  }, [equalizerAvailable]);
+
+  const setEqualizerBand = useCallback((index: number, gain: number) => {
+    if (index < 0 || index >= EQUALIZER_FREQUENCIES.length || !equalizerAvailable) return;
+    const gains = [...equalizerGainsRef.current];
+    gains[index] = clampEqualizerGain(gain);
+    equalizerGainsRef.current = gains;
+    setEqualizerGains(gains);
+    updateEqualizer(equalizerFiltersRef.current, gains, equalizerEnabledRef.current, graphRef.current?.currentTime ?? 0);
+  }, [equalizerAvailable]);
+
+  const resetEqualizer = useCallback(() => {
+    const gains = EQUALIZER_FREQUENCIES.map(() => 0);
+    equalizerGainsRef.current = gains;
+    setEqualizerGains(gains);
+    updateEqualizer(equalizerFiltersRef.current, gains, equalizerEnabledRef.current, graphRef.current?.currentTime ?? 0);
+  }, []);
+
   useEffect(() => {
     const audio = audioRef.current;
     return () => {
@@ -278,13 +353,15 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
       void graphRef.current?.close();
       graphRef.current = null;
       analyserRef.current = null;
+      equalizerFiltersRef.current = [];
     };
   }, []);
 
   const value: RadioContextValue = {
     tracks, currentTrack, upcomingTracks, status, error, position, duration, volume, repeatOne, canSkipNext,
-    hasPrevious, analyserReady, play, pause, toggle, select, next, previous,
-    seek, setVolume, toggleMute, toggleRepeatOne, reshuffle, retry, getAnalyser
+    hasPrevious, analyserReady, equalizerAvailable, equalizerEnabled, equalizerGains,
+    play, pause, toggle, select, next, previous, seek, setVolume, toggleMute,
+    toggleRepeatOne, reshuffle, retry, getAnalyser, toggleEqualizer, setEqualizerBand, resetEqualizer
   };
 
   return (

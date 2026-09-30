@@ -1298,6 +1298,181 @@
   opacity: 1;
 }
 
+.equalizerArea {
+  position: relative;
+  flex: none;
+  min-width: 0;
+}
+
+.equalizerArea .visualizer {
+  width: calc(100% - 2.7rem);
+}
+
+.equalizerTrigger {
+  position: absolute;
+  top: 0.45rem;
+  right: 0;
+  width: 2.35rem;
+  height: 1.75rem;
+  padding: 0;
+  background: #0b1828;
+  border: 1px solid rgb(82 214 255 / 35%);
+  border-radius: 0.35rem;
+  color: #b9def5;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.equalizerTrigger:not(:disabled):hover,
+.equalizerTrigger[aria-expanded="true"] {
+  background: rgb(82 214 255 / 16%);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.equalizerTrigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.equalizerPanel {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  left: 0;
+  z-index: 25;
+  min-width: 0;
+  max-height: min(17rem, 43dvh);
+  overflow-y: auto;
+  padding: 0.75rem;
+  background: #0b1524;
+  border: 1px solid rgb(82 214 255 / 32%);
+  border-radius: 0.55rem;
+  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 55%);
+}
+
+.equalizerHeading,
+.equalizerHeading > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.equalizerHeading strong {
+  color: #edf7ff;
+  font-size: 0.8rem;
+}
+
+.equalizerHeading button {
+  min-height: 1.8rem;
+  padding: 0.2rem 0.55rem;
+  background: #101f31;
+  border: 1px solid rgb(102 142 193 / 28%);
+  border-radius: 0.3rem;
+  color: #c4d7e8;
+  cursor: pointer;
+  font-size: 0.67rem;
+}
+
+.equalizerHeading button:not(:disabled):hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.equalizerHeading button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.equalizerHeading .equalizerToggle[aria-pressed="true"] {
+  background: rgb(82 214 255 / 19%);
+  border-color: rgb(82 214 255 / 60%);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 0.6rem rgb(82 214 255 / 25%);
+}
+
+.equalizerBands {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.12rem;
+  min-width: 0;
+  margin-top: 0.65rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.equalizerScale {
+  width: 1.35rem;
+  min-width: 1.35rem;
+  height: 7.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 1.3rem;
+  padding-bottom: 0.1rem;
+  color: #7690a8;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  text-align: right;
+}
+
+.equalizerBand {
+  width: 1.85rem;
+  min-width: 1.85rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  color: #9db4c8;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-align: center;
+}
+
+.equalizerBand output {
+  color: #c5e8f7;
+  font-size: 0.58rem;
+}
+
+.equalizerBand input {
+  width: 1.7rem;
+  height: 6.3rem;
+  margin: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  accent-color: var(--accent-cyan);
+  cursor: pointer;
+}
+
+.equalizerBand > span {
+  white-space: nowrap;
+}
+
+.equalizerUnavailable {
+  margin: 0.7rem 0 0;
+  color: #aebfd1;
+  font-size: 0.72rem;
+}
+
+.equalizerTrigger:focus-visible,
+.equalizerHeading button:focus-visible,
+.equalizerBand input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (max-height: 40rem) {
+  .equalizerPanel {
+    top: auto;
+    bottom: calc(100% + 0.35rem);
+  }
+}
+
 .queueHeader {
   align-items: center;
   justify-content: space-between;

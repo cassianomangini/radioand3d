@@ -14,6 +14,7 @@ import {
 import styles from "./studio-radio-shell.module.css";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
+import { EQUALIZER_FREQUENCIES, EQUALIZER_MAX_DB, EQUALIZER_MIN_DB } from "@/features/radio/equalizer";
 
 const DEFAULT_RADIO_WIDTH = 480;
 const MIN_RADIO_WIDTH = 400;
@@ -85,9 +86,13 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
   const radio = useRadio();
   const [query, setQuery] = useState("");
   const [volumeOpen, setVolumeOpen] = useState(false);
+  const [equalizerOpen, setEqualizerOpen] = useState(false);
   const volumeMenuRef = useRef<HTMLDivElement>(null);
   const volumeButtonRef = useRef<HTMLButtonElement>(null);
+  const equalizerRef = useRef<HTMLDivElement>(null);
+  const equalizerButtonRef = useRef<HTMLButtonElement>(null);
   const volumePanelId = mobile ? "mobile-radio-volume" : "desktop-radio-volume";
+  const equalizerPanelId = mobile ? "mobile-radio-equalizer" : "desktop-radio-equalizer";
   const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
   const listTracks = radio.upcomingTracks
     .map((track, index) => ({ track, position: index + 1 }))
@@ -123,6 +128,28 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
       document.removeEventListener("keydown", handleEscape);
     };
   }, [volumeOpen]);
+
+  useEffect(() => {
+    if (!equalizerOpen) return;
+
+    function handleOutsidePointer(event: PointerEvent) {
+      if (!equalizerRef.current?.contains(event.target as Node)) setEqualizerOpen(false);
+    }
+
+    function handleEscape(event: globalThis.KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setEqualizerOpen(false);
+      equalizerButtonRef.current?.focus();
+    }
+
+    document.addEventListener("pointerdown", handleOutsidePointer);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsidePointer);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [equalizerOpen]);
 
   return (
     <div className={styles.radioContent}>
@@ -194,7 +221,10 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
             ref={volumeButtonRef}
             type="button"
             className={`${styles.modeButton} ${styles.volumeTrigger}`}
-            onClick={() => setVolumeOpen((open) => !open)}
+            onClick={() => {
+              setEqualizerOpen(false);
+              setVolumeOpen((open) => !open);
+            }}
             disabled={!canPlay}
             aria-label={`Volume ${Math.round(radio.volume * 100)}%. ${volumeOpen ? "Fechar" : "Abrir"} controle`}
             aria-expanded={volumeOpen}
@@ -215,7 +245,66 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
         <button type="button" className={styles.modeButton} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
       </div>
 
-      <RadioVisualizer className={styles.visualizer} />
+      <div
+        ref={equalizerRef}
+        className={styles.equalizerArea}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setEqualizerOpen(false);
+        }}
+      >
+        <RadioVisualizer className={styles.visualizer} />
+        <button
+          ref={equalizerButtonRef}
+          type="button"
+          className={styles.equalizerTrigger}
+          onClick={() => {
+            setVolumeOpen(false);
+            setEqualizerOpen((open) => !open);
+          }}
+          disabled={!canPlay}
+          aria-label="Equalizador"
+          aria-expanded={equalizerOpen}
+          aria-controls={equalizerOpen ? equalizerPanelId : undefined}
+        >
+          EQ
+        </button>
+        {equalizerOpen ? (
+          <section id={equalizerPanelId} className={styles.equalizerPanel} aria-label="Equalizador de dez bandas">
+            <div className={styles.equalizerHeading}>
+              <strong>Equalizador</strong>
+              <div>
+                <button type="button" className={styles.equalizerToggle} onClick={radio.toggleEqualizer} disabled={!radio.equalizerAvailable} aria-pressed={radio.equalizerEnabled}>
+                  {radio.equalizerEnabled ? "Ligado" : "Desligado"}
+                </button>
+                <button type="button" className={styles.equalizerReset} onClick={radio.resetEqualizer} disabled={!radio.equalizerAvailable || radio.equalizerGains.every((gain) => gain === 0)}>
+                  Zerar
+                </button>
+              </div>
+            </div>
+            {radio.equalizerAvailable ? (
+              <div className={styles.equalizerBands}>
+                <div className={styles.equalizerScale} aria-hidden="true"><span>+12</span><span>0</span><span>−12</span></div>
+                {EQUALIZER_FREQUENCIES.map((frequency, index) => (
+                  <label key={frequency} className={styles.equalizerBand}>
+                    <output>{radio.equalizerGains[index] > 0 ? "+" : ""}{radio.equalizerGains[index]}</output>
+                    <input
+                      type="range"
+                      min={EQUALIZER_MIN_DB}
+                      max={EQUALIZER_MAX_DB}
+                      step={1}
+                      value={radio.equalizerGains[index]}
+                      onChange={(event) => radio.setEqualizerBand(index, Number(event.target.value))}
+                      aria-label={`${frequency} Hz`}
+                      aria-valuetext={`${radio.equalizerGains[index]} decibéis`}
+                    />
+                    <span>{frequency >= 1000 ? `${frequency / 1000}k` : frequency}</span>
+                  </label>
+                ))}
+              </div>
+            ) : <p className={styles.equalizerUnavailable}>Equalizador indisponível neste navegador; a música continua tocando.</p>}
+          </section>
+        ) : null}
+      </div>
 
       <div className={styles.queueHeader}>
         <h3>A seguir</h3>

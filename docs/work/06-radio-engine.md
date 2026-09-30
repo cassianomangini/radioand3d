@@ -23,19 +23,23 @@ Critérios de aceite: a fila anunciada coincide com os próximos avanços; não 
 - [x] Implementar leitura paginada do inventário R2 no servidor, sem excluir variantes `(1)` e sem expor credenciais ao player.
 - [ ] Verificar reprodução, troca rápida, continuidade, seek, volume e barras no navegador com escuta real.
 - [x] Executar lint, typecheck, build e testes pertinentes; revisar diff.
-- [ ] Integrar mídias reais autorizadas e validar som/CORS no ambiente alvo.
-- [ ] Confirmar inventário completo do R2 por API S3 com credencial somente de leitura ou exportação da lista de objetos.
-- [ ] Validar URLs de reprodução do inventário completo no ambiente alvo, sem recorrer à pasta local como fonte canônica.
+- [x] Integrar o catálogo real no ambiente local e conferir CORS por HTTP.
+- [ ] Validar o som e as interações no navegador com Cassiano.
+- [x] Confirmar inventário completo do R2 por API S3 com credencial somente de leitura.
+- [x] Validar URLs públicas de todo o inventário por HTTP, sem recorrer à pasta local como fonte canônica.
 - [ ] Receber revisão visual e de interações de Cassiano.
 
 ## Evidência e retomada
 
-No início, o repositório continha apenas a referência visual `Limite Elástico`, sem áudio ou catálogo de músicas. Cassiano foi consultado sobre a origem das faixas e sobre o significado de “equalizador”. A Home em desenvolvimento usa 12 amostras sintéticas explicitamente rotuladas até o R2 ser configurado; em produção, a rota `/dev/audio-fixture` responde 404 e a Home não inclui essas amostras. A ponte de leitura do R2 foi implementada, mas sua ativação depende do inventário e da validação real do bucket. O fluxo editorial da entrega 04 permanece separado.
+No início, o repositório continha apenas a referência visual `Limite Elástico`, sem áudio ou catálogo de músicas. Cassiano foi consultado sobre a origem das faixas e sobre o significado de “equalizador”. A Home em desenvolvimento usa 12 amostras sintéticas explicitamente rotuladas até o R2 ser configurado; em produção, a rota `/dev/audio-fixture` responde 404 e a Home não inclui essas amostras. Cassiano configurou o acesso R2 no `.env.local` ignorado pelo Git, e o catálogo real está ativo nesse ambiente local. O fluxo editorial da entrega 04 permanece separado.
 
 | Critério | Evidência | Resultado |
 | --- | --- | --- |
 | Próximas dez na ordem efetiva | `pnpm test`, casos de sequência, shuffle, repeat e histórico | 11 testes passaram no total, incluindo 3 do catálogo R2 |
-| Inventário R2 sem omissão por página ou sufixo | `pnpm test`, páginas simuladas com `(1)`, M4A e chave aninhada | Passou; validação contra o bucket real pendente |
+| Inventário R2 sem omissão por página ou sufixo | `pnpm test`, páginas simuladas com `(1)`, M4A e chave aninhada | Passou |
+| Inventário real do bucket | `ListObjectsV2` com credencial local de leitura; registro ignorado em `output/r2-inventory-2026-09-30.json` | 242 objetos em uma página: 160 MP3, 82 M4A; 32 com `(1)` |
+| URLs públicas do inventário | HEAD com `Origin: http://localhost:3000` para todos os 242 objetos | 242 respostas 200, tipo `audio/*` e CORS `*`; nenhuma falha |
+| Catálogo na Home local | GET `http://localhost:3005/` após ativar R2 no `.env.local` | 200, biblioteca com 242 músicas, dez linhas em “A seguir”, sem amostra sintética |
 | Visualizador silencioso e com sinal | `pnpm test`, vetor vazio e frequência conhecida | Barras ficam na linha de base em silêncio e reagem ao sinal |
 | Fixture local | GET `/dev/audio-fixture?track=1` em servidor de desenvolvimento | 200, `audio/wav`, 352844 bytes |
 | Sem fixture publicada | GET da rota no build de produção + inspeção da Home | 404; título das amostras ausente |
@@ -44,6 +48,6 @@ No início, o repositório continha apenas a referência visual `Limite Elástic
 
 Essas verificações não comprovam escuta, interação visual ou continuidade em navegador. O próximo passo é revisar a interface com Cassiano, executar os cenários de áudio no navegador quando ele solicitar essa validação e conectar as mídias autorizadas. As mudanças locais do hero foram preservadas.
 
-Em 30/09, Cassiano informou o bucket R2 e confirmou que a lista inteira da rádio deve ser usada, inclusive `(1)`. A ponte de leitura percorre `ListObjectsV2` até a última página e fornece URLs públicas codificadas; a pasta local não define o catálogo. Sem credencial S3 disponível, a listagem real permanece pendente: a tentativa anônima recebeu `400 InvalidArgument/Authorization`, e `wrangler whoami` informou ausência de login. O endereço público não lista objetos. Requisições `GET` com `Range: bytes=0-1` responderam `206`, `Access-Control-Allow-Origin: *` e tipo de áudio para um MP3 com `(1)` e um M4A. Isso prova acesso às duas amostras, não ao inventário completo nem a reprodução audível.
+Em 30/09, Cassiano informou o bucket R2 e confirmou que a lista inteira da rádio deve ser usada, inclusive `(1)`. A ponte de leitura percorre `ListObjectsV2` até a última página e fornece URLs públicas codificadas; a pasta local não define o catálogo. O endereço público não lista objetos, por isso a credencial de leitura fica somente no servidor. Requisições `GET` com `Range: bytes=0-1` responderam `206`, `Access-Control-Allow-Origin: *` e tipo de áudio para um MP3 com `(1)` e um M4A. A conferência posterior validou todas as 242 URLs por HEAD. Isso não comprova reprodução audível.
 
-O próximo passo exato é obter acesso de leitura ao bucket ou uma exportação de todas as chaves; conferir contagem e URLs, ativar `RADIO_CATALOG_SOURCE=r2` no ambiente de teste e fazer a escuta com Cassiano. O domínio próprio continua necessário antes de uso em produção.
+O próximo passo exato é Cassiano ouvir e revisar as interações da rádio local, incluindo seleção, dez próximas, seek, volume, shuffle, repetição e visualizador. O domínio próprio e a configuração de credenciais no ambiente hospedado continuam necessários antes de uso em produção.

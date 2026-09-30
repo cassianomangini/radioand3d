@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Manrope } from "next/font/google";
 import { connection } from "next/server";
@@ -38,11 +39,12 @@ export default async function RootLayout({
 }>) {
   await connection();
   const tracks = await getRadioTracks();
+  const playlistSeed = randomInt(0, 4294967296);
 
   return (
     <html lang="pt-BR">
       <body className={`${manrope.variable} ${plexMono.variable}`}>
-        <RadioProvider tracks={tracks}>{children}</RadioProvider>
+        <RadioProvider tracks={tracks} playlistSeed={playlistSeed}>{children}</RadioProvider>
       </body>
     </html>
   );

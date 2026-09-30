@@ -1,6 +1,72 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { RadioQueue } from "../src/features/radio/queue.ts";
+import { RadioQueue, createShuffledQueue } from "../src/features/radio/queue.ts";
+
+test("new radio playlist starts randomly and plays every entry once", () => {
+  const ids = Array.from({ length: 20 }, (_, index) => `track-${index}`);
+  const first = createShuffledQueue(ids, 123);
+  const sameSeed = createShuffledQueue(ids, 123);
+  const otherSeed = createShuffledQueue(ids, 456);
+  const order = [first.currentId, ...first.upcoming(ids.length)];
+
+  assert.deepEqual(order, [sameSeed.currentId, ...sameSeed.upcoming(ids.length)]);
+  assert.notDeepEqual(order, [otherSeed.currentId, ...otherSeed.upcoming(ids.length)]);
+  assert.equal(order.length, ids.length);
+  assert.equal(new Set(order).size, ids.length);
+  assert.deepEqual(Array.from({ length: ids.length - 1 }, () => first.next()), order.slice(1));
+  assert.equal(first.next(), null);
+});
+
+test("manual selection does not put previously visited entries back into the automatic queue", () => {
+  const queue = createShuffledQueue(["a", "b", "c", "d", "e"], 9);
+  const order = [queue.currentId, ...queue.upcoming(5)];
+
+  assert.equal(queue.next(), order[1]);
+  assert.equal(queue.select(order[4]), true);
+  const remaining = queue.upcoming(5);
+  assert.deepEqual(new Set(remaining), new Set([order[2], order[3]]));
+  assert.deepEqual([queue.next(), queue.next()], remaining);
+  assert.equal(queue.next(), null);
+});
+
+test("repeat current track is opt-in and next skips to an unplayed entry", () => {
+  const queue = createShuffledQueue(["a", "b", "c"], 7);
+  const first = queue.currentId;
+
+  queue.setRepeat("one");
+  assert.deepEqual(queue.upcoming(1), [first]);
+  assert.equal(queue.next(false), first);
+  assert.equal(queue.hasNextManual, true);
+  const next = queue.next(true);
+  assert.notEqual(next, first);
+  assert.equal(queue.next(false), next);
+});
+
+test("next returns to the track just left with previous, even while repeating", () => {
+  const queue = createShuffledQueue(["a", "b", "c"], 11);
+  const second = queue.next();
+  queue.setRepeat("one");
+  queue.previous(0);
+
+  assert.equal(queue.hasNextManual, true);
+  assert.equal(queue.next(true), second);
+});
+
+test("new order restarts the full playlist and turns repeat off", () => {
+  const ids = ["a", "b", "c", "d"];
+  const queue = createShuffledQueue(ids, 3);
+  queue.next();
+  const previous = queue.currentId;
+  queue.setRepeat("one");
+
+  queue.reshuffle(() => 0.5);
+  const order = [queue.currentId, ...queue.upcoming(ids.length)];
+  assert.notEqual(queue.currentId, previous);
+  assert.equal(queue.repeat, "off");
+  assert.equal(queue.hasPrevious, false);
+  assert.equal(order.length, ids.length);
+  assert.equal(new Set(order).size, ids.length);
+});
 
 test("the announced ten tracks are the next ten advances", () => {
   const queue = new RadioQueue(Array.from({ length: 12 }, (_, index) => `track-${index}`));

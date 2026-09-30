@@ -8,7 +8,7 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, foi aprovada por Cassiano. A Home da **03b** e a ponte R2 da **06** estão implementadas em PRs com verificações de código aprovadas. Cassiano ainda precisa revisar a Rádio em desktop e mobile, ouvir a reprodução e conferir as interações antes de concluir essas entregas; [checklist visual](work/03b-frontend-foundation.md) e [checklist de áudio](work/06-radio-engine.md).
+**03, direção visual CM**, foi aprovada por Cassiano. A Home da **03b** e a ponte R2 da **06** estão implementadas em PRs com verificações de código aprovadas. A revisão do transporte, volume e ordem aleatória foi implementada em branch sobre a ponte R2, com aprovação de Cassiano para a composição solicitada e verificações técnicas locais. Cassiano ainda precisa revisar a Rádio renderizada em desktop e mobile, ouvir a reprodução e conferir as interações antes de concluir essas entregas; [checklist visual](work/03b-frontend-foundation.md) e [checklist de áudio](work/06-radio-engine.md).
 
 ## Sequência única
 

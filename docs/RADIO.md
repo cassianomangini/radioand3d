@@ -13,11 +13,15 @@ Isso cobre navegação interna, não continuidade sonora durante refresh, fecham
 
 ## Interfaces da primeira versão
 
-Mini player **mobile**: faixa/capa ou fallback CM, play/pause, anterior/próxima, indicação de progresso e ação de abrir a Rádio completa. Volume, biblioteca e controles adicionais ficam na Rádio completa quando faltar espaço.
+Mini player **mobile**: faixa/capa ou fallback CM, play/pause, anterior/próxima, indicação de progresso e ação de abrir a Rádio completa. Volume, fila completa e controles adicionais ficam na Rádio completa quando faltar espaço.
 
-Rádio completa: no desktop fica acoplada à composição e pode ser redimensionada/expandida; no mobile abre sob demanda. Contém biblioteca publicada, busca simples por título, seleção direta, playlist/fila atual, posição/duração, seek, volume quando suportado, shuffle e repetição. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
+Rádio completa: no desktop fica acoplada à composição e pode ser redimensionada/expandida; no mobile abre sob demanda. Contém a lista única **A seguir**, busca simples entre as faixas ainda programadas, seleção direta, posição/duração, seek e volume quando suportado. Ao abrir o site, a playlist nasce em ordem aleatória, sem repetição automática. O transporte mostra Nova ordem, Repetir faixa, Anterior, Play/Pausa, Próxima, Volume e Coração nessa ordem. Nova ordem tem tooltip; Repetir faixa fica iluminado quando ativo. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
 
-A lista da fila tem rolagem própria e acompanha a sequência decidida pelo controller. Exibe pelo menos as próximas dez ocorrências quando a fila oferece essa quantidade, atualizando após avanço, seleção e mudanças de shuffle/repetição. Com `repeat: off`, uma fila que termina antes disso mostra somente as próximas reais. Repetições previstas pelo modo ativo podem aparecer; a UI não inventa títulos nem repete itens só para preencher a lista. A rolagem não desloca os controles ou a Rádio inteira.
+O botão de volume fica depois de Próxima no transporte, abre um slider e uma ação de mudo. Ao sair do mudo, restaura o último volume audível; mover o slider para acima de zero também reativa o som. Desktop e Rádio completa mobile compartilham o mesmo volume do motor. Fechar o controle não altera o volume nem a reprodução.
+
+A lista **A seguir** tem rolagem própria e mostra todas as entradas ainda programadas na ordem decidida pelo controller; as dez primeiras são sempre as próximas dez quando existem. Atualiza após avanço e seleção manual. Quando a fila acaba, a lista fica vazia e a reprodução para. A UI não inventa títulos nem repete itens só para preencher a lista. A rolagem não desloca os controles ou a Rádio inteira.
+
+Com **Repetir faixa** ligado, a faixa atual aparece como próxima e volta a tocar ao terminar. O botão **Próxima faixa** avança para uma entrada ainda não percorrida quando existe. Desligar a repetição restaura a sequência restante.
 
 Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, painel de histórico, favoritos e equalização sonora avançada são evoluções. O histórico mínimo para o botão anterior faz parte do motor inicial.
 
@@ -25,11 +29,12 @@ Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, pain
 
 Validar estes padrões operacionais na entrega 01:
 
-- Selecionar uma faixa toca a versão escolhida, mantendo a preferência de shuffle. O contexto de seleção, biblioteca ou playlist, define a sequência a partir de IDs estáveis.
-- Digitar uma busca ou mudar a ordenação visual não altera a fila em execução. Uma nova ação de tocar pode criar uma nova fila a partir do contexto exibido.
-- Shuffle desligado segue a ordem da fila. Ligado percorre candidatos sem reposição antes de iniciar novo ciclo; respeita o modo de repetição.
-- O controller fornece à interface a ordem futura já decidida, inclusive no shuffle; mostrar a fila não pode sortear uma sequência diferente da usada pelo botão próxima ou pelo término natural.
-- `repeat` aceita `off`, `all` e `one`. O término natural respeita o modo; próxima/anterior explícitos continuam sendo ações do usuário, mesmo em `one`.
+- A abertura cria uma ordem aleatória para as entradas elegíveis. A mesma ordem é usada na renderização inicial e pela fila do navegador, sem discrepância entre a lista e o botão próxima.
+- Selecionar uma faixa toca a versão escolhida e preserva o conjunto das entradas ainda não percorridas. Uma seleção explícita pode revisitar uma faixa; os avanços automáticos não a reinserem.
+- Digitar uma busca filtra somente a apresentação da lista **A seguir**, sem alterar a fila em execução. Selecionar uma faixa reorganiza as próximas entre as entradas ainda não percorridas.
+- O controller fornece à interface a ordem futura já decidida. Mostrar a lista não pode sortear uma sequência diferente da usada pelo botão próxima ou pelo término natural.
+- Cada entrada toca no máximo uma vez por avanço automático enquanto **Repetir faixa** está desligado. Ao terminar a playlist, a reprodução para. Repetir faixa, anterior e seleção direta são ações explícitas e podem revisitar uma entrada.
+- **Nova ordem** reinicia a playlist com todas as entradas elegíveis em outra sequência aleatória, limpa o histórico e desliga Repetir faixa. Se a Rádio estava tocando, passa a tocar a primeira música da nova ordem; se estava pausada, a nova primeira música fica pronta sem autoplay.
 - Anterior reinicia a faixa se já passou de três segundos; senão usa o histórico realmente ouvido. Com fila vazia, controles ficam desabilitados. Uma faixa sozinha termina em `off` e repete somente quando solicitado.
 - Ao mudar a biblioteca publicada, preservar a faixa atual quando ainda elegível. Uma versão retirada não pode ser selecionada de novo; tratar item indisponível sem loop infinito.
 
@@ -67,6 +72,6 @@ Pausar loops quando não houver visualização ativa, aba visível ou movimento 
 
 ## Aceite da rádio
 
-Testar zero, uma e várias faixas; seleção com shuffle ligado/desligado; término em cada modo; histórico; seek; pausa; erro real; bloqueio do navegador; cliques rápidos; capa/título ausentes; volume conforme suporte. Redimensionar/expandir a Rádio no desktop, abrir/fechar a Rádio completa no mobile e navegar entre duas rotas repetidamente sem recriar áudio, duplicar som ou perder posição.
+Testar zero, uma e várias faixas; início aleatório em novas aberturas; ordem anunciada igual aos avanços; término sem repetição; seleção manual; histórico; seek; pausa; erro real; bloqueio do navegador; cliques rápidos; capa/título ausentes; volume e mudo conforme suporte. Redimensionar/expandir a Rádio no desktop, abrir/fechar a Rádio completa no mobile e navegar entre duas rotas repetidamente sem recriar áudio, duplicar som ou perder posição.
 
 Validar com mídia real, storage e CORS do ambiente, não apenas mocks. Automação testa estados; escuta e navegador real verificam som e continuidade. Registrar resultados separados para desktop e mobile. Fallback visual não pode interromper a música.

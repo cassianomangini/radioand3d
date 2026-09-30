@@ -27,7 +27,7 @@ const previewTrack = {
   duration: "3:52"
 } as const;
 
-type IconName = "expand" | "close" | "heart" | "more" | "shuffle" | "previous" | "play" | "pause" | "next" | "repeat" | "search" | "bars" | "volume";
+type IconName = "expand" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute";
 
 function Icon({ name }: { name: IconName }) {
   const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
@@ -35,16 +35,15 @@ function Icon({ name }: { name: IconName }) {
     expand: <><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" /><path d="m4 4 5 5m11-5-5 5M4 20l5-5m11 5-5-5" /></>,
     close: <><path d="M5 5l14 14M19 5 5 19" /></>,
     heart: <path d="M20.8 8.6c0 4.2-8.8 10-8.8 10s-8.8-5.8-8.8-10a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z" />,
-    more: <><circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" /></>,
     shuffle: <><path d="M4 7h3c4 0 6 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.7 0 3-1.7 4.3-3.7M16 7h4m-3-3 3 3-3 3" /></>,
-    previous: <><path d="M5 5v14M19 5 7 12l12 7V5Z" fill="currentColor" stroke="none" /></>,
+    repeat: <><path d="M18 7H7a3 3 0 0 0-3 3v2m0-5 3-3M4 7 1 4m5 13h11a3 3 0 0 0 3-3v-2m0 5-3 3m3-3 3 3" /></>,
+    previous: <><path d="M5 5v14" /><path d="m19 5-11 7 11 7V5Z" fill="currentColor" stroke="none" /></>,
     play: <path d="m8 5 11 7-11 7V5Z" fill="currentColor" stroke="none" />,
     pause: <><rect x="7" y="5" width="3.5" height="14" rx=".6" fill="currentColor" stroke="none" /><rect x="13.5" y="5" width="3.5" height="14" rx=".6" fill="currentColor" stroke="none" /></>,
-    next: <><path d="M19 5v14M5 5l12 7-12 7V5Z" fill="currentColor" stroke="none" /></>,
-    repeat: <><path d="M18 7H7a3 3 0 0 0-3 3v2m0-5 3-3M4 7 1 4m5 13h11a3 3 0 0 0 3-3v-2m0 5-3 3m3-3 3 3" /></>,
+    next: <><path d="M19 5v14" /><path d="m5 5 11 7-11 7V5Z" fill="currentColor" stroke="none" /></>,
     search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></>,
-    bars: <><path d="M4 19v-5m4 5V9m4 10V5m4 14V8m4 11v-7" /></>,
-    volume: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12" /></>
+    volume: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12" /></>,
+    volumeMute: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="m16 9 5 6m0-6-5 6" /></>
   };
   return <svg {...common}>{paths[name]}</svg>;
 }
@@ -85,19 +84,45 @@ function formatTrackDuration(seconds?: number) {
 function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?: () => void }) {
   const radio = useRadio();
   const [query, setQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"upcoming" | "library">("upcoming");
+  const [volumeOpen, setVolumeOpen] = useState(false);
+  const volumeMenuRef = useRef<HTMLDivElement>(null);
+  const volumeButtonRef = useRef<HTMLButtonElement>(null);
+  const volumePanelId = mobile ? "mobile-radio-volume" : "desktop-radio-volume";
   const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
-  const libraryTracks = radio.tracks.filter((track) =>
-    `${track.title} ${track.artist}`.toLocaleLowerCase("pt-BR").includes(normalizedQuery)
-  );
+  const listTracks = radio.upcomingTracks
+    .map((track, index) => ({ track, position: index + 1 }))
+    .filter(({ track }) =>
+      `${track.title} ${track.artist}`.toLocaleLowerCase("pt-BR").includes(normalizedQuery)
+    );
   const displayTrack = radio.currentTrack ?? previewTrack;
   const canPlay = Boolean(radio.currentTrack);
   const playing = radio.status === "playing";
   const pending = radio.status === "loading" || radio.status === "buffering";
   const currentArtwork = radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png";
-  const listTracks = activeTab === "upcoming" ? radio.upcomingTracks : libraryTracks;
   const progress = radio.duration > 0 ? Math.min(100, radio.position / radio.duration * 100) : 0;
-  const repeatLabel = radio.repeat === "one" ? "uma faixa" : radio.repeat === "all" ? "todas" : "desligada";
+
+  useEffect(() => {
+    if (!volumeOpen) return;
+
+    function handleOutsidePointer(event: PointerEvent) {
+      if (!volumeMenuRef.current?.contains(event.target as Node)) setVolumeOpen(false);
+    }
+
+    function handleEscape(event: globalThis.KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      setVolumeOpen(false);
+      volumeButtonRef.current?.focus();
+    }
+
+    document.addEventListener("pointerdown", handleOutsidePointer);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsidePointer);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [volumeOpen]);
 
   return (
     <div className={styles.radioContent}>
@@ -118,17 +143,11 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
 
       <div className={styles.coverArt}>
         <Image src={currentArtwork} alt="Arte visual da CM Rádio" fill sizes="(min-width: 1180px) 720px, 100vw" priority unoptimized />
-      </div>
-
-      <div className={styles.nowPlaying}>
-        <span className={styles.trackThumb}><Image src={currentArtwork} alt="" fill sizes="48px" unoptimized /></span>
-        <div className={styles.nowMeta}>
+        <div className={styles.coverCaption}>
           <strong>{displayTrack.title}</strong>
           <span>{displayTrack.artist}</span>
         </div>
-        <span className={styles.previewBadge}>{radio.currentTrack?.fixture ? "TESTE" : radio.currentTrack ? "CM RÁDIO" : "PRÉVIA"}</span>
-        <button type="button" className={styles.smallIcon} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos indisponíveis nesta prévia"><Icon name="heart" /></button>
-        <button type="button" className={styles.smallIcon} disabled aria-label="Mais opções indisponíveis nesta prévia" title="Mais opções indisponíveis nesta prévia"><Icon name="more" /></button>
+        {!radio.currentTrack || radio.currentTrack.fixture ? <span className={styles.coverBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span> : null}
       </div>
 
       <div className={styles.progressBlock}>
@@ -151,7 +170,8 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
       </div>
 
       <div className={styles.transport} aria-label="Controles da rádio">
-        <button type="button" onClick={radio.toggleShuffle} disabled={radio.tracks.length < 2} aria-pressed={radio.shuffle} aria-label="Embaralhar"><Icon name="shuffle" /></button>
+        <button type="button" className={styles.modeButton} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória" data-tooltip="Embaralhar lista do zero"><Icon name="shuffle" /></button>
+        <button type="button" className={styles.modeButton} onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir faixa" title={radio.repeatOne ? "Desligar repetição" : "Repetir faixa"}><Icon name="repeat" /></button>
         <button type="button" onClick={radio.previous} disabled={!canPlay} aria-label="Faixa anterior"><Icon name="previous" /></button>
         <button
           type="button"
@@ -162,53 +182,70 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
         >
           <Icon name={playing || pending ? "pause" : "play"} />
         </button>
-        <button type="button" onClick={radio.next} disabled={!canPlay || radio.upcomingTracks.length === 0 || radio.tracks.length < 2} aria-label="Próxima faixa"><Icon name="next" /></button>
-        <button type="button" onClick={radio.cycleRepeat} disabled={!canPlay} aria-label={`Repetição: ${repeatLabel}`} title={`Repetição: ${repeatLabel}`} aria-pressed={radio.repeat !== "off"}><Icon name="repeat" />{radio.repeat === "one" ? <span className={styles.repeatOne}>1</span> : null}</button>
-      </div>
-
-      <div className={styles.volumeControl}>
-        <Icon name="volume" />
-        <input type="range" min={0} max={1} step={0.01} value={radio.volume} onChange={(event) => radio.setVolume(Number(event.target.value))} disabled={!canPlay} aria-label="Volume" />
-        <span>{Math.round(radio.volume * 100)}%</span>
+        <button type="button" onClick={radio.next} disabled={!canPlay || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
+        <div
+          ref={volumeMenuRef}
+          className={styles.volumeMenu}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) setVolumeOpen(false);
+          }}
+        >
+          <button
+            ref={volumeButtonRef}
+            type="button"
+            className={`${styles.modeButton} ${styles.volumeTrigger}`}
+            onClick={() => setVolumeOpen((open) => !open)}
+            disabled={!canPlay}
+            aria-label={`Volume ${Math.round(radio.volume * 100)}%. ${volumeOpen ? "Fechar" : "Abrir"} controle`}
+            aria-expanded={volumeOpen}
+            aria-controls={volumeOpen ? volumePanelId : undefined}
+          >
+            <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
+          </button>
+          {volumeOpen ? (
+            <div id={volumePanelId} className={styles.volumePopover} role="group" aria-label="Controle de volume">
+              <button type="button" className={styles.muteButton} onClick={radio.toggleMute} aria-label={radio.volume === 0 ? "Ativar som" : "Silenciar"} title={radio.volume === 0 ? "Ativar som" : "Silenciar"}>
+                <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
+              </button>
+              <input type="range" min={0} max={1} step={0.01} value={radio.volume} onChange={(event) => radio.setVolume(Number(event.target.value))} aria-label="Volume" aria-valuetext={`${Math.round(radio.volume * 100)}%`} />
+              <span className={styles.volumeLevel}>{Math.round(radio.volume * 100)}%</span>
+            </div>
+          ) : null}
+        </div>
+        <button type="button" className={styles.modeButton} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
       </div>
 
       <RadioVisualizer className={styles.visualizer} />
 
-      <div className={styles.libraryHeader}>
-        <button type="button" className={activeTab === "upcoming" ? styles.activeTab : undefined} aria-pressed={activeTab === "upcoming"} onClick={() => setActiveTab("upcoming")}>A seguir <span>{radio.upcomingTracks.length}</span></button>
-        <button type="button" className={activeTab === "library" ? styles.activeTab : undefined} aria-pressed={activeTab === "library"} onClick={() => setActiveTab("library")}>Biblioteca <span>{radio.tracks.length}</span></button>
+      <div className={styles.queueHeader}>
+        <h3>A seguir</h3>
+        <span>{radio.upcomingTracks.length}</span>
       </div>
 
       <label className={styles.searchField}>
-        <span className={styles.srOnly}>Buscar música na biblioteca</span>
+        <span className={styles.srOnly}>Buscar nas próximas músicas</span>
         <Icon name="search" />
         <input
           type="search"
           value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            if (event.target.value) setActiveTab("library");
-          }}
-          placeholder="Buscar na biblioteca..."
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Buscar em A seguir..."
         />
       </label>
 
-      <ol className={styles.trackList} aria-label={activeTab === "upcoming" ? "Próximas músicas na ordem de reprodução" : "Biblioteca de músicas"}>
-        {listTracks.map((track, index) => (
-          <li key={`${activeTab}-${track.id}-${index}`}>
-            <button type="button" className={styles.trackRow} onClick={() => radio.select(track.id)} aria-current={activeTab === "library" && track.id === radio.currentTrack?.id ? "true" : undefined}>
+      <ol className={styles.trackList} aria-label="Próximas músicas na ordem de reprodução">
+        {listTracks.map(({ track, position }) => (
+          <li key={`${track.id}-${position}`}>
+            <button type="button" className={styles.trackRow} onClick={() => radio.select(track.id)}>
               <span className={styles.trackThumb}><Image src={track.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="48px" unoptimized /></span>
               <span className={styles.trackMeta}><strong>{track.title}</strong><small>{track.artist}</small></span>
-              <span className={styles.trackState}>{activeTab === "upcoming" ? String(index + 1).padStart(2, "0") : track.id === radio.currentTrack?.id ? <Icon name="bars" /> : null}</span>
+              <span className={styles.trackState}>{String(position).padStart(2, "0")}</span>
               <span className={styles.duration}>{formatTrackDuration(track.durationSeconds ?? (track.id === radio.currentTrack?.id ? radio.duration : undefined))}</span>
             </button>
           </li>
         ))}
-        {activeTab === "library" && radio.tracks.length === 0 && previewTrack.title.toLocaleLowerCase("pt-BR").includes(normalizedQuery) ? (
-          <li className={styles.emptyState}>“{previewTrack.title}” aguarda áudio autorizado para reprodução.</li>
-        ) : null}
-        {listTracks.length === 0 && (activeTab === "upcoming" || radio.tracks.length > 0 || normalizedQuery.length > 0) ? (
-          <li className={styles.emptyState}>{activeTab === "upcoming" ? "Não há próximas músicas nesta fila." : "Nenhuma música encontrada."}</li>
+        {listTracks.length === 0 ? (
+          <li className={styles.emptyState}>{normalizedQuery ? "Nenhuma próxima música encontrada." : "Não há próximas músicas nesta fila."}</li>
         ) : null}
       </ol>
       {radio.error ? <p className={styles.playerMessage} role="alert">{radio.error} <button type="button" onClick={radio.retry}>Tentar novamente</button></p> : null}
@@ -470,7 +507,7 @@ export function StudioRadioShell() {
           >
             <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />
           </button>
-          <button type="button" className={styles.miniStep} onClick={radio.next} disabled={!radio.currentTrack || radio.upcomingTracks.length === 0 || radio.tracks.length < 2} aria-label="Próxima faixa"><Icon name="next" /></button>
+          <button type="button" className={styles.miniStep} onClick={radio.next} disabled={!radio.currentTrack || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
         </div>
         <button
           type="button"

@@ -27,6 +27,7 @@ Critérios de aceite: a fila anunciada coincide com os próximos avanços; não 
 - [ ] Validar o som e as interações no navegador com Cassiano.
 - [x] Confirmar inventário completo do R2 por API S3 com credencial somente de leitura.
 - [x] Validar URLs públicas de todo o inventário por HTTP, sem recorrer à pasta local como fonte canônica.
+- [ ] Reconciliar os 101 arquivos que existem na pasta local e não estão no R2 antes de declarar o acervo completo.
 - [ ] Receber revisão visual e de interações de Cassiano.
 
 ## Evidência e retomada
@@ -37,7 +38,8 @@ No início, o repositório continha apenas a referência visual `Limite Elástic
 | --- | --- | --- |
 | Próximas dez na ordem efetiva | `pnpm test`, casos de sequência, shuffle, repeat e histórico | 11 testes passaram no total, incluindo 3 do catálogo R2 |
 | Inventário R2 sem omissão por página ou sufixo | `pnpm test`, páginas simuladas com `(1)`, M4A e chave aninhada | Passou |
-| Inventário real do bucket | `ListObjectsV2` com credencial local de leitura; registro ignorado em `output/r2-inventory-2026-09-30.json` | 242 objetos em uma página: 160 MP3, 82 M4A; 32 com `(1)` |
+| Inventário real do bucket | `ListObjectsV2` com credencial local de leitura; registro ignorado em `output/r2-inventory-2026-09-30.json` | 242 objetos em uma página: 160 MP3, 82 M4A; 32 com `(1)`; inventário do bucket ainda incompleto frente à pasta local |
+| Reconciliação com a pasta local | Comparação de nomes e tamanho entre R2 e `D:\Músicas\radio artesopolis`; plano ignorado em `output/r2-missing-upload-plan-2026-09-30.csv` | 343 arquivos locais; 242 presentes no R2 com o mesmo tamanho; 101 ausentes (421,5 MiB), incluindo 9 com `(1)` |
 | URLs públicas do inventário | HEAD com `Origin: http://localhost:3000` para todos os 242 objetos | 242 respostas 200, tipo `audio/*` e CORS `*`; nenhuma falha |
 | Catálogo na Home local | GET `http://localhost:3005/` após ativar R2 no `.env.local` | 200, biblioteca com 242 músicas, dez linhas em “A seguir”, sem amostra sintética |
 | Visualizador silencioso e com sinal | `pnpm test`, vetor vazio e frequência conhecida | Barras ficam na linha de base em silêncio e reagem ao sinal |
@@ -50,4 +52,4 @@ Essas verificações não comprovam escuta, interação visual ou continuidade e
 
 Em 30/09, Cassiano informou o bucket R2 e confirmou que a lista inteira da rádio deve ser usada, inclusive `(1)`. A ponte de leitura percorre `ListObjectsV2` até a última página e fornece URLs públicas codificadas; a pasta local não define o catálogo. O endereço público não lista objetos, por isso a credencial de leitura fica somente no servidor. Requisições `GET` com `Range: bytes=0-1` responderam `206`, `Access-Control-Allow-Origin: *` e tipo de áudio para um MP3 com `(1)` e um M4A. A conferência posterior validou todas as 242 URLs por HEAD. Isso não comprova reprodução audível.
 
-O próximo passo exato é Cassiano ouvir e revisar as interações da rádio local, incluindo seleção, dez próximas, seek, volume, shuffle, repetição e visualizador. O domínio próprio e a configuração de credenciais no ambiente hospedado continuam necessários antes de uso em produção.
+Após a comparação, o próximo passo exato é Cassiano decidir se os 101 arquivos locais ausentes devem ser enviados ao bucket `musicas`. Se autorizado, preparar credencial temporária de escrita restrita ao bucket, enviar apenas os ausentes, relistar o R2 e verificar as URLs. Depois, Cassiano ouve e revisa as interações da rádio local. O domínio próprio e a configuração de credenciais no ambiente hospedado continuam necessários antes de uso em produção.

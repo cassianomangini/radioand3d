@@ -150,3 +150,22 @@ Cassiano considerou a barra lateral estreita e pediu que seu layout combine com 
 - [ ] receber revisão visual de Cassiano.
 
 A nova imagem da Rádio foi conferida também em [390 × 844](evidence/03b-radio-dj2-mobile.png). Estas capturas são autorrevisão; não registram aprovação visual de Cassiano.
+
+## Fila rolável solicitada em 29/09/2026
+
+Objetivo: mostrar na Rádio uma lista com rolagem das próximas dez músicas, sempre na ordem em que tocarão. Responsável: CM Frontend. Contratos lidos: `docs/RADIO.md` e `docs/EXPERIENCE.md`. Base: `fix/radio-mockup-fidelity`, HEAD `39b78c9`; alterações locais existentes no hero e sua imagem devem ser preservadas.
+
+Limite: o recorte 03b contém somente a prévia visual de `Limite Elástico`; ainda não existe motor, fila ou outras faixas autorizadas no repositório. A interface não deve apresentar músicas fictícias como próximas. Aceite: rolagem restrita à lista, dez próximas ocorrências reais quando a fila tiver esse volume, ordem correspondente ao controller e atualização após troca de faixa ou modo. Cassiano valida o resultado visual e a interação.
+
+- [x] conferir base, diff local, contrato e disponibilidade de faixas;
+- [x] reservar a barra de rolagem no painel da lista sem rolar o player inteiro;
+- [ ] identificar pelo menos dez faixas autorizadas e a origem da fila;
+- [ ] implementar a lista das próximas faixas ligada à ordem de reprodução;
+- [x] executar lint, tipos e build;
+- [x] revisar diff e confirmar que o ajuste da Rádio preserva as alterações locais do hero;
+- [ ] Cassiano verificar a rolagem e a lista com dez faixas em desktop e mobile;
+- [ ] registrar validação visual de Cassiano.
+
+Evidência inicial: `rg --files public src` e busca por arquivos de áudio no repositório encontraram somente imagens, sem áudio nem catálogo de faixas. `pnpm check` passou em 29/09/2026. A rolagem ainda não foi conferida no navegador, pois Cassiano reservou para si a validação visual e de interações. O próximo passo dependente de conteúdo é receber a origem das faixas autorizadas e integrá-las ao controller da entrega 06/07. A composição do hero já modificada localmente não pertence a este ajuste. Sem commit/PR novo nesta sessão.
+
+Cassiano informou depois que o layout da Home está praticamente aprovado e pediu continuidade no layout funcional da Rádio. Isso ainda não é aprovação visual final da Rádio; a prova técnica do motor e do visualizador está no [checklist 06](06-radio-engine.md).

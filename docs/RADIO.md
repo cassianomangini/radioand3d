@@ -17,6 +17,8 @@ Mini player **mobile**: faixa/capa ou fallback CM, play/pause, anterior/próxima
 
 Rádio completa: no desktop fica acoplada à composição e pode ser redimensionada/expandida; no mobile abre sob demanda. Contém biblioteca publicada, busca simples por título, seleção direta, playlist/fila atual, posição/duração, seek, volume quando suportado, shuffle e repetição. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
 
+A lista da fila tem rolagem própria e acompanha a sequência decidida pelo controller. Exibe pelo menos as próximas dez ocorrências quando a fila oferece essa quantidade, atualizando após avanço, seleção e mudanças de shuffle/repetição. Com `repeat: off`, uma fila que termina antes disso mostra somente as próximas reais. Repetições previstas pelo modo ativo podem aparecer; a UI não inventa títulos nem repete itens só para preencher a lista. A rolagem não desloca os controles ou a Rádio inteira.
+
 Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, painel de histórico, favoritos e equalização sonora avançada são evoluções. O histórico mínimo para o botão anterior faz parte do motor inicial.
 
 ## Regras propostas da fila
@@ -26,6 +28,7 @@ Validar estes padrões operacionais na entrega 01:
 - Selecionar uma faixa toca a versão escolhida, mantendo a preferência de shuffle. O contexto de seleção, biblioteca ou playlist, define a sequência a partir de IDs estáveis.
 - Digitar uma busca ou mudar a ordenação visual não altera a fila em execução. Uma nova ação de tocar pode criar uma nova fila a partir do contexto exibido.
 - Shuffle desligado segue a ordem da fila. Ligado percorre candidatos sem reposição antes de iniciar novo ciclo; respeita o modo de repetição.
+- O controller fornece à interface a ordem futura já decidida, inclusive no shuffle; mostrar a fila não pode sortear uma sequência diferente da usada pelo botão próxima ou pelo término natural.
 - `repeat` aceita `off`, `all` e `one`. O término natural respeita o modo; próxima/anterior explícitos continuam sendo ações do usuário, mesmo em `one`.
 - Anterior reinicia a faixa se já passou de três segundos; senão usa o histórico realmente ouvido. Com fila vazia, controles ficam desabilitados. Uma faixa sozinha termina em `off` e repete somente quando solicitado.
 - Ao mudar a biblioteca publicada, preservar a faixa atual quando ainda elegível. Uma versão retirada não pode ser selecionada de novo; tratar item indisponível sem loop infinito.

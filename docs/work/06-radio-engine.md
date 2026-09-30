@@ -2,13 +2,13 @@
 
 ## Identificação
 
-ID do roadmap: 06. Responsável: CM Audio. Branch/base/HEAD: `fix/radio-mockup-fidelity`, `39b78c9`. Contratos lidos: [Rádio](../RADIO.md), [biblioteca](../MUSIC_PIPELINE.md) e [arquitetura](../ARCHITECTURE.md). A entrega 02 fornece o projeto local; o contrato público definitivo da entrega 04 e as mídias autorizadas continuam pendentes.
+ID do roadmap: 06. Responsável: CM Audio. Branch atual: `feat/radio-r2-catalog`, baseada em `fix/radio-mockup-fidelity` (`f67701b`). Contratos lidos: [Rádio](../RADIO.md), [biblioteca](../MUSIC_PIPELINE.md) e [arquitetura](../ARCHITECTURE.md). A entrega 02 fornece o projeto local; o contrato editorial definitivo da entrega 04 continua pendente.
 
 ## Resultado e limites
 
 Objetivo observável: um único motor de áudio e uma fila que exponha as próximas dez ocorrências na ordem efetiva, com play/pause, anterior/próxima, seek, volume, shuffle, repetição e dados para visualizador. O mini player e a Rádio completa consomem o mesmo estado.
 
-Incluído: prova local do motor e da interface com fixture de áudio explicitamente identificada apenas em desenvolvimento; testes de fila e estados de reprodução. Fora do escopo: publicar músicas, conectar storage/banco, importar o acervo, equalização que altera o som e declarar aprovação visual. Áreas reservadas: `src/features/radio/`, interface da Rádio em `src/components/studio-radio/`, rota técnica em `/dev` e testes correspondentes. As alterações locais do hero e sua imagem são trabalho já existente e devem ser preservadas.
+Incluído: prova local do motor e da interface com fixture de áudio explicitamente identificada apenas em desenvolvimento; testes de fila e estados de reprodução. Cassiano informou o bucket R2 `musicas` com a lista correta da rádio e pediu que nenhuma faixa seja excluída, inclusive nomes com `(1)`. Este recorte acrescenta leitura completa e paginada do bucket no servidor, sem filtrar variantes pelo nome, e usa o endereço público apenas para reprodução. Fora do escopo: upload, alteração ou exclusão no R2, banco, Music Inbox, equalização que altera o som e declarar aprovação visual. Áreas reservadas: `src/features/radio/`, `src/app/layout.tsx`, configuração de exemplo, testes e documentação desta entrega.
 
 Critérios de aceite: a fila anunciada coincide com os próximos avanços; não há duas fontes de áudio; play só aparece após evento do motor; mudança de largura e abertura mobile preservam faixa, posição e volume; barras reagem ao sinal e param quando a visualização não está ativa. Cassiano faz a revisão visual e das interações.
 
@@ -20,22 +20,30 @@ Critérios de aceite: a fila anunciada coincide com os próximos avanços; não 
 - [x] Implementar um elemento de áudio no layout persistente, com estados, seek, volume e tratamento de falhas.
 - [x] Conectar mini player, player completo e visualizador ao mesmo motor.
 - [x] Disponibilizar fixture identificada somente no ambiente local e conferir a resposta HTTP.
+- [x] Implementar leitura paginada do inventário R2 no servidor, sem excluir variantes `(1)` e sem expor credenciais ao player.
 - [ ] Verificar reprodução, troca rápida, continuidade, seek, volume e barras no navegador com escuta real.
 - [x] Executar lint, typecheck, build e testes pertinentes; revisar diff.
 - [ ] Integrar mídias reais autorizadas e validar som/CORS no ambiente alvo.
+- [ ] Confirmar inventário completo do R2 por API S3 com credencial somente de leitura ou exportação da lista de objetos.
+- [ ] Validar URLs de reprodução do inventário completo no ambiente alvo, sem recorrer à pasta local como fonte canônica.
 - [ ] Receber revisão visual e de interações de Cassiano.
 
 ## Evidência e retomada
 
-No início, o repositório continha apenas a referência visual `Limite Elástico`, sem áudio ou catálogo de músicas. Cassiano foi consultado sobre a origem das faixas e sobre o significado de “equalizador”. A Home em desenvolvimento usa 12 amostras sintéticas explicitamente rotuladas; em produção, a rota `/dev/audio-fixture` responde 404 e a Home não inclui essas amostras. A integração real depende das faixas e da publicação do contrato da entrega 04. Nenhum commit/PR desta entrega ainda.
+No início, o repositório continha apenas a referência visual `Limite Elástico`, sem áudio ou catálogo de músicas. Cassiano foi consultado sobre a origem das faixas e sobre o significado de “equalizador”. A Home em desenvolvimento usa 12 amostras sintéticas explicitamente rotuladas até o R2 ser configurado; em produção, a rota `/dev/audio-fixture` responde 404 e a Home não inclui essas amostras. A ponte de leitura do R2 foi implementada, mas sua ativação depende do inventário e da validação real do bucket. O fluxo editorial da entrega 04 permanece separado.
 
 | Critério | Evidência | Resultado |
 | --- | --- | --- |
-| Próximas dez na ordem efetiva | `pnpm test`, casos de sequência, shuffle, repeat e histórico | 8 testes passaram |
+| Próximas dez na ordem efetiva | `pnpm test`, casos de sequência, shuffle, repeat e histórico | 11 testes passaram no total, incluindo 3 do catálogo R2 |
+| Inventário R2 sem omissão por página ou sufixo | `pnpm test`, páginas simuladas com `(1)`, M4A e chave aninhada | Passou; validação contra o bucket real pendente |
 | Visualizador silencioso e com sinal | `pnpm test`, vetor vazio e frequência conhecida | Barras ficam na linha de base em silêncio e reagem ao sinal |
 | Fixture local | GET `/dev/audio-fixture?track=1` em servidor de desenvolvimento | 200, `audio/wav`, 352844 bytes |
 | Sem fixture publicada | GET da rota no build de produção + inspeção da Home | 404; título das amostras ausente |
 | Lista no HTML de desenvolvimento | GET da Home e contagem dos itens no primeiro `ol` “Próximas músicas” | Dez linhas |
-| Código e build | `pnpm check`, `pnpm test`, `git diff --check` | Passaram; oito testes |
+| Código e build | `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test`, `git diff --check` | Passaram nesta branch; 11 testes |
 
-Essas verificações não comprovam escuta, interação visual ou continuidade em navegador. O próximo passo é revisar a interface com Cassiano, executar os cenários de áudio no navegador quando ele solicitar essa validação e conectar as mídias autorizadas. As mudanças locais do hero foram preservadas; nenhum commit/PR foi criado.
+Essas verificações não comprovam escuta, interação visual ou continuidade em navegador. O próximo passo é revisar a interface com Cassiano, executar os cenários de áudio no navegador quando ele solicitar essa validação e conectar as mídias autorizadas. As mudanças locais do hero foram preservadas.
+
+Em 30/09, Cassiano informou o bucket R2 e confirmou que a lista inteira da rádio deve ser usada, inclusive `(1)`. A ponte de leitura percorre `ListObjectsV2` até a última página e fornece URLs públicas codificadas; a pasta local não define o catálogo. Sem credencial S3 disponível, a listagem real permanece pendente: a tentativa anônima recebeu `400 InvalidArgument/Authorization`, e `wrangler whoami` informou ausência de login. O endereço público não lista objetos. Requisições `GET` com `Range: bytes=0-1` responderam `206`, `Access-Control-Allow-Origin: *` e tipo de áudio para um MP3 com `(1)` e um M4A. Isso prova acesso às duas amostras, não ao inventário completo nem a reprodução audível.
+
+O próximo passo exato é obter acesso de leitura ao bucket ou uma exportação de todas as chaves; conferir contagem e URLs, ativar `RADIO_CATALOG_SOURCE=r2` no ambiente de teste e fazer a escuta com Cassiano. O domínio próprio continua necessário antes de uso em produção.

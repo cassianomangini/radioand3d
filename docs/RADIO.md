@@ -35,6 +35,8 @@ Validar estes padrões operacionais na entrega 01:
 
 Faixa, versão publicada e playlist seguem [MUSIC_PIPELINE.md](MUSIC_PIPELINE.md). Não inferir identidade ou versão por regex no motor.
 
+Para a prova com o acervo R2 indicado por Cassiano, o servidor lista todas as páginas do bucket `musicas` e entrega ao motor todas as chaves de áudio, inclusive variantes com `(1)`. A chave do objeto serve como ID estável apenas nesta ponte de leitura; a identidade editorial definitiva pertence à biblioteca. Nomes da pasta local não substituem o inventário do bucket. O endpoint S3 fica no servidor com credencial de leitura; o player usa a URL pública do objeto.
+
 ## Separação técnica
 
 | Parte | Responsabilidade | Não deve conhecer |

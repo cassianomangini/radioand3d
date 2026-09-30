@@ -122,7 +122,7 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
           <strong>{displayTrack.title}</strong>
           <span>{displayTrack.artist}</span>
         </div>
-        <span className={styles.previewBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span>
+        <span className={styles.previewBadge}>{radio.currentTrack?.fixture ? "TESTE" : radio.currentTrack ? "CM RÁDIO" : "PRÉVIA"}</span>
         <button type="button" className={styles.smallIcon} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos indisponíveis nesta prévia"><Icon name="heart" /></button>
         <button type="button" className={styles.smallIcon} disabled aria-label="Mais opções indisponíveis nesta prévia" title="Mais opções indisponíveis nesta prévia"><Icon name="more" /></button>
       </div>

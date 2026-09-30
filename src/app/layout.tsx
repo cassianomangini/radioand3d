@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Manrope } from "next/font/google";
-import { getDevRadioTracks } from "@/features/radio/dev-catalog";
+import { connection } from "next/server";
+import { getRadioTracks } from "@/features/radio/catalog";
 import { RadioProvider } from "@/features/radio/radio-provider";
 import "./globals.css";
 
@@ -30,15 +31,18 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await connection();
+  const tracks = await getRadioTracks();
+
   return (
     <html lang="pt-BR">
       <body className={`${manrope.variable} ${plexMono.variable}`}>
-        <RadioProvider tracks={getDevRadioTracks()}>{children}</RadioProvider>
+        <RadioProvider tracks={tracks}>{children}</RadioProvider>
       </body>
     </html>
   );

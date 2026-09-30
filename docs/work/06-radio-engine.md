@@ -56,3 +56,18 @@ Em 30/09, Cassiano informou o bucket R2 e confirmou que a lista inteira da rádi
 O próximo passo exato é Cassiano ouvir e revisar as interações da rádio local, incluindo seleção, dez próximas, seek, volume, shuffle, repetição e visualizador. Até o navegador carregar os metadados de uma faixa, a lista mostra duração indisponível em vez de inventar `0:00`; para a faixa carregada, mostra a duração informada pelo áudio. A credencial temporária de escrita deve ser revogada no painel da Cloudflare após o envio. O domínio próprio e a configuração da credencial de leitura no ambiente hospedado continuam necessários antes de uso em produção.
 
 A branch posterior `fix/radio-volume-popover` ajustou a fila para abrir embaralhada, expor toda a sequência restante em **A seguir** e terminar sem repetir automaticamente. Acrescentou Repetir faixa e Nova ordem como ações explícitas. Os 16 testes passaram, incluindo a nova sequência sem reposição; a escuta e a revisão no navegador seguem pendentes com Cassiano.
+
+## Correção do movimento das barras em 30/09/2026
+
+Cassiano informou que as barras permanecem paradas enquanto a música toca. Responsável: CM Audio. Branch `fix/radio-visualizer-motion`, base `fix/radio-volume-popover` (`a7a76fa`). Contratos lidos: `docs/RADIO.md` e este checklist. Limite: corrigir o caminho do sinal e a atualização das barras; preservar fila, transporte, layout aprovado e arquivos de mídia.
+
+Aceite técnico: o sinal percorre fonte → analisador → saída no mesmo grafo; níveis não nulos produzem alturas acima da linha de base; o loop de desenho começa quando reprodução e análise estão prontas, para ao pausar ou ocultar a superfície e não interrompe o áudio. A confirmação de movimento com música real fica com Cassiano, que revisa a interface no navegador.
+
+- [x] Conferir branch, dependências, relato, contrato e código do grafo/visualizador.
+- [x] Registrar objetivo, limite e critérios antes da correção.
+- [x] Ligar o analisador ao caminho da saída e revisar o estado de disponibilidade.
+- [x] Iniciar o ciclo imediatamente quando visível, manter a observação e melhorar a resposta a frequências estreitas.
+- [x] Executar testes pertinentes, lint, tipos e build; revisar diff.
+- [ ] Cassiano confirmar movimento das barras durante música real em desktop e mobile.
+
+Evidência: a implementação anterior conectava a fonte separadamente à saída e ao analisador; a [documentação do `AnalyserNode`](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode) diz que saída desconectada também funciona, portanto essa topologia não comprova a causa do defeito. A correção coloca o analisador no caminho da saída, inicia o loop de desenho quando o elemento já está visível e informa falha de análise. O cálculo das barras agora combina média e pico para revelar energia concentrada em poucas frequências. O teste novo cobre sinal fraco em banda larga; os testes sintéticos não comprovam movimento com as músicas reais. A revisão final depende da escuta de Cassiano.

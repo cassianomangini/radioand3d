@@ -68,6 +68,8 @@ Trocas rápidas precisam ignorar resultados antigos. Recarregar a lista ou metad
 
 Proposta inicial: `AnalyserNode` nativo para dados de frequência e tempo. A API não desenha nem calibra o visualizador automaticamente: definir bandas, escala, suavização e limites, e testar. Ela analisa sem alterar o som: [MDN](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode).
 
+O sinal deve percorrer fonte → `AnalyserNode` → saída no grafo único. O renderer só anuncia barras reativas depois que o analisador estiver disponível e a reprodução for confirmada. Pausa e indisponibilidade voltam as barras à linha de base sem prometer movimento inexistente.
+
 Meyda, suavização e renderização imperativa não são proibidos por princípio. Reutilizar somente quando houver função justificada, fronteiras limpas e testes. DOM refs ou canvas podem existir no renderer, nunca como contrato do provider de reprodução. Não disparar renderizações da página inteira a cada frame.
 
 Pausar loops quando não houver visualização ativa, aba visível ou movimento permitido; não parar a música por isso. Tolerar falha de canvas/análise sem derrubar reprodução. Testar silêncio e sinal conhecido para evitar barras que pulam sem correspondência ao áudio. Equalizador que modifica frequências é outro recurso, fora do marco inicial.

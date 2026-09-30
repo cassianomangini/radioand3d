@@ -6,8 +6,13 @@ export function frequencyBarHeights(levels: Uint8Array, sampleRate: number, coun
     const start = Math.max(1, Math.floor(low / nyquist * levels.length));
     const end = Math.max(start + 1, Math.min(levels.length, Math.ceil(high / nyquist * levels.length)));
     let total = 0;
-    for (let bin = start; bin < end; bin += 1) total += levels[bin] ?? 0;
-    const amplitude = total / (end - start) / 255;
+    let peak = 0;
+    for (let bin = start; bin < end; bin += 1) {
+      const level = levels[bin] ?? 0;
+      total += level;
+      peak = Math.max(peak, level);
+    }
+    const amplitude = (0.55 * total / (end - start) + 0.45 * peak) / 255;
     return Math.max(4, Math.min(100, amplitude * 145));
   });
 }

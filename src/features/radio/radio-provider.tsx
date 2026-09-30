@@ -45,6 +45,7 @@ interface RadioContextValue {
   canSkipNext: boolean;
   hasPrevious: boolean;
   analyserReady: boolean;
+  analyserUnavailable: boolean;
   play: () => void;
   pause: () => void;
   toggle: () => void;
@@ -87,6 +88,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const [canSkipNext, setCanSkipNext] = useState(queue.hasNextManual);
   const [hasPrevious, setHasPrevious] = useState(false);
   const [analyserReady, setAnalyserReady] = useState(false);
+  const [analyserUnavailable, setAnalyserUnavailable] = useState(false);
 
   const trackById = useMemo(
     () => new Map(tracks.map((track) => [track.id, track])),
@@ -114,20 +116,32 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
       graphRef.current = context;
       void context.resume().then(() => {
         if (graphRef.current !== context || !audio.isConnected) return;
-        const source = context.createMediaElementSource(audio);
-        const analyser = context.createAnalyser();
-        analyser.fftSize = 1024;
-        analyser.smoothingTimeConstant = 0.75;
-        source.connect(context.destination);
-        source.connect(analyser);
-        analyserRef.current = analyser;
-        setAnalyserReady(true);
+        let source: MediaElementAudioSourceNode | null = null;
+        try {
+          const analyser = context.createAnalyser();
+          analyser.fftSize = 1024;
+          analyser.smoothingTimeConstant = 0.75;
+          source = context.createMediaElementSource(audio);
+          source.connect(analyser);
+          analyser.connect(context.destination);
+          analyserRef.current = analyser;
+          setAnalyserUnavailable(false);
+          setAnalyserReady(true);
+        } catch {
+          if (source) {
+            source.disconnect();
+            source.connect(context.destination);
+          }
+          setAnalyserUnavailable(true);
+        }
       }).catch(() => {
         if (graphRef.current === context) graphRef.current = null;
+        setAnalyserUnavailable(true);
         void context.close();
       });
     } catch {
-      // Audio playback must continue if analysis is unavailable.
+      setAnalyserUnavailable(true);
+      // The media element keeps playing if Web Audio is unavailable.
     }
   }, []);
 
@@ -283,7 +297,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
 
   const value: RadioContextValue = {
     tracks, currentTrack, upcomingTracks, status, error, position, duration, volume, repeatOne, canSkipNext,
-    hasPrevious, analyserReady, play, pause, toggle, select, next, previous,
+    hasPrevious, analyserReady, analyserUnavailable, play, pause, toggle, select, next, previous,
     seek, setVolume, toggleMute, toggleRepeatOne, reshuffle, retry, getAnalyser
   };
 

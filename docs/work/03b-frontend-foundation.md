@@ -200,3 +200,5 @@ Aceite: a primeira faixa e a ordem seguinte variam entre aberturas, a fila anunc
 - [ ] Receber revisão visual e de interação de Cassiano.
 
 Evidência técnica desta branch: `pnpm lint`, `pnpm typecheck`, `pnpm test` (16 testes) e `pnpm build` passaram. Duas requisições HTTP à Home local responderam 200, exibiram 342 entradas reais em “A seguir” para o catálogo de 343 faixas, sem aba Biblioteca, e produziram ordens diferentes. A aprovação de Cassiano nesta conversa cobre a composição solicitada; ainda falta ele conferir a interface renderizada, os estados de hover e as interações em desktop e mobile com áudio real.
+
+Após ver a fila, Cassiano pediu três linhas completas visíveis no tamanho inicial, título **A seguir** e busca lado a lado e ausência de contador. A branch `fix/radio-volume-popover` implementa esse ajuste; a revisão visual final permanece pendente.

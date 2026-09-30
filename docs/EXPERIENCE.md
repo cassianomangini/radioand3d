@@ -24,6 +24,8 @@ Na revisão da Rádio de 30/09/2026, Cassiano pediu retirar o slider de volume d
 
 Na mesma revisão, Cassiano definiu que a playlist já abre aleatória e não reinicia automaticamente. A interface usa uma lista rolável única chamada **A seguir**, sem aba separada de Biblioteca. A lista contém toda a sequência restante, com as dez próximas no topo. Os controles ocupam uma fileira na ordem: Nova ordem, Repetir faixa, Anterior, Play/Pausa, Próxima, Volume e Coração. Próxima/Anterior usam ícones de avanço com barra; Nova ordem mostra tooltip no hover/foco; Repetir faixa permanece iluminado enquanto ativo.
 
+Na revisão seguinte, Cassiano pediu mais altura inicial para a fila, com três músicas completas visíveis em uma tela comum. **A seguir** e a busca ficam lado a lado; a interface não mostra contador de músicas ao lado do título. A lista continua rolável com toda a ordem restante.
+
 **Desktop**
 
 - Header CM enxuto.

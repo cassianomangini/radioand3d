@@ -21,6 +21,8 @@ O botão de volume fica depois de Próxima no transporte, abre um slider e uma a
 
 A lista **A seguir** tem rolagem própria e mostra todas as entradas ainda programadas na ordem decidida pelo controller; as dez primeiras são sempre as próximas dez quando existem. Atualiza após avanço e seleção manual. Quando a fila acaba, a lista fica vazia e a reprodução para. A UI não inventa títulos nem repete itens só para preencher a lista. A rolagem não desloca os controles ou a Rádio inteira.
 
+Na Rádio completa, o título **A seguir** e o campo de busca ocupam a mesma linha. Não exibir contador de faixas; o espaço inicial da lista deve comportar três músicas completas em alturas de tela comuns, preservando rolagem para as demais.
+
 Com **Repetir faixa** ligado, a faixa atual aparece como próxima e volta a tocar ao terminar. O botão **Próxima faixa** avança para uma entrada ainda não percorrida quando existe. Desligar a repetição restaura a sequência restante.
 
 Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, painel de histórico, favoritos e equalização sonora avançada são evoluções. O histórico mínimo para o botão anterior faz parte do motor inicial.

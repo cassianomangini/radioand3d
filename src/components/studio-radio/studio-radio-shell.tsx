@@ -219,19 +219,17 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
 
       <div className={styles.queueHeader}>
         <h3>A seguir</h3>
-        <span>{radio.upcomingTracks.length}</span>
+        <label className={styles.searchField}>
+          <span className={styles.srOnly}>Buscar nas próximas músicas</span>
+          <Icon name="search" />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Buscar em A seguir..."
+          />
+        </label>
       </div>
-
-      <label className={styles.searchField}>
-        <span className={styles.srOnly}>Buscar nas próximas músicas</span>
-        <Icon name="search" />
-        <input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Buscar em A seguir..."
-        />
-      </label>
 
       <ol className={styles.trackList} aria-label="Próximas músicas na ordem de reprodução">
         {listTracks.map(({ track, position }) => (

@@ -1300,15 +1300,16 @@
 
 .queueHeader {
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.4rem;
-  min-height: 2.35rem;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.65rem;
   padding: 0;
   border-top: 0;
-  border-bottom: 1px solid rgb(102 142 193 / 15%);
+  border-bottom: 0;
 }
 
 .queueHeader h3 {
+  flex: none;
   color: var(--accent-cyan);
   font-size: 0.79rem;
   font-weight: 650;
@@ -1317,6 +1318,8 @@
 .searchField {
   position: relative;
   display: block;
+  flex: 1;
+  min-width: 0;
 }
 
 .searchField > svg {
@@ -1332,7 +1335,7 @@
 }
 
 .searchField input {
-  min-height: 2.65rem;
+  min-height: 2.5rem;
   padding-left: 2.35rem;
   background: #0b1524;
   border-color: rgb(102 142 193 / 20%);
@@ -1426,12 +1429,6 @@
   outline-offset: 3px;
 }
 
-.queueHeader span {
-  color: #8298af;
-  font-family: var(--font-mono);
-  font-size: 0.67rem;
-}
-
 .playerMessage {
   margin: 0;
   color: #91a1b5;
@@ -1493,6 +1490,12 @@
 
   .site[data-radio-expanded="true"] .mediaFrame {
     min-height: 22rem;
+  }
+}
+
+@media (min-width: 73.75rem) and (min-height: 44rem) {
+  .trackList {
+    min-height: 10.8rem;
   }
 }
 
@@ -1559,6 +1562,12 @@
     margin: 0;
     border: 0;
     border-radius: 0;
+  }
+}
+
+@media (max-width: 73.74rem) and (min-height: 42rem) {
+  .trackList {
+    min-height: 10.8rem;
   }
 }
 

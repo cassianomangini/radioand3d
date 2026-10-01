@@ -12,6 +12,7 @@ import {
   type PointerEvent as ReactPointerEvent
 } from "react";
 import styles from "./studio-radio-shell.module.css";
+import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
 import { getRadioDragPreview } from "./radio-panel-drag";
@@ -98,46 +99,6 @@ function formatTime(seconds: number) {
 
 function formatTrackDuration(seconds?: number) {
   return seconds && Number.isFinite(seconds) && seconds > 0 ? formatTime(seconds) : "—";
-}
-
-function RadioLyrics({ trackId, title }: { trackId?: string; title?: string }) {
-  const [result, setResult] = useState<{ trackId: string; lyrics: string | null; failed: boolean } | null>(null);
-
-  useEffect(() => {
-    if (!trackId) return;
-    const controller = new AbortController();
-
-    fetch(`/api/radio/lyrics?id=${encodeURIComponent(trackId)}`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error("Lyrics request failed");
-        return response.json() as Promise<{ lyrics: string | null }>;
-      })
-      .then(({ lyrics }) => setResult({ trackId, lyrics, failed: false }))
-      .catch((error: unknown) => {
-        if (error instanceof Error && error.name === "AbortError") return;
-        setResult({ trackId, lyrics: null, failed: true });
-      });
-
-    return () => controller.abort();
-  }, [trackId]);
-
-  const current = result?.trackId === trackId ? result : null;
-
-  return (
-    <section className={styles.lyricsPanel} aria-labelledby="radio-lyrics-title">
-      <div className={styles.lyricsHeader}>
-        <h3 id="radio-lyrics-title">Letra</h3>
-        <span title={title}>{title}</span>
-      </div>
-      <div className={styles.lyricsScroll} role="region" aria-label={`Letra de ${title ?? "música atual"}`} tabIndex={0}>
-        {!trackId ? <p className={styles.lyricsStatus}>Selecione uma faixa para ver a letra.</p> : null}
-        {trackId && !current ? <p className={styles.lyricsStatus} role="status">Carregando letra…</p> : null}
-        {current?.failed ? <p className={styles.lyricsStatus} role="alert">Não foi possível carregar a letra.</p> : null}
-        {current && !current.failed && !current.lyrics ? <p className={styles.lyricsStatus}>Letra ainda não disponível para esta faixa.</p> : null}
-        {current?.lyrics ? <p className={styles.lyricsText}>{current.lyrics}</p> : null}
-      </div>
-    </section>
-  );
 }
 
 function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: boolean; expanded?: boolean; onClose?: () => void }) {

@@ -218,3 +218,17 @@ Aceite técnico: mini player abaixo do header com faixa legível em 320–390 px
 Evidência técnica: `pnpm check`, `pnpm test` (21 testes) e `git diff --check` passaram. O mini player exibe 24 barras do mesmo analisador da Rádio, sem novo elemento de áudio; interrompe o desenho ao abrir a Rádio completa. A grade reserva 56–64 px para a capa, 44–52 px para os controles e mantém o título em até duas linhas. Não houve revisão visual ou interação em navegador nesta branch, conforme o pedido de Cassiano para interromper a automação do player.
 
 O [PR #11](https://github.com/cassianomangini/radioand3d/pull/11) foi integrado à `main` em 01/10/2026 por pedido de Cassiano. O merge não substitui a conferência visual e das interações marcada acima.
+
+## Arraste da divisória para abrir a Rádio no desktop em 01/10/2026
+
+Objetivo: mostrar a Rádio avançando sobre o Estúdio enquanto a divisória desktop é arrastada para a esquerda e abrir a Rádio na tela inteira ao chegar ao limite. Responsável: CM Frontend. Branch `feat/desktop-radio-fullscreen-drag`, criada de `main` (`ebc8a4b`) em worktree separado para preservar uma alteração local alheia no menu. Contratos lidos: `docs/EXPERIENCE.md`, `docs/RADIO.md` e este checklist. Limites: preservar o player e a fila únicos, o redimensionamento atual, o menu e o mini player mobile.
+
+Aceite técnico: a prévia acompanha o ponteiro sem renderizar a página a cada quadro; soltar a divisória perto do limite esquerdo abre a Rádio em tela inteira e o link Rádio leva ao mesmo estado. Arraste incompleto ou cancelado retorna à barra lateral. O controle de fechar retorna ao layout dividido. Cassiano aprova aparência e sensação do movimento no desktop.
+
+- [x] Conferir instruções, branch, diff local, contratos e pontos de entrada do gesto.
+- [x] Registrar objetivo, limites e critérios antes da implementação.
+- [x] Implementar prévia, estado de tela inteira, navegação e testes do limiar.
+- [x] Executar verificações pertinentes e revisar diff.
+- [ ] Cassiano conferir a interação e o efeito no Chrome desktop.
+
+Evidência técnica: a divisória acompanha o ponteiro depois do limite de largura da barra lateral; o link Rádio e o arraste completo ativam o mesmo painel de tela inteira, com foco no controle de voltar. Arraste incompleto volta à largura lateral. `pnpm check`, `pnpm test` (23 testes) e `git diff --check` passaram. Não houve revisão visual nem teste de interação em navegador pelo agente, conforme a instrução de Cassiano para trabalhar no código.

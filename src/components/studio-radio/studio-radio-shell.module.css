@@ -1901,6 +1901,68 @@
     transition: grid-template-columns var(--motion-expand) var(--ease-standard);
   }
 
+  .desktopShell[data-radio-preview="true"] .radioPanel {
+    width: calc(var(--radio-width) + var(--radio-preview-width));
+    z-index: calc(var(--layer-nav) + 1);
+    box-shadow: -1rem 0 3rem rgb(37 129 255 / 24%);
+  }
+
+  .desktopShell[data-radio-preview="true"] .resizeHandle {
+    right: calc(var(--radio-width) + var(--radio-preview-width));
+    z-index: calc(var(--layer-nav) + 2);
+    box-shadow: -0.25rem 0 1.25rem rgb(37 129 255 / 32%);
+  }
+
+  .desktopShell[data-radio-ready="true"] .resizeHandle::after {
+    content: "Solte para abrir a Rádio";
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 0.75rem);
+    padding: 0.6rem 0.85rem;
+    background: rgb(4 15 30 / 92%);
+    border: 1px solid rgb(82 214 255 / 55%);
+    border-radius: 0.45rem;
+    box-shadow: 0 0 1.5rem rgb(37 129 255 / 32%);
+    color: var(--accent-cyan);
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .site[data-radio-fullscreen="true"] {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .site[data-radio-fullscreen="true"] .resizeHandle {
+    display: none;
+  }
+
+  .site[data-radio-fullscreen="true"] .radioPanel {
+    width: 100vw;
+    z-index: calc(var(--layer-nav) + 3);
+    background: radial-gradient(ellipse at 85% 0%, rgb(24 55 113 / 22%), transparent 50%), #03050a;
+  }
+
+  .site[data-radio-fullscreen="true"] .radioContent {
+    width: 100%;
+    max-width: 72rem;
+    height: 100%;
+    margin-inline: auto;
+    padding: clamp(1rem, 2dvh, 1.75rem) clamp(1.5rem, 4vw, 3rem);
+    gap: clamp(0.75rem, 1.5dvh, 1.15rem);
+  }
+
+  .site[data-radio-fullscreen="true"] .coverArt {
+    height: clamp(11rem, 27dvh, 18rem);
+  }
+
+  .site[data-radio-fullscreen="true"] .visualizer {
+    height: clamp(7rem, 15dvh, 10rem);
+  }
+
   .siteHeader,
   .resizeHandle {
     transition: right var(--motion-expand) var(--ease-standard);

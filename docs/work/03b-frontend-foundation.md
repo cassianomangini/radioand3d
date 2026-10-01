@@ -216,3 +216,5 @@ Aceite técnico: mini player abaixo do header com faixa legível em 320–390 px
 - [ ] Cassiano conferir visual e interação no Chrome mobile.
 
 Evidência técnica: `pnpm check`, `pnpm test` (21 testes) e `git diff --check` passaram. O mini player exibe 24 barras do mesmo analisador da Rádio, sem novo elemento de áudio; interrompe o desenho ao abrir a Rádio completa. A grade reserva 56–64 px para a capa, 44–52 px para os controles e mantém o título em até duas linhas. Não houve revisão visual ou interação em navegador nesta branch, conforme o pedido de Cassiano para interromper a automação do player.
+
+O [PR #11](https://github.com/cassianomangini/radioand3d/pull/11) foi integrado à `main` em 01/10/2026 por pedido de Cassiano. O merge não substitui a conferência visual e das interações marcada acima.

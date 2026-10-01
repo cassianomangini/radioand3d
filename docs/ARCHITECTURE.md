@@ -122,6 +122,8 @@ Separar desenvolvimento, preview/teste e produção, incluindo dados e credencia
 
 Guardar originais e rascunhos de mídia em área privada. Publicar somente derivados aprovados, conforme o contrato da biblioteca. Se escolher R2 público, usar domínio próprio para produção: `r2.dev` é destinado a desenvolvimento e tem limitação de tráfego. Validar CORS para os domínios autorizados, `GET`/`HEAD`, upload e requisições de intervalos; CORS não torna um arquivo privado. Referências: [R2 público](https://developers.cloudflare.com/r2/buckets/public-buckets/) e [CORS](https://developers.cloudflare.com/r2/buckets/cors/).
 
+O bucket R2 `musicas` informado por Cassiano é a origem inicial de leitura da rádio. A listagem usa a API S3 no servidor com credencial restrita a leitura; a reprodução usa URL pública. Essa ponte não substitui o modelo editorial e de publicação da biblioteca. O domínio público definitivo continua pendente; o endereço `r2.dev` é apenas para desenvolvimento.
+
 Antes da publicação: documentar limites de upload e lote, cache/revalidação, domínio, HTTPS, logs sem dados sensíveis, alertas de erro/custo, backup de metadados, retenção dos originais e procedimento de restauração. Rollback de código não desfaz automaticamente alterações de banco ou arquivos.
 
 A CI da entrega 02 deve validar dependências reproduzíveis, lint, tipos, testes e build. Acrescentar E2E e verificações visuais conforme os fluxos existirem. Não registrar execução de comandos inexistentes. Alterações remotas de infraestrutura exigem autorização e conferência do alvo.

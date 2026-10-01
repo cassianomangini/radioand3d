@@ -8,7 +8,7 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, foi aprovada por Cassiano e liberou o frontend. **03b, base visual compartilhada**, entra em execução com o primeiro recorte Estúdio + Rádio; [checklist](work/03-experience.md).
+**03, direção visual CM**, foi aprovada por Cassiano. A Home da **03b** e a ponte R2 da **06** estão implementadas em PRs com verificações de código aprovadas. Cassiano ainda precisa revisar a Rádio em desktop e mobile, ouvir a reprodução e conferir as interações antes de concluir essas entregas; [checklist visual](work/03b-frontend-foundation.md) e [checklist de áudio](work/06-radio-engine.md).
 
 ## Sequência única
 
@@ -21,7 +21,7 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 | 03b | Construir base visual compartilhada | CM Frontend | 02 + 03 | in_progress | Home Estúdio + Rádio, tokens e interações de layout em implementação; revisão renderizada exigida; [checklist](work/03b-frontend-foundation.md) |
 | 04 | Biblioteca e ingestão seguras | CM Data | 02 + decisões de dados/serviços da 01 | blocked | Modelo, autorização, importação e publicação testados por serviço/API, incluindo falhas e rascunhos |
 | 05 | Music Inbox utilizável | CM Frontend | 03b + 04 | blocked | Upload em lote, revisão e publicação de três a cinco faixas reais sem JSON manual |
-| 06 | Motor de rádio e análise isolados | CM Audio | 02 + contrato de leitura da biblioteca | in_progress | Prova local com fixture identificada em andamento; integração com biblioteca real pendente; [checklist](work/06-radio-engine.md) |
+| 06 | Motor de rádio e análise isolados | CM Audio | 02 + contrato de leitura da biblioteca | in_progress | Motor e fila ligados localmente às 343 faixas do R2; inventário, tamanhos e URLs validados; escuta e revisão de Cassiano pendentes; [checklist](work/06-radio-engine.md) |
 | 07 | Rádio CM pronta na interface | CM Frontend | 03b + 04 + 06 | blocked | Desktop com rádio acoplada/redimensionável e expansível; mobile com mini player sob o header e full player sob demanda; seleção, controles, visualizador e sincronização revisados |
 | 08 | Entrada do Estúdio de Impressão 3D | CM Frontend | 03b | blocked | Hero e navegação pública do estúdio, preparados para crescimento progressivo; nenhuma seção fictícia exigida e conteúdo real adicionado apenas quando disponível |
 | 09 | Validar marco Estúdio + Rádio | CM Review | 05 + 07 + 08 + acesso aos ambientes | blocked | Experiência integrada em desktop/mobile, continuidade de áudio, resize/expand, mídia real disponível, privacidade e aprovação visual final |

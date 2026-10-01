@@ -166,6 +166,8 @@ Limite: o recorte 03b contém somente a prévia visual de `Limite Elástico`; ai
 - [ ] Cassiano verificar a rolagem e a lista com dez faixas em desktop e mobile;
 - [ ] registrar validação visual de Cassiano.
 
-Evidência inicial: `rg --files public src` e busca por arquivos de áudio no repositório encontraram somente imagens, sem áudio nem catálogo de faixas. `pnpm check` passou em 29/09/2026. A rolagem ainda não foi conferida no navegador, pois Cassiano reservou para si a validação visual e de interações. O próximo passo dependente de conteúdo é receber a origem das faixas autorizadas e integrá-las ao controller da entrega 06/07. A composição do hero já modificada localmente não pertence a este ajuste. Sem commit/PR novo nesta sessão.
+Evidência inicial: `rg --files public src` e busca por arquivos de áudio no repositório encontraram somente imagens, sem áudio nem catálogo de faixas. `pnpm check` passou em 29/09/2026. A rolagem ainda não foi conferida no navegador, pois Cassiano reservou para si a validação visual e de interações. A composição do hero já modificada localmente não pertencia a este ajuste. Não houve commit/PR novo naquela sessão.
 
 Cassiano informou depois que o layout da Home está praticamente aprovado e pediu continuidade no layout funcional da Rádio. Isso ainda não é aprovação visual final da Rádio; a prova técnica do motor e do visualizador está no [checklist 06](06-radio-engine.md).
+
+Em 30/09, a origem das faixas deixou de ser pendência: a entrega 06 conectou as 343 músicas do R2, e a lista “A seguir” passou a receber as dez próximas ocorrências do controller. Esta integração está no PR da entrega 06, não no PR visual 03b. Permanecem pendentes a conferência de rolagem e da ordem da fila por Cassiano em desktop e mobile.

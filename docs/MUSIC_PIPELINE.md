@@ -53,7 +53,7 @@ Um manifesto antigo pode alimentar um importador único, jamais voltar a ser a b
 
 ## Limites da V1
 
-MP3 como formato inicial proposto; WAV, transcodificação, extração de letra, sincronizador local e importadores externos dependem de decisão posterior. O helper de Windows seria uma aplicação autorizada separada: o site hospedado não ganha acesso automático à pasta Downloads.
+MP3 continua como formato inicial proposto. A sincronização de letras da Rádio pode ser pré-processada localmente a partir do áudio + letra canônica por `scripts/sync-radio-lyrics.mjs`; os timestamps gerados são um derivado de apresentação, não a fonte editorial da letra. WAV/transcodificação, extração de letra quando não houver fonte canônica, sincronizador geral de pastas e importadores externos continuam dependendo de decisão posterior. O site hospedado não ganha acesso automático à pasta local de músicas.
 
 O Inbox é gestão musical mínima para Cassiano, não um novo ERP ou SaaS multiusuário. Fluxos visuais seguem [EXPERIENCE.md](EXPERIENCE.md); reprodução e filas seguem [RADIO.md](RADIO.md).
 

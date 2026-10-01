@@ -76,6 +76,12 @@ Meyda, suavização e renderização imperativa não são proibidos por princíp
 
 Pausar o loop quando a visualização não estiver ativa ou a aba estiver oculta; não parar a música por isso. As barras representam dados do áudio, inclusive quando o navegador reduz animações decorativas. Tolerar falha de canvas/análise sem derrubar reprodução. Testar silêncio e sinal conhecido para evitar barras que pulam sem correspondência ao áudio. Equalizador que modifica frequências é outro recurso, fora do marco inicial.
 
+## Letras sincronizadas
+
+A letra canônica continua sendo a fonte editorial. A sincronização é um derivado pré-calculado fora do navegador: áudio + letra canônica passam por alinhamento temporal e geram timestamps por linha e palavra. A transcrição automática serve apenas como evidência de tempo; ela não substitui nem reescreve a letra exibida.
+
+O player usa a posição do mesmo motor de áudio já existente para selecionar linha e palavra ativas. Não existe segundo elemento de áudio nem IA durante a reprodução. O derivado guarda hash da letra de origem; se a letra mudar, a API descarta timestamps obsoletos e mantém o fallback para texto simples até nova geração. Alinhamentos com cobertura insuficiente devem ser recusados em vez de publicados como sincronização aparentemente correta. Detalhes operacionais ficam no [checklist 06b](work/06b-synced-lyrics.md).
+
 ## Aceite da rádio
 
 Testar zero, uma e várias faixas; início aleatório em novas aberturas; ordem anunciada igual aos avanços; término sem repetição; seleção manual; histórico; seek; pausa; erro real; bloqueio do navegador; cliques rápidos; capa/título ausentes; volume e mudo conforme suporte. Redimensionar/expandir a Rádio no desktop, abrir/fechar a Rádio completa no mobile e navegar entre duas rotas repetidamente sem recriar áudio, duplicar som ou perder posição.

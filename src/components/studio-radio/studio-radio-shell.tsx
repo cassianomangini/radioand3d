@@ -443,9 +443,6 @@ export function StudioRadioShell() {
           <a href="#top">Início</a>
           <a href="#studio">Estúdio</a>
           <a href="#radio">Rádio</a>
-          <button type="button" className={styles.pendingNav} disabled title="Página do Estúdio em breve">
-            Sobre
-          </button>
         </nav>
 
         <span className={styles.headerBalance} aria-hidden="true" />

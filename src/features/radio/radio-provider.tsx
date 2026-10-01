@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode
 } from "react";
-import { RadioQueue, type RepeatMode } from "./queue";
+import { createShuffledQueue } from "./queue";
 
 export interface RadioTrack {
   id: string;
@@ -41,8 +41,8 @@ interface RadioContextValue {
   position: number;
   duration: number;
   volume: number;
-  shuffle: boolean;
-  repeat: RepeatMode;
+  repeatOne: boolean;
+  canSkipNext: boolean;
   hasPrevious: boolean;
   analyserReady: boolean;
   play: () => void;
@@ -53,8 +53,9 @@ interface RadioContextValue {
   previous: () => void;
   seek: (seconds: number) => void;
   setVolume: (volume: number) => void;
-  toggleShuffle: () => void;
-  cycleRepeat: () => void;
+  toggleMute: () => void;
+  toggleRepeatOne: () => void;
+  reshuffle: () => void;
   retry: () => void;
   getAnalyser: () => AnalyserNode | null;
 }
@@ -68,21 +69,22 @@ function mediaErrorMessage(error: unknown) {
   return "Não foi possível reproduzir esta faixa. Tente novamente.";
 }
 
-export function RadioProvider({ children, tracks }: { children: ReactNode; tracks: RadioTrack[] }) {
-  const [queue] = useState(() => new RadioQueue(tracks.map((track) => track.id)));
+export function RadioProvider({ children, tracks, playlistSeed }: { children: ReactNode; tracks: RadioTrack[]; playlistSeed: number }) {
+  const [queue] = useState(() => createShuffledQueue(tracks.map((track) => track.id), playlistSeed));
   const audioRef = useRef<HTMLAudioElement>(null);
   const graphRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const requestRef = useRef(0);
   const [currentId, setCurrentId] = useState(queue.currentId);
-  const [upcomingIds, setUpcomingIds] = useState(() => queue.upcoming(10));
+  const [upcomingIds, setUpcomingIds] = useState(() => queue.upcoming(tracks.length));
   const [status, setStatus] = useState<PlaybackStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(1);
-  const [shuffle, setShuffleState] = useState(queue.shuffle);
-  const [repeat, setRepeatState] = useState<RepeatMode>(queue.repeat);
+  const lastAudibleVolumeRef = useRef(1);
+  const [repeatOne, setRepeatOne] = useState(false);
+  const [canSkipNext, setCanSkipNext] = useState(queue.hasNextManual);
   const [hasPrevious, setHasPrevious] = useState(false);
   const [analyserReady, setAnalyserReady] = useState(false);
 
@@ -98,11 +100,11 @@ export function RadioProvider({ children, tracks }: { children: ReactNode; track
 
   const refreshQueue = useCallback(() => {
     setCurrentId(queue.currentId);
-    setUpcomingIds(queue.upcoming(10));
-    setShuffleState(queue.shuffle);
-    setRepeatState(queue.repeat);
+    setUpcomingIds(queue.upcoming(queue.repeat === "one" ? 1 : tracks.length));
     setHasPrevious(queue.hasPrevious);
-  }, [queue]);
+    setRepeatOne(queue.repeat === "one");
+    setCanSkipNext(queue.hasNextManual);
+  }, [queue, tracks.length]);
 
   const ensureGraph = useCallback(() => {
     const audio = audioRef.current;
@@ -228,20 +230,38 @@ export function RadioProvider({ children, tracks }: { children: ReactNode; track
   }, []);
 
   const setVolume = useCallback((value: number) => {
+    if (!Number.isFinite(value)) return;
     const nextVolume = Math.min(Math.max(value, 0), 1);
+    if (nextVolume > 0) lastAudibleVolumeRef.current = nextVolume;
     if (audioRef.current) audioRef.current.volume = nextVolume;
     setVolumeState(nextVolume);
   }, []);
 
-  const toggleShuffle = useCallback(() => {
-    queue.setShuffle(!queue.shuffle);
+  const toggleMute = useCallback(() => {
+    setVolume(volume === 0 ? lastAudibleVolumeRef.current : 0);
+  }, [setVolume, volume]);
+
+  const toggleRepeatOne = useCallback(() => {
+    queue.setRepeat(queue.repeat === "one" ? "off" : "one");
     refreshQueue();
   }, [queue, refreshQueue]);
 
-  const cycleRepeat = useCallback(() => {
-    queue.setRepeat(queue.repeat === "off" ? "all" : queue.repeat === "all" ? "one" : "off");
+  const reshuffle = useCallback(() => {
+    const wasPlaying = status === "playing" || status === "loading" || status === "buffering";
+    queue.reshuffle();
+    if (audioRef.current?.getAttribute("src")) audioRef.current.currentTime = 0;
+    setPosition(0);
+    setError(null);
+    if (wasPlaying) {
+      switchToCurrent();
+      return;
+    }
+    requestRef.current += 1;
+    audioRef.current?.pause();
+    loadCurrent();
+    setStatus(queue.currentId && status !== "idle" ? "paused" : "idle");
     refreshQueue();
-  }, [queue, refreshQueue]);
+  }, [loadCurrent, queue, refreshQueue, status, switchToCurrent]);
 
   const retry = useCallback(() => {
     audioRef.current?.load();
@@ -262,9 +282,9 @@ export function RadioProvider({ children, tracks }: { children: ReactNode; track
   }, []);
 
   const value: RadioContextValue = {
-    tracks, currentTrack, upcomingTracks, status, error, position, duration, volume,
-    shuffle, repeat, hasPrevious, analyserReady, play, pause, toggle, select, next, previous,
-    seek, setVolume, toggleShuffle, cycleRepeat, retry, getAnalyser
+    tracks, currentTrack, upcomingTracks, status, error, position, duration, volume, repeatOne, canSkipNext,
+    hasPrevious, analyserReady, play, pause, toggle, select, next, previous,
+    seek, setVolume, toggleMute, toggleRepeatOne, reshuffle, retry, getAnalyser
   };
 
   return (

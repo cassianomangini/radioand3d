@@ -159,8 +159,8 @@ Limite: o recorte 03b contém somente a prévia visual de `Limite Elástico`; ai
 
 - [x] conferir base, diff local, contrato e disponibilidade de faixas;
 - [x] reservar a barra de rolagem no painel da lista sem rolar o player inteiro;
-- [ ] identificar pelo menos dez faixas autorizadas e a origem da fila;
-- [ ] implementar a lista das próximas faixas ligada à ordem de reprodução;
+- [x] identificar pelo menos dez faixas autorizadas e a origem da fila (concluído depois na entrega 06);
+- [x] implementar a lista das próximas faixas ligada à ordem de reprodução (concluído depois na entrega 06);
 - [x] executar lint, tipos e build;
 - [x] revisar diff e confirmar que o ajuste da Rádio preserva as alterações locais do hero;
 - [ ] Cassiano verificar a rolagem e a lista com dez faixas em desktop e mobile;
@@ -170,4 +170,35 @@ Evidência inicial: `rg --files public src` e busca por arquivos de áudio no re
 
 Cassiano informou depois que o layout da Home está praticamente aprovado e pediu continuidade no layout funcional da Rádio. Isso ainda não é aprovação visual final da Rádio; a prova técnica do motor e do visualizador está no [checklist 06](06-radio-engine.md).
 
-Em 30/09, a origem das faixas deixou de ser pendência: a entrega 06 conectou as 343 músicas do R2, e a lista “A seguir” passou a receber as dez próximas ocorrências do controller. Esta integração está no PR da entrega 06, não no PR visual 03b. Permanecem pendentes a conferência de rolagem e da ordem da fila por Cassiano em desktop e mobile.
+Em 30/09, a origem das faixas deixou de ser pendência: a entrega 06 conectou as 343 músicas do R2. A revisão seguinte passou a mostrar em “A seguir” toda a sequência restante, com as dez próximas no topo. Permanecem pendentes a conferência de rolagem e da ordem da fila por Cassiano em desktop e mobile.
+
+## Volume recolhido no transporte em 30/09/2026
+
+Objetivo: mover o volume para perto do coração, conforme a revisão e a imagem enviadas por Cassiano. Responsável: CM Frontend. Branch: `fix/radio-volume-popover`, baseada em `feat/radio-r2-catalog`. Contratos lidos: `docs/EXPERIENCE.md` e `docs/RADIO.md`. Escopo: botão depois de Próxima, popover de volume e ação de mudo usando o motor compartilhado; remover a barra de volume fixa abaixo do transporte. Não alterar catálogo, arte ou composição do Estúdio.
+
+Aceite: abrir/fechar o controle por botão e Escape, ajustar o slider, silenciar e restaurar o último nível audível; desktop e Rádio completa mobile exibem o mesmo volume. O botão fica depois de Próxima e antes do coração. Cassiano confere posição, uso e aparência em desktop/mobile.
+
+- [x] Conferir branch, diff local, contratos e dependência do motor.
+- [x] Registrar objetivo, limites, responsável e aceite antes da implementação.
+- [x] Implementar botão, popover acessível, slider e mudo compartilhado.
+- [x] Remover a barra de volume fixa e revisar o encaixe responsivo pelo código.
+- [x] Executar verificações pertinentes e revisar diff.
+- [ ] Receber revisão visual e de interações de Cassiano.
+
+## Playlist aleatória sem repetição em 30/09/2026
+
+Cassiano identificou que os botões nas pontas do transporte (shuffle e repetição) não eram claros e pediu que a Rádio sempre abra em ordem aleatória, sem repetir automaticamente as músicas. Depois pediu explicitamente Repetir faixa e Nova ordem, além de melhorar ícones, layout e hover. Responsável: CM Frontend nesta branch, com ajuste pontual do controller da entrega 06. Contratos lidos: `docs/RADIO.md` e `docs/EXPERIENCE.md`. Limite: manter seleção manual, mostrar a ordem efetiva da fila e usar uma lista única **A seguir**, sem aba Biblioteca. A composição corrigida põe título/artista sobre a arte grande, retira miniatura e selo duplicado e reúne os sete controles na mesma fileira.
+
+Aceite: a primeira faixa e a ordem seguinte variam entre aberturas, a fila anunciada coincide com os avanços, nenhuma entrada toca novamente por avanço automático enquanto Repetir faixa está desligado, e a Rádio para ao final. Ação explícita de selecionar ou voltar a uma faixa pode reproduzi-la novamente. Repetir faixa ativo repete somente a atual; Nova ordem reinicia todas as entradas em outra sequência.
+
+- [x] Registrar objetivo, limites, responsável e aceite antes de mudar a fila.
+- [x] Inicializar uma ordem aleatória estável para a renderização da página.
+- [x] Impedir repetição automática mesmo após seleção manual.
+- [x] Corrigir ícones e hover, ordenar os sete controles na mesma fileira, destacar repetição ativa, dar tooltip a Nova ordem e manter somente **A seguir**.
+- [x] Colocar título/artista sobre a arte grande e remover miniatura, selo duplicado e menu de três pontos.
+- [x] Testar fila, lint, tipos, build e revisar diff.
+- [ ] Receber revisão visual e de interação de Cassiano.
+
+Evidência técnica desta branch: `pnpm lint`, `pnpm typecheck`, `pnpm test` (16 testes) e `pnpm build` passaram. Duas requisições HTTP à Home local responderam 200, exibiram 342 entradas reais em “A seguir” para o catálogo de 343 faixas, sem aba Biblioteca, e produziram ordens diferentes. A aprovação de Cassiano nesta conversa cobre a composição solicitada; ainda falta ele conferir a interface renderizada, os estados de hover e as interações em desktop e mobile com áudio real.
+
+Após ver a fila, Cassiano pediu três linhas completas visíveis no tamanho inicial, título **A seguir** e busca lado a lado e ausência de contador. A branch `fix/radio-volume-popover` implementa esse ajuste; a revisão visual final permanece pendente.

@@ -12,6 +12,7 @@ export class RadioQueue {
   private shufflePool: string[] = [];
   private shuffleCycles = 0;
   private history: string[] = [];
+  private played: Set<string>;
   private random: () => number;
 
   shuffle = false;
@@ -20,6 +21,7 @@ export class RadioQueue {
   constructor(ids: string[], currentId: string | null = null, random = Math.random) {
     this.ids = [...new Set(ids)];
     this.current = currentId && this.ids.includes(currentId) ? currentId : this.ids[0] ?? null;
+    this.played = new Set(this.current ? [this.current] : []);
     this.random = random;
   }
 
@@ -31,11 +33,21 @@ export class RadioQueue {
     return this.history.length > 0;
   }
 
+  get hasNextManual() {
+    return this.repeat === "one"
+      ? this.planned.length > 0 || (this.shuffle
+        ? this.ids.some((id) => !this.played.has(id))
+        : this.ids.indexOf(this.current ?? "") < this.ids.length - 1)
+      : this.upcoming(1).length > 0;
+  }
+
   setTracks(ids: string[]) {
     this.ids = [...new Set(ids)];
     if (!this.current || !this.ids.includes(this.current)) {
       this.current = this.ids[0] ?? null;
     }
+    this.played = new Set([...this.played].filter((id) => this.ids.includes(id)));
+    if (this.current) this.played.add(this.current);
     this.history = this.history.filter((id) => this.ids.includes(id));
     this.resetPlan();
   }
@@ -44,6 +56,7 @@ export class RadioQueue {
     if (!this.ids.includes(id)) return false;
     if (this.current && this.current !== id) this.history.push(this.current);
     this.current = id;
+    this.played.add(id);
     this.resetPlan();
     return true;
   }
@@ -60,6 +73,19 @@ export class RadioQueue {
     this.resetPlan();
   }
 
+  reshuffle(random: () => number = Math.random) {
+    const candidates = this.ids.length > 1
+      ? this.ids.filter((id) => id !== this.current)
+      : this.ids;
+    this.random = random;
+    this.current = candidates[Math.floor(random() * candidates.length)] ?? null;
+    this.played = new Set(this.current ? [this.current] : []);
+    this.history = [];
+    this.shuffle = true;
+    this.repeat = "off";
+    this.resetPlan();
+  }
+
   upcoming(count = 10): string[] {
     if (!this.current || count <= 0) return [];
     if (this.repeat === "one") return Array(count).fill(this.current) as string[];
@@ -72,8 +98,7 @@ export class RadioQueue {
     if (this.repeat === "one" && !manual) return this.current;
     if (this.repeat === "one" && manual) {
       const original = this.repeat;
-      this.repeat = "all";
-      this.resetPlan();
+      this.repeat = "off";
       const next = this.takeNext();
       this.repeat = original;
       this.resetPlan();
@@ -98,6 +123,7 @@ export class RadioQueue {
     if (!next || !this.current) return null;
     if (next !== this.current) this.history.push(this.current);
     this.current = next;
+    this.played.add(next);
     return next;
   }
 
@@ -109,7 +135,7 @@ export class RadioQueue {
           if (this.shuffleCycles > 0 && this.repeat === "off") break;
           const last = this.planned.at(-1) ?? this.current;
           const candidates = this.shuffleCycles === 0
-            ? this.ids.filter((id) => id !== this.current)
+            ? this.ids.filter((id) => this.repeat === "off" ? !this.played.has(id) : id !== this.current)
             : [...this.ids];
           if (candidates.length === 0 && this.repeat === "all" && this.ids.length === 1) {
             candidates.push(this.ids[0]);
@@ -148,4 +174,20 @@ export class RadioQueue {
     this.shufflePool = [];
     this.shuffleCycles = 0;
   }
+}
+
+export function createShuffledQueue(ids: string[], seed: number) {
+  let state = seed >>> 0;
+  const random = () => {
+    state += 0x6D2B79F5;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+  const uniqueIds = [...new Set(ids)];
+  const currentId = uniqueIds[Math.floor(random() * uniqueIds.length)] ?? null;
+  const queue = new RadioQueue(uniqueIds, currentId, random);
+  queue.setShuffle(true);
+  return queue;
 }

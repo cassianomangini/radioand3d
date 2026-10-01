@@ -76,6 +76,8 @@ Meyda, suavização e renderização imperativa não são proibidos por princíp
 
 Pausar o loop quando a visualização não estiver ativa ou a aba estiver oculta; não parar a música por isso. As barras representam dados do áudio, inclusive quando o navegador reduz animações decorativas. Tolerar falha de canvas/análise sem derrubar reprodução. Testar silêncio e sinal conhecido para evitar barras que pulam sem correspondência ao áudio. Equalizador que modifica frequências é outro recurso, fora do marco inicial.
 
+Cada barra deve derivar somente da energia da própria faixa de frequência. O renderer pode aplicar escala visual e attack/release por barra, mas não deve injetar envelope RMS global, pulso compartilhado entre bandas, boost fixo de "voz" ou movimento sintético para fazer o espectro parecer mais animado. Faixas constantes devem estabilizar; mudanças em uma região do espectro não podem levantar regiões sem energia correspondente.
+
 ## Letras sincronizadas
 
 A letra canônica continua sendo a fonte editorial. A sincronização é um derivado pré-calculado fora do navegador: áudio + letra canônica passam por alinhamento temporal e geram timestamps por linha e palavra. A transcrição automática serve apenas como evidência de tempo; ela não substitui nem reescreve a letra exibida.

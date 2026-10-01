@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { createFrequencyBarMotion, waveformRms } from "./frequency-bars";
+import { createFrequencyBarMotion } from "./frequency-bars";
 import { useRadio } from "./radio-provider";
 
 export function RadioVisualizer({ className, barCount = 36, active = true }: { className: string; barCount?: number; active?: boolean }) {
@@ -14,8 +14,7 @@ export function RadioVisualizer({ className, barCount = 36, active = true }: { c
     if (!root || !analyser || !analyserReady || status !== "playing" || !active) return;
 
     const bars = Array.from(root.querySelectorAll<HTMLSpanElement>(":scope > span"));
-    const levels = new Uint8Array(analyser.frequencyBinCount);
-    const waveform = new Uint8Array(analyser.fftSize);
+    const levels = new Float32Array(analyser.frequencyBinCount);
     const moveBars = createFrequencyBarMotion(bars.length);
     const bounds = root.getBoundingClientRect();
     let visible = bounds.width > 0 && bounds.height > 0 && bounds.bottom > 0 && bounds.top < window.innerHeight && bounds.right > 0 && bounds.left < window.innerWidth;
@@ -24,11 +23,10 @@ export function RadioVisualizer({ className, barCount = 36, active = true }: { c
 
     function draw(now: number) {
       if (!analyser) return;
-      analyser.getByteFrequencyData(levels);
-      analyser.getByteTimeDomainData(waveform);
+      analyser.getFloatFrequencyData(levels);
       const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
       previousFrame = now;
-      const heights = moveBars(levels, analyser.context.sampleRate, waveformRms(waveform), elapsed);
+      const heights = moveBars(levels, analyser.context.sampleRate, analyser.fftSize, elapsed);
       bars.forEach((bar, index) => {
         bar.style.height = `${heights[index]}%`;
       });

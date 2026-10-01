@@ -116,10 +116,10 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
     try {
       context = new AudioContext();
       const analyser = context.createAnalyser();
-      analyser.fftSize = 2048;
-      analyser.smoothingTimeConstant = 0.18;
-      analyser.minDecibels = -90;
-      analyser.maxDecibels = -5;
+      analyser.fftSize = 4096;
+      analyser.smoothingTimeConstant = 0;
+      analyser.minDecibels = -100;
+      analyser.maxDecibels = -10;
       source = context.createMediaElementSource(audio);
       source.connect(analyser);
       analyser.connect(context.destination);

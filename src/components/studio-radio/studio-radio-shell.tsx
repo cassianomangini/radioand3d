@@ -8,7 +8,6 @@ import {
   useState,
   type CSSProperties,
   type ReactNode,
-  type Ref,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent
 } from "react";
@@ -28,6 +27,24 @@ const previewTrack = {
   artist: "CM",
   duration: "3:52"
 } as const;
+
+const socialIcons = [
+  { label: "Email", src: "/images/social/email_sem_borda.png" },
+  { label: "Instagram", src: "/images/social/instagram_sem_borda.png" },
+  { label: "Shopee", src: "/images/social/shopee_sem_borda.png" }
+] as const;
+
+function SocialIcons() {
+  return (
+    <div className={styles.socialIcons} role="group" aria-label="Contato e redes sociais">
+      {socialIcons.map(({ label, src }) => (
+        <span className={styles.socialIcon} key={label} title={label}>
+          <Image src={src} alt={label} width={42} height={42} />
+        </span>
+      ))}
+    </div>
+  );
+}
 
 type IconName = "expand" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute";
 
@@ -83,7 +100,47 @@ function formatTrackDuration(seconds?: number) {
   return seconds && Number.isFinite(seconds) && seconds > 0 ? formatTime(seconds) : "—";
 }
 
-function RadioContent({ mobile = false, onClose, closeButtonRef }: { mobile?: boolean; onClose?: () => void; closeButtonRef?: Ref<HTMLButtonElement> }) {
+function RadioLyrics({ trackId, title }: { trackId?: string; title?: string }) {
+  const [result, setResult] = useState<{ trackId: string; lyrics: string | null; failed: boolean } | null>(null);
+
+  useEffect(() => {
+    if (!trackId) return;
+    const controller = new AbortController();
+
+    fetch(`/api/radio/lyrics?id=${encodeURIComponent(trackId)}`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("Lyrics request failed");
+        return response.json() as Promise<{ lyrics: string | null }>;
+      })
+      .then(({ lyrics }) => setResult({ trackId, lyrics, failed: false }))
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === "AbortError") return;
+        setResult({ trackId, lyrics: null, failed: true });
+      });
+
+    return () => controller.abort();
+  }, [trackId]);
+
+  const current = result?.trackId === trackId ? result : null;
+
+  return (
+    <section className={styles.lyricsPanel} aria-labelledby="radio-lyrics-title">
+      <div className={styles.lyricsHeader}>
+        <h3 id="radio-lyrics-title">Letra</h3>
+        <span title={title}>{title}</span>
+      </div>
+      <div className={styles.lyricsScroll} role="region" aria-label={`Letra de ${title ?? "música atual"}`} tabIndex={0}>
+        {!trackId ? <p className={styles.lyricsStatus}>Selecione uma faixa para ver a letra.</p> : null}
+        {trackId && !current ? <p className={styles.lyricsStatus} role="status">Carregando letra…</p> : null}
+        {current?.failed ? <p className={styles.lyricsStatus} role="alert">Não foi possível carregar a letra.</p> : null}
+        {current && !current.failed && !current.lyrics ? <p className={styles.lyricsStatus}>Letra ainda não disponível para esta faixa.</p> : null}
+        {current?.lyrics ? <p className={styles.lyricsText}>{current.lyrics}</p> : null}
+      </div>
+    </section>
+  );
+}
+
+function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: boolean; expanded?: boolean; onClose?: () => void }) {
   const radio = useRadio();
   const [query, setQuery] = useState("");
   const [volumeOpen, setVolumeOpen] = useState(false);
@@ -133,7 +190,6 @@ function RadioContent({ mobile = false, onClose, closeButtonRef }: { mobile?: bo
 
         {onClose ? (
           <button
-            ref={closeButtonRef}
             type="button"
             className={styles.iconButton}
             onClick={onClose}
@@ -249,6 +305,7 @@ function RadioContent({ mobile = false, onClose, closeButtonRef }: { mobile?: bo
           <li className={styles.emptyState}>{normalizedQuery ? "Nenhuma próxima música encontrada." : "Não há próximas músicas nesta fila."}</li>
         ) : null}
       </ol>
+      {expanded ? <RadioLyrics trackId={radio.currentTrack?.id} title={radio.currentTrack?.title} /> : null}
       {radio.error ? <p className={styles.playerMessage} role="alert">{radio.error} <button type="button" onClick={radio.retry}>Tentar novamente</button></p> : null}
       {!radio.error && radio.currentTrack?.fixture ? <p className={styles.playerMessage}>Áudio sintético para teste local. Nenhuma música foi publicada.</p> : null}
     </div>
@@ -260,7 +317,6 @@ export function StudioRadioShell() {
   const shellRef = useRef<HTMLDivElement>(null);
   const radioNavRef = useRef<HTMLAnchorElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
-  const desktopCloseRef = useRef<HTMLButtonElement>(null);
   const mobileDialogRef = useRef<HTMLDialogElement>(null);
   const customWidthRef = useRef(false);
   const dragOffsetRef = useRef(0);
@@ -272,12 +328,16 @@ export function StudioRadioShell() {
   const pointerMovedRef = useRef(false);
   const dragFullscreenRef = useRef(false);
   const dragRestoredRef = useRef(false);
+  const returnDistanceRef = useRef(0);
+  const returnOffsetRef = useRef(0);
   const openedFromDragRef = useRef(false);
   const previewResetFrameRef = useRef<number | null>(null);
+  const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [radioExpanded, setRadioExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [radioFullscreen, setRadioFullscreen] = useState(false);
+  const [snapDirection, setSnapDirection] = useState<"opening" | "closing" | null>(null);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -305,16 +365,16 @@ export function StudioRadioShell() {
   }, [mobileRadioOpen]);
 
   useEffect(() => {
-    if (radioFullscreen && !pointerActiveRef.current) desktopCloseRef.current?.focus();
-  }, [radioFullscreen]);
-
-  useEffect(() => {
     const media = window.matchMedia("(max-width: 73.74rem)");
     function leaveDesktop() {
       if (media.matches) setRadioFullscreen(false);
     }
     media.addEventListener("change", leaveDesktop);
     return () => media.removeEventListener("change", leaveDesktop);
+  }, []);
+
+  useEffect(() => () => {
+    if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -379,6 +439,16 @@ export function StudioRadioShell() {
     if (!shell) return;
     shell.style.removeProperty("--radio-return-offset");
     delete shell.dataset.radioReturning;
+    returnOffsetRef.current = 0;
+  }
+
+  function animateRadioSnap(direction: "opening" | "closing") {
+    if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
+    setSnapDirection(direction);
+    snapTimerRef.current = setTimeout(() => {
+      setSnapDirection(null);
+      snapTimerRef.current = null;
+    }, 620);
   }
 
   function openRadioFullscreen(fromDrag: boolean) {
@@ -388,11 +458,21 @@ export function StudioRadioShell() {
     }
     openedFromDragRef.current = fromDrag;
     dragFullscreenRef.current = true;
-    clearDragPreview();
+    if (fromDrag) {
+      previewResetFrameRef.current = requestAnimationFrame(() => {
+        clearDragPreview();
+        previewResetFrameRef.current = null;
+      });
+    } else {
+      clearDragPreview();
+    }
+    animateRadioSnap("opening");
     setRadioFullscreen(true);
   }
 
   function closeRadioFullscreen(restoreFocus = true) {
+    animateRadioSnap("closing");
+    clearDragPreview();
     dragFullscreenRef.current = false;
     customWidthRef.current = true;
     setRadioWidth(initialRadioWidthRef.current);
@@ -417,12 +497,13 @@ export function StudioRadioShell() {
 
     const rect = shell.getBoundingClientRect();
     dragOriginRef.current = radioFullscreen ? "fullscreen" : "sidebar";
-    initialRadioWidthRef.current = radioWidth ?? getDefaultWidth(rect.width);
+    if (!radioFullscreen) initialRadioWidthRef.current = radioWidth ?? getDefaultWidth(rect.width);
     dragFullscreenRef.current = radioFullscreen;
     dragRestoredRef.current = false;
     dragOffsetRef.current = rect.right - event.clientX - initialRadioWidthRef.current;
     dragStartXRef.current = event.clientX;
     dragStartDistanceRef.current = event.clientX - rect.left;
+    returnDistanceRef.current = Math.max(0, rect.width - initialRadioWidthRef.current - event.currentTarget.getBoundingClientRect().width);
     pointerActiveRef.current = true;
     pointerMovedRef.current = false;
     clearDragPreview();
@@ -445,14 +526,15 @@ export function StudioRadioShell() {
     pointerMovedRef.current = true;
 
     if (dragOriginRef.current === "fullscreen") {
-      const distance = Math.max(0, dragStartXRef.current - event.clientX);
+      const distance = Math.min(returnDistanceRef.current, Math.max(0, event.clientX - dragStartXRef.current));
+      returnOffsetRef.current = distance;
       if (distance > 0) {
         shell.style.setProperty("--radio-return-offset", `${distance}px`);
         shell.dataset.radioReturning = "true";
       } else {
         clearReturnPreview();
       }
-      if (distance >= Math.min(160, rect.width * 0.18)) {
+      if (distance >= returnDistanceRef.current) {
         pointerActiveRef.current = false;
         if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
         setDragging(false);
@@ -504,9 +586,10 @@ export function StudioRadioShell() {
     if (!pointerActiveRef.current) return;
     const shouldToggle = event.type === "pointerup" && !pointerMovedRef.current;
     const shouldRestore = event.type === "pointercancel" && dragOriginRef.current === "sidebar" && dragFullscreenRef.current;
+    const shouldReturn = event.type === "pointerup" && dragOriginRef.current === "fullscreen" && returnOffsetRef.current >= returnDistanceRef.current / 2;
     pointerActiveRef.current = false;
     setDragging(false);
-    if (shouldRestore) {
+    if (shouldRestore || shouldReturn) {
       closeRadioFullscreen(false);
     } else if (shouldToggle) {
       if (radioFullscreen) closeRadioFullscreen();
@@ -521,7 +604,7 @@ export function StudioRadioShell() {
 
   function handleResizeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
     if (radioFullscreen) {
-      if (["Enter", " ", "Escape", "ArrowLeft"].includes(event.key)) {
+      if (["Enter", " ", "Escape", "ArrowRight"].includes(event.key)) {
         event.preventDefault();
         closeRadioFullscreen();
       }
@@ -574,19 +657,19 @@ export function StudioRadioShell() {
   }
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined}>
-      <header className={styles.siteHeader} inert={radioFullscreen}>
-        <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início">
+    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-snap={snapDirection ?? undefined}>
+      <header className={styles.siteHeader}>
+        <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
         </a>
 
         <nav className={styles.desktopNav} aria-label="Navegação principal">
-          <a href="#top">Início</a>
-          <a href="#studio">Estúdio</a>
+          <a href="#top" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>Início</a>
+          <a href="#studio" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>Estúdio</a>
           <a ref={radioNavRef} href="#radio" onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
         </nav>
 
-        <span className={styles.headerBalance} aria-hidden="true" />
+        <SocialIcons />
 
         <button
           type="button"
@@ -622,6 +705,7 @@ export function StudioRadioShell() {
             <button type="button" disabled title="Página do Estúdio em breve">
               Sobre
             </button>
+            <SocialIcons />
           </nav>
         ) : null}
       </header>
@@ -674,8 +758,7 @@ export function StudioRadioShell() {
             <div className={styles.heroContent}>
               <h1 id="studio-title" aria-label="Ideias que ganham forma.">Ideias que<br />ganham <span>forma.</span></h1>
               <p className={styles.lead}>
-                Descubra mais sobre nosso estúdio, peças, materiais, cores e
-                muito mais para voce explorar..
+                Explore peças, materiais e cores no nosso estúdio de impressão 3D.
               </p>
               <button
                 type="button"
@@ -695,7 +778,7 @@ export function StudioRadioShell() {
           ref={resizeHandleRef}
           className={styles.resizeHandle}
           role={radioFullscreen ? "button" : "separator"}
-          aria-label={radioFullscreen ? "Arraste para voltar ao Estúdio" : "Redimensionar ou expandir CM Rádio"}
+          aria-label={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Redimensionar ou expandir CM Rádio"}
           aria-orientation={radioFullscreen ? undefined : "vertical"}
           aria-valuemin={radioFullscreen ? undefined : MIN_RADIO_WIDTH}
           aria-valuemax={radioFullscreen ? undefined : MAX_RADIO_WIDTH}
@@ -706,11 +789,11 @@ export function StudioRadioShell() {
           onPointerUp={stopDragging}
           onPointerCancel={stopDragging}
           onKeyDown={handleResizeKeyDown}
-          title={radioFullscreen ? "Arraste para a esquerda ou clique para voltar ao Estúdio" : "Clique para expandir ou recolher; arraste para ajustar a largura ou abrir a Rádio"}
+          title={radioFullscreen ? "Arraste para a direita ou clique para mostrar o Estúdio" : "Clique para expandir ou recolher; arraste para ajustar a largura ou abrir a Rádio"}
         />
 
         <aside id="radio" className={styles.radioPanel} aria-label="CM Rádio">
-          <RadioContent onClose={radioFullscreen ? () => closeRadioFullscreen() : undefined} closeButtonRef={desktopCloseRef} />
+          <RadioContent expanded={radioFullscreen} />
         </aside>
       </div>
 

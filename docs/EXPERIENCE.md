@@ -26,6 +26,8 @@ Na mesma revisão, Cassiano definiu que a playlist já abre aleatória e não re
 
 Na revisão seguinte, Cassiano pediu mais altura inicial para a fila, com três músicas completas visíveis em uma tela comum. **A seguir** e a busca ficam lado a lado; a interface não mostra contador de músicas ao lado do título. A lista continua rolável com toda a ordem restante.
 
+Em 01/10, Cassiano mostrou que o mini player mobile estava pequeno demais e pediu barras e botões mais presentes. A proposta em revisão usa capa e título legíveis, acesso à Rádio completa e uma segunda linha com barras reativas e controles de transporte maiores. A composição final depende da conferência visual dele no mobile.
+
 **Desktop**
 
 - Header CM enxuto.

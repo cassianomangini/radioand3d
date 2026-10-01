@@ -89,11 +89,11 @@ Body: tracking normal.
 
 ### Superfícies
 
-- `page`: **#080B12**
-- `studio-surface`: **#0B1019**
-- `radio-surface`: **#0D1420**
-- `panel`: **#111A28**
-- `elevated`: **#162131**
+- `page`: **#020305**
+- `studio-surface`: **#020305**
+- `radio-surface`: **#03050A**
+- `panel`: **#0A101B**
+- `elevated`: **#111827**
 - `media-light`: **#E9EDF2**
 - `overlay`: rgba(4, 7, 12, .86)
 
@@ -101,8 +101,8 @@ O lado do Estúdio é um pouco mais neutro. A Rádio é ligeiramente mais fria/a
 
 ### Texto
 
-- `text-primary`: **#F5F7FB**
-- `text-secondary`: **#B1BBC8**
+- `text-primary`: **#F7F8FB**
+- `text-secondary`: **#C0C7D2**
 - `text-muted`: **#7E8998**
 - `text-disabled`: **#596373**
 
@@ -120,7 +120,7 @@ Uso:
 - azul: ação primária e seleção;
 - ciano: detalhe vivo, foco e progresso;
 - violeta: Rádio/visualizador e estados secundários de música;
-- gradiente azul->violeta: permitido somente em pequenas áreas de assinatura, visualizador e progresso especial; não contornar cada card.
+- gradiente azul->violeta: permitido no logo fornecido, em uma palavra de destaque no título, no visualizador e no progresso especial; não contornar cada card.
 
 ### Status
 
@@ -161,7 +161,7 @@ Desktop:
 
 - 68px;
 - fundo praticamente sólido, levemente separado da página;
-- logo CM à esquerda;
+- logo **CM 3D and Radio** fornecido por Cassiano à esquerda, em escala pequena;
 - navegação curta;
 - tipografia 14px / 600;
 - item ativo indicado por texto/acento, não por cápsula grande;
@@ -170,7 +170,7 @@ Desktop:
 Mobile:
 
 - 60px;
-- logo;
+- o mesmo logo em escala pequena;
 - menu;
 - sem controles de Rádio duplicados.
 
@@ -181,30 +181,31 @@ Mobile:
 ### Hero
 
 Label:
-**ESTÚDIO DE IMPRESSÃO 3D**
+**ESTÚDIO DE IMPRESSÃO 3D & MÚSICAS**
 
 Visual:
 
 - label em 12px/700;
 - headline clara de 2-3 linhas;
 - texto máximo 52ch;
-- uma imagem grande;
+- o logo fornecido como âncora visual até existir fotografia real autorizada;
 - máximo dois CTAs;
 - nenhum conjunto de "benefícios" em cards logo abaixo.
 
 A imagem do Estúdio ocupa aproximadamente 42-50% da região útil quando houver foto real.
 
-Enquanto não houver mídia final, usar um placeholder editorial neutro escrito **MÍDIA DO ESTÚDIO**. Não simular produto real.
+Enquanto não houver mídia final, construir a abertura com logo, tipografia, texto e CTA. Não usar um card grande de placeholder nem simular produto real.
 
 ### CTA
 
-Primário:
+Entrada do Estúdio:
 
-- sólido `cm-blue`;
-- texto quase preto;
-- 46-48px de altura;
-- raio 10px;
-- sem gradiente obrigatório.
+- botão em cápsula preta com contorno azul e seta à direita, segundo a referência de Cassiano;
+- texto claro, legível antes do hover;
+- área acionável de pelo menos 44px;
+- sem preenchimento azul sólido na abertura.
+
+Botões primários de operações em outras superfícies continuam usando `cm-blue` sólido quando essa hierarquia fizer sentido.
 
 Secundário:
 

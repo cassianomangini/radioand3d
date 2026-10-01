@@ -1,27 +1,53 @@
 "use client";
 
+import Image from "next/image";
 import {
   useEffect,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent
 } from "react";
 import styles from "./studio-radio-shell.module.css";
+import { RadioVisualizer } from "@/features/radio/radio-visualizer";
+import { useRadio } from "@/features/radio/radio-provider";
 
-const DEFAULT_RADIO_WIDTH = 390;
-const MIN_RADIO_WIDTH = 320;
+const DEFAULT_RADIO_WIDTH = 480;
+const MIN_RADIO_WIDTH = 400;
 const MAX_RADIO_WIDTH = 720;
 const MIN_STUDIO_WIDTH = 640;
-const RESIZE_GUTTER = 16;
+const RESIZE_GUTTER = 68;
 
 const previewTrack = {
   title: "Limite Elástico",
   artist: "CM",
   duration: "3:52"
 } as const;
+
+type IconName = "expand" | "close" | "heart" | "more" | "shuffle" | "previous" | "play" | "pause" | "next" | "repeat" | "search" | "bars" | "volume";
+
+function Icon({ name }: { name: IconName }) {
+  const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
+  const paths: Record<IconName, ReactNode> = {
+    expand: <><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" /><path d="m4 4 5 5m11-5-5 5M4 20l5-5m11 5-5-5" /></>,
+    close: <><path d="M5 5l14 14M19 5 5 19" /></>,
+    heart: <path d="M20.8 8.6c0 4.2-8.8 10-8.8 10s-8.8-5.8-8.8-10a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z" />,
+    more: <><circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" /></>,
+    shuffle: <><path d="M4 7h3c4 0 6 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.7 0 3-1.7 4.3-3.7M16 7h4m-3-3 3 3-3 3" /></>,
+    previous: <><path d="M5 5v14M19 5 7 12l12 7V5Z" fill="currentColor" stroke="none" /></>,
+    play: <path d="m8 5 11 7-11 7V5Z" fill="currentColor" stroke="none" />,
+    pause: <><rect x="7" y="5" width="3.5" height="14" rx=".6" fill="currentColor" stroke="none" /><rect x="13.5" y="5" width="3.5" height="14" rx=".6" fill="currentColor" stroke="none" /></>,
+    next: <><path d="M19 5v14M5 5l12 7-12 7V5Z" fill="currentColor" stroke="none" /></>,
+    repeat: <><path d="M18 7H7a3 3 0 0 0-3 3v2m0-5 3-3M4 7 1 4m5 13h11a3 3 0 0 0 3-3v-2m0 5-3 3m3-3 3 3" /></>,
+    search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></>,
+    bars: <><path d="M4 19v-5m4 5V9m4 10V5m4 14V8m4 11v-7" /></>,
+    volume: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12" /></>
+  };
+  return <svg {...common}>{paths[name]}</svg>;
+}
 
 function clampRadioWidth(shellWidth: number, requested: number) {
   const availableMaximum = Math.max(
@@ -35,40 +61,44 @@ function clampRadioWidth(shellWidth: number, requested: number) {
   );
 }
 
+function getDefaultWidth(shellWidth: number) {
+  return clampRadioWidth(
+    shellWidth,
+    Math.min(DEFAULT_RADIO_WIDTH, Math.round(shellWidth / 3))
+  );
+}
+
 function getExpandedWidth(shellWidth: number) {
   return clampRadioWidth(shellWidth, shellWidth * 0.48);
 }
 
-interface RadioContentProps {
-  expanded?: boolean;
-  mobile?: boolean;
-  visualPlaying: boolean;
-  onToggleVisualPlaying: () => void;
-  onExpand?: () => void;
-  onClose?: () => void;
+function formatTime(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+  const rounded = Math.floor(seconds);
+  return `${Math.floor(rounded / 60)}:${String(rounded % 60).padStart(2, "0")}`;
 }
 
-function RadioContent({
-  expanded = false,
-  mobile = false,
-  visualPlaying,
-  onToggleVisualPlaying,
-  onExpand,
-  onClose
-}: RadioContentProps) {
+function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?: () => void }) {
+  const radio = useRadio();
   const [query, setQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "library">("upcoming");
   const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
-  const trackVisible =
-    normalizedQuery.length === 0 ||
-    previewTrack.title.toLocaleLowerCase("pt-BR").includes(normalizedQuery);
+  const libraryTracks = radio.tracks.filter((track) =>
+    `${track.title} ${track.artist}`.toLocaleLowerCase("pt-BR").includes(normalizedQuery)
+  );
+  const displayTrack = radio.currentTrack ?? previewTrack;
+  const canPlay = Boolean(radio.currentTrack);
+  const playing = radio.status === "playing";
+  const pending = radio.status === "loading" || radio.status === "buffering";
+  const currentArtwork = radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png";
+  const listTracks = activeTab === "upcoming" ? radio.upcomingTracks : libraryTracks;
+  const progress = radio.duration > 0 ? Math.min(100, radio.position / radio.duration * 100) : 0;
+  const repeatLabel = radio.repeat === "one" ? "uma faixa" : radio.repeat === "all" ? "todas" : "desligada";
 
   return (
     <div className={styles.radioContent}>
       <div className={styles.radioHeader}>
-        <div>
-          <span className={styles.radioKicker}>PRÉVIA VISUAL</span>
-          <h2>CM RÁDIO</h2>
-        </div>
+        <h2><span>CM</span> RÁDIO</h2>
 
         {mobile ? (
           <button
@@ -77,144 +107,132 @@ function RadioContent({
             onClick={onClose}
             aria-label="Fechar rádio"
           >
-            Fechar
+            <Icon name="close" />
           </button>
-        ) : (
-          <button
-            type="button"
-            className={styles.iconButton}
-            onClick={onExpand}
-            aria-label={expanded ? "Recolher rádio" : "Expandir rádio"}
-          >
-            {expanded ? "Recolher" : "Expandir"}
-          </button>
-        )}
+        ) : null}
       </div>
 
-      <div className={styles.coverFallback} aria-label="Capa provisória CM">
-        <span>CM</span>
-        <small>CAPA ENTRA COM O ACERVO</small>
+      <div className={styles.coverArt}>
+        <Image src={currentArtwork} alt="Arte visual da CM Rádio" fill sizes="(min-width: 1180px) 720px, 100vw" priority unoptimized />
       </div>
 
       <div className={styles.nowPlaying}>
-        <div>
-          <span className={styles.nowLabel}>FAIXA DE REFERÊNCIA</span>
-          <strong>{previewTrack.title}</strong>
-          <span>{previewTrack.artist}</span>
+        <span className={styles.trackThumb}><Image src={currentArtwork} alt="" fill sizes="48px" unoptimized /></span>
+        <div className={styles.nowMeta}>
+          <strong>{displayTrack.title}</strong>
+          <span>{displayTrack.artist}</span>
         </div>
-        <span className={styles.duration}>{previewTrack.duration}</span>
+        <span className={styles.previewBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span>
+        <button type="button" className={styles.smallIcon} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos indisponíveis nesta prévia"><Icon name="heart" /></button>
+        <button type="button" className={styles.smallIcon} disabled aria-label="Mais opções indisponíveis nesta prévia" title="Mais opções indisponíveis nesta prévia"><Icon name="more" /></button>
       </div>
 
       <div className={styles.progressBlock}>
-        <div
-          className={styles.progressTrack}
-          role="progressbar"
-          aria-label="Posição visual da faixa de referência"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={36}
-        >
-          <span className={styles.progressFill} />
-        </div>
+        <input
+          className={styles.progressSeek}
+          type="range"
+          min={0}
+          max={radio.duration || 1}
+          step={0.1}
+          value={Math.min(radio.position, radio.duration || 1)}
+          onChange={(event) => radio.seek(Number(event.target.value))}
+          disabled={!canPlay || radio.duration === 0}
+          aria-label="Posição da música"
+          style={{ "--seek-progress": `${progress}%` } as CSSProperties}
+        />
         <div className={styles.progressTimes}>
-          <span>1:22</span>
-          <span>{previewTrack.duration}</span>
+          <span>{formatTime(radio.position)}</span>
+          <span>{canPlay ? formatTime(radio.duration) : previewTrack.duration}</span>
         </div>
       </div>
 
-      <div className={styles.transport} aria-label="Controles de prévia da rádio">
-        <button type="button" disabled aria-label="Faixa anterior indisponível">
-          Anterior
-        </button>
+      <div className={styles.transport} aria-label="Controles da rádio">
+        <button type="button" onClick={radio.toggleShuffle} disabled={radio.tracks.length < 2} aria-pressed={radio.shuffle} aria-label="Embaralhar"><Icon name="shuffle" /></button>
+        <button type="button" onClick={radio.previous} disabled={!canPlay} aria-label="Faixa anterior"><Icon name="previous" /></button>
         <button
           type="button"
           className={styles.playButton}
-          onClick={onToggleVisualPlaying}
-          aria-pressed={visualPlaying}
-          aria-label={
-            visualPlaying
-              ? "Pausar estado visual de reprodução"
-              : "Ativar estado visual de reprodução"
-          }
+          onClick={radio.toggle}
+          disabled={!canPlay}
+          aria-label={pending ? "Cancelar reprodução" : playing ? "Pausar" : "Tocar"}
         >
-          {visualPlaying ? "Pausar" : "Tocar"}
+          <Icon name={playing || pending ? "pause" : "play"} />
         </button>
-        <button type="button" disabled aria-label="Próxima faixa indisponível">
-          Próxima
-        </button>
+        <button type="button" onClick={radio.next} disabled={!canPlay || radio.upcomingTracks.length === 0 || radio.tracks.length < 2} aria-label="Próxima faixa"><Icon name="next" /></button>
+        <button type="button" onClick={radio.cycleRepeat} disabled={!canPlay} aria-label={`Repetição: ${repeatLabel}`} title={`Repetição: ${repeatLabel}`} aria-pressed={radio.repeat !== "off"}><Icon name="repeat" />{radio.repeat === "one" ? <span className={styles.repeatOne}>1</span> : null}</button>
       </div>
 
-      <div className={styles.visualizer} aria-label="Fallback estático do visualizador">
-        <span style={{ height: "28%" }} />
-        <span style={{ height: "52%" }} />
-        <span style={{ height: "38%" }} />
-        <span style={{ height: "72%" }} />
-        <span style={{ height: "46%" }} />
-        <span style={{ height: "82%" }} />
-        <span style={{ height: "58%" }} />
-        <span style={{ height: "67%" }} />
-        <span style={{ height: "42%" }} />
-        <span style={{ height: "76%" }} />
-        <span style={{ height: "54%" }} />
-        <span style={{ height: "34%" }} />
+      <div className={styles.volumeControl}>
+        <Icon name="volume" />
+        <input type="range" min={0} max={1} step={0.01} value={radio.volume} onChange={(event) => radio.setVolume(Number(event.target.value))} disabled={!canPlay} aria-label="Volume" />
+        <span>{Math.round(radio.volume * 100)}%</span>
       </div>
-      <p className={styles.visualizerNote}>
-        Visualizador estático nesta etapa. O áudio real entra no motor da Rádio.
-      </p>
+
+      <RadioVisualizer className={styles.visualizer} />
 
       <div className={styles.libraryHeader}>
-        <strong>Biblioteca</strong>
-        <span>1 faixa de referência</span>
+        <button type="button" className={activeTab === "upcoming" ? styles.activeTab : undefined} aria-pressed={activeTab === "upcoming"} onClick={() => setActiveTab("upcoming")}>A seguir <span>{radio.upcomingTracks.length}</span></button>
+        <button type="button" className={activeTab === "library" ? styles.activeTab : undefined} aria-pressed={activeTab === "library"} onClick={() => setActiveTab("library")}>Biblioteca <span>{radio.tracks.length}</span></button>
       </div>
 
       <label className={styles.searchField}>
-        <span className={styles.srOnly}>Buscar música na prévia</span>
+        <span className={styles.srOnly}>Buscar música na biblioteca</span>
+        <Icon name="search" />
         <input
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Buscar música..."
+          onChange={(event) => {
+            setQuery(event.target.value);
+            if (event.target.value) setActiveTab("library");
+          }}
+          placeholder="Buscar na biblioteca..."
         />
       </label>
 
-      <div className={styles.trackList}>
-        {trackVisible ? (
-          <button
-            type="button"
-            className={styles.trackRow}
-            aria-current="true"
-            onClick={onToggleVisualPlaying}
-          >
-            <span className={styles.trackFallback}>CM</span>
-            <span className={styles.trackMeta}>
-              <strong>{previewTrack.title}</strong>
-              <small>{previewTrack.artist}</small>
-            </span>
-            <span className={styles.trackState}>
-              {visualPlaying ? "em prévia" : "selecionada"}
-            </span>
-            <span className={styles.duration}>{previewTrack.duration}</span>
-          </button>
-        ) : (
-          <p className={styles.emptyState}>Nenhuma faixa de prévia encontrada.</p>
-        )}
-      </div>
+      <ol className={styles.trackList} aria-label={activeTab === "upcoming" ? "Próximas músicas na ordem de reprodução" : "Biblioteca de músicas"}>
+        {listTracks.map((track, index) => (
+          <li key={`${activeTab}-${track.id}-${index}`}>
+            <button type="button" className={styles.trackRow} onClick={() => radio.select(track.id)} aria-current={activeTab === "library" && track.id === radio.currentTrack?.id ? "true" : undefined}>
+              <span className={styles.trackThumb}><Image src={track.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="48px" unoptimized /></span>
+              <span className={styles.trackMeta}><strong>{track.title}</strong><small>{track.artist}</small></span>
+              <span className={styles.trackState}>{activeTab === "upcoming" ? String(index + 1).padStart(2, "0") : track.id === radio.currentTrack?.id ? <Icon name="bars" /> : null}</span>
+              <span className={styles.duration}>{formatTime(track.durationSeconds ?? 0)}</span>
+            </button>
+          </li>
+        ))}
+        {activeTab === "library" && radio.tracks.length === 0 && previewTrack.title.toLocaleLowerCase("pt-BR").includes(normalizedQuery) ? (
+          <li className={styles.emptyState}>“{previewTrack.title}” aguarda áudio autorizado para reprodução.</li>
+        ) : null}
+        {listTracks.length === 0 && (activeTab === "upcoming" || radio.tracks.length > 0 || normalizedQuery.length > 0) ? (
+          <li className={styles.emptyState}>{activeTab === "upcoming" ? "Não há próximas músicas nesta fila." : "Nenhuma música encontrada."}</li>
+        ) : null}
+      </ol>
+      {radio.error ? <p className={styles.playerMessage} role="alert">{radio.error} <button type="button" onClick={radio.retry}>Tentar novamente</button></p> : null}
+      {!radio.error && radio.currentTrack?.fixture ? <p className={styles.playerMessage}>Áudio sintético para teste local. Nenhuma música foi publicada.</p> : null}
     </div>
   );
 }
 
 export function StudioRadioShell() {
+  const radio = useRadio();
   const shellRef = useRef<HTMLDivElement>(null);
   const mobileDialogRef = useRef<HTMLDialogElement>(null);
-  const [radioWidth, setRadioWidth] = useState(DEFAULT_RADIO_WIDTH);
+  const customWidthRef = useRef(false);
+  const dragOffsetRef = useRef(0);
+  const dragStartXRef = useRef(0);
+  const pointerActiveRef = useRef(false);
+  const pointerMovedRef = useRef(false);
+  const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [radioExpanded, setRadioExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [visualPlaying, setVisualPlaying] = useState(false);
 
   const shellStyle = useMemo(
-    () => ({ "--radio-width": `${radioWidth}px` }) as CSSProperties,
+    () =>
+      (radioWidth === null
+        ? {}
+        : { "--radio-width": `${radioWidth}px` }) as CSSProperties,
     [radioWidth]
   );
 
@@ -233,6 +251,27 @@ export function StudioRadioShell() {
     }
   }, [mobileRadioOpen]);
 
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      const width = shell.getBoundingClientRect().width;
+      setRadioWidth((current) =>
+        radioExpanded
+          ? getExpandedWidth(width)
+          : customWidthRef.current
+            ? clampRadioWidth(width, current ?? getDefaultWidth(width))
+            : getDefaultWidth(width)
+      );
+    });
+
+    observer.observe(shell);
+    return () => observer.disconnect();
+  }, [radioExpanded]);
+
   function updateRadioWidth(requested: number) {
     const shell = shellRef.current;
     if (!shell) {
@@ -250,9 +289,10 @@ export function StudioRadioShell() {
     }
 
     const shellWidth = shell.getBoundingClientRect().width;
+    customWidthRef.current = false;
 
     if (radioExpanded) {
-      updateRadioWidth(DEFAULT_RADIO_WIDTH);
+      setRadioWidth(getDefaultWidth(shellWidth));
       setRadioExpanded(false);
       return;
     }
@@ -262,12 +302,22 @@ export function StudioRadioShell() {
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    const shell = shellRef.current;
+    if (!shell) {
+      return;
+    }
+
+    const rect = shell.getBoundingClientRect();
+    dragOffsetRef.current = rect.right - event.clientX - (radioWidth ?? getDefaultWidth(rect.width));
+    dragStartXRef.current = event.clientX;
+    pointerActiveRef.current = true;
+    pointerMovedRef.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
   }
 
   function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!dragging) {
+    if (!pointerActiveRef.current || Math.abs(event.clientX - dragStartXRef.current) < 4) {
       return;
     }
 
@@ -277,7 +327,9 @@ export function StudioRadioShell() {
     }
 
     const rect = shell.getBoundingClientRect();
-    const requested = rect.right - event.clientX;
+    const requested = rect.right - event.clientX - dragOffsetRef.current;
+    pointerMovedRef.current = true;
+    customWidthRef.current = true;
     updateRadioWidth(requested);
     setRadioExpanded(false);
   }
@@ -286,7 +338,12 @@ export function StudioRadioShell() {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+    const shouldToggle = event.type === "pointerup" && pointerActiveRef.current && !pointerMovedRef.current;
+    pointerActiveRef.current = false;
     setDragging(false);
+    if (shouldToggle) {
+      toggleRadioExpanded();
+    }
   }
 
   function handleResizeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
@@ -297,26 +354,36 @@ export function StudioRadioShell() {
 
     const step = event.shiftKey ? 48 : 16;
 
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleRadioExpanded();
+      return;
+    }
+
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      updateRadioWidth(radioWidth + step);
+      customWidthRef.current = true;
+      updateRadioWidth((radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width)) + step);
       setRadioExpanded(false);
     }
 
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      updateRadioWidth(radioWidth - step);
+      customWidthRef.current = true;
+      updateRadioWidth((radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width)) - step);
       setRadioExpanded(false);
     }
 
     if (event.key === "Home") {
       event.preventDefault();
+      customWidthRef.current = true;
       updateRadioWidth(MIN_RADIO_WIDTH);
       setRadioExpanded(false);
     }
 
     if (event.key === "End") {
       event.preventDefault();
+      customWidthRef.current = false;
       setRadioWidth(getExpandedWidth(shell.getBoundingClientRect().width));
       setRadioExpanded(true);
     }
@@ -327,21 +394,19 @@ export function StudioRadioShell() {
   }
 
   return (
-    <div id="top" className={styles.site}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined}>
       <header className={styles.siteHeader}>
         <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início">
-          <span className={styles.brandMark}>CM</span>
-          <span className={styles.brandSuffix}>
-            <strong>3D</strong>
-            <small>&amp; RADIO</small>
-          </span>
+          <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
         </a>
 
         <nav className={styles.desktopNav} aria-label="Navegação principal">
           <a href="#top">Início</a>
           <a href="#studio">Estúdio</a>
           <a href="#radio">Rádio</a>
-          <a href="#studio-about">Sobre</a>
+          <button type="button" className={styles.pendingNav} disabled title="Página do Estúdio em breve">
+            Sobre
+          </button>
         </nav>
 
         <span className={styles.headerBalance} aria-hidden="true" />
@@ -377,92 +442,68 @@ export function StudioRadioShell() {
             >
               Rádio
             </button>
-            <a href="#studio-about" onClick={closeMobileMenu}>
+            <button type="button" disabled title="Página do Estúdio em breve">
               Sobre
-            </a>
+            </button>
           </nav>
         ) : null}
       </header>
 
       <div className={styles.mobileMiniPlayer}>
-        <span className={styles.miniCover}>CM</span>
+        <span className={styles.miniCover}><Image src={radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="44px" unoptimized /></span>
         <span className={styles.miniMeta}>
-          <strong>{previewTrack.title}</strong>
-          <small>{previewTrack.artist}</small>
+          <strong>{radio.currentTrack?.title ?? previewTrack.title}</strong>
+          <small>{radio.currentTrack?.artist ?? previewTrack.artist}</small>
         </span>
-        <button
-          type="button"
-          className={styles.miniPlay}
-          onClick={() => setVisualPlaying((playing) => !playing)}
-          aria-pressed={visualPlaying}
-        >
-          {visualPlaying ? "Pausar" : "Tocar"}
-        </button>
+        <div className={styles.miniControls}>
+          <button type="button" className={styles.miniStep} onClick={radio.previous} disabled={!radio.currentTrack} aria-label="Faixa anterior"><Icon name="previous" /></button>
+          <button
+            type="button"
+            className={styles.miniPlay}
+            onClick={radio.toggle}
+            disabled={!radio.currentTrack}
+            aria-label={radio.status === "loading" || radio.status === "buffering" ? "Cancelar reprodução" : radio.status === "playing" ? "Pausar" : "Tocar"}
+          >
+            <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />
+          </button>
+          <button type="button" className={styles.miniStep} onClick={radio.next} disabled={!radio.currentTrack || radio.upcomingTracks.length === 0 || radio.tracks.length < 2} aria-label="Próxima faixa"><Icon name="next" /></button>
+        </div>
         <button
           type="button"
           className={styles.miniOpen}
           onClick={() => setMobileRadioOpen(true)}
+          aria-label="Abrir rádio completa"
         >
-          Abrir rádio
+          Abrir
         </button>
         <span className={styles.miniProgress} aria-hidden="true">
-          <span />
+          <span style={{ width: radio.duration > 0 ? `${radio.position / radio.duration * 100}%` : "0%" }} />
         </span>
       </div>
 
       <div
         ref={shellRef}
         className={styles.desktopShell}
-        style={shellStyle}
         data-dragging={dragging ? "true" : undefined}
       >
         <main id="studio" className={styles.studio}>
           <section className={styles.hero} aria-labelledby="studio-title">
-            <div className={styles.heroCopy}>
-              <p className={styles.eyebrow}>ESTÚDIO DE IMPRESSÃO 3D</p>
-              <h1 id="studio-title">Ideias que ganham forma.</h1>
+            <div className={styles.heroContent}>
+              <h1 id="studio-title" aria-label="Ideias que ganham forma.">Ideias que<br />ganham <span>forma.</span></h1>
               <p className={styles.lead}>
-                Peças úteis, decorativas e personalizadas, criadas do projeto à
-                impressão com atenção ao acabamento.
+                Descubra mais sobre nosso estúdio, peças, materiais, cores e
+                muito mais para voce explorar..
               </p>
-              <div className={styles.heroActions}>
-                <a className={styles.primaryAction} href="#studio-about">
-                  Conhecer o estúdio
-                </a>
-              </div>
-            </div>
-
-            <div className={styles.mediaFrame} aria-label="Mídia do estúdio ainda não publicada">
-              <div>
-                <span>MÍDIA DO ESTÚDIO</span>
-                <strong>Foto real entra aqui.</strong>
-                <p>
-                  A estrutura já reserva o enquadramento principal sem inventar um
-                  produto para preencher a tela.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section
-            id="studio-about"
-            className={styles.aboutStudio}
-            aria-labelledby="about-studio-title"
-          >
-            <p className={styles.sectionLabel}>O ESTÚDIO</p>
-            <h2 id="about-studio-title">
-              Do arquivo ao <span>objeto real.</span>
-            </h2>
-            <p>
-              Cada peça passa por decisões de formato, material, impressão e
-              acabamento até virar algo físico, pronto para uso.
-            </p>
-            <div className={styles.futureContent}>
-              <span>PRÓXIMAS ENTRADAS</span>
-              <p>
-                Produtos, materiais, fotos e trabalhos aparecem aqui conforme o
-                conteúdo real for publicado.
-              </p>
+              <button
+                type="button"
+                className={styles.primaryAction}
+                disabled
+                title="Página do Estúdio em breve"
+                aria-label="Conheça mais sobre — página do Estúdio em breve"
+              >
+                <span>Conheça mais</span>
+                <span aria-hidden="true">→</span>
+              </button>
             </div>
           </section>
         </main>
@@ -470,30 +511,22 @@ export function StudioRadioShell() {
         <div
           className={styles.resizeHandle}
           role="separator"
-          aria-label="Redimensionar CM Rádio"
+          aria-label="Redimensionar ou expandir CM Rádio"
           aria-orientation="vertical"
           aria-valuemin={MIN_RADIO_WIDTH}
           aria-valuemax={MAX_RADIO_WIDTH}
-          aria-valuenow={Math.round(radioWidth)}
+          aria-valuenow={Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)}
           tabIndex={0}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={stopDragging}
           onPointerCancel={stopDragging}
           onKeyDown={handleResizeKeyDown}
-        >
-          <span aria-hidden="true" />
-        </div>
+          title="Clique para expandir ou recolher; arraste para ajustar a largura"
+        />
 
         <aside id="radio" className={styles.radioPanel} aria-label="CM Rádio">
-          <RadioContent
-            expanded={radioExpanded}
-            visualPlaying={visualPlaying}
-            onToggleVisualPlaying={() =>
-              setVisualPlaying((playing) => !playing)
-            }
-            onExpand={toggleRadioExpanded}
-          />
+          <RadioContent />
         </aside>
       </div>
 
@@ -507,12 +540,7 @@ export function StudioRadioShell() {
         onClose={() => setMobileRadioOpen(false)}
         aria-label="CM Rádio completa"
       >
-        <RadioContent
-          mobile
-          visualPlaying={visualPlaying}
-          onToggleVisualPlaying={() => setVisualPlaying((playing) => !playing)}
-          onClose={() => setMobileRadioOpen(false)}
-        />
+        <RadioContent mobile onClose={() => setMobileRadioOpen(false)} />
       </dialog>
     </div>
   );

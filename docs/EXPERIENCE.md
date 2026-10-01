@@ -2,13 +2,23 @@
 
 ## Direção confirmada
 
-CM como identidade principal. Sem astronauta, lettering Artesopolis ou tema espacial herdado. O monograma fica livre de cubos, bicos de impressão ou outros símbolos internos. As versões pesadas, cromadas e cheias de adereços foram rejeitadas. O logo final ainda requer escolha explícita.
+CM como identidade principal. Sem astronauta, lettering Artesopolis ou tema espacial herdado. Cassiano forneceu em 29/09/2026 o logo **CM 3D and Radio**, salvo em `public/images/cm-3d-radio-logo.png`. A navbar mostra uma versão pequena; o hero usa a mesma arte em escala moderada, sem competir com o título. Preservar o arquivo fornecido, sem redesenhar o monograma no frontend.
 
 Cassiano pediu um resultado bonito, chique, fácil e vivo, com muitas animações. Isso vale para composição e uso real. Tokens e componentes preservam uma direção visual aprovada; não substituem essa direção.
 
 ## Decisões confirmadas desta rodada
 
 A referência visual mais próxima do alvo mostrou uma composição em dois mundos, não uma home convencional com uma coleção de cards.
+
+Na revisão da interface em 29/09/2026, Cassiano pediu fundo quase preto, mais presença de cor no título, CTA do Estúdio em cápsula preta com contorno azul e seta, e uma única borda fina entre Estúdio e Rádio. Não reservar uma faixa escura para o divisor nem exibir um puxador permanente. A área de arraste pode ser transparente sobre a borda.
+
+No hero da landing, o marcador “ESTÚDIO 3D” e o texto “Descubra mais sobre nosso estúdio, peças, materiais, cores e muito mais para voce explorar..” substituem a copy anterior. Cassiano pediu retirar o bloco inferior “O ESTÚDIO / Do arquivo ao objeto real” e “PRÓXIMAS ENTRADAS” da home, preservando o botão “Conheça mais sobre”. O destino definido por Cassiano é a futura página do Estúdio. Até a rota existir, o botão e o item “Sobre” permanecem visíveis, mas desativados.
+
+Cassiano escolheu `output/dj2.png` como imagem da Rádio. A cópia exata em `public/images/cm-radio-preview-art.png` aparece na arte principal e nas miniaturas da prévia visual, sem logo CM 3D and Radio sobreposto. A imagem não é apresentada como capa oficial da faixa.
+
+O logo e a arte da Rádio devem manter a definição máxima dos PNGs fornecidos. A Home serve os arquivos originais, sem recompressão no carregamento. Isso não cria detalhe além da resolução dos arquivos de origem.
+
+Na mesma revisão, Cassiano pediu que a barra lateral da Rádio tenha proporção e aparência coerentes com o Estúdio. O estado inicial usa 480 px no desktop de 1440 px e reduz até 400 px perto do limite desktop; Expandir/Recolher fica dentro do cabeçalho da Rádio, mostra cursor de mão ao passar o mouse e anima apenas a mudança de largura em 260 ms. O arraste permanece imediato e a preferência por movimento reduzido desativa essa transição.
 
 **Desktop**
 
@@ -126,7 +136,7 @@ Registrar `ready_for_frontend: yes|no`, `artifact_ref`, `approved_by` e referên
 
 ## Verificação e rejeição
 
-Revisar render em 360/390 px, faixa intermediária e 1440 px; zoom de texto de 200%; toque, teclado, foco, títulos longos, capa ausente, zero/muitas faixas e loading/empty/error. Contraste precisa funcionar no estado normal, não apenas no hover.
+Cassiano revisa o render em 360/390 px, faixa intermediária e 1440 px; zoom de texto de 200%; toque, teclado, foco, títulos longos, capa ausente, zero/muitas faixas e loading/empty/error. Contraste precisa funcionar no estado normal, não apenas no hover.
 
 Meta: WCAG 2.2 AA, incluindo contraste de 4,5:1 para texto comum e 3:1 para texto grande conforme o critério. Meta própria para controles frequentes de toque: área acionável de 44 x 44 CSS px mesmo com ícone menor; essa meta não deve ser confundida com o mínimo AA de tamanho e suas exceções. Referências: [contraste](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) e [alvos de toque](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
 

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Manrope } from "next/font/google";
+import { getDevRadioTracks } from "@/features/radio/dev-catalog";
+import { RadioProvider } from "@/features/radio/radio-provider";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -35,7 +37,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${manrope.variable} ${plexMono.variable}`}>{children}</body>
+      <body className={`${manrope.variable} ${plexMono.variable}`}>
+        <RadioProvider tracks={getDevRadioTracks()}>{children}</RadioProvider>
+      </body>
     </html>
   );
 }

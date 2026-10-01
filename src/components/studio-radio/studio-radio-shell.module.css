@@ -1284,7 +1284,8 @@
 }
 
 .visualizer {
-  height: 4.4rem;
+  position: relative;
+  height: 7rem;
   gap: 0.14rem;
   padding-top: 0.2rem;
   overflow: hidden;
@@ -1296,6 +1297,18 @@
   background: linear-gradient(to top, #15c6ef 2%, #3b9fff 53%, #ae32ea 100%);
   border-radius: 1px 1px 0 0;
   opacity: 1;
+}
+
+.visualizer p {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  background: rgb(5 9 20 / 88%);
+  color: #a7bfd4;
+  font-size: 0.7rem;
+  text-align: center;
 }
 
 .queueHeader {
@@ -1530,11 +1543,15 @@
   }
 
   .visualizer {
-    height: 3.2rem;
+    height: 5.4rem;
   }
 }
 
 @media (max-width: 73.74rem) {
+  .visualizer {
+    height: 5.6rem;
+  }
+
   .radioContent {
     height: 100%;
     min-height: 0;

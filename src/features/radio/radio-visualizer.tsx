@@ -1,53 +1,63 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { frequencyBarHeights } from "./frequency-bars";
+import { frequencyBarHeights, waveformRms } from "./frequency-bars";
 import { useRadio } from "./radio-provider";
 
 const BAR_COUNT = 36;
 
 export function RadioVisualizer({ className }: { className: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const { status, analyserReady, getAnalyser } = useRadio();
+  const { status, analyserReady, analyserUnavailable, getAnalyser } = useRadio();
 
   useEffect(() => {
     const root = rootRef.current;
     const analyser = getAnalyser();
-    if (!root || !analyser || status !== "playing") return;
+    if (!root || !analyser || !analyserReady || status !== "playing") return;
 
-    const bars = Array.from(root.querySelectorAll<HTMLSpanElement>("span"));
+    const bars = Array.from(root.querySelectorAll<HTMLSpanElement>(":scope > span"));
     const levels = new Uint8Array(analyser.frequencyBinCount);
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let visible = false;
+    const waveform = new Uint8Array(analyser.fftSize);
+    const displayed = new Float32Array(bars.length).fill(4);
+    const bounds = root.getBoundingClientRect();
+    let visible = bounds.width > 0 && bounds.height > 0 && bounds.bottom > 0 && bounds.top < window.innerHeight && bounds.right > 0 && bounds.left < window.innerWidth;
     let frame = 0;
+    let averageRms = 0;
 
     function draw() {
       if (!analyser) return;
       analyser.getByteFrequencyData(levels);
-      const heights = frequencyBarHeights(levels, analyser.context.sampleRate, bars.length);
-      bars.forEach((bar, index) => { bar.style.height = `${heights[index]}%`; });
+      analyser.getByteTimeDomainData(waveform);
+      const rms = waveformRms(waveform);
+      averageRms += (rms - averageRms) * 0.06;
+      const pulse = Math.min(1, rms * 2.8 + Math.max(0, rms - averageRms) * 4);
+      const heights = frequencyBarHeights(levels, analyser.context.sampleRate, bars.length, pulse);
+      bars.forEach((bar, index) => {
+        const target = heights[index];
+        displayed[index] += (target - displayed[index]) * (target > displayed[index] ? 0.85 : 0.25);
+        bar.style.height = `${displayed[index]}%`;
+      });
       frame = window.requestAnimationFrame(draw);
     }
 
     function reconcile() {
       window.cancelAnimationFrame(frame);
-      if (visible && !document.hidden && !motion.matches) {
+      if (visible && !document.hidden) {
         frame = window.requestAnimationFrame(draw);
       }
     }
 
-    const observer = new IntersectionObserver(([entry]) => {
+    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       reconcile();
     });
-    observer.observe(root);
+    observer?.observe(root);
     document.addEventListener("visibilitychange", reconcile);
-    motion.addEventListener("change", reconcile);
+    reconcile();
 
     return () => {
-      observer.disconnect();
+      observer?.disconnect();
       document.removeEventListener("visibilitychange", reconcile);
-      motion.removeEventListener("change", reconcile);
       window.cancelAnimationFrame(frame);
       bars.forEach((bar) => { bar.style.height = "4%"; });
     };
@@ -58,9 +68,10 @@ export function RadioVisualizer({ className }: { className: string }) {
       ref={rootRef}
       className={className}
       role="img"
-      aria-label={status === "playing" ? "Visualizador reagindo ao áudio" : "Visualizador em espera"}
+      aria-label={analyserUnavailable ? "Visualizador indisponível" : status === "playing" && analyserReady ? "Visualizador reagindo ao áudio" : "Visualizador em espera"}
     >
       {Array.from({ length: BAR_COUNT }, (_, index) => <span key={index} style={{ height: "4%" }} />)}
+      {analyserUnavailable ? <p>Barras indisponíveis nesta reprodução</p> : null}
     </div>
   );
 }

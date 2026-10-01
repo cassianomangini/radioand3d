@@ -27,10 +27,7 @@ export function RadioLyrics({ trackId, title }: { trackId?: string; title?: stri
   const lineRefs = useRef<Array<HTMLParagraphElement | null>>([]);
 
   useEffect(() => {
-    if (!trackId) {
-      setResult(null);
-      return;
-    }
+    if (!trackId) return;
 
     const controller = new AbortController();
     fetch(`/api/radio/lyrics?id=${encodeURIComponent(trackId)}`, { signal: controller.signal })

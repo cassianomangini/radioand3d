@@ -1,123 +1,112 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createFrequencyBarMotion, frequencyBandLevels, waveformRms } from "../src/features/radio/frequency-bars.ts";
+import { createFrequencyBarMotion, frequencyBandLevels } from "../src/features/radio/frequency-bars.ts";
+
+const SAMPLE_RATE = 48_000;
+const FFT_SIZE = 4096;
+const BIN_COUNT = FFT_SIZE / 2;
+const BAR_COUNT = 36;
+const BIN_WIDTH = SAMPLE_RATE / FFT_SIZE;
+
+function silentSpectrum() {
+  return new Float32Array(BIN_COUNT).fill(Number.NEGATIVE_INFINITY);
+}
+
+function flatSpectrum(db) {
+  return new Float32Array(BIN_COUNT).fill(db);
+}
+
+function withTone(frequency, db = -12, baseDb = Number.NEGATIVE_INFINITY) {
+  const levels = new Float32Array(BIN_COUNT).fill(baseDb);
+  levels[Math.round(frequency / BIN_WIDTH)] = db;
+  return levels;
+}
 
 test("silence leaves every visualizer bar at its quiet baseline", () => {
-  const moveBars = createFrequencyBarMotion(36);
-  assert.deepEqual(moveBars(new Uint8Array(1024), 48000, 0, 16), Array(36).fill(4));
+  const moveBars = createFrequencyBarMotion(BAR_COUNT);
+  assert.deepEqual(moveBars(silentSpectrum(), SAMPLE_RATE, FFT_SIZE, 16), Array(BAR_COUNT).fill(4));
 });
 
-test("waveform level follows the actual sample amplitude", () => {
-  assert.equal(waveformRms(new Uint8Array(2048).fill(128)), 0);
-  assert.ok(waveformRms(Uint8Array.of(64, 192)) > waveformRms(Uint8Array.of(112, 144)));
+test("bass and midrange tones occupy different parts of the spectrum", () => {
+  const bass = frequencyBandLevels(withTone(90), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const mid = frequencyBandLevels(withTone(1_200), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const bassPeak = bass.indexOf(Math.max(...bass));
+  const midPeak = mid.indexOf(Math.max(...mid));
+
+  assert.ok(bassPeak >= 0 && bassPeak < 10);
+  assert.ok(midPeak > bassPeak + 8);
+  assert.ok(Math.max(...bass.slice(20)) === 0);
+  assert.ok(Math.max(...mid.slice(0, 8)) === 0);
 });
 
-test("bass and guitar-range energy occupy different bars", () => {
-  const bass = new Uint8Array(1024);
-  const guitar = new Uint8Array(1024);
-  bass[4] = 220;
-  guitar[160] = 220;
-  const bassBands = frequencyBandLevels(bass, 48000, 36);
-  const guitarBands = frequencyBandLevels(guitar, 48000, 36);
-  assert.ok(bassBands.slice(0, 12).some((level) => level > 0));
-  assert.ok(guitarBands.slice(24).some((level) => level > 0));
-  assert.ok(bassBands.slice(24).every((level) => level === 0));
-  assert.ok(guitarBands.slice(0, 12).every((level) => level === 0));
+test("the visualizer keeps useful treble above 12 kHz", () => {
+  const treble = frequencyBandLevels(withTone(15_000), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  assert.ok(Math.max(...treble.slice(-6)) > 0);
+  assert.equal(Math.max(...treble.slice(0, 20)), 0);
 });
 
-test("a quieter narrow frequency remains visible inside a wide high band", () => {
-  const levels = new Uint8Array(1024);
-  levels[90] = 48;
-  const heights = createFrequencyBarMotion(36)(levels, 48000, 0.05, 16);
-  assert.ok(heights.some((height) => height > 4));
-  assert.ok(heights.some((height) => height === 4));
+test("equal energy is not boosted just because it sits in the vocal range", () => {
+  const levels = frequencyBandLevels(flatSpectrum(-42), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const min = Math.min(...levels);
+  const max = Math.max(...levels);
+
+  assert.ok(min > 0.45 && max < 0.55);
+  assert.ok(max - min < 0.01);
 });
 
-test("loud music keeps headroom so bars can respond to changing levels", () => {
-  const moveBars = createFrequencyBarMotion(36);
-  const loud = new Uint8Array(1024).fill(255);
-  let heights = [];
-  for (let frame = 0; frame < 180; frame += 1) heights = moveBars(loud, 48000, 0.3, 16);
-  assert.ok(heights.every((height) => height > 4 && height < 96));
-});
-
-test("a sudden solo rises above its settled level", () => {
-  const moveBars = createFrequencyBarMotion(36);
-  const quiet = new Uint8Array(1024);
-  const solo = new Uint8Array(1024);
-  quiet[160] = 70;
-  solo[160] = 235;
-  const band = frequencyBandLevels(solo, 48000, 36).findIndex((level) => level > 0);
-  let before = 4;
-  for (let frame = 0; frame < 100; frame += 1) before = moveBars(quiet, 48000, 0.07, 16)[band];
-  const attack = moveBars(solo, 48000, 0.13, 16)[band];
-  let settled = attack;
-  for (let frame = 0; frame < 180; frame += 1) settled = moveBars(solo, 48000, 0.13, 16)[band];
-  assert.ok(attack > before + 10);
-  assert.ok(attack > settled + 5);
-});
-
-test("an RMS beat accents bass without lifting unrelated high bands", () => {
-  const moveBars = createFrequencyBarMotion(36);
-  const levels = new Uint8Array(1024);
-  levels[4] = 180;
-  levels[160] = 180;
-  const bands = frequencyBandLevels(levels, 48000, 36);
-  const bass = bands.findIndex((level) => level > 0);
-  const guitar = bands.findLastIndex((level) => level > 0);
+test("changing only the bass does not lift unrelated high-frequency bars", () => {
+  const moveBars = createFrequencyBarMotion(BAR_COUNT);
+  const backing = flatSpectrum(-60);
   let before = [];
-  for (let frame = 0; frame < 100; frame += 1) before = moveBars(levels, 48000, 0.06, 16);
-  const beat = moveBars(levels, 48000, 0.4, 16);
-  assert.ok(beat[bass] - before[bass] > beat[guitar] - before[guitar] + 4);
-});
 
-test("waveform changes alone cannot animate silent frequency bands", () => {
-  const heights = createFrequencyBarMotion(36)(new Uint8Array(1024), 48000, 0.8, 16);
-  assert.ok(heights.every((height) => height === 4));
-});
-
-test("moderate steady music stays around the middle of the visualizer", () => {
-  const moveBars = createFrequencyBarMotion(36);
-  const levels = new Uint8Array(1024).fill(100);
-  let heights = [];
-  for (let frame = 0; frame < 120; frame += 1) heights = moveBars(levels, 48000, 0.12, 16);
-  assert.ok(heights.every((height) => height > 35 && height < 55));
-});
-
-test("the vocal range remains visible in a mixed spectrum", () => {
-  const bands = frequencyBandLevels(new Uint8Array(1024).fill(100), 48000, 36);
-  assert.ok(bands[18] > bands[2]);
-  assert.ok(bands[18] > bands[34]);
-});
-
-test("a changing vocal-range tone moves middle bars over steady backing", () => {
-  const moveBars = createFrequencyBarMotion(36);
-  const first = new Uint8Array(1024).fill(80);
-  const next = new Uint8Array(1024).fill(80);
-  first[48] = 170;
-  first[49] = 90;
-  next[48] = 90;
-  next[49] = 170;
-  assert.deepEqual(frequencyBandLevels(first, 48000, 36), frequencyBandLevels(next, 48000, 36));
-
-  let before = [];
-  for (let frame = 0; frame < 100; frame += 1) before = moveBars(first, 48000, 0.15, 16);
-  const after = moveBars(next, 48000, 0.15, 16);
-  assert.ok(after[20] > before[20] + 7);
-  assert.ok(after[20] - before[20] > after[2] - before[2] + 7);
-});
-
-test("continuous midrange movement dances without pinning bars near the top", () => {
-  const moveBars = createFrequencyBarMotion(36);
-  const first = new Uint8Array(1024).fill(80);
-  const next = new Uint8Array(1024).fill(80);
-  first[48] = next[49] = 170;
-  first[49] = next[48] = 90;
-  const heights = [];
   for (let frame = 0; frame < 180; frame += 1) {
-    const height = moveBars(frame % 2 === 0 ? first : next, 48000, 0.15, 16)[20];
-    if (frame >= 120) heights.push(height);
+    before = moveBars(backing, SAMPLE_RATE, FFT_SIZE, 16);
   }
-  assert.ok(Math.max(...heights) < 75);
-  assert.ok(Math.max(...heights) - Math.min(...heights) > 5);
+
+  const bassHit = flatSpectrum(-60);
+  bassHit[Math.round(90 / BIN_WIDTH)] = -10;
+  const after = moveBars(bassHit, SAMPLE_RATE, FFT_SIZE, 16);
+
+  const lowRise = Math.max(...after.slice(0, 10).map((height, index) => height - before[index]));
+  const highRise = Math.max(...after.slice(24).map((height, index) => height - before[index + 24]));
+
+  assert.ok(lowRise > 5);
+  assert.ok(highRise < 0.1);
+});
+
+test("a steady spectrum settles instead of inventing continuous motion", () => {
+  const moveBars = createFrequencyBarMotion(BAR_COUNT);
+  const levels = flatSpectrum(-38);
+  let previous = moveBars(levels, SAMPLE_RATE, FFT_SIZE, 16);
+
+  for (let frame = 0; frame < 240; frame += 1) {
+    previous = moveBars(levels, SAMPLE_RATE, FFT_SIZE, 16);
+  }
+
+  const next = moveBars(levels, SAMPLE_RATE, FFT_SIZE, 16);
+  const drift = Math.max(...next.map((height, index) => Math.abs(height - previous[index])));
+  assert.ok(drift < 0.01);
+});
+
+test("attack is fast while release remains smooth", () => {
+  const moveBars = createFrequencyBarMotion(BAR_COUNT);
+  const tone = withTone(1_000, -10);
+  const bandLevels = frequencyBandLevels(tone, SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const band = bandLevels.indexOf(Math.max(...bandLevels));
+
+  const baseline = moveBars(silentSpectrum(), SAMPLE_RATE, FFT_SIZE, 16)[band];
+  const attacked = moveBars(tone, SAMPLE_RATE, FFT_SIZE, 16)[band];
+  const released = moveBars(silentSpectrum(), SAMPLE_RATE, FFT_SIZE, 16)[band];
+
+  assert.ok(attacked > baseline + 10);
+  assert.ok(released < attacked);
+  assert.ok(released > baseline + 5);
+});
+
+test("a stronger signal produces a taller bar in the same frequency band", () => {
+  const quiet = frequencyBandLevels(withTone(800, -46), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const loud = frequencyBandLevels(withTone(800, -18), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const band = loud.indexOf(Math.max(...loud));
+
+  assert.ok(loud[band] > quiet[band] + 0.3);
 });

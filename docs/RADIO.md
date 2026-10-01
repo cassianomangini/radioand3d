@@ -72,7 +72,7 @@ O sinal deve percorrer fonte → `AnalyserNode` → saída no grafo único. O re
 
 Meyda, suavização e renderização imperativa não são proibidos por princípio. Reutilizar somente quando houver função justificada, fronteiras limpas e testes. DOM refs ou canvas podem existir no renderer, nunca como contrato do provider de reprodução. Não disparar renderizações da página inteira a cada frame.
 
-Pausar loops quando não houver visualização ativa, aba visível ou movimento permitido; não parar a música por isso. Tolerar falha de canvas/análise sem derrubar reprodução. Testar silêncio e sinal conhecido para evitar barras que pulam sem correspondência ao áudio. Equalizador que modifica frequências é outro recurso, fora do marco inicial.
+Pausar o loop quando a visualização não estiver ativa ou a aba estiver oculta; não parar a música por isso. As barras representam dados do áudio, inclusive quando o navegador reduz animações decorativas. Tolerar falha de canvas/análise sem derrubar reprodução. Testar silêncio e sinal conhecido para evitar barras que pulam sem correspondência ao áudio. Equalizador que modifica frequências é outro recurso, fora do marco inicial.
 
 ## Aceite da rádio
 

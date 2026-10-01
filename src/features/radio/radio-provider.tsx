@@ -111,35 +111,38 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const ensureGraph = useCallback(() => {
     const audio = audioRef.current;
     if (!audio || analyserRef.current || graphRef.current) return;
+    let context: AudioContext | null = null;
+    let source: MediaElementAudioSourceNode | null = null;
     try {
-      const context = new AudioContext();
+      context = new AudioContext();
+      const analyser = context.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.3;
+      analyser.minDecibels = -90;
+      analyser.maxDecibels = -5;
+      source = context.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(context.destination);
       graphRef.current = context;
-      void context.resume().then(() => {
-        if (graphRef.current !== context || !audio.isConnected) return;
-        let source: MediaElementAudioSourceNode | null = null;
-        try {
-          const analyser = context.createAnalyser();
-          analyser.fftSize = 1024;
-          analyser.smoothingTimeConstant = 0.75;
-          source = context.createMediaElementSource(audio);
-          source.connect(analyser);
-          analyser.connect(context.destination);
-          analyserRef.current = analyser;
-          setAnalyserUnavailable(false);
-          setAnalyserReady(true);
-        } catch {
-          if (source) {
-            source.disconnect();
-            source.connect(context.destination);
-          }
-          setAnalyserUnavailable(true);
-        }
-      }).catch(() => {
-        if (graphRef.current === context) graphRef.current = null;
-        setAnalyserUnavailable(true);
-        void context.close();
+      analyserRef.current = analyser;
+      setAnalyserUnavailable(false);
+      setAnalyserReady(true);
+      void context.resume().catch(() => {
+        if (graphRef.current === context) setAnalyserUnavailable(true);
       });
     } catch {
+      if (source && context) {
+        try {
+          source.disconnect();
+          source.connect(context.destination);
+          graphRef.current = context;
+          void context.resume().catch(() => undefined);
+        } catch {
+          void context.close();
+        }
+      } else if (context) {
+        void context.close();
+      }
       setAnalyserUnavailable(true);
       // The media element keeps playing if Web Audio is unavailable.
     }

@@ -41,3 +41,8 @@ test("the same spectrum rises with the waveform pulse", () => {
   const strong = frequencyBarHeights(levels, 48000, 36, 0.9);
   assert.ok(strong.every((height, index) => height > soft[index]));
 });
+
+test("a moderate signal uses a meaningful part of the visualizer height", () => {
+  const heights = frequencyBarHeights(new Uint8Array(1024).fill(100), 48000, 36, 0.5);
+  assert.ok(heights.every((height) => height > 50 && height < 70));
+});

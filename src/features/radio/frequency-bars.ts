@@ -10,7 +10,7 @@ export function waveformRms(samples: Uint8Array): number {
 
 export function frequencyBarHeights(levels: Uint8Array, sampleRate: number, count: number, pulse: number): number[] {
   const nyquist = sampleRate / 2;
-  const envelope = 0.18 + 0.82 * Math.min(1, Math.max(0, pulse));
+  const envelope = 0.5 + 0.5 * Math.min(1, Math.max(0, pulse));
   return Array.from({ length: count }, (_, index) => {
     const low = 45 * Math.pow(10000 / 45, index / count);
     const high = 45 * Math.pow(10000 / 45, (index + 1) / count);
@@ -24,6 +24,6 @@ export function frequencyBarHeights(levels: Uint8Array, sampleRate: number, coun
       peak = Math.max(peak, level);
     }
     const amplitude = (0.8 * total / (end - start) + 0.2 * peak) / 255;
-    return Math.max(4, Math.min(90, 4 + Math.pow(amplitude, 1.2) * envelope * 86));
+    return Math.max(4, Math.min(96, 4 + Math.sqrt(amplitude) * envelope * 108));
   });
 }

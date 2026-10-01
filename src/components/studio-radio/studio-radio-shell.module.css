@@ -77,20 +77,32 @@
   justify-self: end;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .socialIcon {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 1.875rem;
+  height: 1.875rem;
   display: grid;
   place-items: center;
 }
 
 .socialIcon img {
-  width: 2.625rem;
-  height: 2.625rem;
+  display: block;
   object-fit: contain;
+  filter: drop-shadow(0 0 0.3rem var(--social-glow));
+}
+
+.socialIcon[data-icon="email"] {
+  --social-glow: rgb(37 195 255 / 58%);
+}
+
+.socialIcon[data-icon="instagram"] {
+  --social-glow: rgb(231 58 220 / 55%);
+}
+
+.socialIcon[data-icon="shopee"] {
+  --social-glow: rgb(255 124 39 / 55%);
 }
 
 .desktopNav a {
@@ -1280,6 +1292,8 @@
 }
 
 .transport {
+  position: relative;
+  z-index: 2;
   justify-content: space-between;
   gap: 0.15rem;
 }
@@ -1376,6 +1390,10 @@
 .transport .modeButton[data-tooltip]:not(:disabled):is(:hover, :focus-visible)::after {
   opacity: 1;
   transform: translateY(0);
+}
+
+.transport .modeButton[data-tooltip]:not(:disabled):is(:hover, :focus-visible) {
+  z-index: 3;
 }
 
 .transport .playButton:not(:disabled):hover {
@@ -2010,7 +2028,7 @@
     min-height: 0;
     gap: 0.5rem;
     padding: 0.45rem 0.65rem 0;
-    background: #07101d;
+    background: #000;
     border: 1px solid rgb(82 214 255 / 20%);
     border-bottom: 0;
     border-radius: 0.5rem 0.5rem 0 0;
@@ -2022,6 +2040,7 @@
 
   .site[data-radio-fullscreen="true"] .queueHeader .searchField input {
     min-height: 2rem;
+    background: #080808;
   }
 
   .site[data-radio-fullscreen="true"] .trackList {
@@ -2029,10 +2048,11 @@
     grid-row: 3 / 5;
     min-height: 0;
     padding: 0.25rem 0.4rem 0.5rem;
-    background: #07101d;
+    background: #000;
     border: 1px solid rgb(82 214 255 / 20%);
     border-top: 0;
     border-radius: 0 0 0.5rem 0.5rem;
+    scrollbar-color: #4c7395 #000;
   }
 
   .site[data-radio-fullscreen="true"] .lyricsPanel {
@@ -2043,7 +2063,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: #07101d;
+    background: #000;
     border: 1px solid rgb(82 214 255 / 20%);
     border-radius: 0.5rem;
   }
@@ -2078,7 +2098,7 @@
     overscroll-behavior: contain;
     padding: 1rem 0.95rem 1.5rem;
     scrollbar-width: thin;
-    scrollbar-color: #4c7395 #07101d;
+    scrollbar-color: #4c7395 #000;
   }
 
   .site[data-radio-fullscreen="true"] .lyricsScroll:focus-visible {
@@ -2264,13 +2284,26 @@
   }
 }
 
-@container radio-panel (min-width: 75rem) {
+@container radio-panel (min-width: 64rem) {
   .site[data-radio-fullscreen="true"] .radioContent {
-    grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.82fr) minmax(16rem, 0.9fr);
+    grid-template-columns: minmax(14rem, 0.85fr) minmax(26rem, 1.5fr) minmax(14rem, 0.9fr);
+  }
+
+  .site[data-radio-fullscreen="true"] .queueHeader {
+    grid-column: 1;
   }
 
   .site[data-radio-fullscreen="true"] .trackList {
+    grid-column: 1;
     grid-row: 3 / 8;
+  }
+
+  .site[data-radio-fullscreen="true"] .coverArt,
+  .site[data-radio-fullscreen="true"] .progressBlock,
+  .site[data-radio-fullscreen="true"] .visualizer,
+  .site[data-radio-fullscreen="true"] .transport,
+  .site[data-radio-fullscreen="true"] .playerMessage {
+    grid-column: 2;
   }
 
   .site[data-radio-fullscreen="true"] .lyricsPanel {

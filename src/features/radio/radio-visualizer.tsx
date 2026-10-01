@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { frequencyBarHeights, waveformRms } from "./frequency-bars";
+import { createFrequencyBarMotion, waveformRms } from "./frequency-bars";
 import { useRadio } from "./radio-provider";
 
 export function RadioVisualizer({ className, barCount = 36, active = true }: { className: string; barCount?: number; active?: boolean }) {
@@ -16,24 +16,21 @@ export function RadioVisualizer({ className, barCount = 36, active = true }: { c
     const bars = Array.from(root.querySelectorAll<HTMLSpanElement>(":scope > span"));
     const levels = new Uint8Array(analyser.frequencyBinCount);
     const waveform = new Uint8Array(analyser.fftSize);
-    const displayed = new Float32Array(bars.length).fill(4);
+    const moveBars = createFrequencyBarMotion(bars.length);
     const bounds = root.getBoundingClientRect();
     let visible = bounds.width > 0 && bounds.height > 0 && bounds.bottom > 0 && bounds.top < window.innerHeight && bounds.right > 0 && bounds.left < window.innerWidth;
     let frame = 0;
-    let averageRms = 0;
+    let previousFrame = 0;
 
-    function draw() {
+    function draw(now: number) {
       if (!analyser) return;
       analyser.getByteFrequencyData(levels);
       analyser.getByteTimeDomainData(waveform);
-      const rms = waveformRms(waveform);
-      averageRms += (rms - averageRms) * 0.06;
-      const pulse = Math.min(1, rms * 2.8 + Math.max(0, rms - averageRms) * 4);
-      const heights = frequencyBarHeights(levels, analyser.context.sampleRate, bars.length, pulse);
+      const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
+      previousFrame = now;
+      const heights = moveBars(levels, analyser.context.sampleRate, waveformRms(waveform), elapsed);
       bars.forEach((bar, index) => {
-        const target = heights[index];
-        displayed[index] += (target - displayed[index]) * (target > displayed[index] ? 0.85 : 0.25);
-        bar.style.height = `${displayed[index]}%`;
+        bar.style.height = `${heights[index]}%`;
       });
       frame = window.requestAnimationFrame(draw);
     }
@@ -41,6 +38,7 @@ export function RadioVisualizer({ className, barCount = 36, active = true }: { c
     function reconcile() {
       window.cancelAnimationFrame(frame);
       if (visible && !document.hidden) {
+        previousFrame = 0;
         frame = window.requestAnimationFrame(draw);
       }
     }

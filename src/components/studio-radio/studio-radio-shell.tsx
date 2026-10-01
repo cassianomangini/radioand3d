@@ -30,17 +30,17 @@ const previewTrack = {
 } as const;
 
 const socialIcons = [
-  { label: "Email", src: "/images/social/email_sem_borda.png" },
-  { label: "Instagram", src: "/images/social/instagram_sem_borda.png" },
-  { label: "Shopee", src: "/images/social/shopee_sem_borda.png" }
+  { label: "Email", src: "/images/social/email_sem_borda.png", width: 23, height: 16 },
+  { label: "Instagram", src: "/images/social/instagram_sem_borda.png", width: 18, height: 19 },
+  { label: "Shopee", src: "/images/social/shopee_sem_borda.png", width: 19, height: 23 }
 ] as const;
 
 function SocialIcons() {
   return (
     <div className={styles.socialIcons} role="group" aria-label="Contato e redes sociais">
-      {socialIcons.map(({ label, src }) => (
-        <span className={styles.socialIcon} key={label} title={label}>
-          <Image src={src} alt={label} width={42} height={42} />
+      {socialIcons.map(({ label, src, width, height }) => (
+        <span className={styles.socialIcon} key={label} title={label} data-icon={label.toLowerCase()}>
+          <Image src={src} alt={label} width={width} height={height} />
         </span>
       ))}
     </div>

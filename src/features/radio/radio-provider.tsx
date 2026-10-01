@@ -117,7 +117,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
       context = new AudioContext();
       const analyser = context.createAnalyser();
       analyser.fftSize = 2048;
-      analyser.smoothingTimeConstant = 0.3;
+      analyser.smoothingTimeConstant = 0.18;
       analyser.minDecibels = -90;
       analyser.maxDecibels = -5;
       source = context.createMediaElementSource(audio);

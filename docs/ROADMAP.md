@@ -8,7 +8,7 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, foi aprovada por Cassiano. A Home da **03b** e a ponte R2 da **06** estão implementadas em PRs com verificações de código aprovadas. A revisão do transporte, volume, ordem aleatória e fila está no PR #8. No PR #10 em rascunho, Cassiano confirmou que as barras passaram a se mover e aprovou a altura do espaço, mas pediu resposta mais fiel ao ritmo e barras mais altas dentro dele. O cálculo combina frequências e intensidade da forma de onda; a nova escala aguarda escuta. A revisão final da Rádio em desktop e mobile segue pendente; [checklist visual](work/03b-frontend-foundation.md) e [checklist de áudio](work/06-radio-engine.md).
+**03, direção visual CM**, foi aprovada por Cassiano. A Home da **03b** e a ponte R2 da **06** estão implementadas em PRs com verificações de código aprovadas. A revisão do transporte, volume, ordem aleatória e fila está no PR #8. No PR #10 em rascunho, Cassiano confirmou que as barras passaram a se mover e aprovou a altura do espaço, mas pediu resposta mais fiel ao ritmo e barras mais altas dentro dele. O cálculo combina frequências e intensidade da forma de onda; a nova escala aguarda escuta. Após ver o mini player mobile, Cassiano pediu uma composição maior com barras e botões legíveis; essa revisão está em `fix/mobile-mini-player`, pendente de conferência visual. A revisão final da Rádio em desktop e mobile segue pendente; [checklist visual](work/03b-frontend-foundation.md) e [checklist de áudio](work/06-radio-engine.md).
 
 ## Sequência única
 

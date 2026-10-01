@@ -488,33 +488,39 @@ export function StudioRadioShell() {
         ) : null}
       </header>
 
-      <div className={styles.mobileMiniPlayer}>
-        <span className={styles.miniCover}><Image src={radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="44px" unoptimized /></span>
+      <div className={styles.mobileMiniPlayer} role="region" aria-label="Mini player da CM Rádio">
+        <span className={styles.miniCover}><Image src={radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="64px" unoptimized /></span>
         <span className={styles.miniMeta}>
           <strong>{radio.currentTrack?.title ?? previewTrack.title}</strong>
           <small>{radio.currentTrack?.artist ?? previewTrack.artist}</small>
         </span>
-        <div className={styles.miniControls}>
-          <button type="button" className={styles.miniStep} onClick={radio.previous} disabled={!radio.currentTrack} aria-label="Faixa anterior"><Icon name="previous" /></button>
-          <button
-            type="button"
-            className={styles.miniPlay}
-            onClick={radio.toggle}
-            disabled={!radio.currentTrack}
-            aria-label={radio.status === "loading" || radio.status === "buffering" ? "Cancelar reprodução" : radio.status === "playing" ? "Pausar" : "Tocar"}
-          >
-            <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />
-          </button>
-          <button type="button" className={styles.miniStep} onClick={radio.next} disabled={!radio.currentTrack || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
-        </div>
         <button
           type="button"
           className={styles.miniOpen}
           onClick={() => setMobileRadioOpen(true)}
           aria-label="Abrir rádio completa"
         >
-          Abrir
+          <Icon name="expand" />
+          <span>Rádio</span>
         </button>
+        <div className={styles.miniPlaybackRow}>
+          <div className={styles.miniSignal}>
+            <RadioVisualizer className={`${styles.visualizer} ${styles.miniVisualizer}`} barCount={24} active={!mobileRadioOpen} />
+          </div>
+          <div className={styles.miniControls}>
+            <button type="button" className={styles.miniStep} onClick={radio.previous} disabled={!radio.currentTrack} aria-label="Faixa anterior"><Icon name="previous" /></button>
+            <button
+              type="button"
+              className={styles.miniPlay}
+              onClick={radio.toggle}
+              disabled={!radio.currentTrack}
+              aria-label={radio.status === "loading" || radio.status === "buffering" ? "Cancelar reprodução" : radio.status === "playing" ? "Pausar" : "Tocar"}
+            >
+              <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />
+            </button>
+            <button type="button" className={styles.miniStep} onClick={radio.next} disabled={!radio.currentTrack || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
+          </div>
+        </div>
         <span className={styles.miniProgress} aria-hidden="true">
           <span style={{ width: radio.duration > 0 ? `${radio.position / radio.duration * 100}%` : "0%" }} />
         </span>

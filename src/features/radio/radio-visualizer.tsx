@@ -4,16 +4,14 @@ import { useEffect, useRef } from "react";
 import { frequencyBarHeights, waveformRms } from "./frequency-bars";
 import { useRadio } from "./radio-provider";
 
-const BAR_COUNT = 36;
-
-export function RadioVisualizer({ className }: { className: string }) {
+export function RadioVisualizer({ className, barCount = 36, active = true }: { className: string; barCount?: number; active?: boolean }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const { status, analyserReady, analyserUnavailable, getAnalyser } = useRadio();
 
   useEffect(() => {
     const root = rootRef.current;
     const analyser = getAnalyser();
-    if (!root || !analyser || !analyserReady || status !== "playing") return;
+    if (!root || !analyser || !analyserReady || status !== "playing" || !active) return;
 
     const bars = Array.from(root.querySelectorAll<HTMLSpanElement>(":scope > span"));
     const levels = new Uint8Array(analyser.frequencyBinCount);
@@ -61,16 +59,16 @@ export function RadioVisualizer({ className }: { className: string }) {
       window.cancelAnimationFrame(frame);
       bars.forEach((bar) => { bar.style.height = "4%"; });
     };
-  }, [analyserReady, getAnalyser, status]);
+  }, [active, analyserReady, barCount, getAnalyser, status]);
 
   return (
     <div
       ref={rootRef}
       className={className}
       role="img"
-      aria-label={analyserUnavailable ? "Visualizador indisponível" : status === "playing" && analyserReady ? "Visualizador reagindo ao áudio" : "Visualizador em espera"}
+      aria-label={analyserUnavailable ? "Visualizador indisponível" : status === "playing" && analyserReady && active ? "Visualizador reagindo ao áudio" : "Visualizador em espera"}
     >
-      {Array.from({ length: BAR_COUNT }, (_, index) => <span key={index} style={{ height: "4%" }} />)}
+      {Array.from({ length: barCount }, (_, index) => <span key={index} style={{ height: "4%" }} />)}
       {analyserUnavailable ? <p>Barras indisponíveis nesta reprodução</p> : null}
     </div>
   );

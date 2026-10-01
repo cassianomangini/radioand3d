@@ -13,7 +13,7 @@ Isso cobre navegação interna, não continuidade sonora durante refresh, fecham
 
 ## Interfaces da primeira versão
 
-Mini player **mobile**: faixa/capa ou fallback CM, play/pause, anterior/próxima, indicação de progresso e ação de abrir a Rádio completa. Volume, fila completa e controles adicionais ficam na Rádio completa quando faltar espaço.
+Mini player **mobile**: faixa/capa ou fallback CM, play/pause, anterior/próxima, barras ligadas ao mesmo analisador, indicação de progresso e ação de abrir a Rádio completa. Volume, fila completa e controles adicionais ficam na Rádio completa quando faltar espaço.
 
 Rádio completa: no desktop fica acoplada à composição e pode ser redimensionada/expandida; no mobile abre sob demanda. Contém a lista única **A seguir**, busca simples entre as faixas ainda programadas, seleção direta, posição/duração, seek e volume quando suportado. Ao abrir o site, a playlist nasce em ordem aleatória, sem repetição automática. O transporte mostra Nova ordem, Repetir faixa, Anterior, Play/Pausa, Próxima, Volume e Coração nessa ordem. Nova ordem tem tooltip; Repetir faixa fica iluminado quando ativo. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
 

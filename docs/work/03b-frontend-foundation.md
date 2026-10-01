@@ -202,3 +202,17 @@ Aceite: a primeira faixa e a ordem seguinte variam entre aberturas, a fila anunc
 Evidência técnica desta branch: `pnpm lint`, `pnpm typecheck`, `pnpm test` (16 testes) e `pnpm build` passaram. Duas requisições HTTP à Home local responderam 200, exibiram 342 entradas reais em “A seguir” para o catálogo de 343 faixas, sem aba Biblioteca, e produziram ordens diferentes. A aprovação de Cassiano nesta conversa cobre a composição solicitada; ainda falta ele conferir a interface renderizada, os estados de hover e as interações em desktop e mobile com áudio real.
 
 Após ver a fila, Cassiano pediu três linhas completas visíveis no tamanho inicial, título **A seguir** e busca lado a lado e ausência de contador. A branch `fix/radio-volume-popover` implementa esse ajuste; a revisão visual final permanece pendente.
+
+## Revisão do mini player mobile em 01/10/2026
+
+Objetivo: substituir o mini player comprimido da captura enviada por Cassiano por uma superfície mobile legível, com capa, título, controles de transporte e barras ligadas ao áudio. Responsável: CM Frontend. Branch `fix/mobile-mini-player`, baseada em `fix/radio-visualizer-motion` (`b0135ff`). Contratos lidos: `docs/EXPERIENCE.md`, `docs/RADIO.md` e este checklist. Limites: preservar o motor único, a fila, o player completo e a composição desktop; não acrescentar outra fonte de áudio.
+
+Aceite técnico: mini player abaixo do header com faixa legível em 320–390 px, botões de toque confortáveis, barras que usam o mesmo analisador da Rádio completa, progresso visível e ação de abrir a Rádio. Ao abrir o player completo, o mini interrompe apenas o desenho das barras. Cassiano confere o resultado visual e as interações no mobile antes da aprovação final.
+
+- [x] Conferir branch, diff, contrato mobile e código atual.
+- [x] Registrar objetivo, limites e critérios.
+- [x] Implementar a nova composição e as barras compartilhadas.
+- [x] Verificar lint, tipos, testes pertinentes e build; revisar diff.
+- [ ] Cassiano conferir visual e interação no Chrome mobile.
+
+Evidência técnica: `pnpm check`, `pnpm test` (21 testes) e `git diff --check` passaram. O mini player exibe 24 barras do mesmo analisador da Rádio, sem novo elemento de áudio; interrompe o desenho ao abrir a Rádio completa. A grade reserva 56–64 px para a capa, 44–52 px para os controles e mantém o título em até duas linhas. Não houve revisão visual ou interação em navegador nesta branch, conforme o pedido de Cassiano para interromper a automação do player.

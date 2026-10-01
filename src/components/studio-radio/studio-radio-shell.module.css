@@ -1913,41 +1913,31 @@
     box-shadow: -0.25rem 0 1.25rem rgb(37 129 255 / 32%);
   }
 
-  .desktopShell[data-radio-ready="true"] .resizeHandle::after {
-    content: "Solte para abrir a Rádio";
-    position: absolute;
-    top: 50%;
-    left: calc(100% + 0.75rem);
-    padding: 0.6rem 0.85rem;
-    background: rgb(4 15 30 / 92%);
-    border: 1px solid rgb(82 214 255 / 55%);
-    border-radius: 0.45rem;
-    box-shadow: 0 0 1.5rem rgb(37 129 255 / 32%);
-    color: var(--accent-cyan);
-    font-size: 0.8rem;
-    font-weight: 700;
-    white-space: nowrap;
-    pointer-events: none;
-    transform: translateY(-50%);
-  }
-
   .site[data-radio-fullscreen="true"] {
     height: 100dvh;
     overflow: hidden;
   }
 
   .site[data-radio-fullscreen="true"] .resizeHandle {
-    display: none;
+    display: block;
+    right: 0;
+    z-index: calc(var(--layer-nav) + 4);
+    box-shadow: -0.35rem 0 1.5rem rgb(37 129 255 / 24%);
+  }
+
+  .site[data-radio-fullscreen="true"] .desktopShell[data-radio-returning="true"] .resizeHandle {
+    right: var(--radio-return-offset);
   }
 
   .site[data-radio-fullscreen="true"] .radioPanel {
     width: 100vw;
     z-index: calc(var(--layer-nav) + 3);
     background: radial-gradient(ellipse at 85% 0%, rgb(24 55 113 / 22%), transparent 50%), #03050a;
+    transform: translateX(calc(0px - var(--radio-return-offset, 0px)));
   }
 
   .site[data-radio-fullscreen="true"] .radioContent {
-    width: 100%;
+    width: calc(100% - var(--rail-width));
     max-width: 72rem;
     height: 100%;
     margin-inline: auto;
@@ -1969,7 +1959,9 @@
   }
 
   .radioPanel {
-    transition: width var(--motion-expand) var(--ease-standard);
+    transition:
+      width var(--motion-expand) var(--ease-standard),
+      transform var(--motion-expand) var(--ease-standard);
   }
 
   .site[data-radio-dragging="true"] .desktopShell,

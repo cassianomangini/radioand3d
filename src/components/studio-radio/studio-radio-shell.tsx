@@ -265,9 +265,13 @@ export function StudioRadioShell() {
   const customWidthRef = useRef(false);
   const dragOffsetRef = useRef(0);
   const dragStartXRef = useRef(0);
+  const dragStartDistanceRef = useRef(0);
+  const dragOriginRef = useRef<"sidebar" | "fullscreen">("sidebar");
+  const initialRadioWidthRef = useRef(DEFAULT_RADIO_WIDTH);
   const pointerActiveRef = useRef(false);
   const pointerMovedRef = useRef(false);
-  const dragReadyRef = useRef(false);
+  const dragFullscreenRef = useRef(false);
+  const dragRestoredRef = useRef(false);
   const openedFromDragRef = useRef(false);
   const previewResetFrameRef = useRef<number | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
@@ -301,7 +305,7 @@ export function StudioRadioShell() {
   }, [mobileRadioOpen]);
 
   useEffect(() => {
-    if (radioFullscreen) desktopCloseRef.current?.focus();
+    if (radioFullscreen && !pointerActiveRef.current) desktopCloseRef.current?.focus();
   }, [radioFullscreen]);
 
   useEffect(() => {
@@ -368,20 +372,38 @@ export function StudioRadioShell() {
     if (!shell) return;
     shell.style.removeProperty("--radio-preview-width");
     delete shell.dataset.radioPreview;
-    delete shell.dataset.radioReady;
-    dragReadyRef.current = false;
+  }
+
+  function clearReturnPreview() {
+    const shell = shellRef.current;
+    if (!shell) return;
+    shell.style.removeProperty("--radio-return-offset");
+    delete shell.dataset.radioReturning;
   }
 
   function openRadioFullscreen(fromDrag: boolean) {
+    if (!fromDrag) {
+      const width = shellRef.current?.getBoundingClientRect().width;
+      initialRadioWidthRef.current = radioWidth ?? (width ? getDefaultWidth(width) : DEFAULT_RADIO_WIDTH);
+    }
     openedFromDragRef.current = fromDrag;
+    dragFullscreenRef.current = true;
+    clearDragPreview();
     setRadioFullscreen(true);
   }
 
-  function closeRadioFullscreen() {
+  function closeRadioFullscreen(restoreFocus = true) {
+    dragFullscreenRef.current = false;
+    customWidthRef.current = true;
+    setRadioWidth(initialRadioWidthRef.current);
+    setRadioExpanded(false);
     setRadioFullscreen(false);
-    requestAnimationFrame(() => {
-      (openedFromDragRef.current ? resizeHandleRef.current : radioNavRef.current)?.focus();
-    });
+    clearReturnPreview();
+    if (restoreFocus) {
+      requestAnimationFrame(() => {
+        (openedFromDragRef.current ? resizeHandleRef.current : radioNavRef.current)?.focus();
+      });
+    }
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
@@ -394,11 +416,17 @@ export function StudioRadioShell() {
     }
 
     const rect = shell.getBoundingClientRect();
-    dragOffsetRef.current = rect.right - event.clientX - (radioWidth ?? getDefaultWidth(rect.width));
+    dragOriginRef.current = radioFullscreen ? "fullscreen" : "sidebar";
+    initialRadioWidthRef.current = radioWidth ?? getDefaultWidth(rect.width);
+    dragFullscreenRef.current = radioFullscreen;
+    dragRestoredRef.current = false;
+    dragOffsetRef.current = rect.right - event.clientX - initialRadioWidthRef.current;
     dragStartXRef.current = event.clientX;
+    dragStartDistanceRef.current = event.clientX - rect.left;
     pointerActiveRef.current = true;
     pointerMovedRef.current = false;
     clearDragPreview();
+    clearReturnPreview();
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
   }
@@ -414,43 +442,91 @@ export function StudioRadioShell() {
     }
 
     const rect = shell.getBoundingClientRect();
+    pointerMovedRef.current = true;
+
+    if (dragOriginRef.current === "fullscreen") {
+      const distance = Math.max(0, dragStartXRef.current - event.clientX);
+      if (distance > 0) {
+        shell.style.setProperty("--radio-return-offset", `${distance}px`);
+        shell.dataset.radioReturning = "true";
+      } else {
+        clearReturnPreview();
+      }
+      if (distance >= Math.min(160, rect.width * 0.18)) {
+        pointerActiveRef.current = false;
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+        setDragging(false);
+        closeRadioFullscreen(false);
+      }
+      return;
+    }
+
     const requested = rect.right - event.clientX - dragOffsetRef.current;
     const maximum = clampRadioWidth(rect.width, Number.POSITIVE_INFINITY);
-    const preview = getRadioDragPreview(rect.width, maximum, requested, event.clientX - rect.left);
-    pointerMovedRef.current = true;
+    const pointerDistance = event.clientX - rect.left;
+    const preview = getRadioDragPreview(rect.width, maximum, requested, pointerDistance, dragStartDistanceRef.current);
+
+    if (dragFullscreenRef.current) {
+      if (pointerDistance > dragStartDistanceRef.current / 2 + 48) {
+        dragRestoredRef.current = true;
+        closeRadioFullscreen(false);
+      }
+      return;
+    }
+
+    if (dragRestoredRef.current) {
+      if (preview.ready) {
+        dragRestoredRef.current = false;
+        openRadioFullscreen(true);
+      }
+      return;
+    }
+
     customWidthRef.current = true;
     updateRadioWidth(requested);
     setRadioExpanded(false);
+    if (preview.ready) {
+      openRadioFullscreen(true);
+      return;
+    }
     if (preview.width > 0) {
       shell.style.setProperty("--radio-preview-width", `${preview.width}px`);
       shell.dataset.radioPreview = "true";
-      shell.dataset.radioReady = preview.ready ? "true" : "false";
     } else {
       clearDragPreview();
     }
-    dragReadyRef.current = preview.ready;
   }
 
   function stopDragging(event: ReactPointerEvent<HTMLDivElement>) {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
-    const shouldToggle = event.type === "pointerup" && pointerActiveRef.current && !pointerMovedRef.current;
-    const shouldOpen = event.type === "pointerup" && pointerActiveRef.current && pointerMovedRef.current && dragReadyRef.current;
+    if (!pointerActiveRef.current) return;
+    const shouldToggle = event.type === "pointerup" && !pointerMovedRef.current;
+    const shouldRestore = event.type === "pointercancel" && dragOriginRef.current === "sidebar" && dragFullscreenRef.current;
     pointerActiveRef.current = false;
     setDragging(false);
-    if (shouldOpen) {
-      openRadioFullscreen(true);
+    if (shouldRestore) {
+      closeRadioFullscreen(false);
     } else if (shouldToggle) {
-      toggleRadioExpanded();
+      if (radioFullscreen) closeRadioFullscreen();
+      else toggleRadioExpanded();
     }
     previewResetFrameRef.current = requestAnimationFrame(() => {
       clearDragPreview();
+      clearReturnPreview();
       previewResetFrameRef.current = null;
     });
   }
 
   function handleResizeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (radioFullscreen) {
+      if (["Enter", " ", "Escape", "ArrowLeft"].includes(event.key)) {
+        event.preventDefault();
+        closeRadioFullscreen();
+      }
+      return;
+    }
     const shell = shellRef.current;
     if (!shell) {
       return;
@@ -618,24 +694,23 @@ export function StudioRadioShell() {
         <div
           ref={resizeHandleRef}
           className={styles.resizeHandle}
-          role="separator"
-          aria-label="Redimensionar ou expandir CM Rádio"
-          aria-orientation="vertical"
-          aria-valuemin={MIN_RADIO_WIDTH}
-          aria-valuemax={MAX_RADIO_WIDTH}
-          aria-valuenow={Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)}
+          role={radioFullscreen ? "button" : "separator"}
+          aria-label={radioFullscreen ? "Arraste para voltar ao Estúdio" : "Redimensionar ou expandir CM Rádio"}
+          aria-orientation={radioFullscreen ? undefined : "vertical"}
+          aria-valuemin={radioFullscreen ? undefined : MIN_RADIO_WIDTH}
+          aria-valuemax={radioFullscreen ? undefined : MAX_RADIO_WIDTH}
+          aria-valuenow={radioFullscreen ? undefined : Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)}
           tabIndex={0}
-          inert={radioFullscreen}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={stopDragging}
           onPointerCancel={stopDragging}
           onKeyDown={handleResizeKeyDown}
-          title="Clique para expandir ou recolher; arraste para ajustar a largura ou abrir a Rádio"
+          title={radioFullscreen ? "Arraste para a esquerda ou clique para voltar ao Estúdio" : "Clique para expandir ou recolher; arraste para ajustar a largura ou abrir a Rádio"}
         />
 
         <aside id="radio" className={styles.radioPanel} aria-label="CM Rádio">
-          <RadioContent onClose={radioFullscreen ? closeRadioFullscreen : undefined} closeButtonRef={desktopCloseRef} />
+          <RadioContent onClose={radioFullscreen ? () => closeRadioFullscreen() : undefined} closeButtonRef={desktopCloseRef} />
         </aside>
       </div>
 

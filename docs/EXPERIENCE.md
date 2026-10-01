@@ -28,6 +28,8 @@ Na revisão seguinte, Cassiano pediu mais altura inicial para a fila, com três 
 
 Em 01/10, Cassiano mostrou que o mini player mobile estava pequeno demais e pediu barras e botões mais presentes. A proposta em revisão usa capa e título legíveis, acesso à Rádio completa e uma segunda linha com barras reativas e controles de transporte maiores. A composição final depende da conferência visual dele no mobile.
 
+Cassiano pediu também que, no desktop, arrastar a divisória para a esquerda além da largura máxima da barra lateral faça a Rádio avançar visualmente sobre o Estúdio. Ao chegar ao limite esquerdo e soltar, a Rádio ocupa a tela inteira, no mesmo estado acessível pelo link Rádio. Um arraste incompleto retorna à largura lateral. O efeito e o limite de ativação dependem de sua revisão visual e de interação.
+
 **Desktop**
 
 - Header CM enxuto.

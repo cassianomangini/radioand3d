@@ -9,6 +9,8 @@ Existe um único motor e uma única fila por instância da aplicação no navega
 
 Trocar entre estados de largura da Rádio, abrir a Rádio completa no mobile ou navegar internamente preserva versão da faixa, posição, volume e modos. Nenhuma interface cria outro elemento de áudio.
 
+No desktop, a divisória entre Estúdio e Rádio continua ajustando a largura lateral. Ao arrastá-la além da largura máxima para a esquerda, a Rádio avança proporcionalmente sobre o Estúdio; ao chegar ao limite esquerdo e soltar, ocupa a tela inteira. O link Rádio abre esse mesmo estado; o controle de fechar retorna ao layout dividido. Um arraste incompleto retorna à largura lateral. O mobile mantém a Rádio de tela inteira acessível pelo menu e pelo mini player.
+
 Isso cobre navegação interna, não continuidade sonora durante refresh, fechamento do navegador ou entre dispositivos. Recuperação de preferências após recarga é uma melhoria separada; não prometer autoplay. Controles de sistema e reprodução em segundo plano dependem de suporte e testes reais.
 
 ## Interfaces da primeira versão

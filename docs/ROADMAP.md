@@ -8,7 +8,7 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, foi aprovada por Cassiano. Os PRs #6, #7, #8, #10 e #11 foram integrados à `main` em 01/10/2026, com CI aprovado. A Home, o catálogo R2, os controles da Rádio, o visualizador e o mini player mobile estão no código. Cassiano confirmou que as barras se movem e aprovou a altura do espaço, mas a resposta ao ritmo, a escala final das barras e a nova composição mobile ainda aguardam sua conferência. As entregas **03b** e **06** continuam em andamento até a revisão das interações em desktop e mobile; [checklist visual](work/03b-frontend-foundation.md) e [checklist de áudio](work/06-radio-engine.md).
+**03, direção visual CM**, foi aprovada por Cassiano. Os PRs #6, #7, #8, #10 e #11 foram integrados à `main` em 01/10/2026, com CI aprovado. A Home, o catálogo R2, os controles da Rádio, o visualizador e o mini player mobile estão no código. Cassiano confirmou que as barras se movem e aprovou a altura do espaço, mas a resposta ao ritmo, a escala final das barras e a nova composição mobile ainda aguardam sua conferência. Cassiano pediu que a divisória no desktop abra a Rádio em tela inteira, com prévia durante o arraste; a implementação está em `feat/desktop-radio-fullscreen-drag`. As entregas **03b** e **06** continuam em andamento até a revisão das interações em desktop e mobile; [checklist visual](work/03b-frontend-foundation.md) e [checklist de áudio](work/06-radio-engine.md).
 
 ## Sequência única
 

@@ -8,12 +8,14 @@ import {
   useState,
   type CSSProperties,
   type ReactNode,
+  type Ref,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent
 } from "react";
 import styles from "./studio-radio-shell.module.css";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
+import { getRadioDragPreview } from "./radio-panel-drag";
 
 const DEFAULT_RADIO_WIDTH = 480;
 const MIN_RADIO_WIDTH = 400;
@@ -81,7 +83,7 @@ function formatTrackDuration(seconds?: number) {
   return seconds && Number.isFinite(seconds) && seconds > 0 ? formatTime(seconds) : "—";
 }
 
-function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?: () => void }) {
+function RadioContent({ mobile = false, onClose, closeButtonRef }: { mobile?: boolean; onClose?: () => void; closeButtonRef?: Ref<HTMLButtonElement> }) {
   const radio = useRadio();
   const [query, setQuery] = useState("");
   const [volumeOpen, setVolumeOpen] = useState(false);
@@ -129,12 +131,13 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
       <div className={styles.radioHeader}>
         <h2><span>CM</span> RÁDIO</h2>
 
-        {mobile ? (
+        {onClose ? (
           <button
+            ref={closeButtonRef}
             type="button"
             className={styles.iconButton}
             onClick={onClose}
-            aria-label="Fechar rádio"
+            aria-label={mobile ? "Fechar rádio" : "Voltar ao Estúdio"}
           >
             <Icon name="close" />
           </button>
@@ -255,15 +258,22 @@ function RadioContent({ mobile = false, onClose }: { mobile?: boolean; onClose?:
 export function StudioRadioShell() {
   const radio = useRadio();
   const shellRef = useRef<HTMLDivElement>(null);
+  const radioNavRef = useRef<HTMLAnchorElement>(null);
+  const resizeHandleRef = useRef<HTMLDivElement>(null);
+  const desktopCloseRef = useRef<HTMLButtonElement>(null);
   const mobileDialogRef = useRef<HTMLDialogElement>(null);
   const customWidthRef = useRef(false);
   const dragOffsetRef = useRef(0);
   const dragStartXRef = useRef(0);
   const pointerActiveRef = useRef(false);
   const pointerMovedRef = useRef(false);
+  const dragReadyRef = useRef(false);
+  const openedFromDragRef = useRef(false);
+  const previewResetFrameRef = useRef<number | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [radioExpanded, setRadioExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [radioFullscreen, setRadioFullscreen] = useState(false);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -289,6 +299,19 @@ export function StudioRadioShell() {
       dialog.close();
     }
   }, [mobileRadioOpen]);
+
+  useEffect(() => {
+    if (radioFullscreen) desktopCloseRef.current?.focus();
+  }, [radioFullscreen]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 73.74rem)");
+    function leaveDesktop() {
+      if (media.matches) setRadioFullscreen(false);
+    }
+    media.addEventListener("change", leaveDesktop);
+    return () => media.removeEventListener("change", leaveDesktop);
+  }, []);
 
   useEffect(() => {
     const shell = shellRef.current;
@@ -340,7 +363,31 @@ export function StudioRadioShell() {
     setRadioExpanded(true);
   }
 
+  function clearDragPreview() {
+    const shell = shellRef.current;
+    if (!shell) return;
+    shell.style.removeProperty("--radio-preview-width");
+    delete shell.dataset.radioPreview;
+    delete shell.dataset.radioReady;
+    dragReadyRef.current = false;
+  }
+
+  function openRadioFullscreen(fromDrag: boolean) {
+    openedFromDragRef.current = fromDrag;
+    setRadioFullscreen(true);
+  }
+
+  function closeRadioFullscreen() {
+    setRadioFullscreen(false);
+    requestAnimationFrame(() => {
+      (openedFromDragRef.current ? resizeHandleRef.current : radioNavRef.current)?.focus();
+    });
+  }
+
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (pointerActiveRef.current || (event.pointerType === "mouse" && event.button !== 0)) return;
+    if (previewResetFrameRef.current !== null) cancelAnimationFrame(previewResetFrameRef.current);
+    previewResetFrameRef.current = null;
     const shell = shellRef.current;
     if (!shell) {
       return;
@@ -351,6 +398,7 @@ export function StudioRadioShell() {
     dragStartXRef.current = event.clientX;
     pointerActiveRef.current = true;
     pointerMovedRef.current = false;
+    clearDragPreview();
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
   }
@@ -367,10 +415,20 @@ export function StudioRadioShell() {
 
     const rect = shell.getBoundingClientRect();
     const requested = rect.right - event.clientX - dragOffsetRef.current;
+    const maximum = clampRadioWidth(rect.width, Number.POSITIVE_INFINITY);
+    const preview = getRadioDragPreview(rect.width, maximum, requested, event.clientX - rect.left);
     pointerMovedRef.current = true;
     customWidthRef.current = true;
     updateRadioWidth(requested);
     setRadioExpanded(false);
+    if (preview.width > 0) {
+      shell.style.setProperty("--radio-preview-width", `${preview.width}px`);
+      shell.dataset.radioPreview = "true";
+      shell.dataset.radioReady = preview.ready ? "true" : "false";
+    } else {
+      clearDragPreview();
+    }
+    dragReadyRef.current = preview.ready;
   }
 
   function stopDragging(event: ReactPointerEvent<HTMLDivElement>) {
@@ -378,11 +436,18 @@ export function StudioRadioShell() {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     const shouldToggle = event.type === "pointerup" && pointerActiveRef.current && !pointerMovedRef.current;
+    const shouldOpen = event.type === "pointerup" && pointerActiveRef.current && pointerMovedRef.current && dragReadyRef.current;
     pointerActiveRef.current = false;
     setDragging(false);
-    if (shouldToggle) {
+    if (shouldOpen) {
+      openRadioFullscreen(true);
+    } else if (shouldToggle) {
       toggleRadioExpanded();
     }
+    previewResetFrameRef.current = requestAnimationFrame(() => {
+      clearDragPreview();
+      previewResetFrameRef.current = null;
+    });
   }
 
   function handleResizeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
@@ -433,8 +498,8 @@ export function StudioRadioShell() {
   }
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined}>
-      <header className={styles.siteHeader}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined}>
+      <header className={styles.siteHeader} inert={radioFullscreen}>
         <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início">
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
         </a>
@@ -442,7 +507,7 @@ export function StudioRadioShell() {
         <nav className={styles.desktopNav} aria-label="Navegação principal">
           <a href="#top">Início</a>
           <a href="#studio">Estúdio</a>
-          <a href="#radio">Rádio</a>
+          <a ref={radioNavRef} href="#radio" onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
         </nav>
 
         <span className={styles.headerBalance} aria-hidden="true" />
@@ -528,7 +593,7 @@ export function StudioRadioShell() {
         className={styles.desktopShell}
         data-dragging={dragging ? "true" : undefined}
       >
-        <main id="studio" className={styles.studio}>
+        <main id="studio" className={styles.studio} inert={radioFullscreen}>
           <section className={styles.hero} aria-labelledby="studio-title">
             <div className={styles.heroContent}>
               <h1 id="studio-title" aria-label="Ideias que ganham forma.">Ideias que<br />ganham <span>forma.</span></h1>
@@ -551,6 +616,7 @@ export function StudioRadioShell() {
         </main>
 
         <div
+          ref={resizeHandleRef}
           className={styles.resizeHandle}
           role="separator"
           aria-label="Redimensionar ou expandir CM Rádio"
@@ -559,16 +625,17 @@ export function StudioRadioShell() {
           aria-valuemax={MAX_RADIO_WIDTH}
           aria-valuenow={Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)}
           tabIndex={0}
+          inert={radioFullscreen}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={stopDragging}
           onPointerCancel={stopDragging}
           onKeyDown={handleResizeKeyDown}
-          title="Clique para expandir ou recolher; arraste para ajustar a largura"
+          title="Clique para expandir ou recolher; arraste para ajustar a largura ou abrir a Rádio"
         />
 
         <aside id="radio" className={styles.radioPanel} aria-label="CM Rádio">
-          <RadioContent />
+          <RadioContent onClose={radioFullscreen ? closeRadioFullscreen : undefined} closeButtonRef={desktopCloseRef} />
         </aside>
       </div>
 

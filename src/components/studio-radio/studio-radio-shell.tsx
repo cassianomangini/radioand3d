@@ -29,18 +29,61 @@ const previewTrack = {
   duration: "3:52"
 } as const;
 
+type SocialIconName = "email" | "instagram" | "shopee";
+
 const socialIcons = [
-  { label: "Email", src: "/images/social/email_sem_borda.png", width: 23, height: 16 },
-  { label: "Instagram", src: "/images/social/instagram_sem_borda.png", width: 18, height: 19 },
-  { label: "Shopee", src: "/images/social/shopee_sem_borda.png", width: 19, height: 23 }
-] as const;
+  { label: "Email", name: "email" },
+  { label: "Instagram", name: "instagram" },
+  { label: "Shopee", name: "shopee" }
+] as const satisfies ReadonlyArray<{ label: string; name: SocialIconName }>;
+
+function SocialGlyph({ name }: { name: SocialIconName }) {
+  const common = {
+    width: 16,
+    height: 16,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.35,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true as const
+  };
+
+  if (name === "email") {
+    return (
+      <svg {...common}>
+        <rect x="3" y="5" width="18" height="14" rx="2.2" />
+        <path d="m4 7.5 8 6 8-6" />
+      </svg>
+    );
+  }
+
+  if (name === "instagram") {
+    return (
+      <svg {...common}>
+        <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+        <circle cx="12" cy="12" r="3.6" />
+        <circle cx="17.15" cy="6.85" r="0.7" fill="currentColor" stroke="none" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...common}>
+      <path d="M3.4 8.4h17.2c.8 0 1.4.7 1.3 1.5l-1 10.4a1.9 1.9 0 0 1-1.9 1.7H5a1.9 1.9 0 0 1-1.9-1.7l-1-10.4c-.1-.8.5-1.5 1.3-1.5Z" />
+      <path d="M8.1 8.3c.15-3.3 1.8-5.5 3.9-5.5s3.75 2.2 3.9 5.5" />
+      <path d="M15.7 12.6c-.4-1-1.4-1.4-2.8-1.2-1.5.3-2.2 1.2-2 2.1.3 1 1.5 1.4 2.7 1.8 1.2.3 2.1.9 1.9 1.9-.2 1.2-1.2 1.9-2.7 1.8-1.3-.1-2.2-.7-2.5-1.6" />
+    </svg>
+  );
+}
 
 function SocialIcons() {
   return (
     <div className={styles.socialIcons} role="group" aria-label="Contato e redes sociais">
-      {socialIcons.map(({ label, src, width, height }) => (
-        <span className={styles.socialIcon} key={label} title={label} data-icon={label.toLowerCase()}>
-          <Image src={src} alt={label} width={width} height={height} />
+      {socialIcons.map(({ label, name }) => (
+        <span className={styles.socialIcon} key={label} title={label} data-icon={name}>
+          <SocialGlyph name={name} />
         </span>
       ))}
     </div>
@@ -717,18 +760,19 @@ export function StudioRadioShell() {
         <main id="studio" className={styles.studio} inert={radioFullscreen}>
           <section className={styles.hero} aria-labelledby="studio-title">
             <div className={styles.heroContent}>
+              <p className={styles.studioEyebrow}>ESTÚDIO DE CRIAÇÃO</p>
               <h1 id="studio-title" aria-label="Ideias que ganham forma.">Ideias que<br />ganham <span>forma.</span></h1>
               <p className={styles.lead}>
-                Explore peças, materiais e cores no nosso estúdio de impressão 3D.
+                Peças, materiais e cores produzidos<br className={styles.leadBreak} /> com precisão, camada por camada.
               </p>
               <button
                 type="button"
                 className={styles.primaryAction}
                 disabled
                 title="Página do Estúdio em breve"
-                aria-label="Conheça mais sobre — página do Estúdio em breve"
+                aria-label="Explore o estúdio — página do Estúdio em breve"
               >
-                <span>Conheça mais</span>
+                <span>Explore o estúdio</span>
                 <span aria-hidden="true">→</span>
               </button>
             </div>

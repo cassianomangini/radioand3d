@@ -85,24 +85,11 @@
   height: 1.875rem;
   display: grid;
   place-items: center;
+  color: #fff;
 }
 
-.socialIcon img {
+.socialIcon svg {
   display: block;
-  object-fit: contain;
-  filter: drop-shadow(0 0 0.3rem var(--social-glow));
-}
-
-.socialIcon[data-icon="email"] {
-  --social-glow: rgb(37 195 255 / 58%);
-}
-
-.socialIcon[data-icon="instagram"] {
-  --social-glow: rgb(231 58 220 / 55%);
-}
-
-.socialIcon[data-icon="shopee"] {
-  --social-glow: rgb(255 124 39 / 55%);
 }
 
 .desktopNav a {
@@ -1749,6 +1736,7 @@
 
 .studio {
   background: #020305;
+  container: studio / inline-size;
 }
 
 .hero {
@@ -1758,67 +1746,87 @@
   align-items: center;
   overflow: hidden;
   container-type: inline-size;
-  padding: clamp(3rem, 7dvh, 5rem) clamp(1.5rem, 4vw, 4rem);
-  background: #05070a;
+  padding: clamp(2.5rem, 7dvh, 5rem) clamp(1.5rem, 3cqw, 2.75rem) clamp(2.5rem, 7dvh, 5rem) 58%;
+  background: #020305;
 }
 
 .hero::before {
   content: "";
   position: absolute;
-  inset: 0 0 0 auto;
-  width: 48%;
-  background: url("/images/cm-studio-background.webp") 55% center / cover no-repeat;
-  opacity: 0.58;
-  filter: saturate(0.55) brightness(0.68);
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 38%);
-  mask-image: linear-gradient(to right, transparent, #000 38%);
+  inset: 0;
+  width: 100%;
+  background: url("/images/x1_fundo_2.png") 18% center / cover no-repeat;
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0 36%, rgb(2 3 5 / 28%) 50%, rgb(2 3 5 / 55%) 100%);
   pointer-events: none;
 }
 
 .heroContent {
   position: relative;
   z-index: 1;
-  width: min(100%, 31rem);
+  width: 100%;
+  max-width: 34rem;
   display: grid;
-  justify-items: center;
-  gap: clamp(0.9rem, 2.2dvh, 1.3rem);
-  margin-left: clamp(0rem, 2cqw, 1.75rem);
-  text-align: center;
+  justify-items: start;
+  gap: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.studioEyebrow {
+  margin: 0 0 0.7rem;
+  color: #f7f8fb;
+  font-size: clamp(0.78rem, 1.7cqw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.5em;
+  line-height: 1.25;
 }
 
 .hero h1 {
-  margin: 0;
+  margin: 0 0 0.9rem;
   max-width: 100%;
-  font-size: clamp(3rem, 5.5cqw, 4.1rem);
-  font-weight: 750;
-  line-height: 1.02;
-  letter-spacing: -0.05em;
+  color: #fff;
+  font-size: clamp(3rem, 6.9cqw, 4.75rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
 }
 
 .hero h1 span {
-  background: none;
-  color: #70c6e9;
+  background: linear-gradient(100deg, #00d7f5 5%, #1398ff 48%, #b82ee9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .lead {
-  max-width: 37ch;
-  color: #b8c3cd;
-  font-size: clamp(1rem, 1.4cqw, 1.1rem);
-  line-height: 1.5;
+  max-width: 39ch;
+  margin: 0;
+  color: #bec4ce;
+  font-size: clamp(1.05rem, 2.4cqw, 1.35rem);
+  line-height: 1.38;
 }
 
 .primaryAction {
-  width: min(100%, 14.5rem);
-  min-height: 3.2rem;
+  width: min(100%, 14.8rem);
+  min-height: 2.625rem;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.55rem 1.25rem;
-  background: transparent;
-  border: 1px solid #559fd0;
+  margin-top: 1.25rem;
+  padding: 0.4rem 1.25rem;
+  background: linear-gradient(#02040a, #02040a) padding-box, linear-gradient(100deg, #00dbf3, #198cff 55%, #cf2aea) border-box;
+  border: 2px solid transparent;
   border-radius: 999px;
-  color: var(--text-primary);
-  font-size: 0.93rem;
-  font-weight: 650;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: 1;
 }
 
 .primaryAction:not(:disabled):hover {
@@ -1828,8 +1836,8 @@
 }
 
 .primaryAction span:last-child {
-  color: var(--text-primary);
-  font-size: 1.35rem;
+  color: #fff;
+  font-size: 1.5rem;
   font-weight: 400;
   line-height: 1;
   transition: transform var(--motion-fast) var(--ease-standard);
@@ -1851,7 +1859,7 @@
   }
 
   .site[data-radio-expanded="true"] .hero h1 {
-    font-size: clamp(2.9rem, 5.5cqw, 4.1rem);
+    font-size: clamp(3rem, 6.9cqw, 4.75rem);
   }
 
   .siteHeader {
@@ -1874,7 +1882,7 @@
 
 @media (max-width: 81.25rem) and (min-width: 73.75rem) {
   .hero h1 {
-    font-size: clamp(2.9rem, 5.5cqw, 4.1rem);
+    font-size: clamp(3rem, 6.9cqw, 4.75rem);
   }
 }
 
@@ -1886,23 +1894,34 @@
 
   .hero {
     min-height: calc(100dvh - 8.5rem);
+    align-items: flex-end;
     padding: clamp(3rem, 9dvh, 5rem) var(--space-4);
   }
 
   .hero::before {
-    display: none;
+    height: 66%;
+    bottom: auto;
+    background-position: left center;
+  }
+
+  .hero::after {
+    background: linear-gradient(180deg, transparent 12%, rgb(2 3 5 / 20%) 35%, #020305 67%, #020305 100%);
   }
 
   .heroContent {
-    margin-inline: auto;
+    margin: 0;
   }
 
   .hero h1 {
-    font-size: clamp(3.1rem, 10vw, 5.4rem);
+    font-size: clamp(2.7rem, 10.7vw, 3.5rem);
   }
 
   .lead {
     font-size: 1.05rem;
+  }
+
+  .leadBreak {
+    display: none;
   }
 }
 
@@ -1930,15 +1949,15 @@
   }
 
   .hero {
-    background: #05070a;
+    background: #020305;
   }
 
   .hero h1 {
-    font-size: clamp(2.8rem, 11vw, 4rem);
+    font-size: clamp(2.55rem, 10.7vw, 3rem);
   }
 
   .heroContent {
-    gap: 1.5rem;
+    gap: 0;
   }
 }
 

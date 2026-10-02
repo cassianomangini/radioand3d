@@ -18,6 +18,8 @@ const textFiles = readdirSync(lyricsDirectory).filter((name) => name.toLowerCase
 function cleanLyrics(value) {
   const lines = value.replace(/\r\n?/g, "\n").replace(/\0+$/g, "").split("\n");
   while (lines.length > 0 && (!lines[0].trim() || /^lyrics(?:\s*[—–-]\s*.+)?$/i.test(lines[0].trim()))) lines.shift();
+  while (lines.length > 0 && !lines.at(-1).trim()) lines.pop();
+  if (/^Cover Art URL:\s*https?:\/\//i.test(lines.at(-1) ?? "")) lines.pop();
   return lines.join("\n").trim().replace(/^\uFEFF/, "").trim();
 }
 

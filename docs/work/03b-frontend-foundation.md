@@ -232,3 +232,13 @@ Aceite técnico: a prévia acompanha o ponteiro sem renderizar a página a cada 
 - [ ] Cassiano conferir a interação e o efeito no Chrome desktop.
 
 Evidência técnica: a divisória acompanha o ponteiro depois do limite de largura da barra lateral; o link Rádio e o arraste completo ativam o mesmo painel de tela inteira, com foco no controle de voltar. Arraste incompleto volta à largura lateral. `pnpm check`, `pnpm test` (23 testes) e `git diff --check` passaram. Não houve revisão visual nem teste de interação em navegador pelo agente, conforme a instrução de Cassiano para trabalhar no código.
+
+## Novo hero do Estúdio em 01/10/2026
+
+Objetivo: aplicar `x1_fundo.png` enviado por Cassiano e reproduzir texto, alinhamento e cores do mock `Captura de tela 2026-10-01 181141.png`. Responsável: CM Frontend. Branch `feat/studio-hero-mock`. Contrato lido: `docs/EXPERIENCE.md`. Limites: somente o hero; preservar a Rádio e as alterações locais alheias. Aceite: arte original no fundo, copy exata do mock, alinhamento à esquerda, título branco com “forma.” em ciano/violeta e botão contornado no mesmo gradiente. O botão permanece desativado até a página do Estúdio existir. Cassiano confere o render desktop e mobile.
+
+- [x] Conferir branch, diff local, imagens e contrato.
+- [ ] Aplicar imagem, texto e estilos do mock.
+- [x] Em 02/10/2026, trocar o fundo do Estúdio para `x1_fundo_2.png`, cópia exata do PNG enviado.
+- [ ] Executar lint, typecheck e revisar diff.
+- [ ] Cassiano conferir o resultado visual.

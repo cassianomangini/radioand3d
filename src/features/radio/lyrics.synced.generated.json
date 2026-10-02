@@ -1,1 +1,2677 @@
-{}
+{
+  "CMangic - Depois do Barulho.m4a": {
+    "version": 1,
+    "source": "whisperx",
+    "language": "pt",
+    "coverage": 0.9203539823008849,
+    "lines": [
+      {
+        "kind": "section",
+        "text": "[Verse]",
+        "breakBefore": false
+      },
+      {
+        "kind": "line",
+        "text": "...a torneira que não pinga mais",
+        "breakBefore": false,
+        "start": 2.555,
+        "end": 4.916,
+        "confidence": 0.8333333333333334,
+        "words": [
+          {
+            "text": "...a",
+            "start": 2.555,
+            "end": 2.635,
+            "matched": true
+          },
+          {
+            "text": "torneira",
+            "start": 2.715,
+            "end": 3.175,
+            "matched": true
+          },
+          {
+            "text": "que",
+            "start": 3.29692,
+            "end": 3.43408,
+            "matched": false
+          },
+          {
+            "text": "não",
+            "start": 3.556,
+            "end": 3.656,
+            "matched": true
+          },
+          {
+            "text": "pinga",
+            "start": 3.776,
+            "end": 4.116,
+            "matched": true
+          },
+          {
+            "text": "mais",
+            "start": 4.216,
+            "end": 4.916,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu demorei uma semana pra notar",
+        "breakBefore": false,
+        "start": 5.757,
+        "end": 8.358,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 5.757,
+            "end": 5.857,
+            "matched": true
+          },
+          {
+            "text": "demorei",
+            "start": 5.917,
+            "end": 6.597,
+            "matched": true
+          },
+          {
+            "text": "uma",
+            "start": 6.657,
+            "end": 6.897,
+            "matched": true
+          },
+          {
+            "text": "semana",
+            "start": 7.017,
+            "end": 7.558,
+            "matched": true
+          },
+          {
+            "text": "pra",
+            "start": 7.638,
+            "end": 7.858,
+            "matched": true
+          },
+          {
+            "text": "notar",
+            "start": 7.898,
+            "end": 8.358,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Paz não chegou com faixa na portaria",
+        "breakBefore": false,
+        "start": 9.159,
+        "end": 11.76,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Paz",
+            "start": 9.159,
+            "end": 9.359,
+            "matched": true
+          },
+          {
+            "text": "não",
+            "start": 9.399,
+            "end": 9.539,
+            "matched": true
+          },
+          {
+            "text": "chegou",
+            "start": 9.619,
+            "end": 9.979,
+            "matched": true
+          },
+          {
+            "text": "com",
+            "start": 10.039,
+            "end": 10.139,
+            "matched": true
+          },
+          {
+            "text": "faixa",
+            "start": 10.219,
+            "end": 10.599,
+            "matched": true
+          },
+          {
+            "text": "na",
+            "start": 10.659,
+            "end": 10.779,
+            "matched": true
+          },
+          {
+            "text": "portaria",
+            "start": 10.879,
+            "end": 11.76,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Chegou quando a casa parou de discutir no ar",
+        "breakBefore": false,
+        "start": 11.92,
+        "end": 14.962,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Chegou",
+            "start": 11.92,
+            "end": 12.28,
+            "matched": true
+          },
+          {
+            "text": "quando",
+            "start": 12.36,
+            "end": 12.64,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 12.66,
+            "end": 12.68,
+            "matched": true
+          },
+          {
+            "text": "casa",
+            "start": 12.78,
+            "end": 13.121,
+            "matched": true
+          },
+          {
+            "text": "parou",
+            "start": 13.241,
+            "end": 13.841,
+            "matched": true
+          },
+          {
+            "text": "de",
+            "start": 13.901,
+            "end": 14.021,
+            "matched": true
+          },
+          {
+            "text": "discutir",
+            "start": 14.081,
+            "end": 14.742,
+            "matched": true
+          },
+          {
+            "text": "no",
+            "start": 14.782,
+            "end": 14.902,
+            "matched": true
+          },
+          {
+            "text": "ar",
+            "start": 14.922,
+            "end": 14.962,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "O telefone vira com a tela pra mesa",
+        "breakBefore": false,
+        "start": 16.102,
+        "end": 18.964,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "O",
+            "start": 16.102,
+            "end": 16.142,
+            "matched": true
+          },
+          {
+            "text": "telefone",
+            "start": 16.242,
+            "end": 17.003,
+            "matched": true
+          },
+          {
+            "text": "vira",
+            "start": 17.103,
+            "end": 17.423,
+            "matched": true
+          },
+          {
+            "text": "com",
+            "start": 17.503,
+            "end": 17.563,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 17.583,
+            "end": 17.663,
+            "matched": true
+          },
+          {
+            "text": "tela",
+            "start": 17.743,
+            "end": 18.083,
+            "matched": true
+          },
+          {
+            "text": "pra",
+            "start": 18.143,
+            "end": 18.263,
+            "matched": true
+          },
+          {
+            "text": "mesa",
+            "start": 18.424,
+            "end": 18.964,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Ninguém morreu por causa disso",
+        "breakBefore": false,
+        "start": 19.904,
+        "end": 22.045,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Ninguém",
+            "start": 19.904,
+            "end": 20.325,
+            "matched": true
+          },
+          {
+            "text": "morreu",
+            "start": 20.385,
+            "end": 20.745,
+            "matched": true
+          },
+          {
+            "text": "por",
+            "start": 20.785,
+            "end": 20.905,
+            "matched": true
+          },
+          {
+            "text": "causa",
+            "start": 20.985,
+            "end": 21.365,
+            "matched": true
+          },
+          {
+            "text": "disso",
+            "start": 21.485,
+            "end": 22.045,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu só deixei o dia terminar inteiro",
+        "breakBefore": false,
+        "start": 22.946,
+        "end": 25.587,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 22.946,
+            "end": 22.986,
+            "matched": true
+          },
+          {
+            "text": "só",
+            "start": 23.106,
+            "end": 23.306,
+            "matched": true
+          },
+          {
+            "text": "deixei",
+            "start": 23.346,
+            "end": 23.846,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 23.866,
+            "end": 23.886,
+            "matched": true
+          },
+          {
+            "text": "dia",
+            "start": 23.946,
+            "end": 24.307,
+            "matched": true
+          },
+          {
+            "text": "terminar",
+            "start": 24.387,
+            "end": 25.067,
+            "matched": true
+          },
+          {
+            "text": "inteiro",
+            "start": 25.087,
+            "end": 25.587,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Sem pedir desculpa por ter ficado fixo",
+        "breakBefore": false,
+        "start": 26.128,
+        "end": 29.189,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Sem",
+            "start": 26.128,
+            "end": 26.308,
+            "matched": true
+          },
+          {
+            "text": "pedir",
+            "start": 26.388,
+            "end": 26.748,
+            "matched": true
+          },
+          {
+            "text": "desculpa",
+            "start": 26.788,
+            "end": 27.308,
+            "matched": true
+          },
+          {
+            "text": "por",
+            "start": 27.428,
+            "end": 27.548,
+            "matched": true
+          },
+          {
+            "text": "ter",
+            "start": 27.688,
+            "end": 27.909,
+            "matched": true
+          },
+          {
+            "text": "ficado",
+            "start": 28.089,
+            "end": 28.549,
+            "matched": true
+          },
+          {
+            "text": "fixo",
+            "start": 28.709,
+            "end": 29.189,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Tem gente que acha paz um prêmio de palco",
+        "breakBefore": false,
+        "start": 29.389,
+        "end": 32.231,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Tem",
+            "start": 29.389,
+            "end": 29.549,
+            "matched": true
+          },
+          {
+            "text": "gente",
+            "start": 29.589,
+            "end": 29.89,
+            "matched": true
+          },
+          {
+            "text": "que",
+            "start": 29.93,
+            "end": 30.05,
+            "matched": true
+          },
+          {
+            "text": "acha",
+            "start": 30.13,
+            "end": 30.31,
+            "matched": true
+          },
+          {
+            "text": "paz",
+            "start": 30.45,
+            "end": 30.91,
+            "matched": true
+          },
+          {
+            "text": "um",
+            "start": 30.95,
+            "end": 31.01,
+            "matched": true
+          },
+          {
+            "text": "prêmio",
+            "start": 31.09,
+            "end": 31.47,
+            "matched": true
+          },
+          {
+            "text": "de",
+            "start": 31.511,
+            "end": 31.611,
+            "matched": true
+          },
+          {
+            "text": "palco",
+            "start": 31.751,
+            "end": 32.231,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu acho paz a geladeira e o piso",
+        "breakBefore": false,
+        "start": 33.304,
+        "end": 35.825,
+        "confidence": 0.75,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 33.304,
+            "end": 33.424,
+            "matched": true
+          },
+          {
+            "text": "acho",
+            "start": 33.524,
+            "end": 33.744,
+            "matched": true
+          },
+          {
+            "text": "paz",
+            "start": 33.863679999999995,
+            "end": 33.99832,
+            "matched": false
+          },
+          {
+            "text": "a",
+            "start": 34.05068,
+            "end": 34.185320000000004,
+            "matched": false
+          },
+          {
+            "text": "geladeira",
+            "start": 34.305,
+            "end": 35.005,
+            "matched": true
+          },
+          {
+            "text": "e",
+            "start": 35.065,
+            "end": 35.105,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 35.205,
+            "end": 35.245,
+            "matched": true
+          },
+          {
+            "text": "piso",
+            "start": 35.385,
+            "end": 35.825,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Se a sala não levanta a voz às onze",
+        "breakBefore": false,
+        "start": 36.206,
+        "end": 38.823,
+        "confidence": 0.7777777777777778,
+        "words": [
+          {
+            "text": "Se",
+            "start": 36.206,
+            "end": 36.286,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 36.306,
+            "end": 36.346,
+            "matched": true
+          },
+          {
+            "text": "sala",
+            "start": 36.466,
+            "end": 36.806,
+            "matched": true
+          },
+          {
+            "text": "não",
+            "start": 36.866,
+            "end": 37.026,
+            "matched": true
+          },
+          {
+            "text": "levanta",
+            "start": 37.106,
+            "end": 37.687,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 37.702000000000005,
+            "end": 37.752,
+            "matched": false
+          },
+          {
+            "text": "voz",
+            "start": 37.767,
+            "end": 38.067,
+            "matched": true
+          },
+          {
+            "text": "às",
+            "start": 38.147,
+            "end": 38.687,
+            "matched": true
+          },
+          {
+            "text": "onze",
+            "start": 38.751,
+            "end": 38.823,
+            "matched": false
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu durmo como gente, não como aviso",
+        "breakBefore": false,
+        "start": 38.887,
+        "end": 42.409,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 38.887,
+            "end": 38.967,
+            "matched": true
+          },
+          {
+            "text": "durmo",
+            "start": 39.067,
+            "end": 39.367,
+            "matched": true
+          },
+          {
+            "text": "como",
+            "start": 39.528,
+            "end": 39.848,
+            "matched": true
+          },
+          {
+            "text": "gente,",
+            "start": 40.008,
+            "end": 40.508,
+            "matched": true
+          },
+          {
+            "text": "não",
+            "start": 41.048,
+            "end": 41.249,
+            "matched": true
+          },
+          {
+            "text": "como",
+            "start": 41.349,
+            "end": 41.729,
+            "matched": true
+          },
+          {
+            "text": "aviso",
+            "start": 41.829,
+            "end": 42.409,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu já vivi o capítulo do barulho",
+        "breakBefore": false,
+        "start": 43.63,
+        "end": 46.351,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 43.63,
+            "end": 43.71,
+            "matched": true
+          },
+          {
+            "text": "já",
+            "start": 43.79,
+            "end": 43.97,
+            "matched": true
+          },
+          {
+            "text": "vivi",
+            "start": 44.05,
+            "end": 44.35,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 44.39,
+            "end": 44.43,
+            "matched": true
+          },
+          {
+            "text": "capítulo",
+            "start": 44.45,
+            "end": 45.251,
+            "matched": true
+          },
+          {
+            "text": "do",
+            "start": 45.311,
+            "end": 45.431,
+            "matched": true
+          },
+          {
+            "text": "barulho",
+            "start": 45.511,
+            "end": 46.351,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Ele ensinou e ele cobrou caro",
+        "breakBefore": false,
+        "start": 47.112,
+        "end": 49.533,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Ele",
+            "start": 47.112,
+            "end": 47.292,
+            "matched": true
+          },
+          {
+            "text": "ensinou",
+            "start": 47.352,
+            "end": 48.092,
+            "matched": true
+          },
+          {
+            "text": "e",
+            "start": 48.172,
+            "end": 48.253,
+            "matched": true
+          },
+          {
+            "text": "ele",
+            "start": 48.273,
+            "end": 48.413,
+            "matched": true
+          },
+          {
+            "text": "cobrou",
+            "start": 48.533,
+            "end": 48.953,
+            "matched": true
+          },
+          {
+            "text": "caro",
+            "start": 49.073,
+            "end": 49.533,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Não preciso reviver pra provar que eu aguentei",
+        "breakBefore": false,
+        "start": 49.833,
+        "end": 53.295,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Não",
+            "start": 49.833,
+            "end": 49.994,
+            "matched": true
+          },
+          {
+            "text": "preciso",
+            "start": 50.074,
+            "end": 50.614,
+            "matched": true
+          },
+          {
+            "text": "reviver",
+            "start": 50.694,
+            "end": 51.454,
+            "matched": true
+          },
+          {
+            "text": "pra",
+            "start": 51.534,
+            "end": 51.714,
+            "matched": true
+          },
+          {
+            "text": "provar",
+            "start": 51.775,
+            "end": 52.195,
+            "matched": true
+          },
+          {
+            "text": "que",
+            "start": 52.215,
+            "end": 52.295,
+            "matched": true
+          },
+          {
+            "text": "eu",
+            "start": 52.315,
+            "end": 52.435,
+            "matched": true
+          },
+          {
+            "text": "aguentei",
+            "start": 52.515,
+            "end": 53.295,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Aguentei, agora eu quero o ordinário",
+        "breakBefore": false,
+        "start": 53.435,
+        "end": 56.017,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Aguentei,",
+            "start": 53.435,
+            "end": 53.996,
+            "matched": true
+          },
+          {
+            "text": "agora",
+            "start": 54.076,
+            "end": 54.436,
+            "matched": true
+          },
+          {
+            "text": "eu",
+            "start": 54.456,
+            "end": 54.496,
+            "matched": true
+          },
+          {
+            "text": "quero",
+            "start": 54.576,
+            "end": 54.916,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 54.936,
+            "end": 54.996,
+            "matched": true
+          },
+          {
+            "text": "ordinário",
+            "start": 55.156,
+            "end": 56.017,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "text": "[Chorus]",
+        "breakBefore": true
+      },
+      {
+        "kind": "line",
+        "text": "Depois do barulho",
+        "breakBefore": false,
+        "start": 56.385400000000004,
+        "end": 57.8422,
+        "confidence": 0,
+        "words": [
+          {
+            "text": "Depois",
+            "start": 56.385400000000004,
+            "end": 56.745400000000004,
+            "matched": false
+          },
+          {
+            "text": "do",
+            "start": 56.933800000000005,
+            "end": 57.293800000000005,
+            "matched": false
+          },
+          {
+            "text": "barulho",
+            "start": 57.4822,
+            "end": 57.8422,
+            "matched": false
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu escuto a geladeira",
+        "breakBefore": false,
+        "start": 58.0306,
+        "end": 60.282,
+        "confidence": 0.75,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 58.0306,
+            "end": 58.3906,
+            "matched": false
+          },
+          {
+            "text": "escuto",
+            "start": 58.759,
+            "end": 59.16,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 59.22,
+            "end": 59.26,
+            "matched": true
+          },
+          {
+            "text": "geladeira",
+            "start": 59.3,
+            "end": 60.282,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "E isso hoje",
+        "breakBefore": false,
+        "start": 60.883,
+        "end": 61.964,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "E",
+            "start": 60.883,
+            "end": 60.963,
+            "matched": true
+          },
+          {
+            "text": "isso",
+            "start": 61.043,
+            "end": 61.464,
+            "matched": true
+          },
+          {
+            "text": "hoje",
+            "start": 61.484,
+            "end": 61.964,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "É riqueza",
+        "breakBefore": false,
+        "start": 62.005,
+        "end": 63.247,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "É",
+            "start": 62.005,
+            "end": 62.105,
+            "matched": true
+          },
+          {
+            "text": "riqueza",
+            "start": 62.165,
+            "end": 63.247,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Depois do barulho",
+        "breakBefore": false,
+        "start": 63.868,
+        "end": 65.05,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Depois",
+            "start": 63.868,
+            "end": 64.308,
+            "matched": true
+          },
+          {
+            "text": "do",
+            "start": 64.328,
+            "end": 64.429,
+            "matched": true
+          },
+          {
+            "text": "barulho",
+            "start": 64.489,
+            "end": 65.05,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu deixo o quarto quieto",
+        "breakBefore": false,
+        "start": 65.23,
+        "end": 66.833,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 65.23,
+            "end": 65.33,
+            "matched": true
+          },
+          {
+            "text": "deixo",
+            "start": 65.37,
+            "end": 65.651,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 65.671,
+            "end": 65.711,
+            "matched": true
+          },
+          {
+            "text": "quarto",
+            "start": 65.791,
+            "end": 66.132,
+            "matched": true
+          },
+          {
+            "text": "quieto",
+            "start": 66.232,
+            "end": 66.833,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Não invento problema",
+        "breakBefore": false,
+        "start": 66.933,
+        "end": 68.335,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Não",
+            "start": 66.933,
+            "end": 67.153,
+            "matched": true
+          },
+          {
+            "text": "invento",
+            "start": 67.173,
+            "end": 67.714,
+            "matched": true
+          },
+          {
+            "text": "problema",
+            "start": 67.754,
+            "end": 68.335,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Pra me sentir acordado",
+        "breakBefore": false,
+        "start": 68.616,
+        "end": 76.381,
+        "confidence": 0.75,
+        "words": [
+          {
+            "text": "Pra",
+            "start": 68.616,
+            "end": 68.756,
+            "matched": true
+          },
+          {
+            "text": "me",
+            "start": 68.796,
+            "end": 68.976,
+            "matched": true
+          },
+          {
+            "text": "sentir",
+            "start": 69.057,
+            "end": 69.337,
+            "matched": true
+          },
+          {
+            "text": "acordado",
+            "start": 76.02099999999999,
+            "end": 76.381,
+            "matched": false
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "text": "[Verse 2]",
+        "breakBefore": true
+      },
+      {
+        "kind": "line",
+        "text": "Café esfriando no balcão e eu deixo",
+        "breakBefore": false,
+        "start": 83.065,
+        "end": 85.928,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Café",
+            "start": 83.065,
+            "end": 83.506,
+            "matched": true
+          },
+          {
+            "text": "esfriando",
+            "start": 83.526,
+            "end": 84.266,
+            "matched": true
+          },
+          {
+            "text": "no",
+            "start": 84.366,
+            "end": 84.466,
+            "matched": true
+          },
+          {
+            "text": "balcão",
+            "start": 84.567,
+            "end": 85.087,
+            "matched": true
+          },
+          {
+            "text": "e",
+            "start": 85.147,
+            "end": 85.207,
+            "matched": true
+          },
+          {
+            "text": "eu",
+            "start": 85.287,
+            "end": 85.407,
+            "matched": true
+          },
+          {
+            "text": "deixo",
+            "start": 85.467,
+            "end": 85.928,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "O dia pode começar sem discurso",
+        "breakBefore": false,
+        "start": 86.388,
+        "end": 89.211,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "O",
+            "start": 86.388,
+            "end": 86.428,
+            "matched": true
+          },
+          {
+            "text": "dia",
+            "start": 86.529,
+            "end": 86.789,
+            "matched": true
+          },
+          {
+            "text": "pode",
+            "start": 86.949,
+            "end": 87.289,
+            "matched": true
+          },
+          {
+            "text": "começar",
+            "start": 87.389,
+            "end": 88.11,
+            "matched": true
+          },
+          {
+            "text": "sem",
+            "start": 88.25,
+            "end": 88.43,
+            "matched": true
+          },
+          {
+            "text": "discurso",
+            "start": 88.47,
+            "end": 89.211,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu já fui o tipo que enche a casa de plano",
+        "breakBefore": false,
+        "start": 89.812,
+        "end": 92.895,
+        "confidence": 0.9090909090909091,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 89.812,
+            "end": 89.932,
+            "matched": true
+          },
+          {
+            "text": "já",
+            "start": 89.992,
+            "end": 90.132,
+            "matched": true
+          },
+          {
+            "text": "fui",
+            "start": 90.252,
+            "end": 90.452,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 90.492,
+            "end": 90.533,
+            "matched": true
+          },
+          {
+            "text": "tipo",
+            "start": 90.633,
+            "end": 91.013,
+            "matched": true
+          },
+          {
+            "text": "que",
+            "start": 91.073,
+            "end": 91.233,
+            "matched": true
+          },
+          {
+            "text": "enche",
+            "start": 91.333,
+            "end": 91.614,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 91.62899999999999,
+            "end": 91.679,
+            "matched": false
+          },
+          {
+            "text": "casa",
+            "start": 91.694,
+            "end": 92.074,
+            "matched": true
+          },
+          {
+            "text": "de",
+            "start": 92.134,
+            "end": 92.214,
+            "matched": true
+          },
+          {
+            "text": "plano",
+            "start": 92.354,
+            "end": 92.895,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Pra não escutar o que o silêncio puxa",
+        "breakBefore": false,
+        "start": 92.995,
+        "end": 95.978,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Pra",
+            "start": 92.995,
+            "end": 93.195,
+            "matched": true
+          },
+          {
+            "text": "não",
+            "start": 93.255,
+            "end": 93.435,
+            "matched": true
+          },
+          {
+            "text": "escutar",
+            "start": 93.556,
+            "end": 94.156,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 94.597,
+            "end": 94.617,
+            "matched": true
+          },
+          {
+            "text": "que",
+            "start": 94.697,
+            "end": 94.797,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 94.837,
+            "end": 94.877,
+            "matched": true
+          },
+          {
+            "text": "silêncio",
+            "start": 94.977,
+            "end": 95.498,
+            "matched": true
+          },
+          {
+            "text": "puxa",
+            "start": 95.598,
+            "end": 95.978,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Minha conta ainda existe, meu prazo também",
+        "breakBefore": false,
+        "start": 95.998,
+        "end": 99.301,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Minha",
+            "start": 95.998,
+            "end": 96.779,
+            "matched": true
+          },
+          {
+            "text": "conta",
+            "start": 96.879,
+            "end": 97.179,
+            "matched": true
+          },
+          {
+            "text": "ainda",
+            "start": 97.239,
+            "end": 97.62,
+            "matched": true
+          },
+          {
+            "text": "existe,",
+            "start": 97.66,
+            "end": 98.14,
+            "matched": true
+          },
+          {
+            "text": "meu",
+            "start": 98.18,
+            "end": 98.32,
+            "matched": true
+          },
+          {
+            "text": "prazo",
+            "start": 98.42,
+            "end": 98.801,
+            "matched": true
+          },
+          {
+            "text": "também",
+            "start": 98.861,
+            "end": 99.301,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Paz não é sumir do mundo real",
+        "breakBefore": false,
+        "start": 100.142,
+        "end": 102.685,
+        "confidence": 0.7142857142857143,
+        "words": [
+          {
+            "text": "Paz",
+            "start": 100.142,
+            "end": 100.543,
+            "matched": true
+          },
+          {
+            "text": "não",
+            "start": 100.583,
+            "end": 100.763,
+            "matched": true
+          },
+          {
+            "text": "é",
+            "start": 100.823,
+            "end": 100.883,
+            "matched": true
+          },
+          {
+            "text": "sumir",
+            "start": 101.04961333333333,
+            "end": 101.23705333333334,
+            "matched": false
+          },
+          {
+            "text": "do",
+            "start": 101.30994666666666,
+            "end": 101.49738666666667,
+            "matched": false
+          },
+          {
+            "text": "mundo",
+            "start": 101.664,
+            "end": 102.024,
+            "matched": true
+          },
+          {
+            "text": "real",
+            "start": 102.104,
+            "end": 102.685,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "É fazer a fila sem brigar com a fila",
+        "breakBefore": false,
+        "start": 103.652,
+        "end": 106.895,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "É",
+            "start": 103.652,
+            "end": 103.912,
+            "matched": true
+          },
+          {
+            "text": "fazer",
+            "start": 104.012,
+            "end": 104.473,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 104.493,
+            "end": 104.533,
+            "matched": true
+          },
+          {
+            "text": "fila",
+            "start": 104.653,
+            "end": 104.973,
+            "matched": true
+          },
+          {
+            "text": "sem",
+            "start": 105.093,
+            "end": 105.293,
+            "matched": true
+          },
+          {
+            "text": "brigar",
+            "start": 105.333,
+            "end": 105.754,
+            "matched": true
+          },
+          {
+            "text": "com",
+            "start": 105.814,
+            "end": 105.934,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 105.974,
+            "end": 106.014,
+            "matched": true
+          },
+          {
+            "text": "fila",
+            "start": 106.194,
+            "end": 106.895,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "É voltar pra casa e não armar jornal",
+        "breakBefore": false,
+        "start": 106.915,
+        "end": 109.897,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "É",
+            "start": 106.915,
+            "end": 106.935,
+            "matched": true
+          },
+          {
+            "text": "voltar",
+            "start": 107.035,
+            "end": 107.435,
+            "matched": true
+          },
+          {
+            "text": "pra",
+            "start": 107.535,
+            "end": 107.715,
+            "matched": true
+          },
+          {
+            "text": "casa",
+            "start": 107.875,
+            "end": 108.356,
+            "matched": true
+          },
+          {
+            "text": "e",
+            "start": 108.396,
+            "end": 108.456,
+            "matched": true
+          },
+          {
+            "text": "não",
+            "start": 108.536,
+            "end": 108.716,
+            "matched": true
+          },
+          {
+            "text": "armar",
+            "start": 108.816,
+            "end": 109.197,
+            "matched": true
+          },
+          {
+            "text": "jornal",
+            "start": 109.257,
+            "end": 109.897,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Se alguém perguntar se eu tô bem agora",
+        "breakBefore": false,
+        "start": 110.478,
+        "end": 113.6,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Se",
+            "start": 110.478,
+            "end": 110.558,
+            "matched": true
+          },
+          {
+            "text": "alguém",
+            "start": 110.598,
+            "end": 110.878,
+            "matched": true
+          },
+          {
+            "text": "perguntar",
+            "start": 110.938,
+            "end": 111.598,
+            "matched": true
+          },
+          {
+            "text": "se",
+            "start": 111.999,
+            "end": 112.039,
+            "matched": true
+          },
+          {
+            "text": "eu",
+            "start": 112.059,
+            "end": 112.199,
+            "matched": true
+          },
+          {
+            "text": "tô",
+            "start": 112.279,
+            "end": 112.419,
+            "matched": true
+          },
+          {
+            "text": "bem",
+            "start": 112.499,
+            "end": 112.719,
+            "matched": true
+          },
+          {
+            "text": "agora",
+            "start": 112.779,
+            "end": 113.6,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu vou falar que tô numa fase menor",
+        "breakBefore": false,
+        "start": 113.62,
+        "end": 116.642,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 113.62,
+            "end": 113.74,
+            "matched": true
+          },
+          {
+            "text": "vou",
+            "start": 113.76,
+            "end": 113.88,
+            "matched": true
+          },
+          {
+            "text": "falar",
+            "start": 113.98,
+            "end": 114.461,
+            "matched": true
+          },
+          {
+            "text": "que",
+            "start": 114.601,
+            "end": 114.941,
+            "matched": true
+          },
+          {
+            "text": "tô",
+            "start": 114.961,
+            "end": 115.121,
+            "matched": true
+          },
+          {
+            "text": "numa",
+            "start": 115.301,
+            "end": 115.582,
+            "matched": true
+          },
+          {
+            "text": "fase",
+            "start": 115.742,
+            "end": 116.082,
+            "matched": true
+          },
+          {
+            "text": "menor",
+            "start": 116.142,
+            "end": 116.642,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Menor de volume, maior de permanência",
+        "breakBefore": false,
+        "start": 117.443,
+        "end": 120.806,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Menor",
+            "start": 117.443,
+            "end": 117.843,
+            "matched": true
+          },
+          {
+            "text": "de",
+            "start": 117.883,
+            "end": 117.983,
+            "matched": true
+          },
+          {
+            "text": "volume,",
+            "start": 118.064,
+            "end": 118.844,
+            "matched": true
+          },
+          {
+            "text": "maior",
+            "start": 118.924,
+            "end": 119.304,
+            "matched": true
+          },
+          {
+            "text": "de",
+            "start": 119.405,
+            "end": 119.465,
+            "matched": true
+          },
+          {
+            "text": "permanência",
+            "start": 119.585,
+            "end": 120.806,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Não é derrota, é o volume do motor",
+        "breakBefore": false,
+        "start": 120.866,
+        "end": 124.068,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Não",
+            "start": 120.866,
+            "end": 121.026,
+            "matched": true
+          },
+          {
+            "text": "é",
+            "start": 121.166,
+            "end": 121.246,
+            "matched": true
+          },
+          {
+            "text": "derrota,",
+            "start": 121.306,
+            "end": 122.347,
+            "matched": true
+          },
+          {
+            "text": "é",
+            "start": 122.367,
+            "end": 122.387,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 122.467,
+            "end": 122.507,
+            "matched": true
+          },
+          {
+            "text": "volume",
+            "start": 122.627,
+            "end": 123.188,
+            "matched": true
+          },
+          {
+            "text": "do",
+            "start": 123.228,
+            "end": 123.428,
+            "matched": true
+          },
+          {
+            "text": "motor",
+            "start": 123.508,
+            "end": 124.068,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu não preciso de plateia pra descansar",
+        "breakBefore": false,
+        "start": 124.409,
+        "end": 127.251,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 124.409,
+            "end": 124.509,
+            "matched": true
+          },
+          {
+            "text": "não",
+            "start": 124.569,
+            "end": 124.729,
+            "matched": true
+          },
+          {
+            "text": "preciso",
+            "start": 124.789,
+            "end": 125.309,
+            "matched": true
+          },
+          {
+            "text": "de",
+            "start": 125.409,
+            "end": 125.67,
+            "matched": true
+          },
+          {
+            "text": "plateia",
+            "start": 125.69,
+            "end": 126.11,
+            "matched": true
+          },
+          {
+            "text": "pra",
+            "start": 126.27,
+            "end": 126.49,
+            "matched": true
+          },
+          {
+            "text": "descansar",
+            "start": 126.53,
+            "end": 127.251,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Preciso da porta fechando sem teatro",
+        "breakBefore": false,
+        "start": 127.811,
+        "end": 131.014,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Preciso",
+            "start": 127.811,
+            "end": 128.372,
+            "matched": true
+          },
+          {
+            "text": "da",
+            "start": 128.432,
+            "end": 128.552,
+            "matched": true
+          },
+          {
+            "text": "porta",
+            "start": 128.692,
+            "end": 129.192,
+            "matched": true
+          },
+          {
+            "text": "fechando",
+            "start": 129.292,
+            "end": 129.893,
+            "matched": true
+          },
+          {
+            "text": "sem",
+            "start": 130.033,
+            "end": 130.213,
+            "matched": true
+          },
+          {
+            "text": "teatro",
+            "start": 130.293,
+            "end": 131.014,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "O barulho me ensinou a ficar em pé",
+        "breakBefore": false,
+        "start": 131.154,
+        "end": 134.25919076923077,
+        "confidence": 0.5,
+        "words": [
+          {
+            "text": "O",
+            "start": 131.154,
+            "end": 131.234,
+            "matched": true
+          },
+          {
+            "text": "barulho",
+            "start": 131.274,
+            "end": 131.834,
+            "matched": true
+          },
+          {
+            "text": "me",
+            "start": 131.894,
+            "end": 131.934,
+            "matched": true
+          },
+          {
+            "text": "ensinou",
+            "start": 131.974,
+            "end": 132.375,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 132.65157846153846,
+            "end": 132.96272923076924,
+            "matched": false
+          },
+          {
+            "text": "ficar",
+            "start": 133.08373230769232,
+            "end": 133.3948830769231,
+            "matched": false
+          },
+          {
+            "text": "em",
+            "start": 133.51588615384614,
+            "end": 133.82703692307692,
+            "matched": false
+          },
+          {
+            "text": "pé",
+            "start": 133.94804,
+            "end": 134.25919076923077,
+            "matched": false
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "O silêncio me ensina a ficar no mato",
+        "breakBefore": false,
+        "start": 134.38019384615384,
+        "end": 137.71642153846153,
+        "confidence": 0,
+        "words": [
+          {
+            "text": "O",
+            "start": 134.38019384615384,
+            "end": 134.69134461538462,
+            "matched": false
+          },
+          {
+            "text": "silêncio",
+            "start": 134.8123476923077,
+            "end": 135.12349846153847,
+            "matched": false
+          },
+          {
+            "text": "me",
+            "start": 135.24450153846152,
+            "end": 135.5556523076923,
+            "matched": false
+          },
+          {
+            "text": "ensina",
+            "start": 135.67665538461537,
+            "end": 135.98780615384615,
+            "matched": false
+          },
+          {
+            "text": "a",
+            "start": 136.10880923076922,
+            "end": 136.41996,
+            "matched": false
+          },
+          {
+            "text": "ficar",
+            "start": 136.54096307692308,
+            "end": 136.85211384615386,
+            "matched": false
+          },
+          {
+            "text": "no",
+            "start": 136.9731169230769,
+            "end": 137.28426769230768,
+            "matched": false
+          },
+          {
+            "text": "mato",
+            "start": 137.40527076923075,
+            "end": 137.71642153846153,
+            "matched": false
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Do meu próprio chão, sem pedido de palma",
+        "breakBefore": false,
+        "start": 137.993,
+        "end": 146.139,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Do",
+            "start": 137.993,
+            "end": 138.093,
+            "matched": true
+          },
+          {
+            "text": "meu",
+            "start": 138.153,
+            "end": 138.313,
+            "matched": true
+          },
+          {
+            "text": "próprio",
+            "start": 138.393,
+            "end": 138.834,
+            "matched": true
+          },
+          {
+            "text": "chão,",
+            "start": 138.974,
+            "end": 139.114,
+            "matched": true
+          },
+          {
+            "text": "sem",
+            "start": 141.155,
+            "end": 141.315,
+            "matched": true
+          },
+          {
+            "text": "pedido",
+            "start": 141.375,
+            "end": 141.956,
+            "matched": true
+          },
+          {
+            "text": "de",
+            "start": 141.996,
+            "end": 142.076,
+            "matched": true
+          },
+          {
+            "text": "palma",
+            "start": 142.216,
+            "end": 146.139,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "text": "[Chorus]",
+        "breakBefore": true
+      },
+      {
+        "kind": "line",
+        "text": "Depois do barulho",
+        "breakBefore": false,
+        "start": 146.819,
+        "end": 147.96,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Depois",
+            "start": 146.819,
+            "end": 147.259,
+            "matched": true
+          },
+          {
+            "text": "do",
+            "start": 147.279,
+            "end": 147.379,
+            "matched": true
+          },
+          {
+            "text": "barulho",
+            "start": 147.439,
+            "end": 147.96,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu escuto a geladeira",
+        "breakBefore": false,
+        "start": 148.4,
+        "end": 150.121,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 148.4,
+            "end": 148.56,
+            "matched": true
+          },
+          {
+            "text": "escuto",
+            "start": 148.62,
+            "end": 149.041,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 149.081,
+            "end": 149.121,
+            "matched": true
+          },
+          {
+            "text": "geladeira",
+            "start": 149.181,
+            "end": 150.121,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "E isso hoje",
+        "breakBefore": false,
+        "start": 150.141,
+        "end": 151.842,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "E",
+            "start": 150.141,
+            "end": 150.161,
+            "matched": true
+          },
+          {
+            "text": "isso",
+            "start": 150.822,
+            "end": 151.302,
+            "matched": true
+          },
+          {
+            "text": "hoje",
+            "start": 151.522,
+            "end": 151.842,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "É riqueza",
+        "breakBefore": false,
+        "start": 151.903,
+        "end": 153.063,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "É",
+            "start": 151.903,
+            "end": 151.963,
+            "matched": true
+          },
+          {
+            "text": "riqueza",
+            "start": 151.983,
+            "end": 153.063,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Depois do barulho",
+        "breakBefore": false,
+        "start": 153.764,
+        "end": 154.865,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Depois",
+            "start": 153.764,
+            "end": 154.184,
+            "matched": true
+          },
+          {
+            "text": "do",
+            "start": 154.204,
+            "end": 154.304,
+            "matched": true
+          },
+          {
+            "text": "barulho",
+            "start": 154.364,
+            "end": 154.865,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu deixo o quarto quieto",
+        "breakBefore": false,
+        "start": 155.085,
+        "end": 156.54968000000002,
+        "confidence": 0.8,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 155.085,
+            "end": 155.185,
+            "matched": true
+          },
+          {
+            "text": "deixo",
+            "start": 155.245,
+            "end": 155.525,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 155.565,
+            "end": 155.585,
+            "matched": true
+          },
+          {
+            "text": "quarto",
+            "start": 155.665,
+            "end": 156.005,
+            "matched": true
+          },
+          {
+            "text": "quieto",
+            "start": 156.26132,
+            "end": 156.54968000000002,
+            "matched": false
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Não invento problema",
+        "breakBefore": false,
+        "start": 156.806,
+        "end": 158.187,
+        "confidence": 0.6666666666666666,
+        "words": [
+          {
+            "text": "Não",
+            "start": 156.806,
+            "end": 156.966,
+            "matched": true
+          },
+          {
+            "text": "invento",
+            "start": 157.1772,
+            "end": 157.41479999999999,
+            "matched": false
+          },
+          {
+            "text": "problema",
+            "start": 157.626,
+            "end": 158.187,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Pra me sentir acordado",
+        "breakBefore": false,
+        "start": 158.487,
+        "end": 160.909,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Pra",
+            "start": 158.487,
+            "end": 158.627,
+            "matched": true
+          },
+          {
+            "text": "me",
+            "start": 158.667,
+            "end": 158.867,
+            "matched": true
+          },
+          {
+            "text": "sentir",
+            "start": 158.927,
+            "end": 159.388,
+            "matched": true
+          },
+          {
+            "text": "acordado",
+            "start": 159.448,
+            "end": 160.909,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "text": "[Bridge]",
+        "breakBefore": true
+      },
+      {
+        "kind": "line",
+        "text": "Se a paz pedisse um hino",
+        "breakBefore": false,
+        "start": 161.509,
+        "end": 163.931,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Se",
+            "start": 161.509,
+            "end": 161.569,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 161.609,
+            "end": 161.62900000000002,
+            "matched": true
+          },
+          {
+            "text": "paz",
+            "start": 161.709,
+            "end": 161.969,
+            "matched": true
+          },
+          {
+            "text": "pedisse",
+            "start": 162.009,
+            "end": 162.97,
+            "matched": true
+          },
+          {
+            "text": "um",
+            "start": 163.07,
+            "end": 163.23,
+            "matched": true
+          },
+          {
+            "text": "hino",
+            "start": 163.29,
+            "end": 163.931,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu ia desconfiar",
+        "breakBefore": false,
+        "start": 165.051,
+        "end": 166.092,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 165.051,
+            "end": 165.172,
+            "matched": true
+          },
+          {
+            "text": "ia",
+            "start": 165.272,
+            "end": 165.612,
+            "matched": true
+          },
+          {
+            "text": "desconfiar",
+            "start": 165.632,
+            "end": 166.092,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Paz boa chega simples",
+        "breakBefore": false,
+        "start": 168.416,
+        "end": 171.359,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Paz",
+            "start": 168.416,
+            "end": 168.616,
+            "matched": true
+          },
+          {
+            "text": "boa",
+            "start": 168.656,
+            "end": 169.097,
+            "matched": true
+          },
+          {
+            "text": "chega",
+            "start": 169.257,
+            "end": 169.937,
+            "matched": true
+          },
+          {
+            "text": "simples",
+            "start": 170.198,
+            "end": 171.359,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "E deixa o corpo parar",
+        "breakBefore": false,
+        "start": 171.379,
+        "end": 173.681,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "E",
+            "start": 171.379,
+            "end": 171.399,
+            "matched": true
+          },
+          {
+            "text": "deixa",
+            "start": 171.459,
+            "end": 172.059,
+            "matched": true
+          },
+          {
+            "text": "o",
+            "start": 172.139,
+            "end": 172.179,
+            "matched": true
+          },
+          {
+            "text": "corpo",
+            "start": 172.339,
+            "end": 172.84,
+            "matched": true
+          },
+          {
+            "text": "parar",
+            "start": 172.96,
+            "end": 173.681,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "text": "[Chorus]",
+        "breakBefore": true
+      },
+      {
+        "kind": "line",
+        "text": "Depois do barulho",
+        "breakBefore": false,
+        "start": 174.501,
+        "end": 175.962,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Depois",
+            "start": 174.501,
+            "end": 174.942,
+            "matched": true
+          },
+          {
+            "text": "do",
+            "start": 174.962,
+            "end": 175.062,
+            "matched": true
+          },
+          {
+            "text": "barulho",
+            "start": 175.122,
+            "end": 175.962,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Eu escuto a geladeira",
+        "breakBefore": false,
+        "start": 176.063,
+        "end": 178.545,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Eu",
+            "start": 176.063,
+            "end": 176.243,
+            "matched": true
+          },
+          {
+            "text": "escuto",
+            "start": 176.303,
+            "end": 176.723,
+            "matched": true
+          },
+          {
+            "text": "a",
+            "start": 176.763,
+            "end": 176.823,
+            "matched": true
+          },
+          {
+            "text": "geladeira",
+            "start": 176.863,
+            "end": 178.545,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "E isso hoje",
+        "breakBefore": false,
+        "start": 178.565,
+        "end": 179.646,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "E",
+            "start": 178.565,
+            "end": 178.585,
+            "matched": true
+          },
+          {
+            "text": "isso",
+            "start": 178.645,
+            "end": 179.005,
+            "matched": true
+          },
+          {
+            "text": "hoje",
+            "start": 179.085,
+            "end": 179.646,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "É riqueza",
+        "breakBefore": false,
+        "start": 179.666,
+        "end": 181.367,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "É",
+            "start": 179.666,
+            "end": 179.686,
+            "matched": true
+          },
+          {
+            "text": "riqueza",
+            "start": 179.726,
+            "end": 181.367,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "Depois do barulho",
+        "breakBefore": false,
+        "start": 181.427,
+        "end": 182.568,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "Depois",
+            "start": 181.427,
+            "end": 181.867,
+            "matched": true
+          },
+          {
+            "text": "do",
+            "start": 181.887,
+            "end": 181.988,
+            "matched": true
+          },
+          {
+            "text": "barulho",
+            "start": 182.048,
+            "end": 182.568,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "A casa não discute",
+        "breakBefore": false,
+        "start": 182.768,
+        "end": 185.551,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "A",
+            "start": 182.768,
+            "end": 182.828,
+            "matched": true
+          },
+          {
+            "text": "casa",
+            "start": 182.908,
+            "end": 183.289,
+            "matched": true
+          },
+          {
+            "text": "não",
+            "start": 183.369,
+            "end": 183.589,
+            "matched": true
+          },
+          {
+            "text": "discute",
+            "start": 183.629,
+            "end": 185.551,
+            "matched": true
+          }
+        ]
+      },
+      {
+        "kind": "line",
+        "text": "E eu permaneço",
+        "breakBefore": false,
+        "start": 185.571,
+        "end": 187.152,
+        "confidence": 1,
+        "words": [
+          {
+            "text": "E",
+            "start": 185.571,
+            "end": 185.591,
+            "matched": true
+          },
+          {
+            "text": "eu",
+            "start": 185.611,
+            "end": 185.831,
+            "matched": true
+          },
+          {
+            "text": "permaneço",
+            "start": 185.971,
+            "end": 187.152,
+            "matched": true
+          }
+        ]
+      }
+    ],
+    "sourceHash": "ae713a8ba707c28cab29109426ded10b2f36a260e6e4c1545ab55978d0aaa73d",
+    "model": "small",
+    "generatedAt": "2026-10-01T21:04:20.109Z"
+  }
+}

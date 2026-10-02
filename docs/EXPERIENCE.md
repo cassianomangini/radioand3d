@@ -2,7 +2,7 @@
 
 ## Direção confirmada
 
-CM como identidade principal. Sem astronauta, lettering Artesopolis ou tema espacial herdado. Cassiano forneceu em 29/09/2026 o logo **CM 3D and Radio**, salvo em `public/images/cm-3d-radio-logo.png`. A navbar mostra uma versão pequena; o hero usa a mesma arte em escala moderada, sem competir com o título. Preservar o arquivo fornecido, sem redesenhar o monograma no frontend.
+CM como identidade principal. Sem astronauta, lettering Artesopolis ou tema espacial herdado. Cassiano forneceu em 29/09/2026 o logo **CM 3D and Radio**, salvo em `public/images/cm-3d-radio-logo.png`. A navbar mostra uma versão pequena. Preservar o arquivo fornecido, sem redesenhar o monograma no frontend.
 
 Cassiano pediu um resultado bonito, chique, fácil e vivo, com muitas animações. Isso vale para composição e uso real. Tokens e componentes preservam uma direção visual aprovada; não substituem essa direção.
 
@@ -12,7 +12,7 @@ A referência visual mais próxima do alvo mostrou uma composição em dois mund
 
 Na revisão da interface em 29/09/2026, Cassiano pediu fundo quase preto, mais presença de cor no título, CTA do Estúdio em cápsula preta com contorno azul e seta, e uma única borda fina entre Estúdio e Rádio. Não reservar uma faixa escura para o divisor nem exibir um puxador permanente. A área de arraste pode ser transparente sobre a borda.
 
-No hero da landing, o marcador “ESTÚDIO 3D” e o texto “Descubra mais sobre nosso estúdio, peças, materiais, cores e muito mais para voce explorar..” substituem a copy anterior. Cassiano pediu retirar o bloco inferior “O ESTÚDIO / Do arquivo ao objeto real” e “PRÓXIMAS ENTRADAS” da home, preservando o botão “Conheça mais sobre”. O destino definido por Cassiano é a futura página do Estúdio. Até a rota existir, o botão e o item “Sobre” permanecem visíveis, mas desativados.
+Em 01/10/2026, Cassiano substituiu a composição do hero pelo mock `Captura de tela 2026-10-01 181141.png` e enviou `x1_fundo.png` como novo fundo. Em 02/10/2026, substituiu esse fundo por `x1_fundo_2.png`, servido em `public/images/x1_fundo_2.png` sem recompressão. Nessa arte o robô fica à esquerda e o enquadramento da imagem não se desloca. No desktop o texto permanece grande, alinhado à esquerda, e ocupa o lado direito da área do Estúdio. No mobile a arte continua no topo e o texto abaixo. O texto exibido é “ESTÚDIO DE CRIAÇÃO”, “Ideias que ganham forma.”, “Peças, materiais e cores produzidos com precisão, camada por camada.” e “Explore o estúdio”, com alinhamento à esquerda, título branco, “forma.” em ciano/violeta e contorno do botão no mesmo gradiente. O botão e o item “Sobre” permanecem visíveis, mas desativados até existir a página do Estúdio. Os blocos inferiores “O ESTÚDIO” e “PRÓXIMAS ENTRADAS” continuam fora da home.
 
 Cassiano escolheu `output/dj2.png` como imagem da Rádio. A cópia exata em `public/images/cm-radio-preview-art.png` aparece na arte principal e nas miniaturas da prévia visual, sem logo CM 3D and Radio sobreposto. A imagem não é apresentada como capa oficial da faixa.
 

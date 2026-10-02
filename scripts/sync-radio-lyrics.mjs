@@ -16,7 +16,28 @@ const CANONICAL_PATH = join(ROOT, "src/features/radio/lyrics.generated.json");
 const OUTPUT_PATH = join(ROOT, "src/features/radio/lyrics.synced.generated.json");
 const CACHE_DIRECTORY = join(ROOT, "output/lyrics-sync");
 const PYTHON_HELPER = join(ROOT, "scripts/transcribe-radio-lyrics.py");
+const VENV_PYTHON = join(
+  ROOT,
+  "output/lyrics-sync/.venv",
+  process.platform === "win32" ? "Scripts/python.exe" : "bin/python"
+);
+const FFMPEG_DIRECTORY = join(ROOT, "output/lyrics-sync/bin");
 const CACHE_VERSION = 1;
+
+function defaultPython() {
+  if (process.env.PYTHON) return process.env.PYTHON;
+  if (existsSync(VENV_PYTHON)) return VENV_PYTHON;
+  return "python";
+}
+
+function commandEnvironment() {
+  const pathKey = Object.keys(process.env).find((key) => key.toLowerCase() === "path") || "PATH";
+  const current = process.env[pathKey] || "";
+  const ffmpegName = process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg";
+  if (!existsSync(join(FFMPEG_DIRECTORY, ffmpegName))) return { ...process.env };
+  const separator = process.platform === "win32" ? ";" : ":";
+  return { ...process.env, [pathKey]: `${FFMPEG_DIRECTORY}${separator}${current}` };
+}
 
 function usage() {
   return `Usage: pnpm lyrics:sync -- <audio-directory> [options]\n\n` +
@@ -28,12 +49,13 @@ function usage() {
     `  --compute-type <value>   WhisperX compute type (default: auto).\n` +
     `  --batch-size <count>     Transcription batch size (default: 8).\n` +
     `  --min-coverage <0..1>    Minimum direct word-match coverage (default: 0.45).\n` +
-    `  --python <command>       Python executable/launcher (default: PYTHON or python).\n` +
+    `  --python <command>       Python executable (default: local lyrics venv, else PYTHON or python).\n` +
     `  --force                  Ignore cached WhisperX output.\n`;
 }
 
 function parseArgs(argv) {
-  const [audioDirectory, ...rest] = argv;
+  const args = argv[0] === "--" ? argv.slice(1) : argv;
+  const [audioDirectory, ...rest] = args;
   if (!audioDirectory || audioDirectory === "--help" || audioDirectory === "-h") {
     process.stdout.write(usage());
     process.exit(audioDirectory ? 0 : 1);
@@ -48,7 +70,7 @@ function parseArgs(argv) {
     computeType: "auto",
     batchSize: 8,
     minCoverage: 0.45,
-    python: process.env.PYTHON || "python",
+    python: defaultPython(),
     force: false
   };
 
@@ -173,7 +195,7 @@ if (jobs.length) {
       "--compute-type", options.computeType,
       "--batch-size", String(options.batchSize)
     ],
-    { cwd: ROOT, stdio: "inherit" }
+    { cwd: ROOT, stdio: "inherit", env: commandEnvironment() }
   );
 
   if (result.error) throw new Error(`Could not start ${options.python}: ${result.error.message}`);

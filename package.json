@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm build",
-    "lyrics:sync": "node scripts/sync-radio-lyrics.mjs"
+    "lyrics:sync": "node scripts/sync-radio-lyrics.mjs",
+    "visualizer:sync": "node scripts/sync-radio-visualizer.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1143.0",

@@ -39,7 +39,7 @@ export async function collectAudioKeys(
 
 export function visualizerAnalysisObjectKey(trackId: string): string {
   const digest = createHash("sha256").update(trackId).digest("hex");
-  return `_analysis/v1/${digest}.json`;
+  return `_analysis/v2/${digest}.json`;
 }
 
 export function radioTrackFromKey(key: string, publicBaseUrl: string): RadioTrack {

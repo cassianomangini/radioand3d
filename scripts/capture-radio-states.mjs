@@ -202,5 +202,16 @@ try {
   client.close();
 } finally {
   chrome.kill("SIGTERM");
-  await rm(userDataDirectory, { recursive: true, force: true });
+
+  await Promise.race([
+    new Promise((resolve) => chrome.once("close", resolve)),
+    delay(1200)
+  ]);
+
+  await rm(userDataDirectory, {
+    recursive: true,
+    force: true,
+    maxRetries: 3,
+    retryDelay: 100
+  }).catch(() => undefined);
 }

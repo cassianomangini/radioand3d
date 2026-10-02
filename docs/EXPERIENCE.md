@@ -119,6 +119,8 @@ CSS para feedback simples; Motion para coordenação; 3D apenas na interação a
 
 Respeitar preferência do sistema e dar controle sobre efeitos contínuos. A política alcança CSS, canvas e 3D, não somente Motion. Referência: [acessibilidade no Motion](https://motion.dev/docs/react-accessibility). Gráficos de áudio seguem [RADIO.md](RADIO.md).
 
+A arquitetura, o nível de ambição e os gates de qualidade da próxima camada de movimento estão em [CM_MOTION_EXPERIENCE_PLAN_V1.md](design/CM_MOTION_EXPERIENCE_PLAN_V1.md). Esse artefato define mecânicas e qualidade; estado e sequência efetiva continuam exclusivamente no [roadmap](ROADMAP.md).
+
 ## Handoff estrutural
 
 A geometria, o shell responsivo, os limites da Rádio, a ordem mobile e a estratégia de crescimento progressivo do 3D estão documentados em [STUDIO_RADIO_HANDOFF_V1.md](design/STUDIO_RADIO_HANDOFF_V1.md). A proposta de tipografia, paleta, superfícies e motion está em [CM_VISUAL_SYSTEM_V1.md](design/CM_VISUAL_SYSTEM_V1.md). Os estados, responsabilidades e limites dos componentes do primeiro recorte estão em [CM_COMPONENT_STATES_V1.md](design/CM_COMPONENT_STATES_V1.md). Os três artefatos permanecem sujeitos à aprovação visual de Cassiano.

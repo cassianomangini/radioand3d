@@ -3,7 +3,7 @@ import test from "node:test";
 import { createFrequencyBarMotion, frequencyBandLevels } from "../src/features/radio/frequency-bars.ts";
 
 const SAMPLE_RATE = 48_000;
-const FFT_SIZE = 4096;
+const FFT_SIZE = 2048;
 const BIN_COUNT = FFT_SIZE / 2;
 const BAR_COUNT = 36;
 const BIN_WIDTH = SAMPLE_RATE / FFT_SIZE;
@@ -39,31 +39,49 @@ test("bass and midrange tones occupy different parts of the spectrum", () => {
   assert.ok(Math.max(...mid.slice(0, 8)) === 0);
 });
 
-test("the visualizer keeps useful treble above 12 kHz", () => {
-  const treble = frequencyBandLevels(withTone(15_000), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
-  assert.ok(Math.max(...treble.slice(-6)) > 0);
-  assert.equal(Math.max(...treble.slice(0, 20)), 0);
+test("the same narrow-band level is not diluted as frequency bands get wider", () => {
+  const bass = frequencyBandLevels(withTone(90, -18), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const mid = frequencyBandLevels(withTone(1_200, -18), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const treble = frequencyBandLevels(withTone(15_000, -18), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const peaks = [Math.max(...bass), Math.max(...mid), Math.max(...treble)];
+
+  assert.ok(Math.min(...peaks) > 0.78);
+  assert.ok(Math.max(...peaks) - Math.min(...peaks) < 0.12);
 });
 
-test("equal energy is not boosted just because it sits in the vocal range", () => {
-  const levels = frequencyBandLevels(flatSpectrum(-42), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
-  const min = Math.min(...levels);
-  const max = Math.max(...levels);
+test("pink-spectrum energy stays balanced across logarithmic bands", () => {
+  const levelsDb = silentSpectrum();
+  for (let bin = 1; bin < levelsDb.length; bin += 1) {
+    const frequency = bin * BIN_WIDTH;
+    if (frequency < 40 || frequency > 18_000) continue;
+    levelsDb[bin] = -30 - 10 * Math.log10(frequency / 100);
+  }
 
-  assert.ok(min > 0.45 && max < 0.55);
-  assert.ok(max - min < 0.01);
+  const levels = frequencyBandLevels(levelsDb, SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  const stable = levels.slice(4, -2);
+  const min = Math.min(...stable);
+  const max = Math.max(...stable);
+
+  assert.ok(min > 0.55);
+  assert.ok(max - min < 0.04);
+});
+
+test("the visualizer keeps useful treble above 12 kHz", () => {
+  const treble = frequencyBandLevels(withTone(15_000), SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
+  assert.ok(Math.max(...treble.slice(-6)) > 0.8);
+  assert.equal(Math.max(...treble.slice(0, 20)), 0);
 });
 
 test("changing only the bass does not lift unrelated high-frequency bars", () => {
   const moveBars = createFrequencyBarMotion(BAR_COUNT);
-  const backing = flatSpectrum(-60);
+  const backing = flatSpectrum(-80);
   let before = [];
 
   for (let frame = 0; frame < 180; frame += 1) {
     before = moveBars(backing, SAMPLE_RATE, FFT_SIZE, 16);
   }
 
-  const bassHit = flatSpectrum(-60);
+  const bassHit = flatSpectrum(-80);
   bassHit[Math.round(90 / BIN_WIDTH)] = -10;
   const after = moveBars(bassHit, SAMPLE_RATE, FFT_SIZE, 16);
 
@@ -76,7 +94,12 @@ test("changing only the bass does not lift unrelated high-frequency bars", () =>
 
 test("a steady spectrum settles instead of inventing continuous motion", () => {
   const moveBars = createFrequencyBarMotion(BAR_COUNT);
-  const levels = flatSpectrum(-38);
+  const levels = silentSpectrum();
+  for (let bin = 1; bin < levels.length; bin += 1) {
+    const frequency = bin * BIN_WIDTH;
+    if (frequency < 40 || frequency > 18_000) continue;
+    levels[bin] = -38 - 10 * Math.log10(frequency / 100);
+  }
   let previous = moveBars(levels, SAMPLE_RATE, FFT_SIZE, 16);
 
   for (let frame = 0; frame < 240; frame += 1) {
@@ -88,7 +111,7 @@ test("a steady spectrum settles instead of inventing continuous motion", () => {
   assert.ok(drift < 0.01);
 });
 
-test("attack is fast while release remains smooth", () => {
+test("attack is fast and release drops enough to expose the next beat", () => {
   const moveBars = createFrequencyBarMotion(BAR_COUNT);
   const tone = withTone(1_000, -10);
   const bandLevels = frequencyBandLevels(tone, SAMPLE_RATE, FFT_SIZE, BAR_COUNT);
@@ -96,11 +119,14 @@ test("attack is fast while release remains smooth", () => {
 
   const baseline = moveBars(silentSpectrum(), SAMPLE_RATE, FFT_SIZE, 16)[band];
   const attacked = moveBars(tone, SAMPLE_RATE, FFT_SIZE, 16)[band];
-  const released = moveBars(silentSpectrum(), SAMPLE_RATE, FFT_SIZE, 16)[band];
+  let released = attacked;
+  for (let frame = 0; frame < 6; frame += 1) {
+    released = moveBars(silentSpectrum(), SAMPLE_RATE, FFT_SIZE, 16)[band];
+  }
 
-  assert.ok(attacked > baseline + 10);
-  assert.ok(released < attacked);
-  assert.ok(released > baseline + 5);
+  assert.ok(attacked > baseline + 20);
+  assert.ok(released < attacked - 20);
+  assert.ok(released > baseline);
 });
 
 test("a stronger signal produces a taller bar in the same frequency band", () => {

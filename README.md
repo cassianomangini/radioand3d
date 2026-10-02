@@ -84,12 +84,12 @@ Na primeira execução, o comando cria automaticamente o ambiente Python em `out
 3. confere o tamanho do arquivo local contra o objeto correspondente no R2 e aborta antes do processamento se houver falta, ambiguidade ou divergência;
 4. verifica quais sidecars já existem e ainda correspondem ao ETag/tamanho/configuração atuais;
 5. processa cada áudio **diretamente da pasta local**, sem baixar música do R2;
-6. separa o stem vocal e preserva os stems não vocais do Demucs durante a análise; baixo, bateria e o restante do acompanhamento ganham envelopes independentes em vez de virarem um único sinal;
-7. publica imediatamente o sidecar pronto em `_analysis/v2/<sha256-do-track-id>.json`;
+6. separa o stem vocal e preserva os stems não vocais do Demucs durante a análise; baixo e bateria mantêm envelopes próprios e o stem `other` combina sustentação harmônica com ataques reais de notas/acordes para dar presença a piano, guitarra, synths, cordas e outros instrumentos sem inventar sua identidade;
+7. publica imediatamente o sidecar pronto em `_analysis/v3/<sha256-do-track-id>.json`;
 8. segue para a próxima faixa.
 
 O relatório de reconciliação fica em `output/radio-visualizer/reconciliation.json`. O lote é retomável: se a máquina parar no meio, execute `pnpm visualizer:sync` outra vez; sidecars válidos já publicados no R2 são ignorados e apenas as faixas pendentes são processadas novamente.
 
-A execução usa as credenciais de leitura já usadas pelo catálogo e uma credencial de escrita restrita a `_analysis/v2/*`, configurada em `R2_VISUALIZER_WRITE_ACCESS_KEY_ID` e `R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY`. Essas credenciais são somente do comando local e nunca entram no frontend.
+A execução usa as credenciais de leitura já usadas pelo catálogo e uma credencial de escrita restrita a `_analysis/v3/*`, configurada em `R2_VISUALIZER_WRITE_ACCESS_KEY_ID` e `R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY`. Essas credenciais são somente do comando local e nunca entram no frontend.
 
 Use `--force` somente quando for necessário regerar todas as análises após uma mudança deliberada no algoritmo/configuração.

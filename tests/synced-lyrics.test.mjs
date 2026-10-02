@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   getActiveLyricLineIndex,
-  getActiveLyricWordIndex
+  getActiveLyricWordIndex,
+  getStartedLyricWordIndex
 } from "../src/features/radio/synced-lyrics.ts";
 
 const lines = [
@@ -45,4 +46,13 @@ test("selects the active word inside the active lyric line", () => {
   assert.equal(getActiveLyricWordIndex(line, 1.2), 0);
   assert.equal(getActiveLyricWordIndex(line, 1.7), 1);
   assert.equal(getActiveLyricWordIndex(line, 0.9), -1);
+});
+
+
+test("keeps completed-word context during short gaps between recognized words", () => {
+  const line = lines[1];
+  assert.equal(getStartedLyricWordIndex(line, 0.9), -1);
+  assert.equal(getStartedLyricWordIndex(line, 1.2), 0);
+  assert.equal(getStartedLyricWordIndex(line, 1.5), 0);
+  assert.equal(getStartedLyricWordIndex(line, 1.7), 1);
 });

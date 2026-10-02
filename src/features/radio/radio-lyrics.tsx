@@ -7,6 +7,7 @@ import { useRadio } from "./radio-provider";
 import {
   getActiveLyricLineIndex,
   getActiveLyricWordIndex,
+  getStartedLyricWordIndex,
   type GeneratedSyncedLyrics
 } from "./synced-lyrics";
 
@@ -100,22 +101,36 @@ export function RadioLyrics({ trackId, title, headingId = "radio-lyrics-title" }
 
               const lineActive = lineIndex === activeLine;
               const activeWord = lineActive ? getActiveLyricWordIndex(line, radio.position) : -1;
+              const startedWord = lineActive ? getStartedLyricWordIndex(line, radio.position) : -1;
+              const lineDistance = activeLine >= 0
+                ? Math.max(-2, Math.min(2, lineIndex - activeLine))
+                : null;
               return (
                 <p
                   key={`${lineIndex}-${line.text}`}
                   ref={(node) => { lineRefs.current[lineIndex] = node; }}
                   className={`${styles.line} ${line.breakBefore ? styles.breakBefore : ""} ${lineActive ? styles.activeLine : ""}`}
+                  data-lyric-distance={lineDistance === null ? undefined : String(lineDistance)}
                   aria-current={lineActive ? "true" : undefined}
                   aria-label={line.text}
                 >
-                  {line.words.map((word, wordIndex) => (
-                    <span key={`${wordIndex}-${word.text}`} aria-hidden="true">
-                      {wordIndex > 0 ? " " : ""}
-                      <span className={`${styles.word} ${wordIndex === activeWord ? styles.activeWord : ""}`}>
-                        {word.text}
+                  {line.words.map((word, wordIndex) => {
+                    const completed = lineActive && (
+                      activeWord >= 0
+                        ? wordIndex < activeWord
+                        : wordIndex <= startedWord
+                    );
+                    return (
+                      <span key={`${wordIndex}-${word.text}`} aria-hidden="true">
+                        {wordIndex > 0 ? " " : ""}
+                        <span
+                          className={`${styles.word} ${completed ? styles.completedWord : ""} ${wordIndex === activeWord ? styles.activeWord : ""}`}
+                        >
+                          {word.text}
+                        </span>
                       </span>
-                    </span>
-                  ))}
+                    );
+                  })}
                 </p>
               );
             })}

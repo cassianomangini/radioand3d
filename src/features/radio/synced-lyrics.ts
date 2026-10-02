@@ -61,3 +61,15 @@ export function getActiveLyricWordIndex(line: SyncedLyricTimedLine, position: nu
   }
   return active;
 }
+
+
+export function getStartedLyricWordIndex(line: SyncedLyricTimedLine, position: number) {
+  if (!Number.isFinite(position) || position < line.start || !line.words.length) return -1;
+
+  let started = -1;
+  for (let index = 0; index < line.words.length; index += 1) {
+    if (position < line.words[index].start) break;
+    started = index;
+  }
+  return started;
+}

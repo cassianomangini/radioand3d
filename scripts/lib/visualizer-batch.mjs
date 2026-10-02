@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
-export const ANALYSIS_PREFIX = "_analysis/v1";
-export const ANALYSIS_VERSION = "1";
+export const ANALYSIS_PREFIX = "_analysis/v2";
+export const ANALYSIS_VERSION = "2";
 export const AUDIO_EXTENSIONS = new Set(["mp3", "m4a", "wav", "aac", "ogg", "opus", "flac"]);
 
 export function normalizeEtag(value) {

@@ -11,6 +11,7 @@ import { spawnSync } from "node:child_process";
 import {
   HeadObjectCommand,
   ListObjectsV2Command,
+  PutObjectCommand,
   S3Client
 } from "@aws-sdk/client-s3";
 import {
@@ -317,6 +318,31 @@ async function sidecarCurrent(client, bucket, objectKey, fingerprint) {
   }
 }
 
+async function verifyWriteAccess(environment) {
+  const client = createR2Client(
+    environment.endpoint,
+    environment.writeAccessKeyId,
+    environment.writeSecretAccessKey
+  );
+  try {
+    await client.send(new PutObjectCommand({
+      Bucket: environment.bucket,
+      Key: "_analysis/v1/_pipeline-write-check.json",
+      Body: "{}\n",
+      ContentType: "application/json; charset=utf-8",
+      CacheControl: "no-store"
+    }));
+  } catch (error) {
+    throw new Error(
+      "R2 visualizer write credential cannot write to _analysis/v1/*. " +
+      "Fix R2_VISUALIZER_WRITE_ACCESS_KEY_ID / R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY before starting the batch. " +
+      (error instanceof Error ? error.message : String(error))
+    );
+  } finally {
+    client.destroy();
+  }
+}
+
 const options = parseArgs(process.argv.slice(2));
 loadProjectEnvironment();
 const environment = requireEnvironment();
@@ -364,6 +390,9 @@ try {
     process.stdout.write("All radio tracks already have current musical visualizer analysis in R2.\n");
     process.exit(0);
   }
+
+  process.stdout.write("Checking R2 sidecar write permission before starting expensive analysis...\n");
+  await verifyWriteAccess(environment);
 
   const python = ensurePython(options);
   const manifestPath = join(WORK_DIRECTORY, "manifest.json");

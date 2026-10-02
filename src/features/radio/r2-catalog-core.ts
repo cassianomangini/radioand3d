@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { RadioTrack } from "./radio-provider";
 
 interface ObjectPage {
@@ -36,15 +37,22 @@ export async function collectAudioKeys(
   return [...keys].sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
+export function visualizerAnalysisObjectKey(trackId: string): string {
+  const digest = createHash("sha256").update(trackId).digest("hex");
+  return `_analysis/v1/${digest}.json`;
+}
+
 export function radioTrackFromKey(key: string, publicBaseUrl: string): RadioTrack {
   const filename = key.split("/").at(-1) ?? key;
   const title = filename.replace(/\.[^.]+$/, "").replace(/^CMangic\s+-\s+/i, "");
   const encodedKey = key.split("/").map((segment) => encodeURIComponent(segment)).join("/");
+  const baseUrl = publicBaseUrl.replace(/\/+$/, "");
 
   return {
     id: key,
     title,
     artist: "CMangic",
-    src: `${publicBaseUrl.replace(/\/+$/, "")}/${encodedKey}`
+    src: `${baseUrl}/${encodedKey}`,
+    visualizerAnalysisSrc: `${baseUrl}/${visualizerAnalysisObjectKey(key)}`
   };
 }

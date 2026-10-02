@@ -1,6 +1,8 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
 import type { RadioTrack } from "./radio-provider";
-import { collectAudioKeys, radioTrackFromKey } from "./r2-catalog-core";
+import { collectAudioKeys, radioTrackFromKey, visualizerAnalysisObjectKey } from "./r2-catalog-core";
 
 export async function getR2RadioTracks(): Promise<RadioTrack[]> {
   const endpoint = process.env.R2_S3_ENDPOINT;
@@ -28,7 +30,23 @@ export async function getR2RadioTracks(): Promise<RadioTrack[]> {
         MaxKeys: 1000
       }));
     });
-    return keys.map((key) => radioTrackFromKey(key, publicBaseUrl));
+    return keys.map((key) => {
+      const track = radioTrackFromKey(key, publicBaseUrl);
+      if (process.env.NODE_ENV === "development") {
+        const localAnalysisPath = resolve(
+          process.cwd(),
+          "output",
+          "radio-visualizer",
+          "publish",
+          visualizerAnalysisObjectKey(key)
+        );
+        if (existsSync(localAnalysisPath)) {
+          track.visualizerAnalysisSrc =
+            `/dev/radio-visualizer-analysis?track=${encodeURIComponent(key)}`;
+        }
+      }
+      return track;
+    });
   } finally {
     client.destroy();
   }

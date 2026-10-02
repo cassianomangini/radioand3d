@@ -20,6 +20,7 @@ export interface RadioTrack {
   artwork?: string;
   durationSeconds?: number;
   fixture?: boolean;
+  visualizerAnalysisSrc?: string;
 }
 
 export type PlaybackStatus =
@@ -59,6 +60,7 @@ interface RadioContextValue {
   reshuffle: () => void;
   retry: () => void;
   getAnalyser: () => AnalyserNode | null;
+  getCurrentTime: () => number;
 }
 
 const RadioContext = createContext<RadioContextValue | null>(null);
@@ -116,7 +118,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
     try {
       context = new AudioContext();
       const analyser = context.createAnalyser();
-      analyser.fftSize = 4096;
+      analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0;
       analyser.minDecibels = -100;
       analyser.maxDecibels = -10;
@@ -286,6 +288,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   }, [play]);
 
   const getAnalyser = useCallback(() => analyserRef.current, []);
+  const getCurrentTime = useCallback(() => audioRef.current?.currentTime ?? 0, []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -301,7 +304,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const value: RadioContextValue = {
     tracks, currentTrack, upcomingTracks, status, error, position, duration, volume, repeatOne, canSkipNext,
     hasPrevious, analyserReady, analyserUnavailable, play, pause, toggle, select, next, previous,
-    seek, setVolume, toggleMute, toggleRepeatOne, reshuffle, retry, getAnalyser
+    seek, setVolume, toggleMute, toggleRepeatOne, reshuffle, retry, getAnalyser, getCurrentTime
   };
 
   return (

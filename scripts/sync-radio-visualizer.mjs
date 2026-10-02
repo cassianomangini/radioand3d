@@ -5,6 +5,7 @@ import {
   readFileSync,
   readdirSync,
   renameSync,
+  rmSync,
   statSync,
   writeFileSync
 } from "node:fs";
@@ -212,16 +213,39 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function runChecked(command, args, label) {
+function cleanPythonEnvironment(extra = {}) {
+  const environment = { ...process.env, ...extra };
+  delete environment.PYTHONHOME;
+  delete environment.PYTHONPATH;
+  return environment;
+}
+
+function runChecked(command, args, label, environment = process.env) {
   const result = spawnSync(command, args, {
     cwd: ROOT,
     stdio: "inherit",
-    env: process.env
+    env: environment
   });
   if (result.error) throw new Error(label + ": " + result.error.message);
   if (result.status !== 0) {
     throw new Error(label + " failed with exit code " + String(result.status ?? "unknown") + ".");
   }
+}
+
+const PYTHON_SANITY_IMPORTS =
+  "import difflib, json, pathlib, subprocess, venv; print('cm-radio-python-ok')";
+
+function pythonWorks(command, prefix = []) {
+  const result = spawnSync(
+    command,
+    [...prefix, "-c", PYTHON_SANITY_IMPORTS],
+    {
+      cwd: ROOT,
+      stdio: "ignore",
+      env: cleanPythonEnvironment()
+    }
+  );
+  return !result.error && result.status === 0;
 }
 
 function findSystemPython() {
@@ -240,43 +264,81 @@ function findSystemPython() {
       ];
 
   for (const candidate of candidates) {
-    const result = spawnSync(
-      candidate.command,
-      [...candidate.prefix, "--version"],
-      { stdio: "ignore" }
-    );
-    if (!result.error && result.status === 0) return candidate;
+    if (pythonWorks(candidate.command, candidate.prefix)) return candidate;
   }
   return null;
 }
 
 function ensurePython(options) {
-  if (options.python) return options.python;
+  if (options.python) {
+    if (!pythonWorks(options.python)) {
+      throw new Error(
+        "The Python executable passed with --python is incomplete: it cannot import the standard library required by the visualizer (including difflib)."
+      );
+    }
+    return options.python;
+  }
 
   mkdirSync(CACHE_DIRECTORY, { recursive: true });
   const requirementsHash = sha256(readFileSync(REQUIREMENTS));
-  const installedHash = existsSync(REQUIREMENTS_MARKER)
+  let installedHash = existsSync(REQUIREMENTS_MARKER)
     ? readFileSync(REQUIREMENTS_MARKER, "utf8").trim()
     : "";
+
+  if (existsSync(VENV_PYTHON) && !pythonWorks(VENV_PYTHON)) {
+    process.stdout.write(
+      "Existing visualizer Python environment is incomplete (standard library import failed). Rebuilding it automatically...\n"
+    );
+    rmSync(VENV_DIRECTORY, { recursive: true, force: true });
+    rmSync(REQUIREMENTS_MARKER, { force: true });
+    installedHash = "";
+  }
 
   if (!existsSync(VENV_PYTHON)) {
     const systemPython = findSystemPython();
     if (!systemPython) {
-      throw new Error("Python 3 was not found. Install Python 3 once; the visualizer command prepares the rest automatically.");
+      throw new Error(
+        "No usable Python installation was found. The visualizer needs a normal CPython 3 installation with the standard library (difflib, venv, pathlib). On Windows, install Python 3.11 or 3.12 from python.org and run pnpm visualizer:sync again."
+      );
     }
     process.stdout.write("Preparing the radio visualizer Python environment (first run only)...\n");
     runChecked(
       systemPython.command,
       [...systemPython.prefix, "-m", "venv", VENV_DIRECTORY],
-      "Creating Python virtual environment"
+      "Creating Python virtual environment",
+      cleanPythonEnvironment()
     );
+
+    if (!pythonWorks(VENV_PYTHON)) {
+      rmSync(VENV_DIRECTORY, { recursive: true, force: true });
+      throw new Error(
+        "Python created a virtual environment that cannot import its own standard library (difflib). Reinstall CPython 3.11 or 3.12 and run pnpm visualizer:sync again."
+      );
+    }
   }
 
   if (installedHash !== requirementsHash) {
     process.stdout.write("Installing/updating musical-analysis dependencies (first run can take several minutes)...\n");
-    runChecked(VENV_PYTHON, ["-m", "pip", "install", "--upgrade", "pip"], "Updating pip");
-    runChecked(VENV_PYTHON, ["-m", "pip", "install", "-r", REQUIREMENTS], "Installing visualizer dependencies");
+    const environment = cleanPythonEnvironment();
+    runChecked(
+      VENV_PYTHON,
+      ["-m", "pip", "install", "--upgrade", "pip"],
+      "Updating pip",
+      environment
+    );
+    runChecked(
+      VENV_PYTHON,
+      ["-m", "pip", "install", "-r", REQUIREMENTS],
+      "Installing visualizer dependencies",
+      environment
+    );
     writeFileSync(REQUIREMENTS_MARKER, requirementsHash + "\n", "utf8");
+  }
+
+  if (!pythonWorks(VENV_PYTHON)) {
+    throw new Error(
+      "The visualizer Python environment became unusable after dependency installation. Delete output/radio-visualizer/.venv and rerun, or reinstall CPython 3.11/3.12."
+    );
   }
 
   return VENV_PYTHON;
@@ -522,13 +584,12 @@ try {
     " pending track(s), reading audio locally and uploading each completed sidecar immediately.\n"
   );
 
-  const pythonEnvironment = {
-    ...process.env,
+  const pythonEnvironment = cleanPythonEnvironment({
     CM_VISUALIZER_R2_ENDPOINT: environment.endpoint,
     CM_VISUALIZER_R2_BUCKET: environment.bucket,
     CM_VISUALIZER_R2_ACCESS_KEY_ID: environment.writeAccessKeyId,
     CM_VISUALIZER_R2_SECRET_ACCESS_KEY: environment.writeSecretAccessKey
-  };
+  });
 
   const result = spawnSync(
     python,

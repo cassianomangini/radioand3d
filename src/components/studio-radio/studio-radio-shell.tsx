@@ -11,6 +11,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent
 } from "react";
+import { flushSync } from "react-dom";
 import styles from "./studio-radio-shell.module.css";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
@@ -22,6 +23,14 @@ const MIN_RADIO_WIDTH = 400;
 const MAX_RADIO_WIDTH = 720;
 const MIN_STUDIO_WIDTH = 640;
 const RESIZE_GUTTER = 68;
+
+type ViewTransitionLike = {
+  finished: Promise<void>;
+};
+
+type DocumentWithViewTransition = Document & {
+  startViewTransition?: (update: () => void) => ViewTransitionLike;
+};
 
 const previewTrack = {
   title: "Limite Elástico",
@@ -188,8 +197,11 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
   }, [volumeOpen]);
 
   return (
-    <div className={styles.radioContent}>
-      <div className={styles.radioHeader}>
+    <div
+      className={styles.radioContent}
+      data-radio-surface={mobile ? "mobile" : "desktop"}
+    >
+      <div className={styles.radioHeader} data-radio-motion-key="header">
         <h2><span>CM</span> RÁDIO</h2>
 
         {onClose ? (
@@ -204,7 +216,7 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
         ) : null}
       </div>
 
-      <div className={styles.coverArt}>
+      <div className={styles.coverArt} data-radio-motion-key="cover">
         <Image src={currentArtwork} alt="Arte visual da CM Rádio" fill sizes="(min-width: 1180px) 720px, 100vw" priority unoptimized />
         <div className={styles.coverCaption}>
           <strong>{displayTrack.title}</strong>
@@ -213,7 +225,7 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
         {!radio.currentTrack || radio.currentTrack.fixture ? <span className={styles.coverBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span> : null}
       </div>
 
-      <div className={styles.progressBlock}>
+      <div className={styles.progressBlock} data-radio-motion-key="progress">
         <input
           className={styles.progressSeek}
           type="range"
@@ -232,7 +244,7 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
         </div>
       </div>
 
-      <div className={styles.transport} aria-label="Controles da rádio">
+      <div className={styles.transport} aria-label="Controles da rádio" data-radio-motion-key="transport">
         <button type="button" className={styles.modeButton} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória" data-tooltip="Embaralhar lista do zero"><Icon name="shuffle" /></button>
         <button type="button" className={styles.modeButton} onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir faixa" title={radio.repeatOne ? "Desligar repetição" : "Repetir faixa"}><Icon name="repeat" /></button>
         <button type="button" onClick={radio.previous} disabled={!canPlay} aria-label="Faixa anterior"><Icon name="previous" /></button>
@@ -278,9 +290,11 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
         <button type="button" className={styles.modeButton} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
       </div>
 
-      <RadioVisualizer className={styles.visualizer} />
+      <div className={styles.visualizerTransition} data-radio-motion-key="visualizer">
+        <RadioVisualizer className={styles.visualizer} />
+      </div>
 
-      <div className={styles.queueHeader}>
+      <div className={styles.queueHeader} data-radio-motion-key="queue-header">
         <h3>A seguir</h3>
         <label className={styles.searchField}>
           <span className={styles.srOnly}>Buscar nas próximas músicas</span>
@@ -294,7 +308,7 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
         </label>
       </div>
 
-      <ol className={styles.trackList} aria-label="Próximas músicas na ordem de reprodução">
+      <ol className={styles.trackList} aria-label="Próximas músicas na ordem de reprodução" data-radio-motion-key="queue-list">
         {listTracks.map(({ track, position }) => (
           <li key={`${track.id}-${position}`}>
             <button type="button" className={styles.trackRow} onClick={() => radio.select(track.id)}>
@@ -342,13 +356,12 @@ export function StudioRadioShell() {
   const returnOffsetRef = useRef(0);
   const openedFromDragRef = useRef(false);
   const previewResetFrameRef = useRef<number | null>(null);
-  const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const motionCommitRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const motionResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [radioExpanded, setRadioExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [radioFullscreen, setRadioFullscreen] = useState(false);
-  const [snapDirection, setSnapDirection] = useState<"opening" | "closing" | null>(null);
+  const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
@@ -410,8 +423,7 @@ export function StudioRadioShell() {
   }, []);
 
   useEffect(() => () => {
-    if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
-    if (motionCommitRef.current !== null) clearTimeout(motionCommitRef.current);
+    if (motionResetTimerRef.current !== null) clearTimeout(motionResetTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -483,43 +495,39 @@ export function StudioRadioShell() {
     returnOffsetRef.current = 0;
   }
 
-  function animateRadioSnap(direction: "opening" | "closing") {
-    if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
-    setSnapDirection(direction);
-    snapTimerRef.current = setTimeout(() => {
-      setSnapDirection(null);
-      snapTimerRef.current = null;
-    }, 1800);
-  }
-
   function runRadioMotion(direction: "opening" | "closing", update: () => void) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (motionCommitRef.current !== null) {
-      clearTimeout(motionCommitRef.current);
-      motionCommitRef.current = null;
+    if (motionResetTimerRef.current !== null) {
+      clearTimeout(motionResetTimerRef.current);
+      motionResetTimerRef.current = null;
     }
+
     if (reduce) {
-      if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
-      snapTimerRef.current = null;
-      setSnapDirection(null);
+      setLayoutMotionDirection(null);
       update();
       return;
     }
 
-    if (direction === "closing") {
-      animateRadioSnap("closing");
-      motionCommitRef.current = setTimeout(() => {
-        motionCommitRef.current = null;
-        if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
-        snapTimerRef.current = null;
-        setSnapDirection(null);
-        update();
-      }, 1400);
+    const clearMotionState = () => {
+      setLayoutMotionDirection(null);
+      motionResetTimerRef.current = null;
+    };
+
+    const documentWithTransition = document as DocumentWithViewTransition;
+    if (documentWithTransition.startViewTransition) {
+      const transition = documentWithTransition.startViewTransition(() => {
+        flushSync(() => {
+          setLayoutMotionDirection(direction);
+          update();
+        });
+      });
+      void transition.finished.finally(clearMotionState);
       return;
     }
 
-    animateRadioSnap("opening");
+    setLayoutMotionDirection(direction);
     update();
+    motionResetTimerRef.current = setTimeout(clearMotionState, 720);
   }
 
   function openRadioFullscreen(fromDrag: boolean) {
@@ -726,8 +734,7 @@ export function StudioRadioShell() {
   }
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-snap={snapDirection ?? undefined}>
-      <div className={styles.radioFlash} aria-hidden="true" />
+    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined}>
       <header className={styles.siteHeader}>
         <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />

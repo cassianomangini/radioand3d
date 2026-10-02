@@ -1422,6 +1422,11 @@
   outline-offset: 3px;
 }
 
+.visualizerTransition {
+  min-height: 0;
+  display: contents;
+}
+
 .visualizer {
   position: relative;
   height: 7rem;
@@ -1977,6 +1982,78 @@
   transform: translate(2px, -2px);
 }
 
+
+.radioPanel {
+  view-transition-name: cm-radio-surface;
+}
+
+.radioContent[data-radio-surface="desktop"] .radioHeader {
+  view-transition-name: cm-radio-header;
+}
+
+.radioContent[data-radio-surface="desktop"] .coverArt {
+  view-transition-name: cm-radio-cover;
+}
+
+.radioContent[data-radio-surface="desktop"] .progressBlock {
+  view-transition-name: cm-radio-progress;
+}
+
+.radioContent[data-radio-surface="desktop"] .transport {
+  view-transition-name: cm-radio-transport;
+}
+
+.radioContent[data-radio-surface="desktop"] .visualizerTransition {
+  view-transition-name: cm-radio-visualizer;
+}
+
+.radioContent[data-radio-surface="desktop"] .queueHeader {
+  view-transition-name: cm-radio-queue-header;
+}
+
+.radioContent[data-radio-surface="desktop"] .trackList {
+  view-transition-name: cm-radio-queue-list;
+}
+
+:global(::view-transition-old(root)),
+:global(::view-transition-new(root)) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:global(::view-transition-group(cm-radio-surface)),
+:global(::view-transition-group(cm-radio-header)),
+:global(::view-transition-group(cm-radio-cover)),
+:global(::view-transition-group(cm-radio-progress)),
+:global(::view-transition-group(cm-radio-transport)),
+:global(::view-transition-group(cm-radio-visualizer)),
+:global(::view-transition-group(cm-radio-queue-header)),
+:global(::view-transition-group(cm-radio-queue-list)) {
+  animation-duration: var(--motion-signature);
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-old(cm-radio-surface)),
+:global(::view-transition-new(cm-radio-surface)),
+:global(::view-transition-old(cm-radio-header)),
+:global(::view-transition-new(cm-radio-header)),
+:global(::view-transition-old(cm-radio-cover)),
+:global(::view-transition-new(cm-radio-cover)),
+:global(::view-transition-old(cm-radio-progress)),
+:global(::view-transition-new(cm-radio-progress)),
+:global(::view-transition-old(cm-radio-transport)),
+:global(::view-transition-new(cm-radio-transport)),
+:global(::view-transition-old(cm-radio-visualizer)),
+:global(::view-transition-new(cm-radio-visualizer)),
+:global(::view-transition-old(cm-radio-queue-header)),
+:global(::view-transition-new(cm-radio-queue-header)),
+:global(::view-transition-old(cm-radio-queue-list)),
+:global(::view-transition-new(cm-radio-queue-list)) {
+  animation-duration: var(--motion-signature);
+  animation-timing-function: var(--ease-signature);
+  mix-blend-mode: normal;
+}
+
 .radioPanel {
   container: radio-panel / inline-size;
   background: #03050a;
@@ -2374,78 +2451,39 @@
     cursor: grabbing;
   }
 
-  .site[data-radio-snap] .siteHeader,
-  .site[data-radio-snap] .desktopShell,
-  .site[data-radio-snap] .studio,
-  .site[data-radio-snap] .resizeHandle,
-  .site[data-radio-snap] .radioPanel {
-    transition: none;
+  .site[data-radio-layout-motion] .desktopShell,
+  .site[data-radio-layout-motion] .siteHeader,
+  .site[data-radio-layout-motion] .resizeHandle,
+  .site[data-radio-layout-motion] .radioPanel {
+    transition-duration: var(--motion-signature);
+    transition-timing-function: var(--ease-signature);
   }
 
-  .site[data-radio-snap="opening"] .radioPanel {
-    z-index: 30;
-    overflow: hidden;
-    transform-origin: 100% 46%;
-    animation: vinyl-drop 1700ms cubic-bezier(0.45, 0.02, 0.18, 1) both;
+  .site[data-radio-layout-motion] .studio {
+    transition:
+      opacity var(--motion-signature) var(--ease-signature),
+      transform var(--motion-signature) var(--ease-signature);
   }
 
-  .site[data-radio-snap="closing"] .radioPanel {
-    z-index: 30;
-    overflow: hidden;
-    transform-origin: 100% 46%;
-    animation: vinyl-lift 1400ms cubic-bezier(0.55, 0.02, 0.35, 1) both;
+  .site[data-radio-layout-motion="closing"] .desktopShell,
+  .site[data-radio-layout-motion="closing"] .siteHeader,
+  .site[data-radio-layout-motion="closing"] .resizeHandle,
+  .site[data-radio-layout-motion="closing"] .radioPanel {
+    transition-duration: var(--motion-signature-close);
+    transition-timing-function: var(--ease-signature-close);
   }
 
-  .site[data-radio-snap="opening"] .resizeHandle {
-    z-index: 31;
-    animation: vinyl-rail-in 1700ms cubic-bezier(0.45, 0.02, 0.18, 1) both;
+  .site[data-radio-layout-motion="closing"] .studio {
+    transition-duration: var(--motion-signature-close);
+    transition-timing-function: var(--ease-signature-close);
   }
 
-  .site[data-radio-snap="closing"] .resizeHandle {
-    z-index: 31;
-    animation: vinyl-rail-out 1400ms cubic-bezier(0.55, 0.02, 0.35, 1) both;
+  .site[data-radio-layout-motion] .radioPanel {
+    box-shadow: -1rem 0 3.25rem rgb(17 92 180 / 18%);
   }
 
-  .radioPanel::after {
-    content: "";
-    position: absolute;
-    inset: -20%;
-    z-index: 6;
-    background: repeating-radial-gradient(circle at 50% 46%, transparent 0 18px, rgb(210 246 255 / 70%) 19px 20px, transparent 21px 36px);
-    mix-blend-mode: screen;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .resizeHandle::after {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 3px;
-    background: linear-gradient(#35d8ff, #315dff 55%, #c337f5);
-    box-shadow: 0 0 1.2rem rgb(52 195 255 / 75%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .site[data-radio-snap="opening"] .radioPanel::after {
-    animation: vinyl-groove 1700ms linear both;
-  }
-
-  .site[data-radio-snap="closing"] .radioPanel::after {
-    animation: vinyl-groove-out 1400ms linear both;
-  }
-
-  .site[data-radio-snap] .resizeHandle::after {
-    animation: radio-edge-flare 1700ms ease-out both;
-  }
-
-  .site[data-radio-snap="opening"] .radioFlash {
-    animation: radio-strobe 1700ms linear both;
-  }
-
-  .site[data-radio-snap="closing"] .radioFlash {
-    animation: radio-strobe-out 1400ms linear both;
+  .site[data-radio-layout-motion] .resizeHandle {
+    box-shadow: -0.2rem 0 1.15rem rgb(52 195 255 / 18%);
   }
 }
 
@@ -2475,113 +2513,6 @@
     grid-column: 3;
     grid-row: 2 / 8;
   }
-}
-
-.radioFlash {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  background: #f7fdff;
-  opacity: 0;
-  pointer-events: none;
-}
-
-@keyframes vinyl-drop {
-  0% {
-    transform: translateX(92%) rotate(18deg) scale(0.7);
-    filter: brightness(2.6) saturate(1.4);
-  }
-
-  28% {
-    transform: translateX(48%) rotate(10deg) scale(0.82);
-    filter: brightness(1.45) saturate(1.2);
-  }
-
-  62% {
-    transform: translateX(14%) rotate(3.5deg) scale(0.95);
-    filter: brightness(1.12);
-  }
-
-  84% {
-    transform: translateX(-1.4%) rotate(-1.4deg) scale(1.02);
-    filter: brightness(1.04);
-  }
-
-  100% {
-    transform: none;
-    filter: none;
-  }
-}
-
-@keyframes vinyl-lift {
-  0% {
-    transform: none;
-    filter: brightness(2.2);
-  }
-
-  24% {
-    transform: translateX(-2%) rotate(-4deg) scale(1.03);
-    filter: brightness(1.25);
-  }
-
-  58% {
-    transform: translateX(30%) rotate(8deg) scale(0.9);
-    filter: brightness(1.35);
-  }
-
-  100% {
-    transform: translateX(96%) rotate(16deg) scale(0.72);
-    filter: brightness(1.6);
-    opacity: 0;
-  }
-}
-
-@keyframes vinyl-rail-in {
-  0% { transform: translateX(92%); }
-  28% { transform: translateX(48%); }
-  62% { transform: translateX(14%); }
-  84% { transform: translateX(-1.4%); }
-  100% { transform: none; }
-}
-
-@keyframes vinyl-rail-out {
-  0% { transform: none; }
-  24% { transform: translateX(-2%); }
-  58% { transform: translateX(30%); }
-  100% { transform: translateX(96%); opacity: 0; }
-}
-
-@keyframes vinyl-groove {
-  0% { opacity: 0.9; transform: rotate(-34deg) scale(0.82); }
-  100% { opacity: 0; transform: rotate(22deg) scale(1.25); }
-}
-
-@keyframes vinyl-groove-out {
-  0% { opacity: 0.85; transform: rotate(8deg) scale(1); }
-  100% { opacity: 0; transform: rotate(-40deg) scale(0.7); }
-}
-
-@keyframes radio-edge-flare {
-  0%, 100% { opacity: 0; }
-  12%, 72% { opacity: 1; }
-}
-
-@keyframes radio-strobe {
-  0% { opacity: 0; }
-  7% { opacity: 0.92; background: #fff; }
-  14% { opacity: 0; }
-  21% { opacity: 0.72; background: #b7f6ff; }
-  34% { opacity: 0; }
-  100% { opacity: 0; }
-}
-
-@keyframes radio-strobe-out {
-  0% { opacity: 0; }
-  8% { opacity: 0.88; background: #fff; }
-  18% { opacity: 0; }
-  28% { opacity: 0.55; background: #c9b6ff; }
-  42% { opacity: 0; }
-  100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

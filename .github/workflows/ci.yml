@@ -46,6 +46,7 @@ jobs:
       - name: Visualizer script syntax
         run: |
           node --check scripts/sync-radio-visualizer.mjs
+          node --check scripts/capture-radio-states.mjs
           python3 -m py_compile scripts/analyze-radio-visualizer.py
 
       - name: Build
@@ -83,6 +84,8 @@ jobs:
           "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=1600             --run-all-compositor-stages-before-draw             --window-size=1760,824             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-short-1760x824.png"             http://127.0.0.1:3000/
 
           "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=1600             --run-all-compositor-stages-before-draw             --window-size=390,844             --screenshot="$GITHUB_WORKSPACE/visual-review/mobile-390.png"             http://127.0.0.1:3000/
+
+          BROWSER="$BROWSER" node scripts/capture-radio-states.mjs "$GITHUB_WORKSPACE/visual-review"
 
       - name: Upload visual review
         if: (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')) && success()

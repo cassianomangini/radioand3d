@@ -309,7 +309,13 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
           <li className={styles.emptyState}>{normalizedQuery ? "Nenhuma próxima música encontrada." : "Não há próximas músicas nesta fila."}</li>
         ) : null}
       </ol>
-      {expanded ? <RadioLyrics trackId={radio.currentTrack?.id} title={radio.currentTrack?.title} /> : null}
+      {mobile || expanded ? (
+        <RadioLyrics
+          trackId={radio.currentTrack?.id}
+          title={radio.currentTrack?.title}
+          headingId={mobile ? "mobile-radio-lyrics-title" : "radio-lyrics-title"}
+        />
+      ) : null}
       {radio.error ? <p className={styles.playerMessage} role="alert">{radio.error} <button type="button" onClick={radio.retry}>Tentar novamente</button></p> : null}
       {!radio.error && radio.currentTrack?.fixture ? <p className={styles.playerMessage}>Áudio sintético para teste local. Nenhuma música foi publicada.</p> : null}
     </div>
@@ -344,6 +350,9 @@ export function StudioRadioShell() {
   const [snapDirection, setSnapDirection] = useState<"opening" | "closing" | null>(null);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
+  const miniVolumeMenuRef = useRef<HTMLDivElement>(null);
+  const miniVolumeButtonRef = useRef<HTMLButtonElement>(null);
 
   const shellStyle = useMemo(
     () =>
@@ -367,6 +376,28 @@ export function StudioRadioShell() {
       dialog.close();
     }
   }, [mobileRadioOpen]);
+
+  useEffect(() => {
+    if (!miniVolumeOpen) return;
+
+    function handleOutsidePointer(event: PointerEvent) {
+      if (!miniVolumeMenuRef.current?.contains(event.target as Node)) setMiniVolumeOpen(false);
+    }
+
+    function handleEscape(event: globalThis.KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setMiniVolumeOpen(false);
+      miniVolumeButtonRef.current?.focus();
+    }
+
+    document.addEventListener("pointerdown", handleOutsidePointer);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsidePointer);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [miniVolumeOpen]);
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 73.74rem)");
@@ -723,29 +754,62 @@ export function StudioRadioShell() {
         <button
           type="button"
           className={styles.miniOpen}
-          onClick={() => setMobileRadioOpen(true)}
+          onClick={() => {
+            setMiniVolumeOpen(false);
+            setMobileRadioOpen(true);
+          }}
           aria-label="Abrir rádio completa"
         >
           <Icon name="expand" />
           <span>Rádio</span>
         </button>
-        <div className={styles.miniPlaybackRow}>
-          <div className={styles.miniSignal}>
-            <RadioVisualizer className={`${styles.visualizer} ${styles.miniVisualizer}`} barCount={24} active={!mobileRadioOpen} />
-          </div>
-          <div className={styles.miniControls}>
-            <button type="button" className={styles.miniStep} onClick={radio.previous} disabled={!radio.currentTrack} aria-label="Faixa anterior"><Icon name="previous" /></button>
+        <div className={styles.miniSignal}>
+          <RadioVisualizer className={`${styles.visualizer} ${styles.miniVisualizer}`} barCount={24} active={!mobileRadioOpen} />
+        </div>
+        <div className={styles.miniControls}>
+          <button type="button" className={styles.miniStep} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória"><Icon name="shuffle" /></button>
+          <button type="button" className={styles.miniStep} onClick={radio.toggleRepeatOne} disabled={!radio.currentTrack} aria-pressed={radio.repeatOne} aria-label="Repetir faixa"><Icon name="repeat" /></button>
+          <button type="button" className={styles.miniStep} onClick={radio.previous} disabled={!radio.currentTrack} aria-label="Faixa anterior"><Icon name="previous" /></button>
+          <button
+            type="button"
+            className={styles.miniPlay}
+            onClick={radio.toggle}
+            disabled={!radio.currentTrack}
+            aria-label={radio.status === "loading" || radio.status === "buffering" ? "Cancelar reprodução" : radio.status === "playing" ? "Pausar" : "Tocar"}
+          >
+            <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />
+          </button>
+          <button type="button" className={styles.miniStep} onClick={radio.next} disabled={!radio.currentTrack || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
+          <div
+            ref={miniVolumeMenuRef}
+            className={styles.volumeMenu}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) setMiniVolumeOpen(false);
+            }}
+          >
             <button
+              ref={miniVolumeButtonRef}
               type="button"
-              className={styles.miniPlay}
-              onClick={radio.toggle}
+              className={`${styles.miniStep} ${styles.volumeTrigger}`}
+              onClick={() => setMiniVolumeOpen((open) => !open)}
               disabled={!radio.currentTrack}
-              aria-label={radio.status === "loading" || radio.status === "buffering" ? "Cancelar reprodução" : radio.status === "playing" ? "Pausar" : "Tocar"}
+              aria-label={`Volume ${Math.round(radio.volume * 100)}%. ${miniVolumeOpen ? "Fechar" : "Abrir"} controle`}
+              aria-expanded={miniVolumeOpen}
+              aria-controls={miniVolumeOpen ? "mini-radio-volume" : undefined}
             >
-              <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />
+              <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
             </button>
-            <button type="button" className={styles.miniStep} onClick={radio.next} disabled={!radio.currentTrack || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
+            {miniVolumeOpen ? (
+              <div id="mini-radio-volume" className={styles.volumePopover} role="group" aria-label="Controle de volume">
+                <button type="button" className={styles.muteButton} onClick={radio.toggleMute} aria-label={radio.volume === 0 ? "Ativar som" : "Silenciar"}>
+                  <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
+                </button>
+                <input type="range" min={0} max={1} step={0.01} value={radio.volume} onChange={(event) => radio.setVolume(Number(event.target.value))} aria-label="Volume" aria-valuetext={`${Math.round(radio.volume * 100)}%`} />
+                <span className={styles.volumeLevel}>{Math.round(radio.volume * 100)}%</span>
+              </div>
+            ) : null}
           </div>
+          <button type="button" className={styles.miniStep} disabled aria-label="Favoritos indisponíveis nesta prévia"><Icon name="heart" /></button>
         </div>
         <span className={styles.miniProgress} aria-hidden="true">
           <span style={{ width: radio.duration > 0 ? `${radio.position / radio.duration * 100}%` : "0%" }} />

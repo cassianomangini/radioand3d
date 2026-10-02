@@ -20,7 +20,7 @@ interface LyricsResult extends LyricsResponse {
   failed: boolean;
 }
 
-export function RadioLyrics({ trackId, title }: { trackId?: string; title?: string }) {
+export function RadioLyrics({ trackId, title, headingId = "radio-lyrics-title" }: { trackId?: string; title?: string; headingId?: string }) {
   const radio = useRadio();
   const [result, setResult] = useState<LyricsResult | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -68,9 +68,9 @@ export function RadioLyrics({ trackId, title }: { trackId?: string; title?: stri
   }, [activeLine]);
 
   return (
-    <section className={shellStyles.lyricsPanel} aria-labelledby="radio-lyrics-title">
+    <section className={shellStyles.lyricsPanel} aria-labelledby={headingId}>
       <div className={shellStyles.lyricsHeader}>
-        <h3 id="radio-lyrics-title">Letra</h3>
+        <h3 id={headingId}>Letra</h3>
         <span title={title}>{title}</span>
       </div>
       <div

@@ -2010,6 +2010,52 @@
   view-transition-name: cm-radio-queue-list;
 }
 
+.radioContent[data-track-flight] .coverArt {
+  view-transition-name: none;
+}
+
+.trackThumb[data-track-flight-source="true"],
+.coverArt[data-track-flight-destination="true"] {
+  view-transition-name: cm-track-art-flight;
+}
+
+.trackMeta[data-track-flight-source="true"],
+.coverCaption[data-track-flight-destination="true"] {
+  view-transition-name: cm-track-meta-flight;
+}
+
+.trackRow[data-track-flight-source="true"] {
+  background:
+    linear-gradient(90deg, rgb(82 214 255 / 18%), rgb(78 157 255 / 8%) 52%, transparent);
+  box-shadow: inset 3px 0 0 var(--accent-cyan);
+}
+
+:global(::view-transition-group(cm-track-art-flight)) {
+  z-index: 120;
+  animation-duration: 760ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-old(cm-track-art-flight)),
+:global(::view-transition-new(cm-track-art-flight)) {
+  animation-duration: 760ms;
+  animation-timing-function: var(--ease-signature);
+  mix-blend-mode: normal;
+}
+
+:global(::view-transition-group(cm-track-meta-flight)) {
+  z-index: 121;
+  animation-duration: 640ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-old(cm-track-meta-flight)),
+:global(::view-transition-new(cm-track-meta-flight)) {
+  animation-duration: 640ms;
+  animation-timing-function: var(--ease-signature);
+  mix-blend-mode: normal;
+}
+
 :global(::view-transition-old(root)),
 :global(::view-transition-new(root)) {
   animation: none;

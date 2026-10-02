@@ -157,6 +157,8 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
   const radio = useRadio();
   const [query, setQuery] = useState("");
   const [volumeOpen, setVolumeOpen] = useState(false);
+  const [trackFlight, setTrackFlight] = useState<{ id: string; phase: "source" | "destination" } | null>(null);
+  const trackMotionTokenRef = useRef(0);
   const volumeMenuRef = useRef<HTMLDivElement>(null);
   const volumeButtonRef = useRef<HTMLButtonElement>(null);
   const volumePanelId = mobile ? "mobile-radio-volume" : "desktop-radio-volume";
@@ -172,6 +174,41 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
   const pending = radio.status === "loading" || radio.status === "buffering";
   const currentArtwork = radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png";
   const progress = radio.duration > 0 ? Math.min(100, radio.position / radio.duration * 100) : 0;
+
+  function selectTrackWithMotion(trackId: string) {
+    if (radio.currentTrack?.id === trackId) {
+      radio.select(trackId);
+      return;
+    }
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const documentWithTransition = document as DocumentWithViewTransition;
+    if (reduce || !documentWithTransition.startViewTransition) {
+      radio.select(trackId);
+      return;
+    }
+
+    const token = ++trackMotionTokenRef.current;
+    flushSync(() => {
+      setTrackFlight({ id: trackId, phase: "source" });
+    });
+
+    try {
+      const transition = documentWithTransition.startViewTransition(() => {
+        flushSync(() => {
+          radio.select(trackId);
+          setTrackFlight({ id: trackId, phase: "destination" });
+        });
+      });
+
+      void transition.finished.finally(() => {
+        if (trackMotionTokenRef.current === token) setTrackFlight(null);
+      });
+    } catch {
+      setTrackFlight(null);
+      radio.select(trackId);
+    }
+  }
 
   useEffect(() => {
     if (!volumeOpen) return;
@@ -200,6 +237,7 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
     <div
       className={styles.radioContent}
       data-radio-surface={mobile ? "mobile" : "desktop"}
+      data-track-flight={trackFlight?.phase}
     >
       <div className={styles.radioHeader} data-radio-motion-key="header">
         <h2><span>CM</span> RÁDIO</h2>
@@ -216,9 +254,16 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
         ) : null}
       </div>
 
-      <div className={styles.coverArt} data-radio-motion-key="cover">
+      <div
+        className={styles.coverArt}
+        data-radio-motion-key="cover"
+        data-track-flight-destination={trackFlight?.phase === "destination" ? "true" : undefined}
+      >
         <Image src={currentArtwork} alt="Arte visual da CM Rádio" fill sizes="(min-width: 1180px) 720px, 100vw" priority unoptimized />
-        <div className={styles.coverCaption}>
+        <div
+          className={styles.coverCaption}
+          data-track-flight-destination={trackFlight?.phase === "destination" ? "true" : undefined}
+        >
           <strong>{displayTrack.title}</strong>
           <span>{displayTrack.artist}</span>
         </div>
@@ -309,9 +354,20 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
       <ol className={styles.trackList} aria-label="Próximas músicas na ordem de reprodução" data-radio-motion-key="queue-list">
         {listTracks.map(({ track, position }) => (
           <li key={`${track.id}-${position}`}>
-            <button type="button" className={styles.trackRow} onClick={() => radio.select(track.id)}>
-              <span className={styles.trackThumb}><Image src={track.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="48px" unoptimized /></span>
-              <span className={styles.trackMeta}><strong>{track.title}</strong><small>{track.artist}</small></span>
+            <button
+              type="button"
+              className={styles.trackRow}
+              onClick={() => selectTrackWithMotion(track.id)}
+              data-track-flight-source={trackFlight?.phase === "source" && trackFlight.id === track.id ? "true" : undefined}
+            >
+              <span
+                className={styles.trackThumb}
+                data-track-flight-source={trackFlight?.phase === "source" && trackFlight.id === track.id ? "true" : undefined}
+              ><Image src={track.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="48px" unoptimized /></span>
+              <span
+                className={styles.trackMeta}
+                data-track-flight-source={trackFlight?.phase === "source" && trackFlight.id === track.id ? "true" : undefined}
+              ><strong>{track.title}</strong><small>{track.artist}</small></span>
               <span className={styles.trackState}>{String(position).padStart(2, "0")}</span>
               <span className={styles.duration}>{formatTrackDuration(track.durationSeconds ?? (track.id === radio.currentTrack?.id ? radio.duration : undefined))}</span>
             </button>

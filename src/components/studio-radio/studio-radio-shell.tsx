@@ -193,6 +193,8 @@ function RadioContent({
   const radio = useRadio();
   const [query, setQuery] = useState("");
   const [volumeOpen, setVolumeOpen] = useState(false);
+  const [scrubbing, setScrubbing] = useState(false);
+  const [seekPreview, setSeekPreview] = useState<number | null>(null);
   const [trackFlight, setTrackFlight] = useState<{ id: string; phase: "source" | "destination" } | null>(null);
   const trackMotionTokenRef = useRef(0);
   const volumeMenuRef = useRef<HTMLDivElement>(null);
@@ -209,7 +211,8 @@ function RadioContent({
   const playing = radio.status === "playing";
   const pending = radio.status === "loading" || radio.status === "buffering";
   const currentArtwork = radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png";
-  const progress = radio.duration > 0 ? Math.min(100, radio.position / radio.duration * 100) : 0;
+  const displayedPosition = seekPreview ?? radio.position;
+  const progress = radio.duration > 0 ? Math.min(100, displayedPosition / radio.duration * 100) : 0;
   const transportPrevious = onPrevious ?? radio.previous;
   const transportNext = onNext ?? radio.next;
   const transportReshuffle = onReshuffle ?? radio.reshuffle;
@@ -311,21 +314,53 @@ function RadioContent({
         {!radio.currentTrack || radio.currentTrack.fixture ? <span className={styles.coverBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span> : null}
       </div>
 
-      <div className={styles.progressBlock} data-radio-motion-key="progress">
+      <div
+        className={styles.progressBlock}
+        data-radio-motion-key="progress"
+        data-scrubbing={scrubbing ? "true" : undefined}
+        style={{ "--seek-progress": `${progress}%` } as CSSProperties}
+      >
         <input
           className={styles.progressSeek}
           type="range"
           min={0}
           max={radio.duration || 1}
           step={0.1}
-          value={Math.min(radio.position, radio.duration || 1)}
-          onChange={(event) => radio.seek(Number(event.target.value))}
+          value={Math.min(displayedPosition, radio.duration || 1)}
+          onPointerDown={() => {
+            setScrubbing(true);
+            setSeekPreview(radio.position);
+          }}
+          onPointerUp={(event) => {
+            radio.seek(Number(event.currentTarget.value));
+            setScrubbing(false);
+            setSeekPreview(null);
+          }}
+          onPointerCancel={() => {
+            setScrubbing(false);
+            setSeekPreview(null);
+          }}
+          onBlur={() => {
+            setScrubbing(false);
+            setSeekPreview(null);
+          }}
+          onChange={(event) => {
+            const nextPosition = Number(event.target.value);
+            if (scrubbing) {
+              setSeekPreview(nextPosition);
+            } else {
+              radio.seek(nextPosition);
+            }
+          }}
           disabled={!canPlay || radio.duration === 0}
           aria-label="Posição da música"
-          style={{ "--seek-progress": `${progress}%` } as CSSProperties}
+          aria-valuetext={formatTime(displayedPosition)}
         />
+        <output className={styles.seekPreview} aria-hidden="true">
+          {formatTime(displayedPosition)}
+        </output>
         <div className={styles.progressTimes}>
-          <span>{formatTime(radio.position)}</span>
+          <span>{formatTime(displayedPosition)}</span>
           <span>{canPlay ? formatTrackDuration(radio.duration) : previewTrack.duration}</span>
         </div>
       </div>
@@ -370,7 +405,18 @@ function RadioContent({
               <button type="button" className={styles.muteButton} onClick={radio.toggleMute} aria-label={radio.volume === 0 ? "Ativar som" : "Silenciar"} title={radio.volume === 0 ? "Ativar som" : "Silenciar"}>
                 <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
               </button>
-              <input type="range" min={0} max={1} step={0.01} value={radio.volume} onChange={(event) => radio.setVolume(Number(event.target.value))} aria-label="Volume" aria-valuetext={`${Math.round(radio.volume * 100)}%`} />
+              <input
+                className={styles.volumeSlider}
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={radio.volume}
+                onChange={(event) => radio.setVolume(Number(event.target.value))}
+                aria-label="Volume"
+                aria-valuetext={`${Math.round(radio.volume * 100)}%`}
+                style={{ "--volume-level": `${Math.round(radio.volume * 100)}%` } as CSSProperties}
+              />
               <span className={styles.volumeLevel}>{Math.round(radio.volume * 100)}%</span>
             </div>
           ) : null}
@@ -1185,7 +1231,18 @@ export function StudioRadioShell() {
                 <button type="button" className={styles.muteButton} onClick={radio.toggleMute} aria-label={radio.volume === 0 ? "Ativar som" : "Silenciar"}>
                   <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
                 </button>
-                <input type="range" min={0} max={1} step={0.01} value={radio.volume} onChange={(event) => radio.setVolume(Number(event.target.value))} aria-label="Volume" aria-valuetext={`${Math.round(radio.volume * 100)}%`} />
+                <input
+                className={styles.volumeSlider}
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={radio.volume}
+                onChange={(event) => radio.setVolume(Number(event.target.value))}
+                aria-label="Volume"
+                aria-valuetext={`${Math.round(radio.volume * 100)}%`}
+                style={{ "--volume-level": `${Math.round(radio.volume * 100)}%` } as CSSProperties}
+              />
                 <span className={styles.volumeLevel}>{Math.round(radio.volume * 100)}%</span>
               </div>
             ) : null}

@@ -40,6 +40,14 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Tests
+        run: pnpm test
+
+      - name: Visualizer script syntax
+        run: |
+          node --check scripts/sync-radio-visualizer.mjs
+          python3 -m py_compile scripts/analyze-radio-visualizer.py
+
       - name: Build
         run: pnpm build
 

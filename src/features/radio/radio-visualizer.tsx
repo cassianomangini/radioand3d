@@ -14,7 +14,17 @@ interface AnalysisResult {
   analysis: DecodedMusicalVisualizerAnalysis | null;
 }
 
-export function RadioVisualizer({ className, barCount = 36, active = true }: { className: string; barCount?: number; active?: boolean }) {
+export function RadioVisualizer({
+  className,
+  barCount = 36,
+  active = true,
+  motionKey
+}: {
+  className: string;
+  barCount?: number;
+  active?: boolean;
+  motionKey?: string;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const {
@@ -148,6 +158,7 @@ export function RadioVisualizer({ className, barCount = 36, active = true }: { c
     <div
       ref={rootRef}
       className={className}
+      data-radio-motion-key={motionKey}
       role="img"
       aria-label={
         synchronized

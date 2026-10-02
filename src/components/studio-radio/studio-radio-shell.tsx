@@ -290,9 +290,7 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
         <button type="button" className={styles.modeButton} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
       </div>
 
-      <div className={styles.visualizerTransition} data-radio-motion-key="visualizer">
-        <RadioVisualizer className={styles.visualizer} />
-      </div>
+      <RadioVisualizer className={styles.visualizer} motionKey="visualizer" />
 
       <div className={styles.queueHeader} data-radio-motion-key="queue-header">
         <h3>A seguir</h3>

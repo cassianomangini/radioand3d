@@ -1422,11 +1422,6 @@
   outline-offset: 3px;
 }
 
-.visualizerTransition {
-  min-height: 0;
-  display: contents;
-}
-
 .visualizer {
   position: relative;
   height: 7rem;
@@ -2003,7 +1998,7 @@
   view-transition-name: cm-radio-transport;
 }
 
-.radioContent[data-radio-surface="desktop"] .visualizerTransition {
+.radioContent[data-radio-surface="desktop"] .visualizer {
   view-transition-name: cm-radio-visualizer;
 }
 

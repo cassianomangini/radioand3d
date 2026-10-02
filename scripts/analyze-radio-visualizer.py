@@ -341,9 +341,27 @@ def main() -> int:
         import torch
         from demucs.api import Separator
     except ImportError as error:
+        missing_name = getattr(error, "name", None)
+        if missing_name in {
+            "difflib",
+            "json",
+            "pathlib",
+            "subprocess",
+            "venv",
+        }:
+            print(
+                "Python standard library is incomplete or its environment is corrupted. "
+                f"Missing module: {missing_name}.",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                "Visualizer dependencies are missing or failed to import. "
+                "Run pnpm visualizer:sync again so the project can prepare them.",
+                file=sys.stderr,
+            )
         print(
-            "Visualizer dependencies are missing. "
-            "Run pnpm visualizer:sync again so the project can prepare them.",
+            f"Python: {sys.executable} ({sys.version.split()[0]})",
             file=sys.stderr,
         )
         print(str(error), file=sys.stderr)

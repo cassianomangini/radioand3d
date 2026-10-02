@@ -3,7 +3,7 @@
 
 The expensive source separation happens offline. The browser only reads compact,
 quantized bar frames synchronized to the existing audio element currentTime.
-The batch downloads one R2 track at a time, uploads each completed sidecar
+The batch reads the reconciled local audio files, uploads each completed sidecar
 immediately, and can safely resume after interruption.
 """
 
@@ -15,14 +15,11 @@ import gc
 import hashlib
 import json
 import os
-import shutil
 import subprocess
 import sys
-import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
 
 
 def parse_args() -> argparse.Namespace:
@@ -277,17 +274,6 @@ def require_environment(name: str) -> str:
     return value
 
 
-def download_audio(url: str, destination: Path) -> None:
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "CM-Radio-Visualizer/1.0"},
-    )
-    with urllib.request.urlopen(request, timeout=180) as response:
-        with destination.open("wb") as target:
-            shutil.copyfileobj(response, target, length=1024 * 1024)
-
-
 def transcode_for_demucs(
     source: Path,
     destination: Path,
@@ -418,29 +404,25 @@ def main() -> int:
 
     processed: list[str] = []
     failures: list[dict[str, str]] = []
-    downloads_directory = report_path.parent / "downloads"
-    downloads_directory.mkdir(parents=True, exist_ok=True)
+    working_directory = report_path.parent / "decoded"
+    working_directory.mkdir(parents=True, exist_ok=True)
 
     for index, job in enumerate(jobs, start=1):
         track_id = str(job["trackId"])
-        parsed = urlparse(str(job["audioUrl"]))
-        suffix = Path(parsed.path).suffix or ".audio"
-        temp_name = hashlib.sha256(
-            track_id.encode("utf-8")
-        ).hexdigest() + suffix
-        audio_path = downloads_directory / temp_name
-        decoded_path = downloads_directory / (
+        audio_path = Path(job["audioPath"])
+        decoded_path = working_directory / (
             hashlib.sha256(track_id.encode("utf-8")).hexdigest() + ".decoded.wav"
         )
         output_path = Path(job["outputPath"])
 
         print(
-            f"[{index}/{len(jobs)}] downloading: {track_id}",
+            f"[{index}/{len(jobs)}] analyzing local file: {track_id}",
             flush=True,
         )
 
         try:
-            download_audio(str(job["audioUrl"]), audio_path)
+            if not audio_path.is_file():
+                raise RuntimeError(f"Local audio file disappeared: {audio_path}")
             transcode_for_demucs(
                 audio_path,
                 decoded_path,
@@ -538,11 +520,10 @@ def main() -> int:
                 flush=True,
             )
         finally:
-            for temporary_path in (audio_path, decoded_path):
-                try:
-                    temporary_path.unlink(missing_ok=True)
-                except OSError:
-                    pass
+            try:
+                decoded_path.unlink(missing_ok=True)
+            except OSError:
+                pass
             release_cuda(torch)
             checkpoint_report(
                 report_path,

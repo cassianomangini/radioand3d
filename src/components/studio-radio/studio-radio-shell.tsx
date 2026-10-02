@@ -489,7 +489,7 @@ export function StudioRadioShell() {
     snapTimerRef.current = setTimeout(() => {
       setSnapDirection(null);
       snapTimerRef.current = null;
-    }, 980);
+    }, 1800);
   }
 
   function runRadioMotion(direction: "opening" | "closing", update: () => void) {
@@ -514,7 +514,7 @@ export function StudioRadioShell() {
         snapTimerRef.current = null;
         setSnapDirection(null);
         update();
-      }, 620);
+      }, 1400);
       return;
     }
 

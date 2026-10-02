@@ -2386,24 +2386,24 @@
     z-index: 30;
     overflow: hidden;
     transform-origin: 100% 46%;
-    animation: vinyl-drop 880ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: vinyl-drop 1700ms cubic-bezier(0.45, 0.02, 0.18, 1) both;
   }
 
   .site[data-radio-snap="closing"] .radioPanel {
     z-index: 30;
     overflow: hidden;
     transform-origin: 100% 46%;
-    animation: vinyl-lift 620ms cubic-bezier(0.6, 0, 0.9, 0.35) both;
+    animation: vinyl-lift 1400ms cubic-bezier(0.55, 0.02, 0.35, 1) both;
   }
 
   .site[data-radio-snap="opening"] .resizeHandle {
     z-index: 31;
-    animation: vinyl-rail-in 880ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: vinyl-rail-in 1700ms cubic-bezier(0.45, 0.02, 0.18, 1) both;
   }
 
   .site[data-radio-snap="closing"] .resizeHandle {
     z-index: 31;
-    animation: vinyl-rail-out 620ms cubic-bezier(0.6, 0, 0.9, 0.35) both;
+    animation: vinyl-rail-out 1400ms cubic-bezier(0.55, 0.02, 0.35, 1) both;
   }
 
   .radioPanel::after {
@@ -2429,23 +2429,23 @@
   }
 
   .site[data-radio-snap="opening"] .radioPanel::after {
-    animation: vinyl-groove 880ms linear both;
+    animation: vinyl-groove 1700ms linear both;
   }
 
   .site[data-radio-snap="closing"] .radioPanel::after {
-    animation: vinyl-groove-out 620ms linear both;
+    animation: vinyl-groove-out 1400ms linear both;
   }
 
   .site[data-radio-snap] .resizeHandle::after {
-    animation: radio-edge-flare 880ms ease-out both;
+    animation: radio-edge-flare 1700ms ease-out both;
   }
 
   .site[data-radio-snap="opening"] .radioFlash {
-    animation: radio-strobe 880ms linear both;
+    animation: radio-strobe 1700ms linear both;
   }
 
   .site[data-radio-snap="closing"] .radioFlash {
-    animation: radio-strobe-out 620ms linear both;
+    animation: radio-strobe-out 1400ms linear both;
   }
 }
 
@@ -2488,21 +2488,23 @@
 
 @keyframes vinyl-drop {
   0% {
-    transform: translateX(78%) rotate(16deg) scale(0.72);
+    transform: translateX(92%) rotate(18deg) scale(0.7);
     filter: brightness(2.6) saturate(1.4);
   }
 
-  16% {
-    filter: brightness(1.35) saturate(1.15);
+  28% {
+    transform: translateX(48%) rotate(10deg) scale(0.82);
+    filter: brightness(1.45) saturate(1.2);
   }
 
-  58% {
-    transform: translateX(-2.5%) rotate(-3.5deg) scale(1.035);
-    filter: brightness(1.08);
+  62% {
+    transform: translateX(14%) rotate(3.5deg) scale(0.95);
+    filter: brightness(1.12);
   }
 
-  78% {
-    transform: translateX(0.8%) rotate(1deg) scale(0.99);
+  84% {
+    transform: translateX(-1.4%) rotate(-1.4deg) scale(1.02);
+    filter: brightness(1.04);
   }
 
   100% {
@@ -2514,32 +2516,39 @@
 @keyframes vinyl-lift {
   0% {
     transform: none;
-    filter: brightness(2.4);
+    filter: brightness(2.2);
   }
 
-  18% {
-    transform: translateX(-3%) rotate(-6deg) scale(1.04);
-    filter: brightness(1.3);
+  24% {
+    transform: translateX(-2%) rotate(-4deg) scale(1.03);
+    filter: brightness(1.25);
+  }
+
+  58% {
+    transform: translateX(30%) rotate(8deg) scale(0.9);
+    filter: brightness(1.35);
   }
 
   100% {
-    transform: translateX(84%) rotate(18deg) scale(0.7);
-    filter: brightness(1.8);
+    transform: translateX(96%) rotate(16deg) scale(0.72);
+    filter: brightness(1.6);
     opacity: 0;
   }
 }
 
 @keyframes vinyl-rail-in {
-  0% { transform: translateX(78%); }
-  58% { transform: translateX(-2.5%); }
-  78% { transform: translateX(0.8%); }
+  0% { transform: translateX(92%); }
+  28% { transform: translateX(48%); }
+  62% { transform: translateX(14%); }
+  84% { transform: translateX(-1.4%); }
   100% { transform: none; }
 }
 
 @keyframes vinyl-rail-out {
   0% { transform: none; }
-  18% { transform: translateX(-3%); }
-  100% { transform: translateX(84%); opacity: 0; }
+  24% { transform: translateX(-2%); }
+  58% { transform: translateX(30%); }
+  100% { transform: translateX(96%); opacity: 0; }
 }
 
 @keyframes vinyl-groove {

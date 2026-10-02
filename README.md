@@ -51,3 +51,23 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 | [Modelo de entrega](docs/work/TEMPLATE.md) | Checklist de execução, evidências e retomada |
 
 Os perfis em `.github/agents/` são instruções versionadas. Serviços de banco, storage, autenticação e deploy não são provisionados por este bootstrap.
+
+
+### Análise musical do visualizador
+
+O visualizador pode usar sidecars pré-calculados para separar a voz do acompanhamento e sincronizar todas as barras pelo mesmo `currentTime` do player. O navegador mantém o FFT ao vivo apenas como fallback.
+
+Prepare um ambiente Python separado e instale:
+
+```bash
+python -m venv output/radio-visualizer/.venv
+output/radio-visualizer/.venv/Scripts/python -m pip install -r scripts/requirements-visualizer-analysis.txt
+```
+
+No Windows, para validar uma faixa antes do lote:
+
+```bash
+pnpm visualizer:sync -- "D:\\Músicas\\radio artesopolis" --limit 1
+```
+
+O resultado fica em `output/radio-visualizer/publish/_analysis/v1`. Para publicar no R2, use `--upload` somente com as credenciais locais de escrita `R2_VISUALIZER_WRITE_ACCESS_KEY_ID` e `R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY`; essas credenciais não pertencem ao frontend nem ao ambiente público.

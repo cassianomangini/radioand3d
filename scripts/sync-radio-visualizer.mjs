@@ -245,5 +245,10 @@ if (jobs.length) {
 const ready = publishItems.filter((item) => existsSync(item.outputPath));
 process.stdout.write(`Visualizer sidecars ready: ${ready.length}/${selected.length}. Output: ${join(PUBLISH_DIRECTORY, ANALYSIS_PREFIX)}\n`);
 
-if (options.upload && ready.length) await uploadOutputs(ready);
+if (options.upload && ready.length) {
+  await uploadOutputs(ready);
+  process.stdout.write("Remote test ready: open the PR preview or deployed site; the player will fetch the uploaded R2 sidecar automatically.\n");
+} else if (ready.length) {
+  process.stdout.write("Local test ready: run pnpm dev with RADIO_CATALOG_SOURCE=r2; development automatically serves generated sidecars from output/.\n");
+}
 if (analysisFailed || ready.length !== selected.length) process.exitCode = 1;

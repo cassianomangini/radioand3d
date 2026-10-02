@@ -55,19 +55,25 @@ Os perfis em `.github/agents/` são instruções versionadas. Serviços de banco
 
 ### Análise musical do visualizador
 
-O visualizador pode usar sidecars pré-calculados para separar a voz do acompanhamento e sincronizar todas as barras pelo mesmo `currentTime` do player. O navegador mantém o FFT ao vivo apenas como fallback.
+O visualizador usa sidecars pré-calculados para separar voz do acompanhamento e sincronizar todas as barras pelo mesmo `currentTime` do player. O FFT ao vivo permanece apenas como fallback para alguma faixa ainda sem sidecar.
 
-Prepare um ambiente Python separado e instale:
-
-```bash
-python -m venv output/radio-visualizer/.venv
-output/radio-visualizer/.venv/Scripts/python -m pip install -r scripts/requirements-visualizer-analysis.txt
-```
-
-No Windows, para validar uma faixa antes do lote:
+O lote completo é um único comando:
 
 ```bash
-pnpm visualizer:sync -- "D:\\Músicas\\radio artesopolis" --limit 1
+pnpm visualizer:sync
 ```
 
-O resultado fica em `output/radio-visualizer/publish/_analysis/v1`. Para publicar no R2, use `--upload` somente com as credenciais locais de escrita `R2_VISUALIZER_WRITE_ACCESS_KEY_ID` e `R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY`; essas credenciais não pertencem ao frontend nem ao ambiente público.
+Na primeira execução, o comando cria automaticamente o ambiente Python em `output/radio-visualizer/.venv` e instala Demucs, librosa e o cliente R2. Depois ele:
+
+1. lê **todo** o catálogo de áudio diretamente do bucket R2;
+2. confere quais sidecars já existem e ainda correspondem ao ETag/tamanho/configuração atuais;
+3. baixa uma música por vez pela URL pública;
+4. separa o stem vocal e analisa todo o acompanhamento em bandas harmônicas, percussivas e transientes;
+5. grava o sidecar localmente e o publica imediatamente em `_analysis/v1/<sha256-do-track-id>.json`;
+6. apaga o áudio temporário e segue para a próxima faixa.
+
+O lote é retomável. Se a máquina parar no meio, execute `pnpm visualizer:sync` outra vez: sidecars válidos já publicados no R2 são ignorados e apenas as faixas pendentes são processadas novamente.
+
+A execução precisa das credenciais de leitura já usadas pelo catálogo e de uma credencial de escrita restrita a `_analysis/v1/*`, configurada em `R2_VISUALIZER_WRITE_ACCESS_KEY_ID` e `R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY`. Essas credenciais são somente do comando local e nunca entram no frontend.
+
+Use `--force` somente quando for necessário regerar todas as análises após uma mudança deliberada no algoritmo/configuração.

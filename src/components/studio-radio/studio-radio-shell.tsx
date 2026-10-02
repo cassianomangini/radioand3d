@@ -28,7 +28,7 @@ const DEFAULT_RADIO_WIDTH = 480;
 const MIN_RADIO_WIDTH = 400;
 const MAX_RADIO_WIDTH = 720;
 const MIN_STUDIO_WIDTH = 640;
-const RESIZE_GUTTER = 68;
+const RESIZE_GUTTER = 32;
 
 type ViewTransitionLike = {
   finished: Promise<void>;

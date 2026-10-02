@@ -159,6 +159,7 @@ export function RadioVisualizer({
       ref={rootRef}
       className={className}
       data-radio-motion-key={motionKey}
+      data-playback-state={status}
       role="img"
       aria-label={
         synchronized

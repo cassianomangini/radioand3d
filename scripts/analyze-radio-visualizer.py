@@ -278,6 +278,7 @@ def transcode_for_demucs(
     source: Path,
     destination: Path,
     ffmpeg_executable: str,
+    samplerate: int,
 ) -> None:
     result = subprocess.run(
         [
@@ -292,7 +293,7 @@ def transcode_for_demucs(
             "-ac",
             "2",
             "-ar",
-            "44100",
+            str(samplerate),
             "-c:a",
             "pcm_s16le",
             str(destination),
@@ -338,8 +339,10 @@ def main() -> int:
         import imageio_ffmpeg
         import librosa
         import numpy as np
+        import soundfile as sf
         import torch
-        from demucs.api import Separator
+        from demucs import pretrained
+        from demucs.apply import apply_model
     except ImportError as error:
         missing_name = getattr(error, "name", None)
         if missing_name in {
@@ -405,14 +408,10 @@ def main() -> int:
     )
 
     try:
-        separator = Separator(
-            model=args.model,
-            device=device,
-            shifts=args.shifts,
-            split=True,
-            overlap=0.25,
-            progress=False,
-        )
+        model = pretrained.get_model(args.model)
+        samplerate = int(model.samplerate)
+        audio_channels = int(model.audio_channels)
+        source_names = list(model.sources)
     except Exception as error:
         print(
             f"Could not load Demucs model {args.model}: {error}",
@@ -445,8 +444,43 @@ def main() -> int:
                 audio_path,
                 decoded_path,
                 ffmpeg_executable,
+                samplerate,
             )
-            origin, stems = separator.separate_audio_file(decoded_path)
+
+            audio_array, decoded_samplerate = sf.read(
+                str(decoded_path),
+                dtype="float32",
+                always_2d=True,
+            )
+            if int(decoded_samplerate) != samplerate:
+                raise RuntimeError(
+                    "Decoded audio sample rate does not match the Demucs model: "
+                    f"{decoded_samplerate} != {samplerate}."
+                )
+
+            origin = torch.from_numpy(audio_array.T.copy())
+            if origin.ndim != 2 or origin.shape[0] != audio_channels:
+                raise RuntimeError(
+                    "Decoded audio channel count does not match the Demucs model: "
+                    f"{tuple(origin.shape)}; expected {audio_channels} channel(s)."
+                )
+
+            reference = origin.mean(0)
+            reference_mean = reference.mean()
+            reference_std = reference.std() + 1e-8
+            normalized = (origin - reference_mean) / reference_std
+
+            separated = apply_model(
+                model,
+                normalized[None],
+                shifts=args.shifts,
+                split=True,
+                overlap=0.25,
+                progress=False,
+                device=device,
+            )[0]
+            separated = separated * reference_std + reference_mean
+            stems = dict(zip(source_names, separated))
 
             if "vocals" not in stems:
                 raise RuntimeError(
@@ -485,7 +519,7 @@ def main() -> int:
                     mix,
                     vocals,
                     instruments,
-                    separator.samplerate,
+                    samplerate,
                     float(job["fps"]),
                     int(job["barCount"]),
                     int(job["voiceBars"]),

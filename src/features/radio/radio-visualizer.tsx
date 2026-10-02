@@ -1,32 +1,99 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFrequencyBarMotion } from "./frequency-bars";
 import { useRadio } from "./radio-provider";
+import {
+  loadMusicalVisualizerAnalysis,
+  sampleMusicalVisualizer,
+  type DecodedMusicalVisualizerAnalysis
+} from "./visualizer-analysis";
+
+interface AnalysisResult {
+  trackId: string;
+  analysis: DecodedMusicalVisualizerAnalysis | null;
+}
 
 export function RadioVisualizer({ className, barCount = 36, active = true }: { className: string; barCount?: number; active?: boolean }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const { status, analyserReady, analyserUnavailable, getAnalyser } = useRadio();
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const {
+    status,
+    currentTrack,
+    analyserReady,
+    analyserUnavailable,
+    getAnalyser,
+    getCurrentTime
+  } = useRadio();
+  const currentTrackId = currentTrack?.id ?? null;
+  const analysisSrc = currentTrack?.visualizerAnalysisSrc ?? null;
+  const currentAnalysis = analysisResult?.trackId === currentTrackId
+    ? analysisResult.analysis
+    : null;
+
+  useEffect(() => {
+    if (!currentTrackId || !analysisSrc) return;
+    let cancelled = false;
+
+    void loadMusicalVisualizerAnalysis(analysisSrc).then((analysis) => {
+      if (!cancelled) setAnalysisResult({ trackId: currentTrackId, analysis });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [analysisSrc, currentTrackId]);
 
   useEffect(() => {
     const root = rootRef.current;
     const analyser = getAnalyser();
-    if (!root || !analyser || !analyserReady || status !== "playing" || !active) return;
+    const liveFallbackReady = Boolean(analyser && analyserReady);
+    if (
+      !root ||
+      status !== "playing" ||
+      !active ||
+      (!currentAnalysis && !liveFallbackReady)
+    ) {
+      return;
+    }
 
     const bars = Array.from(root.querySelectorAll<HTMLSpanElement>(":scope > span"));
-    const levels = new Float32Array(analyser.frequencyBinCount);
-    const moveBars = createFrequencyBarMotion(bars.length);
+    const levels = analyser ? new Float32Array(analyser.frequencyBinCount) : null;
+    const moveBars = analyser ? createFrequencyBarMotion(bars.length) : null;
     const bounds = root.getBoundingClientRect();
-    let visible = bounds.width > 0 && bounds.height > 0 && bounds.bottom > 0 && bounds.top < window.innerHeight && bounds.right > 0 && bounds.left < window.innerWidth;
+    let visible =
+      bounds.width > 0 &&
+      bounds.height > 0 &&
+      bounds.bottom > 0 &&
+      bounds.top < window.innerHeight &&
+      bounds.right > 0 &&
+      bounds.left < window.innerWidth;
     let frame = 0;
     let previousFrame = 0;
 
     function draw(now: number) {
-      if (!analyser) return;
-      analyser.getFloatFrequencyData(levels);
-      const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
-      previousFrame = now;
-      const heights = moveBars(levels, analyser.context.sampleRate, analyser.fftSize, elapsed);
+      let heights: number[];
+
+      if (currentAnalysis) {
+        heights = sampleMusicalVisualizer(
+          currentAnalysis,
+          getCurrentTime(),
+          bars.length
+        ).map((level) => 4 + level * 92);
+      } else if (analyser && levels && moveBars) {
+        analyser.getFloatFrequencyData(levels);
+        const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
+        previousFrame = now;
+        heights = moveBars(
+          levels,
+          analyser.context.sampleRate,
+          analyser.fftSize,
+          elapsed
+        );
+      } else {
+        return;
+      }
+
       bars.forEach((bar, index) => {
         bar.style.height = `${heights[index]}%`;
       });
@@ -41,10 +108,13 @@ export function RadioVisualizer({ className, barCount = 36, active = true }: { c
       }
     }
 
-    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      reconcile();
-    });
+    const observer =
+      typeof IntersectionObserver === "undefined"
+        ? null
+        : new IntersectionObserver(([entry]) => {
+            visible = entry.isIntersecting;
+            reconcile();
+          });
     observer?.observe(root);
     document.addEventListener("visibilitychange", reconcile);
     reconcile();
@@ -53,19 +123,48 @@ export function RadioVisualizer({ className, barCount = 36, active = true }: { c
       observer?.disconnect();
       document.removeEventListener("visibilitychange", reconcile);
       window.cancelAnimationFrame(frame);
-      bars.forEach((bar) => { bar.style.height = "4%"; });
+      bars.forEach((bar) => {
+        bar.style.height = "4%";
+      });
     };
-  }, [active, analyserReady, barCount, getAnalyser, status]);
+  }, [
+    active,
+    analyserReady,
+    barCount,
+    currentAnalysis,
+    getAnalyser,
+    getCurrentTime,
+    status
+  ]);
+
+  const synchronized = Boolean(
+    status === "playing" && currentAnalysis && active
+  );
+  const live = Boolean(
+    status === "playing" && analyserReady && active
+  );
 
   return (
     <div
       ref={rootRef}
       className={className}
       role="img"
-      aria-label={analyserUnavailable ? "Visualizador indisponível" : status === "playing" && analyserReady && active ? "Visualizador reagindo ao áudio" : "Visualizador em espera"}
+      aria-label={
+        synchronized
+          ? "Visualizador sincronizado à análise musical"
+          : analyserUnavailable && !currentAnalysis
+            ? "Visualizador indisponível"
+            : live
+              ? "Visualizador reagindo ao áudio"
+              : "Visualizador em espera"
+      }
     >
-      {Array.from({ length: barCount }, (_, index) => <span key={index} style={{ height: "4%" }} />)}
-      {analyserUnavailable ? <p>Barras indisponíveis nesta reprodução</p> : null}
+      {Array.from({ length: barCount }, (_, index) => (
+        <span key={index} style={{ height: "4%" }} />
+      ))}
+      {analyserUnavailable && !currentAnalysis ? (
+        <p>Barras indisponíveis nesta reprodução</p>
+      ) : null}
     </div>
   );
 }

@@ -430,7 +430,7 @@ def main() -> int:
         ).hexdigest() + suffix
         audio_path = downloads_directory / temp_name
         decoded_path = downloads_directory / (
-            hashlib.sha256(track_id.encode("utf-8")).hexdigest() + ".wav"
+            hashlib.sha256(track_id.encode("utf-8")).hexdigest() + ".decoded.wav"
         )
         output_path = Path(job["outputPath"])
 

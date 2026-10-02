@@ -205,6 +205,144 @@ def onset_pulse(
     )[0]
 
 
+def band_attack_envelopes(
+    power: Any,
+    fps: float,
+    np: Any,
+    librosa: Any,
+) -> Any:
+    if power.size == 0:
+        return np.zeros_like(power, dtype=np.float32)
+
+    db = 10.0 * np.log10(np.maximum(power, 1e-12))
+    novelty = np.maximum(
+        0.0,
+        np.diff(db, axis=1, prepend=db[:, :1]),
+    )
+    scale = np.percentile(novelty, 92, axis=1, keepdims=True)
+    normalized = np.clip(
+        novelty / np.maximum(scale, 1e-6),
+        0.0,
+        1.0,
+    )
+    audibility = robust_band_normalize(
+        power,
+        np,
+        floor_db=-72.0,
+        strong_db=-38.0,
+    )
+
+    impulses = np.zeros_like(normalized, dtype=np.float32)
+    for band in range(normalized.shape[0]):
+        peaks = librosa.util.peak_pick(
+            normalized[band],
+            pre_max=1,
+            post_max=1,
+            pre_avg=2,
+            post_avg=3,
+            delta=0.14,
+            wait=3,
+        )
+        if len(peaks):
+            impulses[band, peaks] = (
+                normalized[band, peaks]
+                * np.sqrt(audibility[band, peaks])
+            )
+
+    return smooth_release(
+        impulses,
+        fps,
+        0.15,
+        np,
+    )
+
+
+def other_instrument_levels(
+    signal: Any,
+    sample_rate: int,
+    hop_length: int,
+    n_fft: int,
+    band_count: int,
+    fmax: float,
+    np: Any,
+    librosa: Any,
+) -> Any:
+    if band_count <= 0:
+        return np.zeros((0, 1), dtype=np.float32)
+
+    stft = librosa.stft(
+        signal,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        center=True,
+    )
+    magnitude = np.abs(stft)
+    harmonic_mag, percussive_mag = librosa.decompose.hpss(
+        magnitude,
+        margin=(1.0, 1.8),
+    )
+    mel_basis = librosa.filters.mel(
+        sr=sample_rate,
+        n_fft=n_fft,
+        n_mels=band_count,
+        fmin=90.0,
+        fmax=fmax,
+        norm="slaney",
+    )
+
+    full_power = mel_basis @ np.square(magnitude)
+    harmonic_power = mel_basis @ np.square(harmonic_mag)
+    percussive_power = mel_basis @ np.square(percussive_mag)
+
+    harmonic = robust_band_normalize(
+        harmonic_power,
+        np,
+        floor_db=-70.0,
+        strong_db=-36.0,
+    )
+    harmonic = moving_average(harmonic, 2, np)
+    harmonic = smooth_release(
+        harmonic,
+        sample_rate / hop_length,
+        0.30,
+        np,
+    )
+
+    articulation = robust_band_normalize(
+        percussive_power,
+        np,
+        floor_db=-72.0,
+        strong_db=-38.0,
+    )
+    articulation = smooth_release(
+        articulation,
+        sample_rate / hop_length,
+        0.14,
+        np,
+    )
+
+    attacks = band_attack_envelopes(
+        full_power * 0.45 + percussive_power,
+        sample_rate / hop_length,
+        np,
+        librosa,
+    )
+
+    # The "other" stem can contain piano, guitar, synths, strings and more.
+    # Preserve sustained harmonic body while exposing real note/chord attacks.
+    # Peak-picking keeps those attacks sparse so the field does not return to
+    # the frame-by-frame spectral-flux jitter rejected in v1.
+    body = np.maximum(
+        harmonic * 0.90,
+        articulation * 0.62,
+    )
+    return np.clip(
+        body + attacks * 0.42,
+        0.0,
+        1.0,
+    )
+
+
 def build_instrument_side(
     instrument_stems: dict[str, Any],
     channel: int,
@@ -273,18 +411,15 @@ def build_instrument_side(
         release_seconds=0.13,
         average_width=2,
     )
-    other_levels = spectral_levels(
+    other_levels = other_instrument_levels(
         other_signal,
         sample_rate,
         hop_length,
         n_fft,
         other_count,
-        90.0,
         fmax,
         np,
         librosa,
-        release_seconds=0.22,
-        average_width=3,
     )
 
     frame_count = min(
@@ -452,7 +587,7 @@ def encode_payload(
         quantized.tobytes(order="C")
     ).decode("ascii")
     return {
-        "version": 2,
+        "version": 3,
         "source": "demucs+librosa",
         "model": model,
         "fps": round(float(fps), 6),

@@ -1,5 +1,5 @@
 export interface MusicalVisualizerPayload {
-  version: 2;
+  version: 3;
   source: "demucs+librosa";
   model: string;
   fps: number;
@@ -42,7 +42,7 @@ export function decodeMusicalVisualizerAnalysis(value: unknown): DecodedMusicalV
   const frameCount = payload.frameCount;
 
   if (
-    payload.version !== 2 ||
+    payload.version !== 3 ||
     payload.source !== "demucs+librosa" ||
     payload.encoding !== "base64-u8" ||
     typeof payload.model !== "string" ||
@@ -73,7 +73,7 @@ export function decodeMusicalVisualizerAnalysis(value: unknown): DecodedMusicalV
   if (data.length !== expectedBytes) return null;
 
   return {
-    version: 2,
+    version: 3,
     source: "demucs+librosa",
     model: payload.model,
     fps: payload.fps,

@@ -16,6 +16,7 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
 import sys
 import urllib.request
 from datetime import datetime, timezone
@@ -287,6 +288,40 @@ def download_audio(url: str, destination: Path) -> None:
             shutil.copyfileobj(response, target, length=1024 * 1024)
 
 
+def transcode_for_demucs(
+    source: Path,
+    destination: Path,
+    ffmpeg_executable: str,
+) -> None:
+    result = subprocess.run(
+        [
+            ffmpeg_executable,
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-i",
+            str(source),
+            "-vn",
+            "-ac",
+            "2",
+            "-ar",
+            "44100",
+            "-c:a",
+            "pcm_s16le",
+            str(destination),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            "ffmpeg could not decode the track: "
+            + (result.stderr.strip() or "unknown decoding error")
+        )
+
+
 def checkpoint_report(
     report_path: Path,
     *,
@@ -314,6 +349,7 @@ def main() -> int:
 
     try:
         import boto3
+        import imageio_ffmpeg
         import librosa
         import numpy as np
         import torch
@@ -326,6 +362,8 @@ def main() -> int:
         )
         print(str(error), file=sys.stderr)
         return 2
+
+    ffmpeg_executable = imageio_ffmpeg.get_ffmpeg_exe()
 
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     jobs = manifest.get("jobs", [])
@@ -391,6 +429,9 @@ def main() -> int:
             track_id.encode("utf-8")
         ).hexdigest() + suffix
         audio_path = downloads_directory / temp_name
+        decoded_path = downloads_directory / (
+            hashlib.sha256(track_id.encode("utf-8")).hexdigest() + ".wav"
+        )
         output_path = Path(job["outputPath"])
 
         print(
@@ -400,7 +441,12 @@ def main() -> int:
 
         try:
             download_audio(str(job["audioUrl"]), audio_path)
-            origin, stems = separator.separate_audio_file(audio_path)
+            transcode_for_demucs(
+                audio_path,
+                decoded_path,
+                ffmpeg_executable,
+            )
+            origin, stems = separator.separate_audio_file(decoded_path)
 
             if "vocals" not in stems:
                 raise RuntimeError(
@@ -492,10 +538,11 @@ def main() -> int:
                 flush=True,
             )
         finally:
-            try:
-                audio_path.unlink(missing_ok=True)
-            except OSError:
-                pass
+            for temporary_path in (audio_path, decoded_path):
+                try:
+                    temporary_path.unlink(missing_ok=True)
+                except OSError:
+                    pass
             release_cuda(torch)
             checkpoint_report(
                 report_path,

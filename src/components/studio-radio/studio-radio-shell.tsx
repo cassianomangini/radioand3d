@@ -43,6 +43,13 @@ type MobileRadioMotionState = {
   phase: "source" | "destination";
 };
 
+type TrackStepKind = "next" | "previous" | "shuffle";
+
+type TrackStepMotionState = {
+  kind: TrackStepKind;
+  phase: "source" | "destination";
+};
+
 const previewTrack = {
   title: "Limite Elástico",
   artist: "CM",
@@ -168,12 +175,20 @@ function RadioContent({
   mobile = false,
   expanded = false,
   onClose,
-  mobileMotionEndpoint = false
+  mobileMotionEndpoint = false,
+  trackStepKind,
+  onPrevious,
+  onNext,
+  onReshuffle
 }: {
   mobile?: boolean;
   expanded?: boolean;
   onClose?: () => void;
   mobileMotionEndpoint?: boolean;
+  trackStepKind?: TrackStepKind;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onReshuffle?: () => void;
 }) {
   const radio = useRadio();
   const [query, setQuery] = useState("");
@@ -195,6 +210,9 @@ function RadioContent({
   const pending = radio.status === "loading" || radio.status === "buffering";
   const currentArtwork = radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png";
   const progress = radio.duration > 0 ? Math.min(100, radio.position / radio.duration * 100) : 0;
+  const transportPrevious = onPrevious ?? radio.previous;
+  const transportNext = onNext ?? radio.next;
+  const transportReshuffle = onReshuffle ?? radio.reshuffle;
 
   function selectTrackWithMotion(trackId: string) {
     if (radio.currentTrack?.id === trackId) {
@@ -259,6 +277,7 @@ function RadioContent({
       className={styles.radioContent}
       data-radio-surface={mobile ? "mobile" : "desktop"}
       data-track-flight={trackFlight?.phase}
+      data-track-step={trackStepKind}
       data-mobile-motion-endpoint={mobile && mobileMotionEndpoint ? "true" : undefined}
     >
       <div className={styles.radioHeader} data-radio-motion-key="header">
@@ -312,9 +331,9 @@ function RadioContent({
       </div>
 
       <div className={styles.transport} aria-label="Controles da rádio" data-radio-motion-key="transport">
-        <button type="button" className={styles.modeButton} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória" data-tooltip="Embaralhar lista do zero"><Icon name="shuffle" /></button>
+        <button type="button" className={styles.modeButton} onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória" data-tooltip="Embaralhar lista do zero"><Icon name="shuffle" /></button>
         <button type="button" className={styles.modeButton} onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir faixa" title={radio.repeatOne ? "Desligar repetição" : "Repetir faixa"}><Icon name="repeat" /></button>
-        <button type="button" onClick={radio.previous} disabled={!canPlay} aria-label="Faixa anterior"><Icon name="previous" /></button>
+        <button type="button" onClick={transportPrevious} disabled={!canPlay} aria-label="Faixa anterior"><Icon name="previous" /></button>
         <button
           type="button"
           className={styles.playButton}
@@ -324,7 +343,7 @@ function RadioContent({
         >
           <Icon name={playing || pending ? "pause" : "play"} />
         </button>
-        <button type="button" onClick={radio.next} disabled={!canPlay || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
+        <button type="button" onClick={transportNext} disabled={!canPlay || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
         <div
           ref={volumeMenuRef}
           className={styles.volumeMenu}
@@ -447,11 +466,13 @@ export function StudioRadioShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
   const [mobileRadioMotion, setMobileRadioMotion] = useState<MobileRadioMotionState | null>(null);
+  const [trackStepMotion, setTrackStepMotion] = useState<TrackStepMotionState | null>(null);
   const miniVolumeMenuRef = useRef<HTMLDivElement>(null);
   const miniVolumeButtonRef = useRef<HTMLButtonElement>(null);
   const miniOpenButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMotionActiveRef = useRef(false);
   const mobileMotionTokenRef = useRef(0);
+  const trackStepMotionTokenRef = useRef(0);
 
   const shellStyle = useMemo(
     () =>
@@ -604,6 +625,64 @@ export function StudioRadioShell() {
     shell.style.removeProperty("--radio-return-offset");
     delete shell.dataset.radioReturning;
     returnOffsetRef.current = 0;
+  }
+
+  function runTrackStepMotion(kind: TrackStepKind, action: () => void) {
+    if (mobileMotionActiveRef.current) {
+      action();
+      return;
+    }
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const documentWithTransition = document as DocumentWithViewTransition;
+    if (reduce || !documentWithTransition.startViewTransition) {
+      action();
+      return;
+    }
+
+    const token = ++trackStepMotionTokenRef.current;
+    let updated = false;
+
+    flushSync(() => {
+      setTrackStepMotion({ kind, phase: "source" });
+    });
+
+    try {
+      const transition = documentWithTransition.startViewTransition(() => {
+        flushSync(() => {
+          updated = true;
+          action();
+          setTrackStepMotion({ kind, phase: "destination" });
+        });
+      });
+
+      void transition.finished.finally(() => {
+        if (trackStepMotionTokenRef.current === token) {
+          setTrackStepMotion(null);
+        }
+      });
+    } catch {
+      if (trackStepMotionTokenRef.current === token) {
+        setTrackStepMotion(null);
+      }
+      if (!updated) action();
+    }
+  }
+
+  function previousTrack() {
+    if (radio.position > 3 || !radio.hasPrevious) {
+      radio.previous();
+      return;
+    }
+    runTrackStepMotion("previous", radio.previous);
+  }
+
+  function nextTrack() {
+    runTrackStepMotion("next", radio.next);
+  }
+
+  function reshuffleTracks() {
+    runTrackStepMotion("shuffle", radio.reshuffle);
   }
 
   function runMobileRadioMotion(direction: "opening" | "closing") {
@@ -1029,6 +1108,7 @@ export function StudioRadioShell() {
         className={styles.mobileMiniPlayer}
         role="region"
         aria-label="Mini player da CM Rádio"
+        data-track-step={!mobileRadioOpen ? trackStepMotion?.kind : undefined}
         data-mobile-motion-endpoint={miniMotionEndpoint ? "true" : undefined}
       >
         <span className={styles.miniCover}><Image src={radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="64px" unoptimized /></span>
@@ -1050,9 +1130,9 @@ export function StudioRadioShell() {
           <RadioVisualizer className={`${styles.visualizer} ${styles.miniVisualizer}`} barCount={24} active={!mobileRadioOpen} />
         </div>
         <div className={styles.miniControls}>
-          <button type="button" className={styles.miniStep} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória"><Icon name="shuffle" /></button>
+          <button type="button" className={styles.miniStep} onClick={reshuffleTracks} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória"><Icon name="shuffle" /></button>
           <button type="button" className={styles.miniStep} onClick={radio.toggleRepeatOne} disabled={!radio.currentTrack} aria-pressed={radio.repeatOne} aria-label="Repetir faixa"><Icon name="repeat" /></button>
-          <button type="button" className={styles.miniStep} onClick={radio.previous} disabled={!radio.currentTrack} aria-label="Faixa anterior"><Icon name="previous" /></button>
+          <button type="button" className={styles.miniStep} onClick={previousTrack} disabled={!radio.currentTrack} aria-label="Faixa anterior"><Icon name="previous" /></button>
           <button
             type="button"
             className={styles.miniPlay}
@@ -1062,7 +1142,7 @@ export function StudioRadioShell() {
           >
             <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />
           </button>
-          <button type="button" className={styles.miniStep} onClick={radio.next} disabled={!radio.currentTrack || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
+          <button type="button" className={styles.miniStep} onClick={nextTrack} disabled={!radio.currentTrack || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
           <div
             ref={miniVolumeMenuRef}
             className={styles.volumeMenu}
@@ -1145,7 +1225,13 @@ export function StudioRadioShell() {
         />
 
         <aside id="radio" className={styles.radioPanel} aria-label="CM Rádio">
-          <RadioContent expanded={radioFullscreen} />
+          <RadioContent
+            expanded={radioFullscreen}
+            trackStepKind={trackStepMotion?.kind}
+            onPrevious={previousTrack}
+            onNext={nextTrack}
+            onReshuffle={reshuffleTracks}
+          />
         </aside>
       </div>
 
@@ -1163,6 +1249,10 @@ export function StudioRadioShell() {
         <RadioContent
           mobile
           mobileMotionEndpoint={dialogMotionEndpoint}
+          trackStepKind={trackStepMotion?.kind}
+          onPrevious={previousTrack}
+          onNext={nextTrack}
+          onReshuffle={reshuffleTracks}
           onClose={closeMobileRadio}
         />
       </dialog>

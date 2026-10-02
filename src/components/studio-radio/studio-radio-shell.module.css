@@ -2029,6 +2029,117 @@
   box-shadow: inset 3px 0 0 var(--accent-cyan);
 }
 
+.radioContent[data-track-step] .coverArt {
+  view-transition-name: none;
+}
+
+.radioContent[data-track-step="next"] .coverArt,
+.mobileMiniPlayer[data-track-step="next"] .miniCover {
+  view-transition-name: cm-track-step-next-art;
+}
+
+.radioContent[data-track-step="next"] .coverCaption,
+.mobileMiniPlayer[data-track-step="next"] .miniMeta {
+  view-transition-name: cm-track-step-next-meta;
+}
+
+.radioContent[data-track-step="previous"] .coverArt,
+.mobileMiniPlayer[data-track-step="previous"] .miniCover {
+  view-transition-name: cm-track-step-previous-art;
+}
+
+.radioContent[data-track-step="previous"] .coverCaption,
+.mobileMiniPlayer[data-track-step="previous"] .miniMeta {
+  view-transition-name: cm-track-step-previous-meta;
+}
+
+.radioContent[data-track-step="shuffle"] .coverArt,
+.mobileMiniPlayer[data-track-step="shuffle"] .miniCover {
+  view-transition-name: cm-track-step-shuffle-art;
+}
+
+.radioContent[data-track-step="shuffle"] .coverCaption,
+.mobileMiniPlayer[data-track-step="shuffle"] .miniMeta {
+  view-transition-name: cm-track-step-shuffle-meta;
+}
+
+:global(::view-transition-group(cm-track-step-next-art)),
+:global(::view-transition-group(cm-track-step-next-meta)),
+:global(::view-transition-group(cm-track-step-previous-art)),
+:global(::view-transition-group(cm-track-step-previous-meta)),
+:global(::view-transition-group(cm-track-step-shuffle-art)),
+:global(::view-transition-group(cm-track-step-shuffle-meta)) {
+  z-index: 119;
+  animation-duration: var(--motion-signature-close);
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-old(cm-track-step-next-art)),
+:global(::view-transition-old(cm-track-step-next-meta)) {
+  animation: track-step-next-out var(--motion-signature-close) var(--ease-signature) both;
+  mix-blend-mode: normal;
+}
+
+:global(::view-transition-new(cm-track-step-next-art)),
+:global(::view-transition-new(cm-track-step-next-meta)) {
+  animation: track-step-next-in var(--motion-signature-close) var(--ease-signature) both;
+  mix-blend-mode: normal;
+}
+
+:global(::view-transition-old(cm-track-step-previous-art)),
+:global(::view-transition-old(cm-track-step-previous-meta)) {
+  animation: track-step-previous-out var(--motion-signature-close) var(--ease-signature) both;
+  mix-blend-mode: normal;
+}
+
+:global(::view-transition-new(cm-track-step-previous-art)),
+:global(::view-transition-new(cm-track-step-previous-meta)) {
+  animation: track-step-previous-in var(--motion-signature-close) var(--ease-signature) both;
+  mix-blend-mode: normal;
+}
+
+:global(::view-transition-old(cm-track-step-shuffle-art)),
+:global(::view-transition-old(cm-track-step-shuffle-meta)) {
+  animation: track-step-shuffle-out 420ms var(--ease-signature) both;
+  mix-blend-mode: normal;
+}
+
+:global(::view-transition-new(cm-track-step-shuffle-art)),
+:global(::view-transition-new(cm-track-step-shuffle-meta)) {
+  animation: track-step-shuffle-in 420ms var(--ease-signature) both;
+  mix-blend-mode: normal;
+}
+
+@keyframes track-step-next-out {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to { opacity: 0; transform: translateX(-5.5%) scale(0.985); }
+}
+
+@keyframes track-step-next-in {
+  from { opacity: 0; transform: translateX(5.5%) scale(1.015); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes track-step-previous-out {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to { opacity: 0; transform: translateX(5.5%) scale(0.985); }
+}
+
+@keyframes track-step-previous-in {
+  from { opacity: 0; transform: translateX(-5.5%) scale(1.015); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes track-step-shuffle-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.985); }
+}
+
+@keyframes track-step-shuffle-in {
+  from { opacity: 0; transform: scale(1.015); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 :global(::view-transition-group(cm-track-art-flight)) {
   z-index: 120;
   animation-duration: 760ms;

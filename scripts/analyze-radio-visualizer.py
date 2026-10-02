@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Build synchronized musical visualizer sidecars for CM Radio.
+"""Build and upload synchronized musical visualizer sidecars for CM Radio.
 
 The expensive source separation happens offline. The browser only reads compact,
 quantized bar frames synchronized to the existing audio element currentTime.
+The batch downloads one R2 track at a time, uploads each completed sidecar
+immediately, and can safely resume after interruption.
 """
 
 from __future__ import annotations
@@ -10,11 +12,16 @@ from __future__ import annotations
 import argparse
 import base64
 import gc
+import hashlib
 import json
+import os
+import shutil
 import sys
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,7 +36,10 @@ def parse_args() -> argparse.Namespace:
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    temporary.write_text(
+        json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
     temporary.replace(path)
 
 
@@ -47,7 +57,12 @@ def relative_db(power: Any, np: Any) -> Any:
     return db - peak
 
 
-def robust_band_normalize(power: Any, np: Any, floor_db: float = -66.0, strong_db: float = -34.0) -> Any:
+def robust_band_normalize(
+    power: Any,
+    np: Any,
+    floor_db: float = -66.0,
+    strong_db: float = -34.0,
+) -> Any:
     db = relative_db(power, np)
     low = np.percentile(db, 10, axis=1, keepdims=True)
     high = np.percentile(db, 95, axis=1, keepdims=True)
@@ -76,7 +91,11 @@ def fit_frames(values: Any, frame_count: int, np: Any) -> Any:
     if values.shape[-1] > frame_count:
         return values[..., :frame_count]
     padding = frame_count - values.shape[-1]
-    edge = values[..., -1:] if values.shape[-1] else np.zeros((*values.shape[:-1], 1), dtype=np.float32)
+    edge = (
+        values[..., -1:]
+        if values.shape[-1]
+        else np.zeros((*values.shape[:-1], 1), dtype=np.float32)
+    )
     return np.concatenate([values, np.repeat(edge, padding, axis=-1)], axis=-1)
 
 
@@ -105,7 +124,12 @@ def build_bar_matrix(
     outer_count = bar_count - voice_count
     side_count = outer_count // 2
 
-    instrument_stft = librosa.stft(instruments, n_fft=n_fft, hop_length=hop_length, center=True)
+    instrument_stft = librosa.stft(
+        instruments,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        center=True,
+    )
     instrument_mag = np.abs(instrument_stft)
     harmonic_mag, percussive_mag = librosa.decompose.hpss(instrument_mag)
     mel_basis = librosa.filters.mel(
@@ -127,12 +151,18 @@ def build_bar_matrix(
     flux = np.maximum(0.0, np.diff(full_db, axis=1, prepend=full_db[:, :1]))
     flux_norm = robust_event_normalize(flux, np)
 
-    instrument_levels = np.maximum.reduce([
-        full_norm * 0.70,
-        harmonic_norm * 0.92,
-        percussive_norm * 0.98,
-    ])
-    instrument_levels = np.clip(instrument_levels + flux_norm * 0.28, 0.0, 1.0)
+    instrument_levels = np.maximum.reduce(
+        [
+            full_norm * 0.70,
+            harmonic_norm * 0.92,
+            percussive_norm * 0.98,
+        ]
+    )
+    instrument_levels = np.clip(
+        instrument_levels + flux_norm * 0.28,
+        0.0,
+        1.0,
+    )
 
     voice_power = librosa.feature.melspectrogram(
         y=vocals,
@@ -145,20 +175,43 @@ def build_bar_matrix(
         power=2.0,
         center=True,
     )
-    voice_norm = robust_band_normalize(voice_power, np, floor_db=-62.0, strong_db=-30.0)
+    voice_norm = robust_band_normalize(
+        voice_power,
+        np,
+        floor_db=-62.0,
+        strong_db=-30.0,
+    )
 
     frame_count = min(instrument_levels.shape[1], voice_norm.shape[1])
     instrument_levels = fit_frames(instrument_levels, frame_count, np)
     voice_norm = fit_frames(voice_norm, frame_count, np)
 
-    mix_rms = fit_frames(rms_frames(mix, librosa, n_fft, hop_length), frame_count, np)
-    voice_rms = fit_frames(rms_frames(vocals, librosa, n_fft, hop_length), frame_count, np)
+    mix_rms = fit_frames(
+        rms_frames(mix, librosa, n_fft, hop_length),
+        frame_count,
+        np,
+    )
+    voice_rms = fit_frames(
+        rms_frames(vocals, librosa, n_fft, hop_length),
+        frame_count,
+        np,
+    )
     mix_peak = max(float(np.max(mix_rms)), 1e-6)
-    absolute_voice = np.clip((20.0 * np.log10(np.maximum(voice_rms / mix_peak, 1e-6)) + 58.0) / 28.0, 0.0, 1.0)
+    absolute_voice = np.clip(
+        (20.0 * np.log10(np.maximum(voice_rms / mix_peak, 1e-6)) + 58.0) / 28.0,
+        0.0,
+        1.0,
+    )
     voice_ratio = voice_rms / np.maximum(mix_rms, 1e-6)
-    voice_presence = np.clip((voice_ratio - 0.06) / 0.30, 0.0, 1.0) * absolute_voice
+    voice_presence = (
+        np.clip((voice_ratio - 0.06) / 0.30, 0.0, 1.0)
+        * absolute_voice
+    )
     voice_levels = np.clip(
-        np.maximum(voice_norm * voice_presence[None, :], voice_presence[None, :] * 0.22),
+        np.maximum(
+            voice_norm * voice_presence[None, :],
+            voice_presence[None, :] * 0.22,
+        ),
         0.0,
         1.0,
     )
@@ -185,8 +238,12 @@ def encode_payload(
     model: str,
     np: Any,
 ) -> dict[str, Any]:
-    quantized = np.rint(np.clip(bars.T, 0.0, 1.0) * 255.0).astype(np.uint8)
-    packed = base64.b64encode(quantized.tobytes(order="C")).decode("ascii")
+    quantized = np.rint(
+        np.clip(bars.T, 0.0, 1.0) * 255.0
+    ).astype(np.uint8)
+    packed = base64.b64encode(
+        quantized.tobytes(order="C")
+    ).decode("ascii")
     return {
         "version": 1,
         "source": "demucs+librosa",
@@ -212,18 +269,59 @@ def release_cuda(torch_module: Any) -> None:
         torch_module.cuda.empty_cache()
 
 
+def require_environment(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return value
+
+
+def download_audio(url: str, destination: Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "CM-Radio-Visualizer/1.0"},
+    )
+    with urllib.request.urlopen(request, timeout=180) as response:
+        with destination.open("wb") as target:
+            shutil.copyfileobj(response, target, length=1024 * 1024)
+
+
+def checkpoint_report(
+    report_path: Path,
+    *,
+    model: str,
+    device: str,
+    processed: list[str],
+    failures: list[dict[str, str]],
+    total: int,
+) -> None:
+    write_json(
+        report_path,
+        {
+            "model": model,
+            "device": device,
+            "total": total,
+            "processed": processed,
+            "failed": failures,
+            "updatedAt": datetime.now(timezone.utc).isoformat(),
+        },
+    )
+
+
 def main() -> int:
     args = parse_args()
 
     try:
+        import boto3
         import librosa
         import numpy as np
         import torch
         from demucs.api import Separator
     except ImportError as error:
         print(
-            "Visualizer dependencies are missing. Run: "
-            "python -m pip install -r scripts/requirements-visualizer-analysis.txt",
+            "Visualizer dependencies are missing. "
+            "Run pnpm visualizer:sync again so the project can prepare them.",
             file=sys.stderr,
         )
         print(str(error), file=sys.stderr)
@@ -236,12 +334,33 @@ def main() -> int:
         write_json(report_path, {"processed": [], "failed": []})
         return 0
 
-    device = "cuda" if args.device == "auto" and torch.cuda.is_available() else args.device
+    device = (
+        "cuda"
+        if args.device == "auto" and torch.cuda.is_available()
+        else args.device
+    )
     if device == "auto":
         device = "cpu"
     if device == "cuda" and not torch.cuda.is_available():
-        print("CUDA was requested but torch.cuda.is_available() is false.", file=sys.stderr)
+        print(
+            "CUDA was requested but torch.cuda.is_available() is false.",
+            file=sys.stderr,
+        )
         return 2
+
+    endpoint = require_environment("CM_VISUALIZER_R2_ENDPOINT")
+    bucket = require_environment("CM_VISUALIZER_R2_BUCKET")
+    access_key_id = require_environment("CM_VISUALIZER_R2_ACCESS_KEY_ID")
+    secret_access_key = require_environment(
+        "CM_VISUALIZER_R2_SECRET_ACCESS_KEY"
+    )
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=endpoint,
+        region_name="auto",
+        aws_access_key_id=access_key_id,
+        aws_secret_access_key=secret_access_key,
+    )
 
     try:
         separator = Separator(
@@ -253,22 +372,52 @@ def main() -> int:
             progress=False,
         )
     except Exception as error:
-        print(f"Could not load Demucs model {args.model}: {error}", file=sys.stderr)
+        print(
+            f"Could not load Demucs model {args.model}: {error}",
+            file=sys.stderr,
+        )
         return 2
 
     processed: list[str] = []
     failures: list[dict[str, str]] = []
+    downloads_directory = report_path.parent / "downloads"
+    downloads_directory.mkdir(parents=True, exist_ok=True)
 
-    for job in jobs:
+    for index, job in enumerate(jobs, start=1):
         track_id = str(job["trackId"])
+        parsed = urlparse(str(job["audioUrl"]))
+        suffix = Path(parsed.path).suffix or ".audio"
+        temp_name = hashlib.sha256(
+            track_id.encode("utf-8")
+        ).hexdigest() + suffix
+        audio_path = downloads_directory / temp_name
+        output_path = Path(job["outputPath"])
+
+        print(
+            f"[{index}/{len(jobs)}] downloading: {track_id}",
+            flush=True,
+        )
+
         try:
-            origin, stems = separator.separate_audio_file(Path(job["audioPath"]))
+            download_audio(str(job["audioUrl"]), audio_path)
+            origin, stems = separator.separate_audio_file(audio_path)
+
             if "vocals" not in stems:
-                raise RuntimeError("The selected Demucs model did not return a vocals stem.")
+                raise RuntimeError(
+                    "The selected Demucs model did not return a vocals stem."
+                )
+
             vocals_tensor = stems["vocals"]
-            instrument_tensors = [source for name, source in stems.items() if name != "vocals"]
+            instrument_tensors = [
+                source
+                for name, source in stems.items()
+                if name != "vocals"
+            ]
             if not instrument_tensors:
-                raise RuntimeError("The selected Demucs model returned no instrumental stems.")
+                raise RuntimeError(
+                    "The selected Demucs model returned no instrumental stems."
+                )
+
             instruments_tensor = instrument_tensors[0].clone()
             for source in instrument_tensors[1:]:
                 instruments_tensor += source
@@ -276,19 +425,27 @@ def main() -> int:
             mix = mono_numpy(origin)
             vocals = mono_numpy(vocals_tensor)
             instruments = mono_numpy(instruments_tensor)
-            length = min(len(mix), len(vocals), len(instruments))
-            mix, vocals, instruments = mix[:length], vocals[:length], instruments[:length]
+            length = min(
+                len(mix),
+                len(vocals),
+                len(instruments),
+            )
+            mix = mix[:length]
+            vocals = vocals[:length]
+            instruments = instruments[:length]
 
-            bars, actual_fps, center_start, voice_count, duration = build_bar_matrix(
-                mix,
-                vocals,
-                instruments,
-                separator.samplerate,
-                float(job["fps"]),
-                int(job["barCount"]),
-                int(job["voiceBars"]),
-                np,
-                librosa,
+            bars, actual_fps, center_start, voice_count, duration = (
+                build_bar_matrix(
+                    mix,
+                    vocals,
+                    instruments,
+                    separator.samplerate,
+                    float(job["fps"]),
+                    int(job["barCount"]),
+                    int(job["voiceBars"]),
+                    np,
+                    librosa,
+                )
             )
             payload = encode_payload(
                 bars,
@@ -299,24 +456,56 @@ def main() -> int:
                 args.model,
                 np,
             )
-            write_json(Path(job["outputPath"]), payload)
-            processed.append(track_id)
-            print(f"analyzed: {track_id} ({bars.shape[1]} frames)", flush=True)
-        except Exception as error:
-            failures.append({"trackId": track_id, "error": str(error)})
-            print(f"analysis failed: {track_id}: {error}", file=sys.stderr, flush=True)
-        finally:
-            release_cuda(torch)
+            write_json(output_path, payload)
 
-    write_json(
-        report_path,
-        {
-            "model": args.model,
-            "device": device,
-            "processed": processed,
-            "failed": failures,
-        },
-    )
+            metadata = {
+                str(key): str(value)
+                for key, value in dict(
+                    job.get("uploadMetadata", {})
+                ).items()
+            }
+            s3.put_object(
+                Bucket=bucket,
+                Key=str(job["objectKey"]),
+                Body=output_path.read_bytes(),
+                ContentType="application/json; charset=utf-8",
+                CacheControl="public, max-age=300",
+                Metadata=metadata,
+            )
+
+            processed.append(track_id)
+            print(
+                f"[{index}/{len(jobs)}] uploaded: {track_id} "
+                f"({bars.shape[1]} frames)",
+                flush=True,
+            )
+        except Exception as error:
+            failures.append(
+                {
+                    "trackId": track_id,
+                    "error": str(error),
+                }
+            )
+            print(
+                f"[{index}/{len(jobs)}] failed: {track_id}: {error}",
+                file=sys.stderr,
+                flush=True,
+            )
+        finally:
+            try:
+                audio_path.unlink(missing_ok=True)
+            except OSError:
+                pass
+            release_cuda(torch)
+            checkpoint_report(
+                report_path,
+                model=args.model,
+                device=device,
+                processed=processed,
+                failures=failures,
+                total=len(jobs),
+            )
+
     return 1 if failures else 0
 
 

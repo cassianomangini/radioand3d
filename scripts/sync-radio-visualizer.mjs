@@ -3,10 +3,12 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
   renameSync,
+  statSync,
   writeFileSync
 } from "node:fs";
-import { join, resolve } from "node:path";
+import { extname, join, relative, resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import {
   HeadObjectCommand,
@@ -17,9 +19,9 @@ import {
 import {
   analysisFingerprint,
   analysisObjectKey,
-  encodePublicObjectUrl,
   fingerprintMetadata,
   isAudioObject,
+  reconcileR2CatalogWithLocalFiles,
   sidecarIsCurrent
 } from "./lib/visualizer-batch.mjs";
 
@@ -27,6 +29,7 @@ const ROOT = resolve(import.meta.dirname, "..");
 const WORK_DIRECTORY = join(ROOT, "output/radio-visualizer");
 const CACHE_DIRECTORY = join(WORK_DIRECTORY, "cache");
 const PUBLISH_DIRECTORY = join(WORK_DIRECTORY, "publish");
+const RECONCILIATION_REPORT = join(WORK_DIRECTORY, "reconciliation.json");
 const PYTHON_HELPER = join(ROOT, "scripts/analyze-radio-visualizer.py");
 const REQUIREMENTS = join(ROOT, "scripts/requirements-visualizer-analysis.txt");
 const VENV_DIRECTORY = join(WORK_DIRECTORY, ".venv");
@@ -37,9 +40,11 @@ const VENV_PYTHON = join(
 const REQUIREMENTS_MARKER = join(CACHE_DIRECTORY, "python-requirements.sha256");
 
 function usage() {
-  return "Usage: pnpm visualizer:sync [options]\n\n" +
-    "Processes the complete R2 radio catalog, uploads every missing/stale sidecar, and resumes safely.\n\n" +
+  return "Usage: pnpm visualizer:sync -- <local-audio-directory> [options]\n" +
+    "   or: RADIO_LOCAL_AUDIO_DIR=<directory> pnpm visualizer:sync\n\n" +
+    "R2 defines the canonical radio catalog. Audio analysis reads the matching files from the local directory; no music is downloaded.\n\n" +
     "Options:\n" +
+    "  --audio-dir <directory>  Local Artesopolis radio folder; overrides RADIO_LOCAL_AUDIO_DIR.\n" +
     "  --model <name>           Demucs model (default: htdemucs).\n" +
     "  --device <auto|cpu|cuda> Device selection (default: auto).\n" +
     "  --fps <number>           Analysis frames per second (default: 25).\n" +
@@ -50,8 +55,16 @@ function usage() {
 }
 
 function parseArgs(argv) {
-  const args = argv[0] === "--" ? argv.slice(1) : argv;
+  const raw = argv[0] === "--" ? argv.slice(1) : argv;
+  const args = [...raw];
+  let positionalAudioDirectory = null;
+
+  if (args[0] && !args[0].startsWith("-")) {
+    positionalAudioDirectory = args.shift();
+  }
+
   const options = {
+    audioDirectory: positionalAudioDirectory,
     model: "htdemucs",
     device: "auto",
     fps: 25,
@@ -76,7 +89,8 @@ function parseArgs(argv) {
     if (!value) throw new Error("Missing value for " + argument);
     index += 1;
 
-    if (argument === "--model") options.model = value;
+    if (argument === "--audio-dir") options.audioDirectory = value;
+    else if (argument === "--model") options.model = value;
     else if (argument === "--device") options.device = value;
     else if (argument === "--fps") options.fps = Number.parseFloat(value);
     else if (argument === "--bars") options.bars = Number.parseInt(value, 10);
@@ -131,11 +145,10 @@ function loadProjectEnvironment() {
   loadEnvFile(join(ROOT, ".env"));
 }
 
-function requireEnvironment() {
+function requireEnvironment(options) {
   const values = {
     endpoint: process.env.R2_S3_ENDPOINT,
     bucket: process.env.R2_BUCKET,
-    publicBaseUrl: process.env.R2_PUBLIC_BASE_URL,
     readAccessKeyId: process.env.R2_ACCESS_KEY_ID,
     readSecretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
     writeAccessKeyId: process.env.R2_VISUALIZER_WRITE_ACCESS_KEY_ID,
@@ -148,13 +161,29 @@ function requireEnvironment() {
 
   if (missing.length) {
     throw new Error(
-      "The complete R2 batch requires these values in .env.local: " +
+      "The complete batch requires these R2 values in .env.local: " +
       missing.join(", ") +
-      ". The visualizer write credential must have PutObject permission only for _analysis/v1/*."
+      ". The visualizer write credential should be restricted to _analysis/v1/*."
     );
   }
 
-  return values;
+  const audioDirectoryValue =
+    options.audioDirectory ||
+    process.env.RADIO_LOCAL_AUDIO_DIR;
+
+  if (!audioDirectoryValue) {
+    throw new Error(
+      "Local radio folder is required. Set RADIO_LOCAL_AUDIO_DIR in .env.local or run: " +
+      'pnpm visualizer:sync -- "D:\\Músicas\\radio artesopolis"'
+    );
+  }
+
+  const audioDirectory = resolve(audioDirectoryValue);
+  if (!existsSync(audioDirectory) || !statSync(audioDirectory).isDirectory()) {
+    throw new Error("Local radio folder was not found: " + audioDirectory);
+  }
+
+  return { ...values, audioDirectory };
 }
 
 function writeJsonAtomic(path, value) {
@@ -283,6 +312,32 @@ async function listAudioObjects(client, bucket) {
   return objects.sort((left, right) => left.Key.localeCompare(right.Key, "pt-BR"));
 }
 
+function walkLocalAudioFiles(rootDirectory) {
+  const result = [];
+
+  function visit(directory) {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) {
+        visit(path);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      const extension = extname(entry.name).replace(/^\./, "").toLowerCase();
+      if (!isAudioObject("file." + extension)) continue;
+      const stat = statSync(path);
+      result.push({
+        path,
+        relativeId: relative(rootDirectory, path).split(sep).join("/"),
+        size: stat.size
+      });
+    }
+  }
+
+  visit(rootDirectory);
+  return result;
+}
+
 async function mapLimit(items, concurrency, mapper) {
   const result = new Array(items.length);
   let cursor = 0;
@@ -345,7 +400,7 @@ async function verifyWriteAccess(environment) {
 
 const options = parseArgs(process.argv.slice(2));
 loadProjectEnvironment();
-const environment = requireEnvironment();
+const environment = requireEnvironment(options);
 mkdirSync(CACHE_DIRECTORY, { recursive: true });
 mkdirSync(PUBLISH_DIRECTORY, { recursive: true });
 
@@ -355,29 +410,64 @@ const readClient = createR2Client(
   environment.readSecretAccessKey
 );
 
-let audioObjects;
 try {
   process.stdout.write("Reading the complete radio catalog from R2...\n");
-  audioObjects = await listAudioObjects(readClient, environment.bucket);
+  const audioObjects = await listAudioObjects(readClient, environment.bucket);
   if (!audioObjects.length) throw new Error("R2 returned no audio tracks.");
+
   process.stdout.write(
-    "R2 catalog: " + audioObjects.length + " audio track(s). Checking existing analysis...\n"
+    "R2 catalog: " + audioObjects.length + " audio track(s). Reading local Artesopolis folder...\n"
+  );
+  const localFiles = walkLocalAudioFiles(environment.audioDirectory);
+  process.stdout.write(
+    "Local folder: " + localFiles.length + " audio file(s). Reconciling with R2...\n"
   );
 
-  const planned = await mapLimit(audioObjects, 12, async (object, index) => {
-    const trackId = object.Key;
-    const fingerprint = analysisFingerprint(object, options);
-    const sidecarKey = analysisObjectKey(trackId);
+  const reconciliation = reconcileR2CatalogWithLocalFiles(audioObjects, localFiles);
+  writeJsonAtomic(RECONCILIATION_REPORT, {
+    r2Tracks: audioObjects.length,
+    localAudioFiles: localFiles.length,
+    matched: reconciliation.matched.length,
+    missing: reconciliation.missing,
+    ambiguous: reconciliation.ambiguous,
+    sizeMismatches: reconciliation.sizeMismatches
+  });
+
+  if (
+    reconciliation.missing.length ||
+    reconciliation.ambiguous.length ||
+    reconciliation.sizeMismatches.length
+  ) {
+    throw new Error(
+      "Local/R2 reconciliation failed before analysis. " +
+      "Matched " + reconciliation.matched.length + "/" + audioObjects.length +
+      "; missing " + reconciliation.missing.length +
+      "; ambiguous " + reconciliation.ambiguous.length +
+      "; size mismatches " + reconciliation.sizeMismatches.length +
+      ". See output/radio-visualizer/reconciliation.json."
+    );
+  }
+
+  process.stdout.write(
+    "Reconciliation OK: " + reconciliation.matched.length +
+    "/" + audioObjects.length + " R2 tracks matched to identical-size local files. No music download is required.\n"
+  );
+
+  const planned = await mapLimit(reconciliation.matched, 12, async (item, index) => {
+    const fingerprint = analysisFingerprint(item.object, options);
+    const sidecarKey = analysisObjectKey(item.trackId);
     const current = !options.force && await sidecarCurrent(
       readClient,
       environment.bucket,
       sidecarKey,
       fingerprint
     );
-    if ((index + 1) % 40 === 0 || index + 1 === audioObjects.length) {
-      process.stdout.write("Checked " + (index + 1) + "/" + audioObjects.length + "\n");
+    if ((index + 1) % 40 === 0 || index + 1 === reconciliation.matched.length) {
+      process.stdout.write(
+        "Checked sidecars " + (index + 1) + "/" + reconciliation.matched.length + "\n"
+      );
     }
-    return { object, trackId, fingerprint, sidecarKey, current };
+    return { ...item, fingerprint, sidecarKey, current };
   });
 
   const pending = planned.filter((item) => !item.current);
@@ -398,29 +488,27 @@ try {
   const manifestPath = join(WORK_DIRECTORY, "manifest.json");
   const reportPath = join(WORK_DIRECTORY, "report.json");
 
-  const jobs = pending.map((item) => {
-    const outputPath = join(PUBLISH_DIRECTORY, item.sidecarKey);
-    return {
-      trackId: item.trackId,
-      audioUrl: encodePublicObjectUrl(environment.publicBaseUrl, item.trackId),
-      outputPath,
-      objectKey: item.sidecarKey,
-      uploadMetadata: fingerprintMetadata(item.fingerprint),
-      fps: options.fps,
-      barCount: options.bars,
-      voiceBars: options.voiceBars
-    };
-  });
+  const jobs = pending.map((item) => ({
+    trackId: item.trackId,
+    audioPath: item.audioPath,
+    outputPath: join(PUBLISH_DIRECTORY, item.sidecarKey),
+    objectKey: item.sidecarKey,
+    uploadMetadata: fingerprintMetadata(item.fingerprint),
+    fps: options.fps,
+    barCount: options.bars,
+    voiceBars: options.voiceBars
+  }));
 
   writeJsonAtomic(manifestPath, {
     reportPath,
     totalCatalogTracks: audioObjects.length,
+    localAudioDirectory: environment.audioDirectory,
     jobs
   });
 
   process.stdout.write(
     "Starting batch: " + jobs.length +
-    " track(s). Each completed track is uploaded immediately, so reruns resume safely.\n"
+    " pending track(s), reading audio locally and uploading each completed sidecar immediately.\n"
   );
 
   const pythonEnvironment = {
@@ -461,7 +549,7 @@ try {
 
   if (result.status !== 0 || failed > 0) {
     process.stderr.write(
-      "Some tracks failed. Run pnpm visualizer:sync again; current R2 sidecars are skipped and only pending tracks are retried.\n"
+      "Some tracks failed. Run the same command again; current R2 sidecars are skipped and only pending tracks are retried.\n"
     );
     process.exitCode = 1;
   } else {

@@ -48,6 +48,15 @@ def mono_numpy(tensor: Any) -> Any:
     return array.mean(axis=0).astype("float32", copy=False)
 
 
+def stereo_numpy(tensor: Any, np: Any) -> Any:
+    array = tensor.detach().cpu().numpy().astype("float32", copy=False)
+    if array.ndim == 1:
+        return np.stack([array, array], axis=0)
+    if array.shape[0] == 1:
+        return np.repeat(array, 2, axis=0)
+    return array[:2]
+
+
 def relative_db(power: Any, np: Any) -> Any:
     safe = np.maximum(power, 1e-12)
     db = 10.0 * np.log10(safe)
@@ -97,10 +106,221 @@ def fit_frames(values: Any, frame_count: int, np: Any) -> Any:
     return np.concatenate([values, np.repeat(edge, padding, axis=-1)], axis=-1)
 
 
+def smooth_release(values: Any, fps: float, release_seconds: float, np: Any) -> Any:
+    smoothed = np.array(values, dtype=np.float32, copy=True)
+    if smoothed.shape[-1] <= 1:
+        return smoothed
+    decay = float(np.exp(-1.0 / max(fps * release_seconds, 1.0)))
+    for frame in range(1, smoothed.shape[-1]):
+        smoothed[..., frame] = np.maximum(
+            smoothed[..., frame],
+            smoothed[..., frame - 1] * decay,
+        )
+    return smoothed
+
+
+def moving_average(values: Any, width: int, np: Any) -> Any:
+    if width <= 1 or values.shape[-1] <= 1:
+        return values
+    kernel = np.ones(width, dtype=np.float32) / float(width)
+    return np.stack(
+        [
+            np.convolve(row, kernel, mode="same")
+            for row in values
+        ],
+        axis=0,
+    )
+
+
+def spectral_levels(
+    signal: Any,
+    sample_rate: int,
+    hop_length: int,
+    n_fft: int,
+    band_count: int,
+    fmin: float,
+    fmax: float,
+    np: Any,
+    librosa: Any,
+    *,
+    release_seconds: float,
+    average_width: int = 1,
+) -> Any:
+    if band_count <= 0:
+        return np.zeros((0, 1), dtype=np.float32)
+
+    power = librosa.feature.melspectrogram(
+        y=signal,
+        sr=sample_rate,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        n_mels=band_count,
+        fmin=fmin,
+        fmax=fmax,
+        power=2.0,
+        center=True,
+    )
+    levels = robust_band_normalize(power, np)
+    if average_width > 1:
+        levels = moving_average(levels, average_width, np)
+    return smooth_release(levels, sample_rate / hop_length, release_seconds, np)
+
+
+def onset_pulse(
+    signal: Any,
+    sample_rate: int,
+    hop_length: int,
+    frame_count: int,
+    np: Any,
+    librosa: Any,
+) -> Any:
+    onset = librosa.onset.onset_strength(
+        y=signal,
+        sr=sample_rate,
+        hop_length=hop_length,
+        aggregate=np.median,
+    )
+    onset = fit_frames(onset, frame_count, np)
+    if not onset.size or float(np.max(onset)) <= 1e-8:
+        return np.zeros(frame_count, dtype=np.float32)
+
+    scale = max(float(np.percentile(onset, 95)), 1e-6)
+    normalized = np.clip(onset / scale, 0.0, 1.0)
+    peaks = librosa.util.peak_pick(
+        normalized,
+        pre_max=1,
+        post_max=1,
+        pre_avg=2,
+        post_avg=3,
+        delta=0.08,
+        wait=2,
+    )
+    impulses = np.zeros(frame_count, dtype=np.float32)
+    impulses[peaks] = normalized[peaks]
+    return smooth_release(
+        impulses[None, :],
+        sample_rate / hop_length,
+        0.16,
+        np,
+    )[0]
+
+
+def build_instrument_side(
+    instrument_stems: dict[str, Any],
+    channel: int,
+    sample_rate: int,
+    hop_length: int,
+    n_fft: int,
+    side_count: int,
+    fmax: float,
+    np: Any,
+    librosa: Any,
+) -> Any:
+    frame_count = 1
+    for stem in instrument_stems.values():
+        if stem.shape[-1]:
+            frame_count = max(
+                frame_count,
+                1 + int(np.ceil(stem.shape[-1] / hop_length)),
+            )
+
+    bass_count = max(2, int(round(side_count * 0.21)))
+    drum_count = max(3, int(round(side_count * 0.29)))
+    if bass_count + drum_count >= side_count:
+        drum_count = max(2, side_count - bass_count - 1)
+    other_count = side_count - bass_count - drum_count
+
+    reference = next(iter(instrument_stems.values()))
+    zero = np.zeros(reference.shape[-1], dtype=np.float32)
+    bass = instrument_stems.get("bass")
+    drums = instrument_stems.get("drums")
+    bass_signal = bass[channel] if bass is not None else zero
+    drum_signal = drums[channel] if drums is not None else zero
+
+    other_signals = [
+        stem[channel]
+        for name, stem in instrument_stems.items()
+        if name not in {"bass", "drums"}
+    ]
+    if other_signals:
+        other_signal = np.sum(np.stack(other_signals, axis=0), axis=0)
+    else:
+        other_signal = zero
+
+    bass_levels = spectral_levels(
+        bass_signal,
+        sample_rate,
+        hop_length,
+        n_fft,
+        bass_count,
+        35.0,
+        min(650.0, fmax),
+        np,
+        librosa,
+        release_seconds=0.24,
+        average_width=3,
+    )
+    drum_levels = spectral_levels(
+        drum_signal,
+        sample_rate,
+        hop_length,
+        n_fft,
+        drum_count,
+        45.0,
+        min(14_000.0, fmax),
+        np,
+        librosa,
+        release_seconds=0.13,
+        average_width=2,
+    )
+    other_levels = spectral_levels(
+        other_signal,
+        sample_rate,
+        hop_length,
+        n_fft,
+        other_count,
+        90.0,
+        fmax,
+        np,
+        librosa,
+        release_seconds=0.22,
+        average_width=3,
+    )
+
+    frame_count = min(
+        bass_levels.shape[1],
+        drum_levels.shape[1],
+        other_levels.shape[1],
+    )
+    bass_levels = fit_frames(bass_levels, frame_count, np)
+    drum_levels = fit_frames(drum_levels, frame_count, np)
+    other_levels = fit_frames(other_levels, frame_count, np)
+
+    pulse = onset_pulse(
+        drum_signal,
+        sample_rate,
+        hop_length,
+        frame_count,
+        np,
+        librosa,
+    )
+    drum_levels = np.clip(
+        drum_levels * (0.82 + pulse[None, :] * 0.18),
+        0.0,
+        1.0,
+    )
+
+    # Outer -> inner: bass body, drum transients, harmonic/melodic accompaniment.
+    return np.concatenate(
+        [bass_levels, drum_levels, other_levels],
+        axis=0,
+    )
+
+
 def build_bar_matrix(
     mix: Any,
     vocals: Any,
-    instruments: Any,
+    instrument_stems: dict[str, Any],
     sample_rate: int,
     fps: float,
     bar_count: int,
@@ -114,6 +334,8 @@ def build_bar_matrix(
         raise ValueError("voiceBars must be at least 4 and smaller than barCount.")
     if (bar_count - voice_count) % 2:
         raise ValueError("barCount - voiceBars must be even so instruments can surround the center.")
+    if not instrument_stems:
+        raise ValueError("At least one non-vocal Demucs stem is required.")
 
     hop_length = max(256, int(round(sample_rate / fps)))
     actual_fps = sample_rate / hop_length
@@ -122,44 +344,27 @@ def build_bar_matrix(
     outer_count = bar_count - voice_count
     side_count = outer_count // 2
 
-    instrument_stft = librosa.stft(
-        instruments,
-        n_fft=n_fft,
-        hop_length=hop_length,
-        center=True,
+    left_levels = build_instrument_side(
+        instrument_stems,
+        0,
+        sample_rate,
+        hop_length,
+        n_fft,
+        side_count,
+        fmax,
+        np,
+        librosa,
     )
-    instrument_mag = np.abs(instrument_stft)
-    harmonic_mag, percussive_mag = librosa.decompose.hpss(instrument_mag)
-    mel_basis = librosa.filters.mel(
-        sr=sample_rate,
-        n_fft=n_fft,
-        n_mels=outer_count,
-        fmin=40.0,
-        fmax=fmax,
-        norm="slaney",
-    )
-    full_power = mel_basis @ np.square(instrument_mag)
-    harmonic_power = mel_basis @ np.square(harmonic_mag)
-    percussive_power = mel_basis @ np.square(percussive_mag)
-
-    full_norm = robust_band_normalize(full_power, np)
-    harmonic_norm = robust_band_normalize(harmonic_power, np)
-    percussive_norm = robust_band_normalize(percussive_power, np)
-    full_db = relative_db(full_power, np)
-    flux = np.maximum(0.0, np.diff(full_db, axis=1, prepend=full_db[:, :1]))
-    flux_norm = robust_event_normalize(flux, np)
-
-    instrument_levels = np.maximum.reduce(
-        [
-            full_norm * 0.70,
-            harmonic_norm * 0.92,
-            percussive_norm * 0.98,
-        ]
-    )
-    instrument_levels = np.clip(
-        instrument_levels + flux_norm * 0.28,
-        0.0,
-        1.0,
+    right_levels = build_instrument_side(
+        instrument_stems,
+        1,
+        sample_rate,
+        hop_length,
+        n_fft,
+        side_count,
+        fmax,
+        np,
+        librosa,
     )
 
     voice_power = librosa.feature.melspectrogram(
@@ -180,8 +385,13 @@ def build_bar_matrix(
         strong_db=-30.0,
     )
 
-    frame_count = min(instrument_levels.shape[1], voice_norm.shape[1])
-    instrument_levels = fit_frames(instrument_levels, frame_count, np)
+    frame_count = min(
+        left_levels.shape[1],
+        right_levels.shape[1],
+        voice_norm.shape[1],
+    )
+    left_levels = fit_frames(left_levels, frame_count, np)
+    right_levels = fit_frames(right_levels, frame_count, np)
     voice_norm = fit_frames(voice_norm, frame_count, np)
 
     mix_rms = fit_frames(
@@ -215,14 +425,13 @@ def build_bar_matrix(
     )
 
     bars = np.zeros((bar_count, frame_count), dtype=np.float32)
-    for index in range(side_count):
-        bars[index, :] = instrument_levels[index * 2, :]
-        bars[bar_count - 1 - index, :] = instrument_levels[index * 2 + 1, :]
+    bars[:side_count, :] = left_levels
+    bars[bar_count - side_count:, :] = right_levels[::-1, :]
 
     center_start = side_count
     bars[center_start:center_start + voice_count, :] = voice_levels
 
-    bars = np.power(np.clip(bars, 0.0, 1.0), 0.82)
+    bars = np.power(np.clip(bars, 0.0, 1.0), 0.88)
     duration = len(mix) / sample_rate
     return bars, actual_fps, center_start, voice_count, duration
 
@@ -243,7 +452,7 @@ def encode_payload(
         quantized.tobytes(order="C")
     ).decode("ascii")
     return {
-        "version": 1,
+        "version": 2,
         "source": "demucs+librosa",
         "model": model,
         "fps": round(float(fps), 6),
@@ -488,37 +697,38 @@ def main() -> int:
                 )
 
             vocals_tensor = stems["vocals"]
-            instrument_tensors = [
-                source
+            instrument_tensors = {
+                name: source
                 for name, source in stems.items()
                 if name != "vocals"
-            ]
+            }
             if not instrument_tensors:
                 raise RuntimeError(
                     "The selected Demucs model returned no instrumental stems."
                 )
 
-            instruments_tensor = instrument_tensors[0].clone()
-            for source in instrument_tensors[1:]:
-                instruments_tensor += source
-
             mix = mono_numpy(origin)
             vocals = mono_numpy(vocals_tensor)
-            instruments = mono_numpy(instruments_tensor)
+            instrument_stems = {
+                name: stereo_numpy(source, np)
+                for name, source in instrument_tensors.items()
+            }
             length = min(
-                len(mix),
-                len(vocals),
-                len(instruments),
+                [len(mix), len(vocals)]
+                + [stem.shape[-1] for stem in instrument_stems.values()]
             )
             mix = mix[:length]
             vocals = vocals[:length]
-            instruments = instruments[:length]
+            instrument_stems = {
+                name: stem[:, :length]
+                for name, stem in instrument_stems.items()
+            }
 
             bars, actual_fps, center_start, voice_count, duration = (
                 build_bar_matrix(
                     mix,
                     vocals,
-                    instruments,
+                    instrument_stems,
                     samplerate,
                     float(job["fps"]),
                     int(job["barCount"]),

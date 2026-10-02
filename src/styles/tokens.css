@@ -73,9 +73,11 @@
   --motion-expand: 260ms;
   --motion-signature: 680ms;
   --motion-signature-close: 560ms;
+  --motion-divider-settle: 420ms;
   --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-signature: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-signature-close: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-divider-spring: cubic-bezier(0.18, 0.9, 0.22, 1.08);
 
   --layer-base: 0;
   --layer-nav: 20;

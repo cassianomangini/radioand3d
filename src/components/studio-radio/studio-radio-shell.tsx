@@ -16,7 +16,13 @@ import styles from "./studio-radio-shell.module.css";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
-import { getRadioDragPreview } from "./radio-panel-drag";
+import {
+  createRadioSnapPoints,
+  getRadioDragMagnet,
+  getRadioDragPreview,
+  getRadioReleaseTarget,
+  type RadioSnapKind
+} from "./radio-panel-drag";
 
 const DEFAULT_RADIO_WIDTH = 480;
 const MIN_RADIO_WIDTH = 400;
@@ -399,6 +405,9 @@ export function StudioRadioShell() {
   const customWidthRef = useRef(false);
   const dragOffsetRef = useRef(0);
   const dragStartXRef = useRef(0);
+  const dragLastXRef = useRef(0);
+  const dragLastTimeRef = useRef(0);
+  const dragPointerVelocityRef = useRef(0);
   const dragStartDistanceRef = useRef(0);
   const dragOriginRef = useRef<"sidebar" | "fullscreen">("sidebar");
   const initialRadioWidthRef = useRef(DEFAULT_RADIO_WIDTH);
@@ -411,11 +420,13 @@ export function StudioRadioShell() {
   const openedFromDragRef = useRef(false);
   const previewResetFrameRef = useRef<number | null>(null);
   const motionResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dividerSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [radioExpanded, setRadioExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [radioFullscreen, setRadioFullscreen] = useState(false);
   const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
+  const [dividerSettling, setDividerSettling] = useState(false);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
@@ -478,6 +489,7 @@ export function StudioRadioShell() {
 
   useEffect(() => () => {
     if (motionResetTimerRef.current !== null) clearTimeout(motionResetTimerRef.current);
+    if (dividerSettleTimerRef.current !== null) clearTimeout(dividerSettleTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -539,6 +551,31 @@ export function StudioRadioShell() {
     if (!shell) return;
     shell.style.removeProperty("--radio-preview-width");
     delete shell.dataset.radioPreview;
+  }
+
+  function setDividerMagnet(snap: RadioSnapKind | null) {
+    const shell = shellRef.current;
+    if (!shell) return;
+    if (snap) shell.dataset.radioMagnet = snap;
+    else delete shell.dataset.radioMagnet;
+  }
+
+  function settleDivider(targetWidth: number, snap: RadioSnapKind | null) {
+    if (!snap) return;
+
+    if (dividerSettleTimerRef.current !== null) {
+      clearTimeout(dividerSettleTimerRef.current);
+    }
+
+    setDividerSettling(true);
+    customWidthRef.current = snap === "compact";
+    setRadioExpanded(snap === "focus");
+    setRadioWidth(targetWidth);
+
+    dividerSettleTimerRef.current = setTimeout(() => {
+      setDividerSettling(false);
+      dividerSettleTimerRef.current = null;
+    }, 460);
   }
 
   function clearReturnPreview() {
@@ -630,6 +667,9 @@ export function StudioRadioShell() {
     dragRestoredRef.current = false;
     dragOffsetRef.current = rect.right - event.clientX - initialRadioWidthRef.current;
     dragStartXRef.current = event.clientX;
+    dragLastXRef.current = event.clientX;
+    dragLastTimeRef.current = event.timeStamp;
+    dragPointerVelocityRef.current = 0;
     dragStartDistanceRef.current = event.clientX - rect.left;
     returnDistanceRef.current = Math.max(0, rect.width - initialRadioWidthRef.current - event.currentTarget.getBoundingClientRect().width);
     pointerActiveRef.current = true;
@@ -652,6 +692,13 @@ export function StudioRadioShell() {
 
     const rect = shell.getBoundingClientRect();
     pointerMovedRef.current = true;
+
+    const elapsed = Math.max(8, event.timeStamp - dragLastTimeRef.current);
+    const instantPointerVelocity = (event.clientX - dragLastXRef.current) / elapsed;
+    dragPointerVelocityRef.current =
+      dragPointerVelocityRef.current * 0.56 + instantPointerVelocity * 0.44;
+    dragLastXRef.current = event.clientX;
+    dragLastTimeRef.current = event.timeStamp;
 
     if (dragOriginRef.current === "fullscreen") {
       const distance = Math.min(returnDistanceRef.current, Math.max(0, event.clientX - dragStartXRef.current));
@@ -692,8 +739,17 @@ export function StudioRadioShell() {
       return;
     }
 
+    const clampedRequested = clampRadioWidth(rect.width, requested);
+    const snapPoints = createRadioSnapPoints(
+      MIN_RADIO_WIDTH,
+      getDefaultWidth(rect.width),
+      getExpandedWidth(rect.width)
+    );
+    const magnet = getRadioDragMagnet(clampedRequested, snapPoints);
+
     customWidthRef.current = true;
-    updateRadioWidth(requested);
+    updateRadioWidth(magnet.width);
+    setDividerMagnet(magnet.snap);
     setRadioExpanded(false);
     if (preview.ready) {
       openRadioFullscreen(true);
@@ -715,14 +771,44 @@ export function StudioRadioShell() {
     const shouldToggle = event.type === "pointerup" && !pointerMovedRef.current;
     const shouldRestore = event.type === "pointercancel" && dragOriginRef.current === "sidebar" && dragFullscreenRef.current;
     const shouldReturn = event.type === "pointerup" && dragOriginRef.current === "fullscreen" && returnOffsetRef.current >= returnDistanceRef.current / 2;
+    const shouldSettle =
+      event.type === "pointerup" &&
+      pointerMovedRef.current &&
+      dragOriginRef.current === "sidebar" &&
+      !dragFullscreenRef.current &&
+      !dragRestoredRef.current;
+
     pointerActiveRef.current = false;
     setDragging(false);
+
     if (shouldRestore || shouldReturn) {
       closeRadioFullscreen(false);
     } else if (shouldToggle) {
       if (radioFullscreen) closeRadioFullscreen();
       else toggleRadioExpanded();
+    } else if (shouldSettle) {
+      const shell = shellRef.current;
+      if (shell) {
+        const rect = shell.getBoundingClientRect();
+        const releasedWidth = clampRadioWidth(
+          rect.width,
+          rect.right - event.clientX - dragOffsetRef.current
+        );
+        const snapPoints = createRadioSnapPoints(
+          MIN_RADIO_WIDTH,
+          getDefaultWidth(rect.width),
+          getExpandedWidth(rect.width)
+        );
+        const target = getRadioReleaseTarget(
+          releasedWidth,
+          -dragPointerVelocityRef.current,
+          snapPoints
+        );
+        settleDivider(target.width, target.snap);
+      }
     }
+
+    setDividerMagnet(null);
     previewResetFrameRef.current = requestAnimationFrame(() => {
       clearDragPreview();
       clearReturnPreview();
@@ -788,7 +874,7 @@ export function StudioRadioShell() {
   }
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
       <header className={styles.siteHeader}>
         <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />

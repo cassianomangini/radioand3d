@@ -2492,6 +2492,19 @@
     cursor: grabbing;
   }
 
+  .desktopShell[data-radio-magnet] .resizeHandle {
+    filter: brightness(1.08) saturate(1.06);
+    box-shadow: -0.15rem 0 1rem rgb(82 214 255 / 22%);
+  }
+
+  .site[data-radio-divider-settling="true"] .desktopShell,
+  .site[data-radio-divider-settling="true"] .siteHeader,
+  .site[data-radio-divider-settling="true"] .resizeHandle,
+  .site[data-radio-divider-settling="true"] .radioPanel {
+    transition-duration: var(--motion-divider-settle);
+    transition-timing-function: var(--ease-divider-spring);
+  }
+
   .site[data-radio-layout-motion] .desktopShell,
   .site[data-radio-layout-motion] .siteHeader,
   .site[data-radio-layout-motion] .resizeHandle,

@@ -18,6 +18,7 @@ import {
   S3Client
 } from "@aws-sdk/client-s3";
 import {
+  ANALYSIS_PREFIX,
   analysisFingerprint,
   analysisObjectKey,
   fingerprintMetadata,
@@ -476,14 +477,14 @@ async function verifyWriteAccess(environment) {
   try {
     await client.send(new PutObjectCommand({
       Bucket: environment.bucket,
-      Key: "_analysis/v1/_pipeline-write-check.json",
+      Key: `${ANALYSIS_PREFIX}/_pipeline-write-check.json`,
       Body: "{}\n",
       ContentType: "application/json; charset=utf-8",
       CacheControl: "no-store"
     }));
   } catch (error) {
     throw new Error(
-      "The available R2 credential cannot write to _analysis/v1/*. " +
+      "The available R2 credential cannot write to " + ANALYSIS_PREFIX + "/*. " +
       "Either grant write permission to the current R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY, " +
       "or configure dedicated R2_VISUALIZER_WRITE_ACCESS_KEY_ID / R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY values. " +
       (error instanceof Error ? error.message : String(error))

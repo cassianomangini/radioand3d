@@ -343,6 +343,7 @@ export function StudioRadioShell() {
   const openedFromDragRef = useRef(false);
   const previewResetFrameRef = useRef<number | null>(null);
   const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const motionCommitRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [radioExpanded, setRadioExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -410,6 +411,7 @@ export function StudioRadioShell() {
 
   useEffect(() => () => {
     if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
+    if (motionCommitRef.current !== null) clearTimeout(motionCommitRef.current);
   }, []);
 
   useEffect(() => {
@@ -453,13 +455,17 @@ export function StudioRadioShell() {
     customWidthRef.current = false;
 
     if (radioExpanded) {
-      setRadioWidth(getDefaultWidth(shellWidth));
-      setRadioExpanded(false);
+      runRadioMotion("closing", () => {
+        setRadioWidth(getDefaultWidth(shellWidth));
+        setRadioExpanded(false);
+      });
       return;
     }
 
-    setRadioWidth(getExpandedWidth(shellWidth));
-    setRadioExpanded(true);
+    runRadioMotion("opening", () => {
+      setRadioWidth(getExpandedWidth(shellWidth));
+      setRadioExpanded(true);
+    });
   }
 
   function clearDragPreview() {
@@ -483,7 +489,37 @@ export function StudioRadioShell() {
     snapTimerRef.current = setTimeout(() => {
       setSnapDirection(null);
       snapTimerRef.current = null;
-    }, 620);
+    }, 980);
+  }
+
+  function runRadioMotion(direction: "opening" | "closing", update: () => void) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (motionCommitRef.current !== null) {
+      clearTimeout(motionCommitRef.current);
+      motionCommitRef.current = null;
+    }
+    if (reduce) {
+      if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
+      snapTimerRef.current = null;
+      setSnapDirection(null);
+      update();
+      return;
+    }
+
+    if (direction === "closing") {
+      animateRadioSnap("closing");
+      motionCommitRef.current = setTimeout(() => {
+        motionCommitRef.current = null;
+        if (snapTimerRef.current !== null) clearTimeout(snapTimerRef.current);
+        snapTimerRef.current = null;
+        setSnapDirection(null);
+        update();
+      }, 620);
+      return;
+    }
+
+    animateRadioSnap("opening");
+    update();
   }
 
   function openRadioFullscreen(fromDrag: boolean) {
@@ -493,27 +529,22 @@ export function StudioRadioShell() {
     }
     openedFromDragRef.current = fromDrag;
     dragFullscreenRef.current = true;
-    if (fromDrag) {
-      previewResetFrameRef.current = requestAnimationFrame(() => {
-        clearDragPreview();
-        previewResetFrameRef.current = null;
-      });
-    } else {
+    runRadioMotion("opening", () => {
       clearDragPreview();
-    }
-    animateRadioSnap("opening");
-    setRadioFullscreen(true);
+      setRadioFullscreen(true);
+    });
   }
 
   function closeRadioFullscreen(restoreFocus = true) {
-    animateRadioSnap("closing");
-    clearDragPreview();
-    dragFullscreenRef.current = false;
-    customWidthRef.current = true;
-    setRadioWidth(initialRadioWidthRef.current);
-    setRadioExpanded(false);
-    setRadioFullscreen(false);
-    clearReturnPreview();
+    runRadioMotion("closing", () => {
+      clearDragPreview();
+      dragFullscreenRef.current = false;
+      customWidthRef.current = true;
+      setRadioWidth(initialRadioWidthRef.current);
+      setRadioExpanded(false);
+      setRadioFullscreen(false);
+      clearReturnPreview();
+    });
     if (restoreFocus) {
       requestAnimationFrame(() => {
         (openedFromDragRef.current ? resizeHandleRef.current : radioNavRef.current)?.focus();
@@ -682,8 +713,11 @@ export function StudioRadioShell() {
     if (event.key === "End") {
       event.preventDefault();
       customWidthRef.current = false;
-      setRadioWidth(getExpandedWidth(shell.getBoundingClientRect().width));
-      setRadioExpanded(true);
+      const shellWidth = shell.getBoundingClientRect().width;
+      runRadioMotion("opening", () => {
+        setRadioWidth(getExpandedWidth(shellWidth));
+        setRadioExpanded(true);
+      });
     }
   }
 
@@ -693,6 +727,7 @@ export function StudioRadioShell() {
 
   return (
     <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-snap={snapDirection ?? undefined}>
+      <div className={styles.radioFlash} aria-hidden="true" />
       <header className={styles.siteHeader}>
         <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />

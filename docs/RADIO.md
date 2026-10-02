@@ -68,15 +68,19 @@ Trocas rápidas precisam ignorar resultados antigos. Recarregar a lista ou metad
 
 ## Visualizador
 
-Proposta inicial: `AnalyserNode` nativo para dados de frequência e tempo. A API não desenha nem calibra o visualizador automaticamente: definir bandas, escala, suavização e limites, e testar. Ela analisa sem alterar o som: [MDN](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode).
+O visualizador tem duas camadas. A camada preferencial é uma análise musical offline por faixa; o `AnalyserNode` do navegador permanece como fallback enquanto uma faixa ainda não possui derivado pré-calculado ou quando o sidecar não puder ser carregado.
 
-O sinal deve percorrer fonte → `AnalyserNode` → saída no grafo único. O renderer só anuncia barras reativas depois que o analisador estiver disponível e a reprodução for confirmada. Pausa e indisponibilidade voltam as barras à linha de base sem prometer movimento inexistente.
+A análise offline separa voz e acompanhamento antes da publicação. Voz principal e backing vocals alimentam o miolo do campo visual. Todo o acompanhamento restante — bateria, baixo, violão, guitarra, piano, flauta, synth e qualquer outro conteúdo audível — continua sendo analisado em múltiplas bandas; não é necessário adivinhar o nome do instrumento para ele participar. O acompanhamento combina energia espectral, componente harmônico, componente percussivo e ataques/transientes reais. A normalização é feita por banda para impedir que graves dominem permanentemente e que regiões altas desapareçam só por terem menor energia absoluta.
 
-Meyda, suavização e renderização imperativa não são proibidos por princípio. Reutilizar somente quando houver função justificada, fronteiras limpas e testes. DOM refs ou canvas podem existir no renderer, nunca como contrato do provider de reprodução. Não disparar renderizações da página inteira a cada frame.
+O layout canônico usa voz no centro e acompanhamento ao redor. As bandas instrumentais são dobradas ao redor do miolo em vez de formar uma régua simples grave → agudo da esquerda para a direita. Isso é uma gramática visual, não uma alegação de que determinada barra identifica um instrumento específico. Toda subida de barra deve continuar ligada a energia, harmônico, percussão ou transiente medido no áudio.
 
-Pausar o loop quando a visualização não estiver ativa ou a aba estiver oculta; não parar a música por isso. As barras representam dados do áudio, inclusive quando o navegador reduz animações decorativas. Tolerar falha de canvas/análise sem derrubar reprodução. Testar silêncio e sinal conhecido para evitar barras que pulam sem correspondência ao áudio. Equalizador que modifica frequências é outro recurso, fora do marco inicial.
+O processamento pesado acontece fora do navegador. Cada faixa pode gerar um sidecar versionado com quadros quantizados a aproximadamente 25 Hz. Durante a reprodução, o renderer consulta o `currentTime` do único elemento de áudio, interpola os quadros e desenha as barras sem criar outro relógio ou outra reprodução. O mesmo derivado é reamostrado para a quantidade de barras da Rádio completa ou do mini player.
 
-Cada barra deve derivar somente da energia da própria faixa de frequência. O renderer pode aplicar escala visual e attack/release por barra, mas não deve injetar envelope RMS global, pulso compartilhado entre bandas, boost fixo de "voz" ou movimento sintético para fazer o espectro parecer mais animado. Faixas constantes devem estabilizar; mudanças em uma região do espectro não podem levantar regiões sem energia correspondente.
+Quando o sidecar não existir, o fallback ao vivo usa `AnalyserNode` no grafo único fonte → analisador → saída. O fallback reorganiza o espectro em torno de um miolo de presença média e dobra as demais bandas nas laterais para evitar a antiga rampa visual concentrada à esquerda, mas não deve ser apresentado como separação real de voz/instrumentos.
+
+Pausar o loop quando a visualização não estiver ativa ou a aba estiver oculta; não parar a música por isso. Pausa e indisponibilidade voltam as barras à linha de base. Dados ausentes ou sidecar inválido nunca derrubam a reprodução. Não disparar renderizações da página inteira a cada frame.
+
+Movimento sintético continua proibido: sem metrônomo inventado, pulso global compartilhado, boost fixo de "voz" ou barras subindo sem evidência no sinal. Equalização que altera o som é outro recurso e permanece fora deste marco.
 
 ## Letras sincronizadas
 

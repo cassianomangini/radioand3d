@@ -49,4 +49,8 @@ test("R2 track keeps the object key and encodes its public URL", () => {
     track.src,
     "https://radio.example.com/m%C3%BAsicas/CMangic%20-%20Luz%20%231%20(1).mp3"
   );
+  assert.equal(
+    track.visualizerAnalysisSrc,
+    "https://radio.example.com/_analysis/v1/e2eabd9774c9194f460a97bb6884c0ca36d312fd74621dcc336f137ca9cbbbf7.json"
+  );
 });

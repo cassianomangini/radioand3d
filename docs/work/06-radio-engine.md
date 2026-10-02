@@ -81,3 +81,26 @@ Cassiano aprovou a altura do espaço, mas percebeu que as barras ocupavam pouco 
 
 
 Em 01/10, uma revisão da implementação já integrada à `main` mostrou que os ajustes perceptivos tinham acumulado heurísticas que fabricavam movimento: boost fixo de médios tratado como faixa vocal, pulso compartilhado de médios, ataque RMS global reaplicado ao grave e flux/onset usados para manter barras dançando mesmo com espectro estável. A correção de fidelidade remove essas dependências cruzadas. O visualizador passa a ler FFT em dB com `getFloatFrequencyData`, usa FFT 4096, cobre aproximadamente 40 Hz–18 kHz, integra a potência real de cada banda com sobreposição fracionária dos bins e aplica somente attack/release por barra. Os testes agora exigem isolamento entre bandas, ausência de boost vocal artificial, representação acima de 12 kHz e estabilização quando o espectro permanece constante. A confirmação perceptiva com músicas reais continua pendente com Cassiano.
+
+
+## Visualizador musical aprovado em 02/10/2026
+
+Cassiano rejeitou a leitura puramente grave → agudo porque ela concentrava movimento à esquerda, deixava a direita quase parada e não comunicava voz/instrumentos da forma desejada. A direção aprovada passa a ser **voz no miolo e todo o acompanhamento ao redor**, com cada evento audível participando: bateria, baixo, violão, guitarra, piano, flauta, synth, backing vocals ou qualquer outro instrumento presente.
+
+Handoff de experiência para este recorte:
+
+- target_surface: visualizador da Rádio completa + mini player;
+- variance: 7; motion: 8; density: 6;
+- desktop: 36 barras canônicas; o miolo recebe o stem vocal e as laterais recebem acompanhamento multibanda;
+- mobile: usa o mesmo derivado reamostrado para 24 barras, sem criar outra análise ou outro player;
+- audio_behavior: Demucs separa voz; o acompanhamento usa energia multibanda + componente harmônico + componente percussivo + transientes; a posição horizontal deixa de ser uma régua simples grave → agudo;
+- fallback: FFT ao vivo reorganizado em torno do centro enquanto não houver sidecar;
+- reduced_motion: não remove a informação do áudio; apenas evita movimento decorativo externo;
+- must_not_invent: instrumento nominal por barra, pulso global, batida sintética, boost fixo de voz ou movimento sem sinal;
+- ready_for_frontend: yes;
+- approved_by: Cassiano;
+- artifact_ref: `docs/work/06-radio-engine.md#visualizador-musical-aprovado-em-02102026`.
+
+Implementação: branch `feat/musical-visualizer-analysis`. O pipeline final é `pnpm visualizer:sync`, sem seleção manual de faixa. O R2 continua definindo o catálogo canônico, mas o áudio para análise vem da pasta local Artesopolis configurada por `RADIO_LOCAL_AUDIO_DIR` ou passada uma vez ao comando. Antes do processamento, o lote reconcilia as 343 entradas do R2 com os arquivos locais e exige correspondência de tamanho, recusando faltas, duplicidades ambíguas ou divergências. Ele compara cada faixa com o sidecar remoto por ETag/tamanho/configuração, prepara automaticamente o ambiente Python na primeira execução e processa somente o que estiver pendente. O modelo `htdemucs` permanece carregado para o lote, o stem vocal ocupa o centro e todos os stems não vocais são somados novamente antes da análise instrumental, portanto guitarra/flauta/violão ou qualquer outro instrumento audível não é descartado por não possuir classe própria. Cada sidecar pronto é publicado imediatamente em `_analysis/v1/<sha256-do-track-id>.json`; nenhuma música é baixada do R2. Se o processo for interrompido, uma nova execução pula tudo que já estiver atual no R2 e continua das pendentes. O browser usa o `currentTime` do mesmo `HTMLAudioElement` para interpolar os quadros; até um sidecar existir, permanece o fallback ao vivo.
+
+O PR #17 representa a tentativa anterior de calibrar o espectro tradicional e não deve ser tratado como solução final deste requisito.

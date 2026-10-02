@@ -38,6 +38,8 @@ export function decodeMusicalVisualizerAnalysis(value: unknown): DecodedMusicalV
   if (!value || typeof value !== "object") return null;
   const payload = value as Partial<MusicalVisualizerPayload>;
   const layout = payload.layout;
+  const barCount = payload.barCount;
+  const frameCount = payload.frameCount;
 
   if (
     payload.version !== 1 ||
@@ -45,19 +47,21 @@ export function decodeMusicalVisualizerAnalysis(value: unknown): DecodedMusicalV
     payload.encoding !== "base64-u8" ||
     typeof payload.model !== "string" ||
     !isFinitePositive(payload.fps) ||
-    !Number.isInteger(payload.barCount) || payload.barCount < 8 || payload.barCount > 96 ||
-    !Number.isInteger(payload.frameCount) || payload.frameCount < 1 ||
+    typeof barCount !== "number" ||
+    !Number.isInteger(barCount) || barCount < 8 || barCount > 96 ||
+    typeof frameCount !== "number" ||
+    !Number.isInteger(frameCount) || frameCount < 1 ||
     !isFinitePositive(payload.duration) ||
     !layout || layout.kind !== "voice-center-instruments-around" ||
     !Number.isInteger(layout.voiceStart) || layout.voiceStart < 0 ||
     !Number.isInteger(layout.voiceCount) || layout.voiceCount < 1 ||
-    layout.voiceStart + layout.voiceCount > payload.barCount ||
+    layout.voiceStart + layout.voiceCount > barCount ||
     typeof payload.data !== "string"
   ) {
     return null;
   }
 
-  const expectedBytes = payload.barCount * payload.frameCount;
+  const expectedBytes = barCount * frameCount;
   if (expectedBytes > MAX_ANALYSIS_BYTES) return null;
 
   let data: Uint8Array;
@@ -73,8 +77,8 @@ export function decodeMusicalVisualizerAnalysis(value: unknown): DecodedMusicalV
     source: "demucs+librosa",
     model: payload.model,
     fps: payload.fps,
-    barCount: payload.barCount,
-    frameCount: payload.frameCount,
+    barCount,
+    frameCount,
     duration: payload.duration,
     encoding: "base64-u8",
     layout,

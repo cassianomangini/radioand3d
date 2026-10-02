@@ -187,10 +187,14 @@ function runChecked(command, args, label) {
 function findSystemPython() {
   const candidates = process.platform === "win32"
     ? [
+        { command: "py", prefix: ["-3.11"] },
+        { command: "py", prefix: ["-3.12"] },
         { command: "py", prefix: ["-3"] },
         { command: "python", prefix: [] }
       ]
     : [
+        { command: "python3.11", prefix: [] },
+        { command: "python3.12", prefix: [] },
         { command: "python3", prefix: [] },
         { command: "python", prefix: [] }
       ];

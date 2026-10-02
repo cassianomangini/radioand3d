@@ -6,6 +6,7 @@ import {
   encodePublicObjectUrl,
   fingerprintMetadata,
   isAudioObject,
+  reconcileR2CatalogWithLocalFiles,
   sidecarIsCurrent
 } from "../scripts/lib/visualizer-batch.mjs";
 
@@ -65,4 +66,48 @@ test("remote sidecar metadata makes the full batch resumable", () => {
     ),
     false
   );
+});
+
+
+test("batch reconciles canonical R2 tracks to local Artesopolis files", () => {
+  const audioObjects = [
+    { Key: "CMangic - A.mp3", Size: 100 },
+    { Key: "sub/CMangic - B.m4a", Size: 200 }
+  ];
+  const localFiles = [
+    { path: "D:/radio/CMangic - A.mp3", relativeId: "CMangic - A.mp3", size: 100 },
+    { path: "D:/radio/CMangic - B.m4a", relativeId: "CMangic - B.m4a", size: 200 }
+  ];
+
+  const result = reconcileR2CatalogWithLocalFiles(audioObjects, localFiles);
+
+  assert.equal(result.matched.length, 2);
+  assert.deepEqual(result.missing, []);
+  assert.deepEqual(result.ambiguous, []);
+  assert.deepEqual(result.sizeMismatches, []);
+  assert.equal(result.matched[1].audioPath, "D:/radio/CMangic - B.m4a");
+});
+
+test("batch refuses to analyze when local file size differs from R2", () => {
+  const result = reconcileR2CatalogWithLocalFiles(
+    [{ Key: "CMangic - A.mp3", Size: 100 }],
+    [{ path: "D:/radio/CMangic - A.mp3", relativeId: "CMangic - A.mp3", size: 99 }]
+  );
+
+  assert.equal(result.matched.length, 0);
+  assert.equal(result.sizeMismatches.length, 1);
+  assert.equal(result.sizeMismatches[0].trackId, "CMangic - A.mp3");
+});
+
+test("batch reports ambiguous basename matches instead of guessing", () => {
+  const result = reconcileR2CatalogWithLocalFiles(
+    [{ Key: "remote/CMangic - A.mp3", Size: 100 }],
+    [
+      { path: "D:/radio/x/CMangic - A.mp3", relativeId: "x/CMangic - A.mp3", size: 100 },
+      { path: "D:/radio/y/CMangic - A.mp3", relativeId: "y/CMangic - A.mp3", size: 100 }
+    ]
+  );
+
+  assert.equal(result.matched.length, 0);
+  assert.equal(result.ambiguous.length, 1);
 });

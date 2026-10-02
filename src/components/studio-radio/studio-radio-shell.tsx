@@ -339,6 +339,8 @@ function RadioContent({
           className={styles.playButton}
           onClick={radio.toggle}
           disabled={!canPlay}
+          data-playback-state={radio.status}
+          aria-busy={pending}
           aria-label={pending ? "Cancelar reprodução" : playing ? "Pausar" : "Tocar"}
         >
           <Icon name={playing || pending ? "pause" : "play"} />
@@ -1050,8 +1052,22 @@ export function StudioRadioShell() {
       )
   );
 
+  const playbackStatusMessage =
+    radio.status === "loading"
+      ? "Carregando áudio."
+      : radio.status === "buffering"
+        ? "Aguardando dados de áudio."
+        : radio.status === "playing"
+          ? "Reprodução iniciada."
+          : radio.status === "paused"
+            ? "Reprodução pausada."
+            : "";
+
   return (
     <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
+      <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
+        {playbackStatusMessage}
+      </span>
       <header className={styles.siteHeader}>
         <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
@@ -1138,6 +1154,8 @@ export function StudioRadioShell() {
             className={styles.miniPlay}
             onClick={radio.toggle}
             disabled={!radio.currentTrack}
+            data-playback-state={radio.status}
+            aria-busy={radio.status === "loading" || radio.status === "buffering"}
             aria-label={radio.status === "loading" || radio.status === "buffering" ? "Cancelar reprodução" : radio.status === "playing" ? "Pausar" : "Tocar"}
           >
             <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />

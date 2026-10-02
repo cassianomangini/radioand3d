@@ -842,6 +842,8 @@
   }
 
   .miniPlay {
+    position: relative;
+    isolation: isolate;
     width: 2.45rem;
     min-width: 2.45rem;
     min-height: 2.45rem;
@@ -1326,6 +1328,8 @@
 }
 
 .transport .playButton {
+  position: relative;
+  isolation: isolate;
   min-width: 3.65rem;
   width: 3.65rem;
   min-height: 3.65rem;
@@ -1338,6 +1342,45 @@
 .transport .playButton svg {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+.transport .playButton[data-playback-state="loading"]::after,
+.transport .playButton[data-playback-state="buffering"]::after,
+.miniPlay[data-playback-state="loading"]::after,
+.miniPlay[data-playback-state="buffering"]::after {
+  content: "";
+  position: absolute;
+  inset: -0.24rem;
+  z-index: -1;
+  border: 2px solid rgb(82 214 255 / 22%);
+  border-top-color: #dff9ff;
+  border-right-color: #8b6dff;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: playback-state-orbit 760ms linear infinite;
+}
+
+.transport .playButton[data-playback-state="buffering"]::after,
+.miniPlay[data-playback-state="buffering"]::after {
+  border-color: rgb(82 214 255 / 16%);
+  border-top-color: #74e4ff;
+  border-left-color: #8b6dff;
+  animation-duration: 1180ms;
+}
+
+.transport .playButton[data-playback-state="loading"],
+.transport .playButton[data-playback-state="buffering"],
+.miniPlay[data-playback-state="loading"],
+.miniPlay[data-playback-state="buffering"] {
+  box-shadow:
+    0 0.4rem 1.4rem rgb(48 91 255 / 20%),
+    0 0 0 0.15rem rgb(82 214 255 / 8%);
+}
+
+@keyframes playback-state-orbit {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 .transport > button:not(.playButton):not(:disabled):hover,
@@ -2761,5 +2804,13 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   .transport > button,
   .transport .volumeTrigger {
     transition: none;
+  }
+
+  .transport .playButton[data-playback-state="loading"]::after,
+  .transport .playButton[data-playback-state="buffering"]::after,
+  .miniPlay[data-playback-state="loading"]::after,
+  .miniPlay[data-playback-state="buffering"]::after {
+    animation: none;
+    transform: none;
   }
 }

@@ -24,7 +24,7 @@ test("batch keeps the radio object key as the stable analysis identity", () => {
 
   assert.equal(left, right);
   assert.notEqual(left, other);
-  assert.match(left, /^_analysis\/v1\/[a-f0-9]{64}\.json$/);
+  assert.match(left, /^_analysis\/v2\/[a-f0-9]{64}\.json$/);
 });
 
 test("batch encodes R2 public object URLs without changing the track identity", () => {
@@ -41,7 +41,7 @@ test("batch recognizes the complete supported audio extension set", () => {
   assert.equal(isAudioObject("a.MP3"), true);
   assert.equal(isAudioObject("folder/b.m4a"), true);
   assert.equal(isAudioObject("folder/c.flac"), true);
-  assert.equal(isAudioObject("_analysis/v1/file.json"), false);
+  assert.equal(isAudioObject("_analysis/v2/file.json"), false);
 });
 
 test("remote sidecar metadata makes the full batch resumable", () => {

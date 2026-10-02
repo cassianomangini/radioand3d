@@ -2,397 +2,358 @@
 
 ## Objetivo
 
-Transformar movimento, áudio, transições e resposta de interface em parte estrutural do CM 3D & Radio, não em decoração adicionada depois.
+Transformar movimento, áudio, transições e resposta de interface em parte estrutural do CM 3D & Radio, sem transformar o produto em uma demonstração de efeitos.
 
-A meta perceptiva é simples: o usuário não deve pensar apenas "tem bastante animação". A experiência deve provocar a sensação de que a interface tem mecânica própria, reage ao conteúdo e faz coisas incomuns de forma coerente, fluida e tecnicamente sólida.
+A meta perceptiva é: a pessoa deve perceber uma interface com mecânica própria, continuidade espacial, resposta real à música e comportamento incomum, mas ainda legível, controlável e rápida.
 
-Este plano não substitui o [Roadmap](../ROADMAP.md). O roadmap continua sendo a única fonte de sequência e estado das entregas. Este documento define a arquitetura de motion, o nível de qualidade e as frentes que podem virar PRs quando suas dependências estiverem prontas.
+Este documento **não substitui** o [Roadmap](../ROADMAP.md), [EXPERIENCE.md](../EXPERIENCE.md), [RADIO.md](../RADIO.md) ou [ARCHITECTURE.md](../ARCHITECTURE.md).
 
-## Calibração
+- O roadmap continua sendo a única fonte de sequência e estado macro.
+- EXPERIENCE continua definindo composição, identidade e comportamento visual aprovado.
+- RADIO continua definindo player, fila, áudio, visualizador e continuidade.
+- ARCHITECTURE continua definindo a stack e as regras de dependência.
+- Este documento define o **nível de ambição, a linguagem de movimento, os gates de qualidade e os recortes técnicos** desta evolução.
 
-- Variance geral: 9/10.
-- Motion da Rádio: 9/10.
-- Motion do Estúdio: 3-4/10.
-- Density da Rádio completa: 8/10.
-- Density do Estúdio: 5/10.
-- A Rádio pode ser expressiva, tátil, densa e reativa.
-- O Estúdio deve permanecer mais silencioso, material, fotográfico e premium.
-- Movimento não compensa composição fraca. Se a experiência depende de glow, partículas ou excesso de neon para parecer interessante, reprovar.
+## Calibração por superfície
+
+Não existe um único nível de "loucura" para o site inteiro.
+
+### Rádio completa
+
+- variance: 9/10;
+- motion: 9/10;
+- density: 8/10.
+
+Pode ser expressiva, tátil, densa, reativa e pouco convencional, desde que controles, faixa e playlist continuem dominando a hierarquia.
+
+### Split desktop Estúdio + Rádio
+
+- variance: 8/10;
+- motion: 7/10;
+- density: 6/10.
+
+A assinatura vem da relação física entre os dois mundos, do resize e da continuidade da Rádio, não de ornamentação.
+
+### Estúdio
+
+- variance: 6/10;
+- motion: 3-4/10;
+- density: 5/10.
+
+Precisa continuar calmo, material, fotográfico e premium. Não importar para o Estúdio toda a agitação visual da Rádio.
+
+### Mobile
+
+- variance: 6/10;
+- motion: 5/10;
+- density: 6/10.
+
+Touch, legibilidade e espaço útil têm prioridade sobre espetáculo.
 
 ## Princípios não negociáveis
 
-1. **Movimento tem causa.** Toda animação deve responder a áudio, mudança de estado, seleção, navegação, arraste, foco, expansão, scroll ou outra ação real.
-2. **Áudio verdadeiro.** O visualizador reage a dados medidos. Não usar batida inventada, pulso global, "voz" sintética ou ciclos decorativos.
-3. **Continuidade espacial.** Quando possível, um elemento muda de posição, escala ou papel sem parecer que foi destruído e recriado.
-4. **Um único player.** Motion nunca cria um segundo motor de áudio nem quebra fila, posição, volume ou continuidade entre superfícies.
-5. **Interrupção segura.** Animações precisam aceitar cliques rápidos, seek, troca de faixa, resize e mudança de rota sem deixar estado fantasma.
-6. **Performance faz parte do design.** Uma ideia que só funciona em máquina forte não está pronta.
-7. **Reduced motion é uma composição válida.** Não é simplesmente desligar tudo.
-8. **Mobile é outra composição.** Não encolher o desktop.
-9. **Nada pela metade.** Cada frente deve fechar comportamento, estados, acessibilidade, performance e validação perceptiva antes de ser considerada concluída.
-10. **Sem biblioteca por vaidade.** Cada dependência entra por um problema concreto que ela resolve melhor que a stack já existente.
+1. **Movimento tem causa.** Toda animação responde a áudio, estado, seleção, navegação, arraste, foco, expansão, scroll ou outra ação real.
+2. **Áudio verdadeiro.** Visualizador e efeitos audio-reactive usam dados medidos. Sem pulso, voz, beat ou movimento inventado.
+3. **Continuidade espacial.** Quando um elemento continua sendo o mesmo objeto conceitual, preferir transformação/recomposição a destruir e recriar visualmente.
+4. **Um único player.** Nenhum sistema de motion cria outro elemento de áudio ou outro dono da fila.
+5. **Interrupção segura.** Troca rápida, seek, resize, drag, mudança de rota e fechamento de painel não deixam estado fantasma.
+6. **Mobile desde o começo.** Nenhuma frente visual desktop pode ser considerada completa deixando mobile para o fim.
+7. **Performance desde o começo.** O gate final existe, mas cada frente já precisa respeitar orçamento de frame, render e bundle.
+8. **Reduced motion é uma composição válida.** Não é apenas desligar `animation`.
+9. **Sem efeito para esconder design fraco.** Se remover glow e cor fizer a composição desabar, a mecânica ainda não está pronta.
+10. **Sem biblioteca por vaidade.** Dependência nova entra somente junto de um caso real que prove necessidade.
 
-## Arquitetura proposta
+## Estado técnico atual que este plano deve respeitar
+
+O projeto já possui:
+
+- Next.js App Router e React;
+- um único provider/motor persistente da Rádio;
+- fila/controller separados da UI;
+- análise live por Web Audio;
+- pipeline de sidecars offline do visualizador;
+- visualizador real em implementação;
+- resize/expansão desktop já pertencentes à 03b;
+- trabalho de fullscreen por drag já registrado em `feat/desktop-radio-fullscreen-drag`;
+- mini player mobile já existente no recorte atual.
+
+O `package.json` atual não possui Motion, GSAP, Lenis, Three.js ou React Three Fiber.
+
+Portanto, este plano **não autoriza reimplementar o que já existe** e **não autoriza instalar todo o stack de animação antecipadamente**.
+
+## Regra de stack
+
+### CSS / browser nativo
+
+Continua sendo a primeira opção para:
+
+- hover/focus/press simples;
+- mudança curta de cor/opacidade;
+- transição pequena sem coordenação entre componentes;
+- estados que não precisam de timeline, gesto ou shared layout.
 
 ### Motion for React
 
-Responsabilidade principal:
+É o **primeiro candidato** para coordenação de interface quando CSS deixar de ser suficiente:
 
-- microinterações;
 - springs;
-- layout animation;
-- shared layout;
-- presença/entrada/saída;
+- presença;
+- layout/shared layout;
 - gestos;
-- drag;
-- mudança de estado dos componentes;
-- transições do player e da playlist.
+- drag coordenado;
+- transições interrompíveis;
+- recomposição do player/playlist.
 
-É a camada padrão para motion de interface.
+Não instalar para criar abstração vazia. A introdução deve vir junto do primeiro caso de uso real aprovado.
 
-### GSAP + ScrollTrigger
+### GSAP / ScrollTrigger
 
-Usar apenas onde Motion não for a ferramenta certa:
+**Não fazem parte da fundação obrigatória.**
 
-- timelines com múltiplas etapas;
-- cenas coordenadas;
-- progressão ligada ao scroll;
-- pin/scrub controlado;
-- momentos de assinatura com sequência complexa.
+ARCHITECTURE hoje determina que motores de animação não devem ser empilhados por padrão. Portanto GSAP só pode entrar por uma decisão técnica explícita depois de um experimento provar que:
 
-Não usar GSAP para todo hover ou botão.
+1. Motion/CSS não resolvem bem a cena;
+2. existe ganho perceptivo relevante;
+3. o custo de bundle, manutenção e cleanup foi medido;
+4. não existe sobreposição confusa de responsabilidade.
+
+Se aprovado, fica restrito à cena que justificou sua entrada.
 
 ### Lenis
 
-Opcional e condicionado a prova real de ganho.
+Não é dependência planejada do core.
 
-Pode ser usado para sincronizar uma experiência de scroll do Estúdio com GSAP/WebGL. Não entra para "deixar o scroll macio" por padrão e não deve sequestrar comportamento nativo, foco, teclado ou acessibilidade.
-
-### Web Audio + sidecars offline
-
-A fonte de verdade da reação musical continua sendo o pipeline definido em [RADIO.md](../RADIO.md).
-
-Combinar:
-
-- análise offline por faixa;
-- posição real do único elemento de áudio;
-- dados live do AnalyserNode apenas quando necessário;
-- interpolação temporal;
-- um estado normalizado consumível pelos renderers.
+Só pode ser avaliado dentro de um experimento real de scroll do Estúdio, se o scroll nativo + ferramenta escolhida não entregarem sincronização suficiente. Não entra apenas para alterar a "sensação" do scroll.
 
 ### Three.js / React Three Fiber
 
-Não é fundação obrigatória.
+Não é dependência do primeiro marco.
 
-Só entra depois de experimento isolado provar vantagem perceptiva clara sobre DOM/CSS/Motion. Casos aceitáveis incluem profundidade real, iluminação/material interativo ou exploração espacial de uma peça.
+Só entra após prova isolada demonstrar que profundidade, luz, material ou exploração espacial agregam algo que DOM/CSS/Motion não entregam. Precisa de fallback e orçamento de GPU/mobile.
 
-Não usar para:
+## Organização do motion
 
-- impressora girando sem função;
-- partículas genéricas;
-- starfield;
-- objetos decorativos;
-- "3D porque o site fala de impressão 3D".
+A arquitetura já reserva `src/components/motion/` para primitives/presets compartilhados. Não criar outro framework paralelo.
 
-## Motion system
+Regras:
 
-Antes de espalhar animações pela aplicação, criar vocabulário centralizado.
+- tokens globais de duração/easing ficam na fonte canônica de tokens;
+- primitives compartilhadas ficam em `src/components/motion/` quando houver repetição real;
+- comportamento específico da Rádio continua dentro do domínio da Rádio;
+- audio-motion não deve transformar dados do áudio em estado React global a cada frame;
+- não criar dezenas de presets abstratos antes de existirem consumidores.
 
-Estrutura de referência:
-
-```text
-motion/
-  tokens
-  springs
-  easings
-  durations
-  reduced-motion
-  audio-motion
-  transitions
-```
-
-O vocabulário deve representar sensação e função, por exemplo:
+Vocabulário de sensação pode incluir nomes como:
 
 - `snappy`;
 - `mechanical`;
 - `heavy`;
 - `fluid`;
-- `magnetic`;
 - `trackChange`;
 - `panelShift`;
-- `radioExpand`;
-- `studioReveal`.
+- `radioExpand`.
 
-Evitar durações e curvas arbitrárias repetidas em componentes.
+O nome deve representar função/sensação real, não mascarar números arbitrários.
 
-## Frentes de implementação
+# Caminho crítico
 
-As frentes abaixo são recortes técnicos planejados. Elas não são estados do roadmap e não devem gerar checklists vazios antecipadamente.
+As etapas abaixo são o caminho principal. Experimentos opcionais ficam fora dele.
 
-### Frente 1 — Motion Foundation
+## C1 — Motion Foundation mínima
 
-Criar a infraestrutura comum de motion e definir responsabilidades entre CSS, Motion e GSAP.
+Objetivo: criar somente a infraestrutura necessária para as primeiras mecânicas aprovadas.
 
-Entregáveis:
+Inclui:
 
-- tokens de duração/easing/spring;
-- primitives reutilizáveis;
-- política de reduced motion;
-- estratégia de cleanup;
-- convenção para animações interrompíveis;
-- limites de bundle/performance;
-- nenhuma reescrita do player.
+- consolidar tokens de duração/easing existentes;
+- definir política de interruption/cancelamento;
+- definir reduced motion;
+- definir ownership entre CSS e a primeira biblioteca adotada;
+- criar primitives somente quando houver uso real;
+- medir custo da dependência introduzida;
+- preservar o player existente.
+
+Não inclui:
+
+- GSAP;
+- Lenis;
+- Three.js;
+- um "framework de motion" vazio;
+- reescrita dos controles atuais.
 
 Gate:
 
-- fundação reutilizável;
-- lint/typecheck/build pertinentes;
-- nenhuma regressão visual relevante;
-- nenhuma dependência instalada sem uso demonstrado.
+- primeira mecânica real usa a fundação;
+- não existem duas soluções diferentes para a mesma classe de animação;
+- lint/typecheck/build pertinentes passam;
+- nenhuma regressão de player, resize ou mobile.
 
-### Frente 2 — Audio Intelligence Bridge
+## C2 — Audio Motion Contract
 
-Começa após existir amostra real válida do sync de análises.
+Dependência: amostra real válida do sync do visualizador.
+
+Objetivo: transformar dados offline + relógio real do player em um contrato consumível por renderers, sem inventar semântica musical.
+
+Pode expor sinais como:
+
+- energia;
+- bandas;
+- transientes;
+- componente harmônico/percussivo quando disponível;
+- presença vocal derivada do stem real;
+- dinâmica.
+
+Não deve tentar nomear instrumento por barra.
+
+Gate:
+
+- faixas diferentes produzem comportamento diferente;
+- silêncio/passagem calma reduz atividade;
+- seek encontra o quadro correto sem "correr" animação atrasada;
+- sidecar ausente usa fallback sem quebrar áudio;
+- dados por frame não rerenderizam a aplicação inteira.
+
+## C3 — Visualizer 2.0
+
+Objetivo: transformar o visualizador atual em uma superfície musical convincente usando o contrato aprovado em RADIO.
+
+Camadas possíveis:
+
+- macro energy;
+- energia por região;
+- transientes;
+- voz central quando disponível;
+- acompanhamento dobrado ao redor do centro;
+- attack/release coerente.
+
+Desktop e mini player usam a mesma análise, reamostrada para suas geometrias.
+
+Gate perceptivo:
+
+- sem movimento metronômico repetido;
+- sem "dança aleatória";
+- regiões diferentes realmente respondem de forma diferente;
+- passagem calma acalma;
+- pausa relaxa;
+- troca de faixa e seek não deixam resíduos;
+- música vocal, instrumental, densa e leve continuam legíveis.
+
+## C4 — Radio Living Interface
+
+Objetivo: fazer seleção e transporte parecerem partes do mesmo software vivo.
+
+Alvos:
+
+- seleção de faixa;
+- playlist -> Now Playing quando houver continuidade espacial real;
+- troca de metadados/capa;
+- play/pause;
+- shuffle/repeat;
+- seek/volume;
+- loading/buffering/error;
+- foco e touch.
+
+Não transformar todo controle em animação de assinatura. A Rádio pode ser rica, mas não pode ficar cansativa.
+
+Gate:
+
+- controles vencem decoração;
+- ações respondem imediatamente;
+- cliques rápidos não deixam estado visual incorreto;
+- keyboard e touch completos;
+- áudio não espera a animação.
+
+## C5 — Split / Focus / Divider refinement
+
+**Esta etapa não cria o fullscreen do zero.**
+
+O fullscreen por drag e a prévia já pertencem ao trabalho atual da 03b. Esta frente começa do comportamento que estiver integrado e aprovado e faz somente o refinamento necessário.
+
+Pode tratar:
+
+- continuidade entre split e fullscreen;
+- recomposição interna da Rádio conforme largura;
+- spring/snap somente se melhorar controle;
+- estados padrão/personalizado/fullscreen;
+- retorno ao split;
+- resize durante viewport change.
+
+Gate:
+
+- não recria player;
+- não perde fila/posição/volume;
+- drag continua direto, sem lag;
+- fullscreen pelo link e pelo gesto converge para o mesmo estado;
+- teclado/pointer permanecem previsíveis;
+- layout não sofre thrashing.
+
+## C6 — Mobile parity e expansão
+
+Mobile é validado em todas as etapas anteriores. Esta etapa é um refinamento específico da relação mini player -> Rádio completa.
 
 Objetivo:
 
-traduzir dados offline + estado live em um modelo único de motion.
-
-Saída conceitual:
-
-```text
-sidecar offline
-      +
-currentTime / live analyzer
-      ↓
-audio motion state
-      ↓
-renderers
-```
-
-Campos devem representar apenas sinais realmente disponíveis, como energia, bandas, transientes, dinâmica e presença vocal quando derivada da separação real.
+- mini player compacto e persistente;
+- abertura da Rádio completa sem parecer uma workstation desktop comprimida;
+- continuidade perceptiva entre origem e destino quando isso ajudar;
+- fechamento devolvendo a pessoa ao ponto útil do Estúdio.
 
 Gate:
 
-- músicas de perfis diferentes produzem comportamento perceptivelmente diferente;
-- silêncio e passagens calmas realmente acalmam;
-- ausência de sidecar não derruba reprodução;
-- nenhum atributo "instrumento" é inventado.
+- primeiro viewport continua pertencendo ao Estúdio;
+- gesto não conflita com scroll;
+- touch targets corretos;
+- rotação/resize preserva estado;
+- nada depende de hover.
 
-### Frente 3 — Visualizer 2.0
+## C7 — Microinteraction integration pass
 
-Substituir a lógica percebida como "barras CSS" por um renderer dirigido pelo áudio.
+Revisar o conjunto depois das grandes mecânicas para remover inconsistências, não para adicionar efeitos em tudo.
 
-Separar pelo menos:
+Cobrir:
 
-- macro energy;
-- distribuição de bandas;
-- transientes;
-- movimento fino;
-- voz central quando disponível;
-- acompanhamento dobrado ao redor do centro.
-
-Gate:
-
-- sem padrão metronômico repetitivo;
-- pausa, seek e troca de faixa não quebram a leitura;
-- mini e full player usam a mesma fonte sem parecer clones redimensionados;
-- comportamento estável em música calma, densa, vocal e instrumental.
-
-### Frente 4 — Radio Living Interface
-
-Fazer a Rádio parecer software vivo, não uma página com controles.
-
-Mecânicas alvo:
-
-- linha selecionada da playlist com continuidade para Now Playing;
-- troca de faixa como transição espacial;
-- play/pause com resposta física;
-- estados de shuffle/repeat/volume/seek coerentes;
-- loading/buffering/error perceptíveis sem espetáculo;
-- shared layout onde houver continuidade real.
-
-Gate:
-
-- controles permanecem mais importantes que decoração;
-- teclado e touch continuam completos;
-- cliques rápidos não deixam estado intermediário travado;
-- continuidade de áudio preservada.
-
-### Frente 5 — Radio Focus Mode
-
-A Rádio pode passar de acoplada para dominante/tela cheia sem virar uma segunda interface.
-
-Ao ganhar espaço:
-
-- playlist recompõe;
-- visualizador expande;
-- Now Playing muda de hierarquia;
-- informações secundárias podem aparecer;
-- controles preservam identidade e posição perceptiva.
-
-Ao voltar, a composição retorna de forma coerente.
-
-Gate:
-
-- nenhuma duplicação do player;
-- nenhuma perda de posição/volume/fila;
-- expansão e retorno funcionam com conteúdo longo e resize.
-
-### Frente 6 — Divider Physics
-
-Transformar o divisor em interação espacial refinada.
-
-Comportamentos possíveis:
-
-- drag real;
-- preview proporcional;
-- limites com resistência;
-- snap/spring apenas quando melhora controle;
-- fullscreen no limite já aprovado;
-- retorno previsível de drag incompleto.
-
-Gate:
-
-- função do divisor continua óbvia;
-- nada de setas, equalizador ou ornamento no handle;
-- pointer, touch e teclado não criam armadilhas;
-- layout não entra em thrashing durante o drag.
-
-### Frente 7 — Page Transition System
-
-Eliminar sensação de tela destruída/recriada quando existe continuidade entre rotas/estados.
-
-Priorizar:
-
-- elementos persistentes;
-- shared identity;
-- transição espacial;
-- áudio contínuo;
-- navegação imediatamente responsiva.
-
-Não tornar API experimental de navegador dependência estrutural da experiência. Pode existir como enhancement futuro se madura e testada.
-
-Gate:
-
-- back/forward funciona;
-- refresh não depende da animação;
-- transição interrompida não deixa overlay/elemento preso;
-- navegação sem motion continua correta.
-
-### Frente 8 — Studio Scroll Experience
-
-Usar scroll como narrativa apenas em trechos que justificam.
-
-Possíveis usos:
-
-- ideia -> preparação -> impressão -> acabamento;
-- impressora/foto mantida como âncora enquanto o conteúdo muda;
-- materiais/cores revelados com relação direta ao conteúdo;
-- progressão espacial curta e controlada.
-
-Evitar:
-
-- cada título aparecendo com fade-up;
-- parallax genérico;
-- scroll sequestrado;
-- múltiplas cenas concorrentes;
-- Rádio e Estúdio brigando por movimento.
-
-Gate:
-
-- sem motion, a informação continua legível;
-- scroll por teclado/touch mantém orientação;
-- nenhuma seção prende o usuário sem necessidade.
-
-### Frente 9 — Depth / WebGL Experiment
-
-Criar prova isolada antes de incorporar WebGL ao produto.
-
-O experimento deve responder:
-
-- o efeito comunica algo que DOM não comunica?;
-- a diferença perceptiva justifica bundle/GPU/complexidade?;
-- existe fallback de imagem/DOM?;
-- funciona em hardware médio e mobile escolhido?;
-- mantém qualidade quando reduced motion estiver ativo?
-
-Se não superar a alternativa, descartar.
-
-### Frente 10 — Microinteraction Pass
-
-Depois das grandes mecânicas, revisar sistematicamente:
-
-- play/pause;
-- next/previous;
-- shuffle/repeat;
-- seek;
-- volume/mute;
-- seleção de playlist;
+- transport;
 - busca;
+- playlist;
+- seek;
+- volume;
 - tooltips;
 - foco;
-- hover;
-- touch;
-- loading;
-- erro;
-- scrollbars internas;
-- botões do Estúdio.
-
-Não aplicar `scale(1.05)` como resposta universal.
+- estados disabled/loading/error;
+- scroll interno;
+- CTA do Estúdio.
 
 Gate:
 
-- famílias de controle compartilham gramática;
-- nenhum feedback atrasa a ação;
-- foco e estado selecionado não dependem apenas de cor.
+- controles equivalentes compartilham gramática;
+- nenhum feedback atrasa ação;
+- foco/seleção não dependem somente de cor;
+- não existe `scale(1.05)` como resposta universal.
 
-### Frente 11 — Mobile Motion Experience
+## C8 — Integrated performance + experience QA
 
-Mobile mantém contrato próprio:
+Performance é verificada em cada etapa. Aqui ocorre a prova integrada.
 
-```text
-header
-mini player persistente
-estúdio
-```
+Medir e observar:
 
-A Rádio completa pode nascer do mini player com continuidade espacial, mas sem comprimir a workstation desktop no celular.
-
-Gate:
-
-- mini player não domina o primeiro viewport;
-- expansão/fechamento retorna ao ponto perceptivo de origem;
-- touch targets e gestos não conflitam com scroll;
-- rotação/resize não perde estado.
-
-### Frente 12 — Performance Gate
-
-Antes de considerar a experiência pronta, medir com áudio e motion ativos ao mesmo tempo.
-
-Revisar:
-
-- frame pacing/FPS;
+- frame pacing;
 - long tasks;
-- layout/reflow;
-- composição GPU;
+- reflow/layout;
 - memória;
 - listeners/timelines órfãos;
 - bundle;
-- canvas/WebGL ocioso;
+- loops de animação invisíveis;
 - aba oculta;
 - resize;
+- drag;
 - navegação;
-- mobile.
-
-Priorizar transform/opacity e valores fora do ciclo de renderização React quando apropriado.
-
-### Frente 13 — Experience QA
+- áudio + motion simultâneos.
 
 Matriz mínima:
 
 - desktop amplo;
-- notebook/desktop mais estreito;
+- notebook/desktop estreito;
+- 1180 px próximo do limite do split;
 - ~390 px mobile;
 - playing;
 - paused;
@@ -401,106 +362,158 @@ Matriz mínima:
 - seek;
 - título longo;
 - lista grande;
-- música lenta;
+- música calma;
 - música densa;
-- música vocal;
+- vocal;
 - instrumental;
-- passagem silenciosa;
+- silêncio/passagem baixa;
 - divider drag;
 - fullscreen/retorno;
-- navegação;
 - reduced motion.
 
-Critério subjetivo adicional:
+Nenhuma frente visual fecha sem revisão perceptiva de Cassiano.
 
-> Se remover glow/neon fizer a experiência perder toda a personalidade, a mecânica/composição ainda está fraca.
+# Extensões condicionais — fora do caminho crítico
 
-## Dependências com o trabalho atual
+Estas ideias podem ser muito fortes, mas **não podem bloquear o marco Estúdio + Rádio**.
 
-Este plano respeita o estado atual do roadmap.
+## X1 — Page continuity / route transitions
 
-- O sync de análises em execução alimenta as Frentes 2 e 3.
-- O motor único, fila e sidecars continuam pertencendo ao contrato de Rádio.
-- A fundação visual 03b precisa continuar estável; motion não autoriza reescrever componentes sem necessidade.
-- A experiência de Rádio 07 é o principal consumidor das Frentes 3 a 7.
-- O Estúdio 08 é o principal consumidor da Frente 8.
-- Letras sincronizadas 06b são independentes do motion system, mas devem compartilhar o mesmo relógio do player.
-- As frentes são abertas conforme dependências reais ficarem disponíveis; não criar treze PRs ou checklists de uma vez.
+Só abrir quando existirem pelo menos dois destinos públicos reais nos quais a continuidade entre elementos faça sentido.
 
-## Ordem de execução pretendida
+Objetivos possíveis:
 
-Quando o roadmap liberar implementação desta camada:
+- preservar identidade;
+- evitar sensação de teardown;
+- manter Rádio contínua;
+- shared layout entre elementos realmente persistentes.
 
-```text
-Motion Foundation
-      ↓
-Audio Intelligence Bridge
-      ↓
-Visualizer 2.0
-      ↓
-Radio Living Interface
-      ↓
-Radio Focus Mode
-      ↓
-Divider Physics
-      ↓
-Page Transitions
-      ↓
-Studio Scroll Experience
-      ↓
-WebGL Experiment
-      ↓
-Microinteraction Pass
-      ↓
-Mobile Motion Experience
-      ↓
-Performance Gate
-      ↓
-Experience QA
-```
+Não criar rota ou arquitetura só para justificar uma transição.
 
-A ordem pode ser ajustada pelo roadmap quando uma dependência concreta mudar, mas não por impulso visual.
+## X2 — Studio Scroll Experience
 
-## Definition of done por frente
+Só abrir quando o Estúdio possuir conteúdo real suficiente para formar narrativa.
 
-Uma frente de motion só pode ser marcada como concluída quando:
+Possíveis casos:
 
-- a mecânica principal está completa;
-- estados de loading/paused/error pertinentes existem;
-- comportamento interrompido foi testado;
-- teclado/touch pertinentes foram testados;
-- reduced motion foi tratado;
-- performance foi observada;
-- não há efeito falso desconectado do estado real;
-- Cassiano fez a revisão perceptiva quando a frente for visual;
-- documentação/contratos afetados foram atualizados.
+- ideia -> preparação -> impressão -> acabamento;
+- mídia real ancorada enquanto contexto muda;
+- materiais/cores com progressão ligada ao conteúdo.
 
-"Funciona em uma gravação" ou "build passou" não fecha entrega visual.
+Proibido preencher a página com conteúdo fictício para viabilizar a cena.
 
-## Anti-slop gate
+GSAP/ScrollTrigger/Lenis só podem ser avaliados aqui mediante o gate de stack descrito acima.
+
+## X3 — Depth / WebGL
+
+Experimento isolado, descartável e comparado com alternativa DOM.
+
+Responder antes de incorporar:
+
+- comunica algo útil?;
+- a melhoria é perceptível sem explicação?;
+- justifica custo de bundle/GPU?;
+- existe fallback?;
+- funciona em hardware médio?;
+- continua coerente em reduced motion?
+
+Se qualquer resposta importante for não, descartar.
+
+# Gates contínuos
+
+Toda frente visível precisa validar, durante a própria implementação:
+
+- desktop e mobile aplicáveis;
+- touch/keyboard;
+- reduced motion;
+- estado interrompido;
+- performance;
+- cleanup;
+- loading/error/disabled pertinentes;
+- ausência de movimento falso;
+- continuidade do player.
+
+Não deixar esses temas para um PR de "polimento".
+
+# Anti-slop gate
 
 Reprovar por padrão:
 
 - fade-up em toda seção;
-- partículas/estrelas genéricas;
-- glow em cada componente;
+- parallax genérico;
+- partículas/estrelas;
+- glow em cada controle;
 - glassmorphism como preenchimento;
-- animação ambiente contínua sem evento;
-- fake equalizer;
-- waveform decorativa sem áudio;
-- WebGL usado apenas para impressionar tecnicamente;
-- cards movendo em direções aleatórias;
+- ambient motion sem evento;
+- fake equalizer/waveform;
+- animações diferentes para controles equivalentes;
 - scroll hijacking;
-- cursores personalizados;
-- movimento que esconde conteúdo até terminar;
-- animações diferentes para componentes equivalentes;
+- cursor customizado;
+- conteúdo escondido até a animação acabar;
 - desktop mini player duplicado;
 - full player desktop espremido no mobile;
-- efeitos que comprometem clareza dos controles.
+- WebGL usado apenas para provar capacidade técnica;
+- biblioteca adicionada sem caso de uso aprovado.
 
-## Estado do artefato
+# Dependências com o roadmap atual
+
+- 03b já contém shell, resize e fullscreen por drag em andamento. Motion novo deve complementar, não reimplementar.
+- 06 fornece motor, analyzer, sidecars e contrato de áudio.
+- O sync atual desbloqueia C2/C3 após validação de uma amostra real.
+- 06b usa o mesmo relógio do player, mas não depende deste plano para funcionar.
+- 07 é o principal consumidor de C3-C6.
+- 08 pode ser entregue sem X2/X3. Scroll cinematográfico e WebGL não são requisito de lançamento.
+- 09 valida o conjunto integrado e não deve esperar extensões opcionais.
+
+# Ordem pretendida
+
+Caminho crítico:
+
+```text
+C1 Motion Foundation mínima
+        ↓
+C2 Audio Motion Contract
+        ↓
+C3 Visualizer 2.0
+        ↓
+C4 Radio Living Interface
+        ↓
+C5 Split / Focus / Divider refinement
+        ↓
+C6 Mobile parity e expansão
+        ↓
+C7 Microinteraction integration pass
+        ↓
+C8 Integrated performance + experience QA
+```
+
+X1/X2/X3 são extensões condicionais independentes e entram somente quando seus pré-requisitos reais existirem.
+
+C1 pode ser iniciada sem esperar o sync, desde que o roadmap permita. C2/C3 dependem da análise real. Mobile, performance, accessibility e reduced motion não esperam C6/C8: são gates contínuos.
+
+# Definition of done por frente
+
+Uma frente só pode ser concluída quando:
+
+- a mecânica principal está inteira;
+- não há implementação paralela antiga fazendo a mesma função;
+- estados pertinentes estão cobertos;
+- interrupção foi testada;
+- desktop/mobile aplicáveis foram tratados;
+- keyboard/touch aplicáveis foram tratados;
+- reduced motion foi tratado;
+- performance foi observada;
+- cleanup foi verificado;
+- não existe efeito falso desconectado do estado real;
+- Cassiano revisou perceptivamente quando a mudança é visual;
+- contratos/checklist/roadmap afetados foram atualizados.
+
+"Build passou", "funciona no meu clique" ou "ficou bonito em uma gravação" não fecha experiência.
+
+# Estado do artefato
 
 - artifact_ref: `CM3D-MOTION-EXPERIENCE-v1`
-- approved_direction: Cassiano, 02/10/2026
+- approved_by: Cassiano
+- approved_scope: nível de ambição e direção de motion
 - ready_for_frontend: `no`
-- motivo: a direção está aprovada para planejamento, mas a camada de áudio depende da validação das análises geradas pelo sync atual e a execução deve ser aberta pelo roadmap, uma frente de cada vez.
+- motivo: este artefato organiza a direção e os gates; cada recorte executável ainda precisa ser aberto no roadmap/checklist vigente. C2/C3 também aguardam validação perceptiva de uma amostra real do sync.

@@ -38,6 +38,11 @@ type DocumentWithViewTransition = Document & {
   startViewTransition?: (update: () => void) => ViewTransitionLike;
 };
 
+type MobileRadioMotionState = {
+  direction: "opening" | "closing";
+  phase: "source" | "destination";
+};
+
 const previewTrack = {
   title: "Limite Elástico",
   artist: "CM",
@@ -159,7 +164,17 @@ function formatTrackDuration(seconds?: number) {
   return seconds && Number.isFinite(seconds) && seconds > 0 ? formatTime(seconds) : "—";
 }
 
-function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: boolean; expanded?: boolean; onClose?: () => void }) {
+function RadioContent({
+  mobile = false,
+  expanded = false,
+  onClose,
+  mobileMotionEndpoint = false
+}: {
+  mobile?: boolean;
+  expanded?: boolean;
+  onClose?: () => void;
+  mobileMotionEndpoint?: boolean;
+}) {
   const radio = useRadio();
   const [query, setQuery] = useState("");
   const [volumeOpen, setVolumeOpen] = useState(false);
@@ -244,6 +259,7 @@ function RadioContent({ mobile = false, expanded = false, onClose }: { mobile?: 
       className={styles.radioContent}
       data-radio-surface={mobile ? "mobile" : "desktop"}
       data-track-flight={trackFlight?.phase}
+      data-mobile-motion-endpoint={mobile && mobileMotionEndpoint ? "true" : undefined}
     >
       <div className={styles.radioHeader} data-radio-motion-key="header">
         <h2><span>CM</span> RÁDIO</h2>
@@ -430,8 +446,12 @@ export function StudioRadioShell() {
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
+  const [mobileRadioMotion, setMobileRadioMotion] = useState<MobileRadioMotionState | null>(null);
   const miniVolumeMenuRef = useRef<HTMLDivElement>(null);
   const miniVolumeButtonRef = useRef<HTMLButtonElement>(null);
+  const miniOpenButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileMotionActiveRef = useRef(false);
+  const mobileMotionTokenRef = useRef(0);
 
   const shellStyle = useMemo(
     () =>
@@ -584,6 +604,69 @@ export function StudioRadioShell() {
     shell.style.removeProperty("--radio-return-offset");
     delete shell.dataset.radioReturning;
     returnOffsetRef.current = 0;
+  }
+
+  function runMobileRadioMotion(direction: "opening" | "closing") {
+    if (mobileMotionActiveRef.current) return;
+
+    const open = direction === "opening";
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const documentWithTransition = document as DocumentWithViewTransition;
+
+    setMiniVolumeOpen(false);
+
+    if (reduce || !documentWithTransition.startViewTransition) {
+      setMobileRadioMotion(null);
+      setMobileRadioOpen(open);
+      if (!open) {
+        requestAnimationFrame(() => miniOpenButtonRef.current?.focus());
+      }
+      return;
+    }
+
+    mobileMotionActiveRef.current = true;
+    const token = ++mobileMotionTokenRef.current;
+
+    flushSync(() => {
+      setMobileRadioMotion({ direction, phase: "source" });
+    });
+
+    try {
+      const transition = documentWithTransition.startViewTransition(() => {
+        flushSync(() => {
+          setMobileRadioOpen(open);
+          setMobileRadioMotion({ direction, phase: "destination" });
+        });
+
+        const dialog = mobileDialogRef.current;
+        if (open && dialog && !dialog.open) {
+          dialog.showModal();
+        } else if (!open && dialog?.open) {
+          dialog.close();
+        }
+      });
+
+      void transition.finished.finally(() => {
+        if (mobileMotionTokenRef.current !== token) return;
+        mobileMotionActiveRef.current = false;
+        setMobileRadioMotion(null);
+        if (!open) {
+          requestAnimationFrame(() => miniOpenButtonRef.current?.focus());
+        }
+      });
+    } catch {
+      mobileMotionActiveRef.current = false;
+      setMobileRadioMotion(null);
+      setMobileRadioOpen(open);
+    }
+  }
+
+  function openMobileRadio() {
+    runMobileRadioMotion("opening");
+  }
+
+  function closeMobileRadio() {
+    runMobileRadioMotion("closing");
   }
 
   function runRadioMotion(direction: "opening" | "closing", update: () => void) {
@@ -873,6 +956,21 @@ export function StudioRadioShell() {
     setMobileMenuOpen(false);
   }
 
+  const miniMotionEndpoint = Boolean(
+    mobileRadioMotion &&
+      (
+        (mobileRadioMotion.direction === "opening" && mobileRadioMotion.phase === "source") ||
+        (mobileRadioMotion.direction === "closing" && mobileRadioMotion.phase === "destination")
+      )
+  );
+  const dialogMotionEndpoint = Boolean(
+    mobileRadioMotion &&
+      (
+        (mobileRadioMotion.direction === "opening" && mobileRadioMotion.phase === "destination") ||
+        (mobileRadioMotion.direction === "closing" && mobileRadioMotion.phase === "source")
+      )
+  );
+
   return (
     <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
       <header className={styles.siteHeader}>
@@ -914,7 +1012,7 @@ export function StudioRadioShell() {
               type="button"
               onClick={() => {
                 closeMobileMenu();
-                setMobileRadioOpen(true);
+                openMobileRadio();
               }}
             >
               Rádio
@@ -927,19 +1025,22 @@ export function StudioRadioShell() {
         ) : null}
       </header>
 
-      <div className={styles.mobileMiniPlayer} role="region" aria-label="Mini player da CM Rádio">
+      <div
+        className={styles.mobileMiniPlayer}
+        role="region"
+        aria-label="Mini player da CM Rádio"
+        data-mobile-motion-endpoint={miniMotionEndpoint ? "true" : undefined}
+      >
         <span className={styles.miniCover}><Image src={radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="64px" unoptimized /></span>
         <span className={styles.miniMeta}>
           <strong>{radio.currentTrack?.title ?? previewTrack.title}</strong>
           <small>{radio.currentTrack?.artist ?? previewTrack.artist}</small>
         </span>
         <button
+          ref={miniOpenButtonRef}
           type="button"
           className={styles.miniOpen}
-          onClick={() => {
-            setMiniVolumeOpen(false);
-            setMobileRadioOpen(true);
-          }}
+          onClick={openMobileRadio}
           aria-label="Abrir rádio completa"
         >
           <Icon name="expand" />
@@ -1051,14 +1152,19 @@ export function StudioRadioShell() {
       <dialog
         ref={mobileDialogRef}
         className={styles.mobileDialog}
+        data-mobile-motion-endpoint={dialogMotionEndpoint ? "true" : undefined}
         onCancel={(event) => {
           event.preventDefault();
-          setMobileRadioOpen(false);
+          closeMobileRadio();
         }}
         onClose={() => setMobileRadioOpen(false)}
         aria-label="CM Rádio completa"
       >
-        <RadioContent mobile onClose={() => setMobileRadioOpen(false)} />
+        <RadioContent
+          mobile
+          mobileMotionEndpoint={dialogMotionEndpoint}
+          onClose={closeMobileRadio}
+        />
       </dialog>
     </div>
   );

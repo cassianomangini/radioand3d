@@ -537,6 +537,11 @@
   backdrop-filter: blur(10px);
 }
 
+.mobileDialog[data-mobile-motion-endpoint="true"]::backdrop {
+  background: rgb(3 5 9 / 68%);
+  backdrop-filter: blur(7px);
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
@@ -2046,6 +2051,66 @@
 :global(::view-transition-old(cm-track-meta-flight)),
 :global(::view-transition-new(cm-track-meta-flight)) {
   animation-duration: 640ms;
+  animation-timing-function: var(--ease-signature);
+  mix-blend-mode: normal;
+}
+
+.mobileMiniPlayer[data-mobile-motion-endpoint="true"],
+dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
+  view-transition-name: cm-mobile-radio-surface;
+}
+
+.mobileMiniPlayer[data-mobile-motion-endpoint="true"] .miniCover,
+.mobileDialog .radioContent[data-mobile-motion-endpoint="true"] .coverArt {
+  view-transition-name: cm-mobile-radio-cover;
+}
+
+.mobileMiniPlayer[data-mobile-motion-endpoint="true"] .miniMeta,
+.mobileDialog .radioContent[data-mobile-motion-endpoint="true"] .coverCaption {
+  view-transition-name: cm-mobile-radio-meta;
+}
+
+.mobileMiniPlayer[data-mobile-motion-endpoint="true"] .miniSignal,
+.mobileDialog .radioContent[data-mobile-motion-endpoint="true"] .visualizer {
+  view-transition-name: cm-mobile-radio-signal;
+}
+
+.mobileMiniPlayer[data-mobile-motion-endpoint="true"] .miniControls,
+.mobileDialog .radioContent[data-mobile-motion-endpoint="true"] .transport {
+  view-transition-name: cm-mobile-radio-controls;
+}
+
+:global(::view-transition-group(cm-mobile-radio-surface)) {
+  z-index: 90;
+  animation-duration: 620ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-old(cm-mobile-radio-surface)),
+:global(::view-transition-new(cm-mobile-radio-surface)) {
+  animation-duration: 620ms;
+  animation-timing-function: var(--ease-signature);
+  mix-blend-mode: normal;
+}
+
+:global(::view-transition-group(cm-mobile-radio-cover)),
+:global(::view-transition-group(cm-mobile-radio-meta)),
+:global(::view-transition-group(cm-mobile-radio-signal)),
+:global(::view-transition-group(cm-mobile-radio-controls)) {
+  z-index: 100;
+  animation-duration: 680ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-old(cm-mobile-radio-cover)),
+:global(::view-transition-new(cm-mobile-radio-cover)),
+:global(::view-transition-old(cm-mobile-radio-meta)),
+:global(::view-transition-new(cm-mobile-radio-meta)),
+:global(::view-transition-old(cm-mobile-radio-signal)),
+:global(::view-transition-new(cm-mobile-radio-signal)),
+:global(::view-transition-old(cm-mobile-radio-controls)),
+:global(::view-transition-new(cm-mobile-radio-controls)) {
+  animation-duration: 680ms;
   animation-timing-function: var(--ease-signature);
   mix-blend-mode: normal;
 }

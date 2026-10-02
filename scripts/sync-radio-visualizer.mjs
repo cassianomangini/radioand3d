@@ -146,16 +146,26 @@ function loadProjectEnvironment() {
 }
 
 function requireEnvironment(options) {
+  const readAccessKeyId = process.env.R2_ACCESS_KEY_ID;
+  const readSecretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
   const values = {
     endpoint: process.env.R2_S3_ENDPOINT,
     bucket: process.env.R2_BUCKET,
-    readAccessKeyId: process.env.R2_ACCESS_KEY_ID,
-    readSecretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-    writeAccessKeyId: process.env.R2_VISUALIZER_WRITE_ACCESS_KEY_ID,
-    writeSecretAccessKey: process.env.R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY
+    readAccessKeyId,
+    readSecretAccessKey,
+    writeAccessKeyId:
+      process.env.R2_VISUALIZER_WRITE_ACCESS_KEY_ID || readAccessKeyId,
+    writeSecretAccessKey:
+      process.env.R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY || readSecretAccessKey
   };
 
-  const missing = Object.entries(values)
+  const required = {
+    endpoint: values.endpoint,
+    bucket: values.bucket,
+    readAccessKeyId: values.readAccessKeyId,
+    readSecretAccessKey: values.readSecretAccessKey
+  };
+  const missing = Object.entries(required)
     .filter(([, value]) => !value)
     .map(([key]) => key);
 
@@ -163,7 +173,7 @@ function requireEnvironment(options) {
     throw new Error(
       "The complete batch requires these R2 values in .env.local: " +
       missing.join(", ") +
-      ". The visualizer write credential should be restricted to _analysis/v1/*."
+      "."
     );
   }
 
@@ -389,8 +399,9 @@ async function verifyWriteAccess(environment) {
     }));
   } catch (error) {
     throw new Error(
-      "R2 visualizer write credential cannot write to _analysis/v1/*. " +
-      "Fix R2_VISUALIZER_WRITE_ACCESS_KEY_ID / R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY before starting the batch. " +
+      "The available R2 credential cannot write to _analysis/v1/*. " +
+      "Either grant write permission to the current R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY, " +
+      "or configure dedicated R2_VISUALIZER_WRITE_ACCESS_KEY_ID / R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY values. " +
       (error instanceof Error ? error.message : String(error))
     );
   } finally {

@@ -7,7 +7,7 @@ import {
 
 function payload(bytes, overrides = {}) {
   return {
-    version: 1,
+    version: 2,
     source: "demucs+librosa",
     model: "htdemucs",
     fps: 2,
@@ -28,7 +28,7 @@ function payload(bytes, overrides = {}) {
 test("rejects malformed musical visualizer payloads", () => {
   assert.equal(decodeMusicalVisualizerAnalysis(payload(new Uint8Array(3))), null);
   assert.equal(
-    decodeMusicalVisualizerAnalysis(payload(new Uint8Array(16), { version: 2 })),
+    decodeMusicalVisualizerAnalysis(payload(new Uint8Array(16), { version: 1 })),
     null
   );
 });

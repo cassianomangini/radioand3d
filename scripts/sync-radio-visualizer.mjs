@@ -344,6 +344,28 @@ function ensurePython(options) {
   return VENV_PYTHON;
 }
 
+
+function verifyAnalysisImports(python) {
+  const imports = [
+    "import boto3",
+    "import imageio_ffmpeg",
+    "import librosa",
+    "import numpy",
+    "import soundfile",
+    "import torch",
+    "from demucs import pretrained",
+    "from demucs.apply import apply_model",
+    "print('cm-radio-analysis-imports-ok')"
+  ].join("; ");
+
+  runChecked(
+    python,
+    ["-c", imports],
+    "Verifying visualizer Python dependencies",
+    cleanPythonEnvironment()
+  );
+}
+
 function createR2Client(endpoint, accessKeyId, secretAccessKey) {
   return new S3Client({
     region: "auto",
@@ -558,6 +580,7 @@ try {
   await verifyWriteAccess(environment);
 
   const python = ensurePython(options);
+  verifyAnalysisImports(python);
   const manifestPath = join(WORK_DIRECTORY, "manifest.json");
   const reportPath = join(WORK_DIRECTORY, "report.json");
 

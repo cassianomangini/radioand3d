@@ -1512,8 +1512,8 @@ export function StudioRadioShell() {
                 tabIndex={studioRoute === "detail" ? 0 : -1}
                 onClick={(event) => handleStudioRouteLink(event, "/")}
               >
-                <span aria-hidden="true">←</span>
                 <span>Voltar ao início</span>
+                <span aria-hidden="true">←</span>
               </Link>
             </div>
           </section>

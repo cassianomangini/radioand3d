@@ -3620,15 +3620,16 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
 .studioDetailRail {
   position: absolute;
-  top: 62%;
-  right: 5%;
-  left: 52%;
+  right: 4.5%;
+  bottom: 4.5%;
+  left: 4.5%;
   z-index: 3;
-  max-width: 46rem;
-  border-top: 1px solid rgb(120 154 187 / 22%);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.65rem, 1.15cqw, 1rem);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(2.5rem) scale(0.985);
+  transform: translateY(2.25rem) scale(0.985);
   transition:
     opacity 420ms ease,
     transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -3641,33 +3642,105 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   transition-delay: 330ms;
 }
 
-.studioDetailRow {
-  display: grid;
-  grid-template-columns: minmax(6.5rem, 0.34fr) minmax(0, 1fr);
-  gap: clamp(1rem, 2vw, 2rem);
-  padding: 1.05rem 0 1.15rem;
-  border-bottom: 1px solid rgb(120 154 187 / 15%);
+.studioDetailCard {
+  position: relative;
+  min-width: 0;
+  min-height: clamp(8.7rem, 16dvh, 10.8rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: clamp(0.9rem, 1.25cqw, 1.15rem);
+  background: linear-gradient(145deg, rgb(13 18 25 / 96%), rgb(5 8 13 / 94%));
+  border: 1px solid rgb(139 166 191 / 18%);
+  border-radius: 0.78rem;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 3%),
+    0 0.8rem 2rem rgb(0 0 0 / 22%);
+  color: inherit;
+  text-decoration: none;
 }
 
-.studioDetailRow > span {
-  color: var(--accent-cyan);
+.studioDetailCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0.9rem;
+  left: 0.9rem;
+  height: 2px;
+  background: linear-gradient(90deg, #42c9ff, #4f74ff);
+  opacity: 0.82;
+}
+
+.studioDetailCard[data-studio-card="materials"]::before {
+  background: linear-gradient(90deg, #7f7cff, #ba64dc);
+}
+
+.studioDetailCard[data-studio-card="store"]::before {
+  background: linear-gradient(90deg, #ff8157, #ee4d2d);
+}
+
+.studioCardLabel {
+  margin: 0 0 0.78rem;
+  color: #85dfff;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 650;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.14em;
 }
 
-.studioDetailRow strong {
+.studioDetailCard[data-studio-card="materials"] .studioCardLabel {
+  color: #c0adff;
+}
+
+.studioDetailCard[data-studio-card="store"] .studioCardLabel,
+.studioCardAction {
+  color: #ff8b68;
+}
+
+.studioDetailCard strong {
+  max-width: 19ch;
   color: #f6f9fc;
-  font-size: clamp(1rem, 1.3vw, 1.18rem);
+  font-size: clamp(1rem, 1.28cqw, 1.18rem);
+  line-height: 1.18;
 }
 
-.studioDetailRow p {
-  max-width: 46ch;
-  margin: 0.35rem 0 0;
-  color: #8fa4b8;
-  font-size: 0.84rem;
-  line-height: 1.5;
+.studioDetailCard p {
+  max-width: 34ch;
+  margin: 0.5rem 0 0;
+  color: #91a4b7;
+  font-size: clamp(0.75rem, 0.88cqw, 0.84rem);
+  line-height: 1.48;
+}
+
+.studioCardAction {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+}
+
+.studioDetailCard[data-studio-card="store"] {
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.studioDetailCard[data-studio-card="store"]:hover,
+.studioDetailCard[data-studio-card="store"]:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgb(238 77 45 / 52%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 4%),
+    0 1rem 2.4rem rgb(0 0 0 / 28%);
+}
+
+.studioDetailCard[data-studio-card="store"]:focus-visible {
+  outline: 2px solid #ff8b68;
+  outline-offset: 3px;
 }
 
 /* Detail route physically folds the same machine into a left equipment bay. */
@@ -3797,9 +3870,19 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transform: translateY(0);
   }
 
-  .studioDetailRow {
+  .studioDetailRail {
     grid-template-columns: 1fr;
-    gap: 0.45rem;
+    gap: 0.75rem;
+  }
+
+  .studioDetailCard {
+    min-height: 0;
+    padding: 1rem;
+  }
+
+  .studioDetailCard strong,
+  .studioDetailCard p {
+    max-width: none;
   }
 
   .studio[data-studio-route="detail"] .studioMachine {

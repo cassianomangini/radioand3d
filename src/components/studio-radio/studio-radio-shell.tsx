@@ -28,6 +28,7 @@ import {
   getRadioReleaseTarget,
   type RadioSnapKind
 } from "./radio-panel-drag";
+import { resolveRadioLayoutMode } from "./radio-motion-spine";
 
 const DEFAULT_RADIO_WIDTH = 480;
 const MIN_RADIO_WIDTH = 400;
@@ -60,19 +61,19 @@ type TrackStepMotionState = {
 type RadioFlipSnapshot = Map<string, DOMRect>;
 
 const RADIO_FLIP_TIMING: Record<string, { open: [number, number]; close: [number, number] }> = {
-  header: { open: [0, 620], close: [300, 560] },
-  cover: { open: [45, 980], close: [245, 820] },
-  progress: { open: [125, 760], close: [185, 650] },
-  visualizer: { open: [165, 900], close: [135, 720] },
-  "control-shuffle": { open: [225, 720], close: [110, 600] },
-  "control-repeat": { open: [255, 720], close: [95, 600] },
-  "control-previous": { open: [285, 760], close: [80, 620] },
-  "control-play": { open: [315, 820], close: [65, 660] },
-  "control-next": { open: [345, 760], close: [50, 620] },
-  "control-volume": { open: [375, 720], close: [35, 600] },
-  "control-favorite": { open: [405, 720], close: [20, 600] },
-  "queue-header": { open: [455, 760], close: [0, 560] },
-  "queue-list": { open: [500, 900], close: [0, 640] }
+  header: { open: [0, 480], close: [80, 420] },
+  cover: { open: [20, 720], close: [60, 620] },
+  progress: { open: [55, 560], close: [45, 500] },
+  visualizer: { open: [70, 680], close: [35, 560] },
+  "control-shuffle": { open: [95, 520], close: [30, 460] },
+  "control-repeat": { open: [105, 520], close: [25, 460] },
+  "control-previous": { open: [115, 540], close: [20, 480] },
+  "control-play": { open: [125, 580], close: [15, 500] },
+  "control-next": { open: [115, 540], close: [20, 480] },
+  "control-volume": { open: [105, 520], close: [25, 460] },
+  "control-favorite": { open: [95, 520], close: [30, 460] },
+  "queue-header": { open: [110, 560], close: [0, 440] },
+  "queue-list": { open: [125, 640], close: [0, 520] }
 };
 
 function collectRadioFlipSnapshot(panel: HTMLElement): RadioFlipSnapshot {
@@ -647,6 +648,8 @@ export function StudioRadioShell() {
   const openedFromDragRef = useRef(false);
   const previewResetFrameRef = useRef<number | null>(null);
   const motionResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeRadioAnimationsRef = useRef<Animation[]>([]);
+  const radioMotionTokenRef = useRef(0);
   const dividerSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [shellWidth, setShellWidth] = useState<number | null>(null);
@@ -678,6 +681,17 @@ export function StudioRadioShell() {
         ? {}
         : { "--radio-width": `${radioWidth}px` }) as CSSProperties,
     [radioWidth]
+  );
+
+  const radioLayoutMode = useMemo(
+    () =>
+      resolveRadioLayoutMode({
+        fullscreen: radioFullscreen,
+        expanded: radioExpanded,
+        width: radioWidth,
+        defaultWidth: shellWidth === null ? null : getDefaultWidth(shellWidth)
+      }),
+    [radioExpanded, radioFullscreen, radioWidth, shellWidth]
   );
 
   useEffect(() => {
@@ -741,7 +755,10 @@ export function StudioRadioShell() {
   }, []);
 
   useEffect(() => () => {
+    radioMotionTokenRef.current += 1;
     if (motionResetTimerRef.current !== null) clearTimeout(motionResetTimerRef.current);
+    for (const animation of activeRadioAnimationsRef.current) animation.cancel();
+    activeRadioAnimationsRef.current = [];
     if (dividerSettleTimerRef.current !== null) clearTimeout(dividerSettleTimerRef.current);
   }, []);
 
@@ -1005,17 +1022,28 @@ export function StudioRadioShell() {
 
   function runRadioMotion(direction: "opening" | "closing", update: () => void) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const token = ++radioMotionTokenRef.current;
+
     if (motionResetTimerRef.current !== null) {
       clearTimeout(motionResetTimerRef.current);
       motionResetTimerRef.current = null;
     }
 
     const panel = shellRef.current?.querySelector<HTMLElement>("#radio");
+    // Measure before cancelling the previous WAAPI set so an interruption starts
+    // from the geometry the user is actually seeing in this frame.
     const before = !reduce && panel ? collectRadioFlipSnapshot(panel) : null;
 
+    for (const animation of activeRadioAnimationsRef.current) {
+      animation.cancel();
+    }
+    activeRadioAnimationsRef.current = [];
+
     const clearMotionState = () => {
+      if (radioMotionTokenRef.current !== token) return;
       setLayoutMotionDirection(null);
       motionResetTimerRef.current = null;
+      activeRadioAnimationsRef.current = [];
     };
 
     flushSync(() => {
@@ -1029,7 +1057,8 @@ export function StudioRadioShell() {
     }
 
     const animations = animateRadioFlip(panel, before, direction);
-    const totalDuration = direction === "opening" ? 1450 : 1120;
+    activeRadioAnimationsRef.current = animations;
+    const totalDuration = direction === "opening" ? 900 : 760;
 
     if (animations.length === 0) {
       motionResetTimerRef.current = setTimeout(clearMotionState, totalDuration);
@@ -1039,7 +1068,7 @@ export function StudioRadioShell() {
     void Promise.allSettled(animations.map((animation) => animation.finished)).finally(
       clearMotionState
     );
-    motionResetTimerRef.current = setTimeout(clearMotionState, totalDuration + 120);
+    motionResetTimerRef.current = setTimeout(clearMotionState, totalDuration + 80);
   }
 
   function openRadioFullscreen(fromDrag: boolean) {
@@ -1411,7 +1440,7 @@ export function StudioRadioShell() {
             : "";
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-wider-than-default={shellWidth !== null && radioWidth !== null && radioWidth > getDefaultWidth(shellWidth) ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-layout-mode={radioLayoutMode} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-wider-than-default={shellWidth !== null && radioWidth !== null && radioWidth > getDefaultWidth(shellWidth) ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
         {playbackStatusMessage}
       </span>

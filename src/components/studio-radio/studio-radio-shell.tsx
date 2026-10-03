@@ -1121,7 +1121,13 @@ export function StudioRadioShell() {
     returnDistanceRef.current = Math.max(0, rect.width - initialRadioWidthRef.current - event.currentTarget.getBoundingClientRect().width);
     pointerActiveRef.current = true;
     pointerMovedRef.current = false;
-    setShowResizeHint(false);
+    if (!radioFullscreen) {
+      const handle = event.currentTarget;
+      const handleRect = handle.getBoundingClientRect();
+      const hintY = Math.min(Math.max(event.clientY - handleRect.top + 32, 24), handleRect.height - 24);
+      handle.style.setProperty("--resize-hint-y", `${hintY}px`);
+    }
+    setShowResizeHint(!radioFullscreen);
     clearDragPreview();
     clearReturnPreview();
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -1228,6 +1234,7 @@ export function StudioRadioShell() {
 
     pointerActiveRef.current = false;
     setDragging(false);
+    if (!shouldToggle) setShowResizeHint(false);
 
     if (shouldRestore || shouldReturn) {
       closeRadioFullscreen(false);
@@ -1680,7 +1687,7 @@ export function StudioRadioShell() {
         <div
           ref={resizeHandleRef}
           className={styles.resizeHandle}
-          data-resize-hint={showResizeHint && radioExpanded && !radioFullscreen ? "true" : undefined}
+          data-resize-hint={showResizeHint && !radioFullscreen ? "true" : undefined}
           role={radioFullscreen ? "button" : "separator"}
           aria-label={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Redimensionar ou expandir CM Rádio"}
           aria-orientation={radioFullscreen ? undefined : "vertical"}

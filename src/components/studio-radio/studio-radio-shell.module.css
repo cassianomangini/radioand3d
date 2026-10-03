@@ -2761,22 +2761,19 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   .resizeHandle[data-resize-hint="true"]::after {
     content: "←";
     position: absolute;
-    top: 50%;
+    top: var(--resize-hint-y, 50%);
     left: 50%;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: min(1.25rem, calc(var(--rail-width) - 4px));
+    height: 1.25rem;
     display: grid;
     place-items: center;
     transform: translate(-50%, -50%);
-    border: 1px solid var(--accent-cyan);
-    border-radius: 50%;
-    background: #030c13;
-    color: var(--accent-cyan);
-    font-size: 1.8rem;
+    color: #198cff;
+    font-family: Arial, sans-serif;
+    font-size: 1.25rem;
     font-weight: 800;
     line-height: 1;
-    text-shadow: 0 0 0.55rem var(--accent-cyan);
-    box-shadow: 0 0 0.65rem rgb(82 214 255 / 75%), inset 0 0 0.45rem rgb(82 214 255 / 35%);
+    text-shadow: 0 0 0.25rem #198cff, 0 0 0.5rem #198cff;
     pointer-events: none;
     animation: resize-hint-blink 1.2s steps(1, end) infinite;
   }
@@ -2787,8 +2784,18 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 @keyframes resize-hint-blink {
-  0%, 45%, 100% { opacity: 1; }
-  50%, 95% { opacity: 0.2; }
+  0%, 18%, 100% {
+    opacity: 1;
+    color: #198cff;
+    text-shadow: 0 0 0.25rem #198cff, 0 0 0.5rem #198cff;
+  }
+  25%, 43% { opacity: 0.12; }
+  50%, 68% {
+    opacity: 1;
+    color: #cf2aea;
+    text-shadow: 0 0 0.25rem #cf2aea, 0 0 0.5rem #cf2aea;
+  }
+  75%, 93% { opacity: 0.12; }
 }
 
 @media (max-width: 81.25rem) and (min-width: 73.75rem) {

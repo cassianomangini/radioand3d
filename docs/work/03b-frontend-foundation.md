@@ -270,3 +270,15 @@ Retomada exata: conferir o HEAD do servidor local e fazer a revisão de C1 na ve
 ## Ajustes da Rádio pedidos em 03/10/2026
 
 Responsável: CM Frontend. Contrato lido: [Rádio](../RADIO.md). Objetivo: corrigir o formato dos controles no Full e permitir alternar o espaço entre playlist e letra com ação de fechar. A playlist abre embaralhada e mantém a ordem durante a reprodução. Cassiano corrigiu o aceite do botão Embaralhar: ele também deve trocar a faixa atual, respeitando o estado tocando/pausado. Os ícones de Embaralhar e Repetir faixa devem comunicar melhor cada ação. Limites: preservar arquivos de mídia, Estúdio e alterações locais existentes. Aceite pendente de Cassiano: controles compactos e circulares no mobile, playlist com mais espaço por padrão, letra que abre e fecha, troca imediata de faixa ao embaralhar e ícones claros. Na correção anterior, Cassiano pediu que não fossem executados testes nem aberto o navegador; nesta revisão, os 15 testes da fila e os 65 testes gerais passaram, assim como lint, typecheck, build e `git diff --check`. A validação visual e das interações continua com Cassiano.
+
+## Seta da divisória desktop em 03/10/2026
+
+Responsável: CM Frontend. Contratos lidos: [Experiência](../EXPERIENCE.md) e [Rádio](../RADIO.md). Objetivo: fazer a seta piscante indicar o arraste assim que Cassiano pressiona a divisória, integrada à barra. Limites: preservar o redimensionamento, os estados de expansão/tela inteira e o comportamento mobile. Aceite: a seta aparece dentro da largura da barra, alterna azul e rosa sem círculo ciano, acompanha a divisória durante o arraste e some ao soltar ou entrar em tela inteira; um clique sem arrastar continua expandindo/recolhendo. Cassiano confere aparência e interação.
+
+- [x] Conferir `main`, HEAD, diff, contratos e condição atual da seta.
+- [x] Corrigir o estado e a posição da seta.
+- [ ] Corrigir a aparência após Cassiano rejeitar o círculo ciano mostrado na captura: seta pequena dentro da barra, piscando em azul e rosa.
+- [ ] Revisar o diff e executar `git diff --check` após a correção visual.
+- [ ] Cassiano conferir a seta piscando no clique e durante o arraste, seu desaparecimento ao soltar e o clique simples para expandir/recolher.
+
+Evidência de código: antes, `handlePointerDown` desligava a dica e o atributo visual exigia `radioExpanded`; agora o atributo acompanha `showResizeHint` durante o gesto. A primeira tentativa usou um círculo ciano que Cassiano rejeitou na captura enviada. Lint, typecheck, build e testes não foram executados nesta correção, conforme a regra de execução apenas por pedido explícito. A aplicação não foi aberta no navegador e não houve validação visual pelo agente. Próximo passo: Cassiano conferir o comportamento e a aparência da seta na divisória desktop; corrigir qualquer defeito observado antes de considerar este ajuste aprovado.

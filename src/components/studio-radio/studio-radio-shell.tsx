@@ -148,6 +148,7 @@ function animateRadioFlip(
           fill: "both"
         }
       );
+      animation.id = `cm-radio-layout-${key}`;
 
       animation.finished
         .catch(() => undefined)

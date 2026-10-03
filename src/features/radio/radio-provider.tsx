@@ -79,7 +79,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const analyserRef = useRef<AnalyserNode | null>(null);
   const requestRef = useRef(0);
   const [currentId, setCurrentId] = useState(queue.currentId);
-  const [upcomingIds, setUpcomingIds] = useState(() => queue.upcoming(tracks.length));
+  const [upcomingIds, setUpcomingIds] = useState(() => queue.following());
   const [status, setStatus] = useState<PlaybackStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [position, setPosition] = useState(0);
@@ -104,11 +104,11 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
 
   const refreshQueue = useCallback(() => {
     setCurrentId(queue.currentId);
-    setUpcomingIds(queue.upcoming(queue.repeat === "one" ? 1 : tracks.length));
+    setUpcomingIds(queue.following());
     setHasPrevious(queue.hasPrevious);
     setRepeatOne(queue.repeat === "one");
     setCanSkipNext(queue.hasNextManual);
-  }, [queue, tracks.length]);
+  }, [queue]);
 
   const ensureGraph = useCallback(() => {
     const audio = audioRef.current;

@@ -66,6 +66,7 @@ test("new order restarts the full playlist and turns repeat off", () => {
   assert.equal(queue.hasPrevious, false);
   assert.equal(order.length, ids.length);
   assert.equal(new Set(order).size, ids.length);
+  assert.deepEqual(queue.following(), order.slice(1));
 });
 
 test("the announced ten tracks are the next ten advances", () => {
@@ -117,6 +118,63 @@ test("previous restarts after three seconds and otherwise returns heard history"
   assert.deepEqual(queue.previous(4), { id: "b", restart: true });
   assert.deepEqual(queue.previous(2), { id: "a", restart: false });
   assert.equal(queue.next(), "b");
+});
+
+test("played shuffle tracks move to the end of the list and stay selectable", () => {
+  const queue = createShuffledQueue(["a", "b", "c", "d"], 21);
+  const order = [queue.currentId, ...queue.upcoming(4)];
+
+  assert.equal(queue.next(), order[1]);
+  assert.deepEqual(queue.upcoming(4), order.slice(2));
+  assert.deepEqual(queue.following(), [...order.slice(2), order[0]]);
+
+  assert.equal(queue.next(), order[2]);
+  assert.deepEqual(queue.following(), [...order.slice(3), order[0], order[1]]);
+  assert.equal(queue.following().length, order.length - 1);
+});
+
+test("a finished shuffle cycle keeps heard tracks in the list without replaying them", () => {
+  const queue = createShuffledQueue(["a", "b", "c"], 4);
+  const order = [queue.currentId, ...queue.upcoming(3)];
+
+  assert.equal(queue.next(), order[1]);
+  assert.equal(queue.next(), order[2]);
+  assert.equal(queue.next(), null);
+  assert.equal(queue.hasNextManual, false);
+  assert.deepEqual(queue.following(), [order[0], order[1]]);
+
+  assert.equal(queue.select(order[0]), true);
+  assert.equal(queue.currentId, order[0]);
+  assert.deepEqual(queue.upcoming(3), []);
+  assert.deepEqual(queue.following(), [order[1], order[2]]);
+  assert.equal(queue.next(), null);
+});
+
+test("selecting a heard track keeps unplayed tracks ahead of the replay tail", () => {
+  const queue = createShuffledQueue(["a", "b", "c", "d", "e"], 9);
+  const order = [queue.currentId, ...queue.upcoming(5)];
+
+  assert.equal(queue.next(), order[1]);
+  assert.equal(queue.select(order[0]), true);
+
+  const automatic = queue.upcoming(5);
+  assert.deepEqual(new Set(automatic), new Set([order[2], order[3], order[4]]));
+  assert.equal(automatic.includes(order[0]), false);
+  assert.equal(automatic.includes(order[1]), false);
+  assert.deepEqual(queue.following(), [...automatic, order[1]]);
+});
+
+test("previous keeps the track just left at the front of the shuffle list", () => {
+  const queue = createShuffledQueue(["a", "b", "c", "d"], 11);
+  const first = queue.currentId;
+  const second = queue.next();
+
+  queue.previous(0);
+
+  assert.equal(queue.currentId, first);
+  assert.equal(queue.following()[0], second);
+  assert.equal(queue.following().includes(first), false);
+  assert.equal(queue.next(), second);
 });
 
 test("withdrawn tracks leave the queue and current selection stays when eligible", () => {

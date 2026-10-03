@@ -12,6 +12,7 @@ export class RadioQueue {
   private shufflePool: string[] = [];
   private shuffleCycles = 0;
   private history: string[] = [];
+  private replayTail: string[] = [];
   private played: Set<string>;
   private random: () => number;
 
@@ -49,14 +50,19 @@ export class RadioQueue {
     this.played = new Set([...this.played].filter((id) => this.ids.includes(id)));
     if (this.current) this.played.add(this.current);
     this.history = this.history.filter((id) => this.ids.includes(id));
+    this.replayTail = this.replayTail.filter((id) => this.ids.includes(id) && id !== this.current && this.played.has(id));
     this.resetPlan();
   }
 
   select(id: string) {
     if (!this.ids.includes(id)) return false;
-    if (this.current && this.current !== id) this.history.push(this.current);
+    if (this.current && this.current !== id) {
+      this.history.push(this.current);
+      if (this.shuffle) this.moveToTail(this.current);
+    }
     this.current = id;
     this.played.add(id);
+    this.replayTail = this.replayTail.filter((entry) => entry !== id);
     this.resetPlan();
     return true;
   }
@@ -81,6 +87,7 @@ export class RadioQueue {
     this.current = candidates[Math.floor(random() * candidates.length)] ?? null;
     this.played = new Set(this.current ? [this.current] : []);
     this.history = [];
+    this.replayTail = [];
     this.shuffle = true;
     this.repeat = "off";
     this.resetPlan();
@@ -91,6 +98,18 @@ export class RadioQueue {
     if (this.repeat === "one") return Array(count).fill(this.current) as string[];
     this.fillPlan(count);
     return this.planned.slice(0, count);
+  }
+
+  following(): string[] {
+    if (!this.current) return [];
+    if (this.repeat === "one") return [this.current];
+    const automatic = this.upcoming(this.ids.length);
+    if (!this.shuffle || this.repeat === "all") return automatic;
+    const automaticIds = new Set(automatic);
+    return [
+      ...automatic,
+      ...this.replayTail.filter((id) => id !== this.current && !automaticIds.has(id) && this.ids.includes(id))
+    ];
   }
 
   next(manual = false): string | null {
@@ -113,6 +132,7 @@ export class RadioQueue {
     const previous = this.history.pop();
     if (!previous) return { id: this.current, restart: true };
     this.planned.unshift(this.current);
+    this.replayTail = this.replayTail.filter((entry) => entry !== this.current && entry !== previous);
     this.current = previous;
     return { id: previous, restart: false };
   }
@@ -121,10 +141,19 @@ export class RadioQueue {
     this.fillPlan(1);
     const next = this.planned.shift();
     if (!next || !this.current) return null;
-    if (next !== this.current) this.history.push(this.current);
+    if (next !== this.current) {
+      this.history.push(this.current);
+      if (this.shuffle) this.moveToTail(this.current);
+    }
+    this.replayTail = this.replayTail.filter((entry) => entry !== next);
     this.current = next;
     this.played.add(next);
     return next;
+  }
+
+  private moveToTail(id: string) {
+    this.replayTail = this.replayTail.filter((entry) => entry !== id);
+    this.replayTail.push(id);
   }
 
   private fillPlan(count: number) {

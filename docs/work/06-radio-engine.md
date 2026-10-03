@@ -111,3 +111,7 @@ O PR #17 representa a tentativa anterior de calibrar o espectro tradicional e n�
 Cassiano validou a dinâmica da v2 em `When Nobody Claps`: voz central com progressão natural, sem deixar o miolo visualmente vazio, e batidas bem distribuídas entre esquerda e direita. O defeito restante foi a baixa participação de instrumentos melódicos/harmônicos, com piano quase ausente.
 
 A v3 preserva voz, baixo e bateria da v2 e altera somente o tratamento do stem `other`. Esse stem continua sem rótulo nominal por instrumento, mas agora é decomposto em componente harmônico e componente de articulação/percussão. A sustentação harmônica usa release mais longo; ataques de notas e acordes são extraídos por novidade espectral por banda, passam por peak-picking e release curto. Isso permite que piano, guitarra, synths, cordas e outros eventos do `other` participem mais da dança sem reintroduzir o spectral-flux quadro a quadro que deixou a v1 frenética. Os novos derivados usam `_analysis/v3/<sha256-do-track-id>.json`; sidecars v1/v2 permanecem obsoletos e não são consumidos pelo frontend atual.
+
+## Fila aleatória em 03/10/2026
+
+Cassiano pediu que as músicas já ouvidas não sumam de **A seguir**: elas passam para o fim da ordem aleatória, para poderem ser escolhidas de novo. O avanço automático e o término natural continuam sem repetir a playlist. **Nova ordem** ainda reinicia o ciclo. Responsável: CM Audio. Branch `fix/shuffle-keeps-played-tracks`. Contrato alterado: `docs/RADIO.md`. A escuta dessa fila no navegador continua com Cassiano.

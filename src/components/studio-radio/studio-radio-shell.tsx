@@ -1603,6 +1603,14 @@ export function StudioRadioShell() {
           <div className={styles.studioMachine} aria-hidden="true" />
           <div className={styles.studioStageShade} aria-hidden="true" />
 
+          <div
+            className={styles.studioCatalogHeader}
+            aria-hidden={studioRoute !== "detail"}
+          >
+            <strong>ESTÚDIO</strong>
+            <span>IMPRESSÕES, MATERIAIS E PRODUTOS EM UM SÓ LUGAR.</span>
+          </div>
+
           <section className={styles.studioIdentity} aria-labelledby="studio-title">
             <div className={styles.studioEyebrowStack} aria-live="off">
               <span aria-hidden={studioRoute !== "home"}>ESTÚDIO DE CRIAÇÃO</span>

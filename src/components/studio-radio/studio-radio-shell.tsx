@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import {
   useEffect,
   useEffectEvent,
@@ -10,6 +11,7 @@ import {
   type CSSProperties,
   type ReactNode,
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent
 } from "react";
 import { flushSync } from "react-dom";
@@ -37,7 +39,13 @@ type ViewTransitionLike = {
 };
 
 type DocumentWithViewTransition = Document & {
-  startViewTransition?: (update: () => void) => ViewTransitionLike;
+  startViewTransition?: (update: () => void | Promise<void>) => ViewTransitionLike;
+};
+
+type RouteTransitionWaiter = {
+  href: string;
+  resolve: () => void;
+  timeout: number;
 };
 
 type MobileRadioMotionState = {
@@ -526,6 +534,9 @@ function RadioContent({
 
 export function StudioRadioShell() {
   const radio = useRadio();
+  const pathname = usePathname();
+  const router = useRouter();
+  const studioRoute = pathname === "/studio" ? "detail" : "home";
   const shellRef = useRef<HTMLDivElement>(null);
   const radioNavRef = useRef<HTMLAnchorElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
@@ -556,7 +567,6 @@ export function StudioRadioShell() {
   const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
   const [dividerSettling, setDividerSettling] = useState(false);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
-  const [studioSection, setStudioSection] = useState<"home" | "studio">("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
   const [mobileRadioMotion, setMobileRadioMotion] = useState<MobileRadioMotionState | null>(null);
@@ -567,6 +577,8 @@ export function StudioRadioShell() {
   const mobileMotionActiveRef = useRef(false);
   const mobileMotionTokenRef = useRef(0);
   const trackStepMotionTokenRef = useRef(0);
+  const routeTransitionWaiterRef = useRef<RouteTransitionWaiter | null>(null);
+  const routeTransitionActiveRef = useRef(false);
 
   const shellStyle = useMemo(
     () =>
@@ -575,6 +587,28 @@ export function StudioRadioShell() {
         : { "--radio-width": `${radioWidth}px` }) as CSSProperties,
     [radioWidth]
   );
+
+  useEffect(() => {
+    router.prefetch("/");
+    router.prefetch("/studio");
+  }, [router]);
+
+  useEffect(() => {
+    const waiter = routeTransitionWaiterRef.current;
+    if (!waiter || waiter.href !== pathname) return;
+
+    window.clearTimeout(waiter.timeout);
+    routeTransitionWaiterRef.current = null;
+    waiter.resolve();
+  }, [pathname]);
+
+  useEffect(() => () => {
+    const waiter = routeTransitionWaiterRef.current;
+    if (!waiter) return;
+    window.clearTimeout(waiter.timeout);
+    routeTransitionWaiterRef.current = null;
+    waiter.resolve();
+  }, []);
 
   useEffect(() => {
     const dialog = mobileDialogRef.current;
@@ -1172,6 +1206,67 @@ export function StudioRadioShell() {
     }
   }
 
+  function navigateStudioRoute(href: "/" | "/studio") {
+    if (pathname === href || routeTransitionActiveRef.current) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const documentWithTransition = document as DocumentWithViewTransition;
+
+    if (reduce || !documentWithTransition.startViewTransition) {
+      router.push(href);
+      return;
+    }
+
+    const previousWaiter = routeTransitionWaiterRef.current;
+    if (previousWaiter) {
+      window.clearTimeout(previousWaiter.timeout);
+      routeTransitionWaiterRef.current = null;
+      previousWaiter.resolve();
+    }
+
+    const direction = href === "/studio" ? "studio-enter" : "studio-exit";
+    routeTransitionActiveRef.current = true;
+    document.documentElement.dataset.siteRouteTransition = direction;
+
+    const transition = documentWithTransition.startViewTransition(async () => {
+      await new Promise<void>((resolve) => {
+        const timeout = window.setTimeout(() => {
+          if (routeTransitionWaiterRef.current?.href === href) {
+            routeTransitionWaiterRef.current = null;
+          }
+          resolve();
+        }, 2500);
+
+        routeTransitionWaiterRef.current = { href, resolve, timeout };
+        router.push(href);
+      });
+    });
+
+    void transition.finished.finally(() => {
+      delete document.documentElement.dataset.siteRouteTransition;
+      routeTransitionActiveRef.current = false;
+    });
+  }
+
+  function handleStudioRouteLink(
+    event: ReactMouseEvent<HTMLAnchorElement>,
+    href: "/" | "/studio"
+  ) {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    navigateStudioRoute(href);
+  }
+
   function closeMobileMenu() {
     setMobileMenuOpen(false);
   }
@@ -1191,7 +1286,12 @@ export function StudioRadioShell() {
       )
   );
 
-  const activeNav = radioFullscreen || mobileRadioOpen ? "radio" : studioSection;
+  const activeNav =
+    radioFullscreen || mobileRadioOpen
+      ? "radio"
+      : studioRoute === "detail"
+        ? "studio"
+        : "home";
 
   const playbackStatusMessage =
     radio.status === "loading"
@@ -1210,13 +1310,31 @@ export function StudioRadioShell() {
         {playbackStatusMessage}
       </span>
       <header className={styles.siteHeader}>
-        <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início" onClick={() => { setStudioSection("home"); if (radioFullscreen) closeRadioFullscreen(false); }}>
+        <a
+          className={styles.brand}
+          href="/"
+          aria-label="CM 3D e Rádio, início"
+          onClick={(event) => handleStudioRouteLink(event, "/")}
+        >
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
         </a>
 
         <nav className={styles.desktopNav} aria-label="Navegação principal">
-          <a href="#top" aria-current={activeNav === "home" ? "page" : undefined} onClick={() => { setStudioSection("home"); if (radioFullscreen) closeRadioFullscreen(false); }}>Início</a>
-          <a href="#studio" aria-current={activeNav === "studio" ? "page" : undefined} onClick={() => { setStudioSection("studio"); if (radioFullscreen) closeRadioFullscreen(false); }}>Estúdio</a>
+          <a
+            href="/"
+            aria-current={activeNav === "home" ? "page" : undefined}
+            onClick={(event) => handleStudioRouteLink(event, "/")}
+          >
+            Início
+          </a>
+          <a
+            href="/studio"
+            aria-current={activeNav === "studio" ? "page" : undefined}
+            onPointerEnter={() => router.prefetch("/studio")}
+            onClick={(event) => handleStudioRouteLink(event, "/studio")}
+          >
+            Estúdio
+          </a>
           <a ref={radioNavRef} href="#radio" aria-current={activeNav === "radio" ? "page" : undefined} onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
         </nav>
 
@@ -1238,10 +1356,24 @@ export function StudioRadioShell() {
             className={styles.mobileNav}
             aria-label="Navegação mobile"
           >
-            <a href="#top" aria-current={activeNav === "home" ? "page" : undefined} onClick={() => { setStudioSection("home"); closeMobileMenu(); }}>
+            <a
+              href="/"
+              aria-current={activeNav === "home" ? "page" : undefined}
+              onClick={(event) => {
+                closeMobileMenu();
+                handleStudioRouteLink(event, "/");
+              }}
+            >
               Início
             </a>
-            <a href="#studio" aria-current={activeNav === "studio" ? "page" : undefined} onClick={() => { setStudioSection("studio"); closeMobileMenu(); }}>
+            <a
+              href="/studio"
+              aria-current={activeNav === "studio" ? "page" : undefined}
+              onClick={(event) => {
+                closeMobileMenu();
+                handleStudioRouteLink(event, "/studio");
+              }}
+            >
               Estúdio
             </a>
             <button
@@ -1356,26 +1488,97 @@ export function StudioRadioShell() {
         className={styles.desktopShell}
         data-dragging={dragging ? "true" : undefined}
       >
-        <main id="studio" className={styles.studio} inert={radioFullscreen}>
-          <section className={styles.hero} aria-labelledby="studio-title">
-            <div className={styles.heroContent}>
-              <p className={styles.studioEyebrow}>ESTÚDIO DE CRIAÇÃO</p>
-              <h1 id="studio-title" aria-label="Ideias que ganham forma.">Ideias que<br />ganham <span>forma.</span></h1>
-              <p className={styles.lead}>
-                Peças, materiais e cores produzidos<br className={styles.leadBreak} /> com precisão, camada por camada.
-              </p>
-              <button
-                type="button"
-                className={styles.primaryAction}
-                disabled
-                title="Página do Estúdio em breve"
-                aria-label="Explore o estúdio — página do Estúdio em breve"
-              >
-                <span>Explore o estúdio</span>
-                <span aria-hidden="true">→</span>
-              </button>
-            </div>
-          </section>
+        <main
+          id="studio"
+          className={styles.studio}
+          data-studio-route={studioRoute}
+          inert={radioFullscreen}
+        >
+          {studioRoute === "home" ? (
+            <section className={styles.hero} aria-labelledby="studio-title">
+              <div className={styles.heroMedia} aria-hidden="true" />
+              <div className={styles.heroShade} aria-hidden="true" />
+              <div className={styles.heroContent}>
+                <p className={`${styles.studioEyebrow} ${styles.routeEyebrow}`}>
+                  ESTÚDIO DE CRIAÇÃO
+                </p>
+                <h1
+                  id="studio-title"
+                  className={styles.routeTitle}
+                  aria-label="Ideias que ganham forma."
+                >
+                  Ideias que<br />ganham <span>forma.</span>
+                </h1>
+                <p className={`${styles.lead} ${styles.routeLead}`}>
+                  Peças, materiais e cores produzidos
+                  <br className={styles.leadBreak} /> com precisão, camada por camada.
+                </p>
+                <a
+                  href="/studio"
+                  className={`${styles.primaryAction} ${styles.routeAction}`}
+                  aria-label="Explore o estúdio"
+                  onPointerEnter={() => router.prefetch("/studio")}
+                  onClick={(event) => handleStudioRouteLink(event, "/studio")}
+                >
+                  <span>Explore o estúdio</span>
+                  <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </section>
+          ) : (
+            <section className={styles.studioDetail} aria-labelledby="studio-title">
+              <div className={styles.studioDetailMedia} aria-hidden="true" />
+              <div className={styles.studioDetailContent}>
+                <a
+                  href="/"
+                  className={`${styles.primaryAction} ${styles.routeAction} ${styles.studioBack}`}
+                  aria-label="Voltar ao início"
+                  onClick={(event) => handleStudioRouteLink(event, "/")}
+                >
+                  <span aria-hidden="true">←</span>
+                  <span>Voltar ao início</span>
+                </a>
+                <div className={styles.studioDetailIntro}>
+                  <p className={`${styles.studioEyebrow} ${styles.routeEyebrow}`}>
+                    ESTÚDIO DE IMPRESSÃO 3D
+                  </p>
+                  <h1
+                    id="studio-title"
+                    className={styles.routeTitle}
+                    aria-label="Ideias que ganham forma."
+                  >
+                    Ideias que<br />ganham <span>forma.</span>
+                  </h1>
+                  <p className={`${styles.lead} ${styles.routeLead}`}>
+                    Peças, materiais e cores produzidos com precisão, camada por camada.
+                  </p>
+                </div>
+                <div className={styles.studioDetailRail} aria-label="Como o estúdio trabalha">
+                  <article className={styles.studioDetailRow}>
+                    <span>PROCESSO</span>
+                    <div>
+                      <strong>Da ideia à peça</strong>
+                      <p>Planejamento, preparação, impressão e acabamento.</p>
+                    </div>
+                  </article>
+                  <article className={styles.studioDetailRow}>
+                    <span>MATERIAIS</span>
+                    <div>
+                      <strong>Cor e acabamento fazem parte da peça</strong>
+                      <p>Opções entram conforme disponibilidade real e publicação aprovada.</p>
+                    </div>
+                  </article>
+                  <article className={styles.studioDetailRow}>
+                    <span>MOSTRUÁRIO</span>
+                    <div>
+                      <strong>Conteúdo real, progressivo</strong>
+                      <p>Peças e trabalhos aparecem à medida que forem publicados.</p>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </section>
+          )}
         </main>
 
         <div

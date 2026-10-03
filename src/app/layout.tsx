@@ -4,6 +4,7 @@ import { IBM_Plex_Mono, Manrope } from "next/font/google";
 import { connection } from "next/server";
 import { getRadioTracks } from "@/features/radio/catalog";
 import { RadioProvider } from "@/features/radio/radio-provider";
+import { PublicExperience } from "@/components/studio-radio/public-experience";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -44,7 +45,9 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${manrope.variable} ${plexMono.variable}`}>
-        <RadioProvider tracks={tracks} playlistSeed={playlistSeed}>{children}</RadioProvider>
+        <RadioProvider tracks={tracks} playlistSeed={playlistSeed}>
+          <PublicExperience>{children}</PublicExperience>
+        </RadioProvider>
       </body>
     </html>
   );

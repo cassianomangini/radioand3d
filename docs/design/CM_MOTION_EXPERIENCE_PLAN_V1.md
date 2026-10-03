@@ -192,6 +192,8 @@ Inclui:
 - criar primitives usadas por casos reais;
 - introduzir Motion quando necessário;
 - implementar pelo menos uma transição/recomposição perceptivelmente superior ao CSS atual;
+- implementar continuidade espacial Home -> Estúdio -> Home com rota pública real;
+- manter Rádio, fila, posição, volume e estado visual fora do teardown da rota;
 - medir custo da dependência introduzida;
 - preservar o player existente.
 
@@ -199,6 +201,7 @@ A prova de C1 precisa demonstrar o tipo de qualidade esperado para o restante do
 
 - playlist -> Now Playing com continuidade espacial;
 - split -> focus/fullscreen com recomposição real;
+- Home -> Estúdio com shared elements e Rádio persistente;
 - mini player -> Rádio completa;
 - outra mecânica de assinatura aprovada.
 
@@ -212,6 +215,8 @@ Não inclui:
 Gate:
 
 - existe pelo menos uma mecânica que mude visivelmente o patamar da experiência;
+- Home -> Estúdio -> Home não parece teardown/fade entre páginas;
+- a Rádio continua tocando e preserva estado durante a navegação;
 - a mecânica é interrompível e reversível quando aplicável;
 - não existem duas soluções diferentes para a mesma classe de animação;
 - desktop/mobile aplicáveis foram considerados;
@@ -416,19 +421,9 @@ Nenhuma frente visual fecha sem revisão perceptiva de Cassiano.
 
 "Fora do caminho crítico" não significa "sem ambição" nem "provavelmente nunca". Significa apenas que não devem bloquear o primeiro marco se o conteúdo ou pré-requisito ainda não existir.
 
-## X1 — Page continuity / route transitions
+## Continuidade de rota incorporada ao C1
 
-Abrir assim que existirem destinos públicos reais onde continuidade entre elementos faça sentido.
-
-Objetivos:
-
-- preservar identidade;
-- evitar sensação de teardown;
-- manter Rádio contínua;
-- shared layout entre elementos persistentes;
-- transições de rota com assinatura própria.
-
-Não criar rota artificial só para justificar uma transição.
+Page continuity deixou de ser extensão condicional. A primeira rota pública real do Estúdio e a navegação Home -> Estúdio -> Home pertencem ao gate do **C1**. A Rádio permanece no shell persistente e não é recriada durante essa navegação.
 
 ## X2 — Studio Scroll Experience
 
@@ -540,7 +535,7 @@ Este bloco registra progresso técnico sem confundir implementação com aprova�
 
 | Frente | Estado | O que já entrou na `main` | Gate ainda aberto |
 | --- | --- | --- | --- |
-| C1 Motion Core de Alto Impacto | **in_progress** | shared-element transitions; faixa selecionada -> Now Playing; **focus workstation dominante (~60% em desktop largo)**; **focus -> fullscreen com coreografia em estágios (Estúdio sai, superfície assume, capa ancora, visualizer/transporte entram, fila fecha a sequência)**; fallback seguro em painéis estreitos; mini player -> Rádio completa | CI captura também frames intermediários da transição; gate fecha somente após Cassiano validar a mecânica no localhost |
+| C1 Motion Core de Alto Impacto | **in_progress** | focus/fullscreen coreografado; **rota real /studio com Home -> Estúdio -> Home por shared elements**; shell/Rádio persistentes entre rotas; mini -> full mobile; faixa -> Now Playing | CI captura ida/volta da rota em desktop e mobile; gate fecha somente após Cassiano validar no localhost que a navegação realmente mudou o patamar |
 | C2 Audio Motion Contract | **in_progress** | sidecar preserva regiões; roles `bass/drums/other/voice`; attack/release por região; fallback live por frequência; continuidade em seek/pause; ferramenta `visualizer:inspect` | validar sidecars reais gerados pelo sync e comparar músicas de perfis diferentes |
 | C3 Visualizer 2.0 | **in_progress** | voz central e instrumentos preservados no reamostramento; contraste espacial sem inventar energia; pausa relaxa; reduced-motion com baixa cadência; cores sutis por papel real | revisão perceptiva com música real; confirmar que deixou de parecer "uma massa só" |
 | C4 Radio Living Interface | **in_progress** | track change direcional; loading/buffering real; seek/volume táteis; teclado global; fila mantém identidade ao reordenar | ainda falta um momento visual claramente memorável no player completo; Cassiano não aprovou o "wow" |

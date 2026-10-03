@@ -209,6 +209,72 @@ try {
   if (!desktopFullscreen) throw new Error("Desktop Radio did not reach fullscreen state.");
   await screenshot(client, "desktop-radio-fullscreen-1760x824.png");
 
+  await navigate(client, 1760, 824, false);
+  const studioRouteClicked = await evaluate(
+    client,
+    `(() => {
+      const link = document.querySelector('a[aria-label="Explore o estúdio"]');
+      if (!(link instanceof HTMLElement)) return false;
+      link.click();
+      return true;
+    })()`
+  );
+  if (!studioRouteClicked) throw new Error("Studio route CTA was not found.");
+  await delay(180);
+  await screenshot(client, "desktop-studio-route-enter-180ms.png");
+  await delay(340);
+  await screenshot(client, "desktop-studio-route-enter-520ms.png");
+  await delay(720);
+  const studioRouteReached = await evaluate(
+    client,
+    `window.location.pathname === "/studio" &&
+      document.querySelector('[data-studio-route="detail"]') !== null`
+  );
+  if (!studioRouteReached) throw new Error("Studio route did not reach the detail world.");
+  await screenshot(client, "desktop-studio-route-detail-1760x824.png");
+
+  const studioBackClicked = await evaluate(
+    client,
+    `(() => {
+      const link = document.querySelector('main a[aria-label="Voltar ao início"]');
+      if (!(link instanceof HTMLElement)) return false;
+      link.click();
+      return true;
+    })()`
+  );
+  if (!studioBackClicked) throw new Error("Studio back route control was not found.");
+  await delay(320);
+  await screenshot(client, "desktop-studio-route-exit-320ms.png");
+  await delay(900);
+  const homeRouteReached = await evaluate(
+    client,
+    `window.location.pathname === "/" &&
+      document.querySelector('[data-studio-route="home"]') !== null`
+  );
+  if (!homeRouteReached) throw new Error("Studio route did not return to Home.");
+
+  await navigate(client, 390, 844, true);
+  const mobileStudioRouteClicked = await evaluate(
+    client,
+    `(() => {
+      const link = document.querySelector('a[aria-label="Explore o estúdio"]');
+      if (!(link instanceof HTMLElement)) return false;
+      link.click();
+      return true;
+    })()`
+  );
+  if (!mobileStudioRouteClicked) throw new Error("Mobile Studio route CTA was not found.");
+  await delay(360);
+  await screenshot(client, "mobile-studio-route-transition-390x844.png");
+  await delay(900);
+  const mobileStudioReached = await evaluate(
+    client,
+    `window.location.pathname === "/studio" &&
+      document.querySelector('[data-studio-route="detail"]') !== null`
+  );
+  if (!mobileStudioReached) throw new Error("Mobile Studio route did not open.");
+  await screenshot(client, "mobile-studio-detail-390x844.png");
+
   await navigate(client, 390, 844, true);
   const mobileClicked = await evaluate(
     client,

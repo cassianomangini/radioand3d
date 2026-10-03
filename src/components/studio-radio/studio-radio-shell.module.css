@@ -3371,3 +3371,357 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transition: none;
   }
 }
+
+
+/* C1 route continuity: Home <-> Estudio keeps the public shell and Radio alive. */
+.hero::before,
+.hero::after {
+  content: none;
+}
+
+.heroMedia,
+.heroShade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.heroMedia {
+  z-index: 0;
+  background: url("/images/x1_fundo_2.png") 18% center / cover no-repeat;
+}
+
+.heroShade {
+  z-index: 0;
+  background: linear-gradient(90deg, transparent 0 36%, rgb(2 3 5 / 28%) 50%, rgb(2 3 5 / 55%) 100%);
+}
+
+.studioDetail {
+  min-height: calc(100dvh - var(--header-height));
+  display: grid;
+  grid-template-columns: minmax(22rem, 0.92fr) minmax(28rem, 1.08fr);
+  overflow: hidden;
+  background: radial-gradient(circle at 78% 18%, rgb(20 91 170 / 9%), transparent 28rem), #020305;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.studioDetailMedia {
+  position: relative;
+  min-height: calc(100dvh - var(--header-height));
+  background:
+    linear-gradient(90deg, transparent 54%, rgb(2 3 5 / 34%) 84%, #020305 100%),
+    url("/images/x1_fundo_2.png") 18% center / cover no-repeat;
+  border-right: 1px solid rgb(82 214 255 / 10%);
+}
+
+.studioDetailContent {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(2.4rem, 5dvh, 4.5rem) clamp(2rem, 4vw, 5rem);
+}
+
+.studioDetailIntro {
+  max-width: 42rem;
+}
+
+.studioDetail .studioEyebrow {
+  margin-bottom: 0.85rem;
+  color: #e9f7ff;
+}
+
+.studioDetail h1 {
+  max-width: 10ch;
+  margin: 0 0 1rem;
+  color: #fff;
+  font-size: clamp(3.6rem, 6vw, 6.4rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.065em;
+}
+
+.studioDetail h1 span {
+  background: linear-gradient(100deg, #00d7f5 5%, #1398ff 48%, #b82ee9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.studioDetail .lead {
+  max-width: 42ch;
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+}
+
+.studioBack {
+  width: auto;
+  align-self: flex-start;
+  gap: 0.7rem;
+  margin: 0 0 clamp(2rem, 5dvh, 4rem);
+  padding-inline: 1rem 1.2rem;
+}
+
+.studioBack span:first-child {
+  font-size: 1.2rem;
+}
+
+.studioDetailRail {
+  max-width: 46rem;
+  margin-top: clamp(2rem, 5dvh, 4rem);
+  border-top: 1px solid rgb(120 154 187 / 22%);
+}
+
+.studioDetailRow {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 0.34fr) minmax(0, 1fr);
+  gap: clamp(1rem, 2vw, 2rem);
+  padding: 1.05rem 0 1.15rem;
+  border-bottom: 1px solid rgb(120 154 187 / 15%);
+}
+
+.studioDetailRow > span {
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+}
+
+.studioDetailRow strong {
+  color: #f6f9fc;
+  font-size: clamp(1rem, 1.3vw, 1.18rem);
+}
+
+.studioDetailRow p {
+  max-width: 46ch;
+  margin: 0.35rem 0 0;
+  color: #8fa4b8;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.heroMedia,
+.studioDetailMedia,
+.routeEyebrow,
+.routeTitle,
+.routeLead,
+.routeAction,
+.studioDetailRail {
+  view-transition-name: none;
+}
+
+:global(html[data-site-route-transition]) .studio,
+:global(html[data-site-route-transition]) .radioPanel,
+:global(html[data-site-route-transition]) .radioHeader,
+:global(html[data-site-route-transition]) .coverArt,
+:global(html[data-site-route-transition]) .progressBlock,
+:global(html[data-site-route-transition]) .transport,
+:global(html[data-site-route-transition]) .visualizer,
+:global(html[data-site-route-transition]) .queueHeader,
+:global(html[data-site-route-transition]) .trackList {
+  view-transition-name: none;
+}
+
+:global(html[data-site-route-transition]) .heroMedia,
+:global(html[data-site-route-transition]) .studioDetailMedia {
+  view-transition-name: cm-studio-route-machine;
+}
+
+:global(html[data-site-route-transition]) .routeEyebrow {
+  view-transition-name: cm-studio-route-eyebrow;
+}
+
+:global(html[data-site-route-transition]) .routeTitle {
+  view-transition-name: cm-studio-route-title;
+}
+
+:global(html[data-site-route-transition]) .routeLead {
+  view-transition-name: cm-studio-route-lead;
+}
+
+:global(html[data-site-route-transition]) .routeAction {
+  view-transition-name: cm-studio-route-action;
+}
+
+:global(html[data-site-route-transition]) .studioDetailRail {
+  view-transition-name: cm-studio-route-detail;
+}
+
+:global(html[data-site-route-transition]::view-transition-group(cm-studio-route-machine)) {
+  z-index: 120;
+  animation-duration: 1180ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(html[data-site-route-transition]::view-transition-group(cm-studio-route-eyebrow)) {
+  z-index: 124;
+  animation-duration: 720ms;
+  animation-delay: 90ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(html[data-site-route-transition]::view-transition-group(cm-studio-route-title)) {
+  z-index: 125;
+  animation-duration: 920ms;
+  animation-delay: 110ms;
+  animation-timing-function: cubic-bezier(0.12, 0.92, 0.2, 1);
+}
+
+:global(html[data-site-route-transition]::view-transition-group(cm-studio-route-lead)) {
+  z-index: 124;
+  animation-duration: 680ms;
+  animation-delay: 235ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(html[data-site-route-transition]::view-transition-group(cm-studio-route-action)) {
+  z-index: 126;
+  animation-duration: 620ms;
+  animation-delay: 310ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(html[data-site-route-transition]::view-transition-old(cm-studio-route-machine)),
+:global(html[data-site-route-transition]::view-transition-new(cm-studio-route-machine)),
+:global(html[data-site-route-transition]::view-transition-old(cm-studio-route-eyebrow)),
+:global(html[data-site-route-transition]::view-transition-new(cm-studio-route-eyebrow)),
+:global(html[data-site-route-transition]::view-transition-old(cm-studio-route-title)),
+:global(html[data-site-route-transition]::view-transition-new(cm-studio-route-title)),
+:global(html[data-site-route-transition]::view-transition-old(cm-studio-route-lead)),
+:global(html[data-site-route-transition]::view-transition-new(cm-studio-route-lead)),
+:global(html[data-site-route-transition]::view-transition-old(cm-studio-route-action)),
+:global(html[data-site-route-transition]::view-transition-new(cm-studio-route-action)),
+:global(html[data-site-route-transition]::view-transition-old(cm-studio-route-detail)),
+:global(html[data-site-route-transition]::view-transition-new(cm-studio-route-detail)) {
+  mix-blend-mode: normal;
+}
+
+:global(html[data-site-route-transition="studio-enter"]::view-transition-old(cm-studio-route-machine)) {
+  animation: studio-route-machine-old 760ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+:global(html[data-site-route-transition="studio-enter"]::view-transition-new(cm-studio-route-machine)) {
+  animation: studio-route-machine-new 980ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:global(html[data-site-route-transition="studio-enter"]::view-transition-old(cm-studio-route-title)),
+:global(html[data-site-route-transition="studio-enter"]::view-transition-old(cm-studio-route-lead)) {
+  animation: studio-route-copy-old 420ms ease-in both;
+}
+
+:global(html[data-site-route-transition="studio-enter"]::view-transition-new(cm-studio-route-title)),
+:global(html[data-site-route-transition="studio-enter"]::view-transition-new(cm-studio-route-lead)) {
+  animation: studio-route-copy-new 760ms 150ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:global(html[data-site-route-transition="studio-enter"]::view-transition-new(cm-studio-route-detail)) {
+  animation: studio-route-detail-in 620ms 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:global(html[data-site-route-transition="studio-exit"]::view-transition-old(cm-studio-route-detail)) {
+  animation: studio-route-detail-out 260ms ease-in both;
+}
+
+:global(html[data-site-route-transition="studio-exit"]::view-transition-old(cm-studio-route-machine)) {
+  animation: studio-route-machine-exit 660ms ease-in-out both;
+}
+
+:global(html[data-site-route-transition="studio-exit"]::view-transition-new(cm-studio-route-machine)) {
+  animation: studio-route-machine-home 1040ms 60ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes studio-route-machine-old {
+  from { opacity: 1; filter: brightness(1) saturate(1); }
+  to { opacity: 0.34; filter: brightness(0.7) saturate(0.82); }
+}
+
+@keyframes studio-route-machine-new {
+  from { opacity: 0.28; filter: brightness(0.74) saturate(0.82); }
+  48% { opacity: 0.84; }
+  to { opacity: 1; filter: brightness(1) saturate(1); }
+}
+
+@keyframes studio-route-machine-exit {
+  from { opacity: 1; filter: brightness(1); }
+  to { opacity: 0.3; filter: brightness(0.72); }
+}
+
+@keyframes studio-route-machine-home {
+  from { opacity: 0.26; filter: brightness(0.72); }
+  to { opacity: 1; filter: brightness(1); }
+}
+
+@keyframes studio-route-copy-old {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-0.8rem); }
+}
+
+@keyframes studio-route-copy-new {
+  from { opacity: 0.08; transform: translateX(1.2rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes studio-route-detail-in {
+  from { opacity: 0; transform: translateY(1.8rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes studio-route-detail-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(0.8rem); }
+}
+
+@container studio (max-width: 48rem) {
+  .studioDetail {
+    grid-template-columns: 1fr;
+    align-content: start;
+    overflow: auto;
+  }
+
+  .studioDetailMedia {
+    min-height: clamp(18rem, 48dvh, 30rem);
+    border-right: 0;
+    border-bottom: 1px solid rgb(82 214 255 / 10%);
+  }
+
+  .studioDetailContent {
+    padding: clamp(2rem, 7vw, 3.5rem);
+  }
+
+  .studioDetail h1 {
+    font-size: clamp(3rem, 10cqw, 5.2rem);
+  }
+}
+
+@media (max-width: 73.74rem) {
+  .studioDetail {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .studioDetailMedia {
+    min-height: clamp(15rem, 38dvh, 23rem);
+    background:
+      linear-gradient(180deg, transparent 52%, #020305 100%),
+      url("/images/x1_fundo_2.png") 18% center / cover no-repeat;
+  }
+
+  .studioDetailContent {
+    padding: 2.1rem 1.1rem 3rem;
+  }
+
+  .studioDetail h1 {
+    font-size: clamp(3rem, 15vw, 4.6rem);
+  }
+
+  .studioDetailRail {
+    margin-top: 2.2rem;
+  }
+
+  .studioDetailRow {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+}

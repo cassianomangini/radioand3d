@@ -229,8 +229,8 @@ function Icon({ name }: { name: IconName }) {
     expand: <><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" /><path d="m4 4 5 5m11-5-5 5M4 20l5-5m11 5-5-5" /></>,
     close: <><path d="M5 5l14 14M19 5 5 19" /></>,
     heart: <path d="M20.8 8.6c0 4.2-8.8 10-8.8 10s-8.8-5.8-8.8-10a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z" />,
-    shuffle: <><path d="M4 7h3c4 0 6 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.7 0 3-1.7 4.3-3.7M16 7h4m-3-3 3 3-3 3" /></>,
-    repeat: <><path d="M18 7H7a3 3 0 0 0-3 3v2m0-5 3-3M4 7 1 4m5 13h11a3 3 0 0 0 3-3v-2m0 5-3 3m3-3 3 3" /></>,
+    shuffle: <><path d="M3 6h2c5 0 7 12 12 12h4m-4-4 4 4-4 4" /><path d="M3 18h2c1.8 0 3.2-1.5 4.5-3.5M14.5 9.5C15.8 7.5 17.2 6 19 6h2m-4-4 4 4-4 4" /></>,
+    repeat: <><path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15" /><path d="m7 22-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3" /><path d="m11 11 1-1v5" /></>,
     previous: <><path d="M5 5v14" /><path d="m19 5-11 7 11 7V5Z" fill="currentColor" stroke="none" /></>,
     play: <path d="m8 5 11 7-11 7V5Z" fill="currentColor" stroke="none" />,
     pause: <><rect x="7" y="5" width="3.5" height="14" rx=".6" fill="currentColor" stroke="none" /><rect x="13.5" y="5" width="3.5" height="14" rx=".6" fill="currentColor" stroke="none" /></>,
@@ -288,15 +288,6 @@ function formatTrackDuration(seconds?: number) {
   return seconds && Number.isFinite(seconds) && seconds > 0 ? formatTime(seconds) : "—";
 }
 
-function stableViewTransitionToken(value: string) {
-  let hash = 2166136261;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return (hash >>> 0).toString(36);
-}
-
 function RadioContent({
   mobile = false,
   focus = false,
@@ -320,6 +311,7 @@ function RadioContent({
 }) {
   const radio = useRadio();
   const [query, setQuery] = useState("");
+  const [mobilePanel, setMobilePanel] = useState<"playlist" | "lyrics">("playlist");
   const [volumeOpen, setVolumeOpen] = useState(false);
   const [scrubbing, setScrubbing] = useState(false);
   const [seekPreview, setSeekPreview] = useState<number | null>(null);
@@ -329,15 +321,11 @@ function RadioContent({
   const volumeButtonRef = useRef<HTMLButtonElement>(null);
   const volumePanelId = mobile ? "mobile-radio-volume" : "desktop-radio-volume";
   const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
-  const listTracks = radio.upcomingTracks
+  const listTracks = radio.playlistTracks
     .map((track, index) => ({ track, position: index + 1 }))
     .filter(({ track }) =>
       `${track.title} ${track.artist}`.toLocaleLowerCase("pt-BR").includes(normalizedQuery)
     );
-  const queueMotionEnabled = Boolean(
-    trackStepKind &&
-      new Set(listTracks.map(({ track }) => track.id)).size === listTracks.length
-  );
   const displayTrack = radio.currentTrack ?? previewTrack;
   const canPlay = Boolean(radio.currentTrack);
   const playing = radio.status === "playing";
@@ -412,6 +400,7 @@ function RadioContent({
       className={styles.radioContent}
       data-radio-surface={mobile ? "mobile" : "desktop"}
       data-radio-focus={!mobile && focus ? "true" : undefined}
+      data-mobile-panel={mobile ? mobilePanel : undefined}
       data-track-flight={trackFlight?.phase}
       data-track-step={trackStepKind}
       data-mobile-motion-endpoint={mobile && mobileMotionEndpoint ? "true" : undefined}
@@ -500,8 +489,8 @@ function RadioContent({
       </div>
 
       <div className={styles.transport} aria-label="Controles da rádio" data-radio-motion-key="transport">
-        <button type="button" className={styles.modeButton} data-radio-flip-key="control-shuffle" onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória" data-tooltip="Embaralhar lista do zero"><Icon name="shuffle" /></button>
-        <button type="button" className={styles.modeButton} data-radio-flip-key="control-repeat" onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir faixa" title={radio.repeatOne ? "Desligar repetição" : "Repetir faixa"}><Icon name="repeat" /></button>
+        <button type="button" className={styles.modeButton} data-radio-flip-key="control-shuffle" onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Embaralhar e trocar de música" data-tooltip="Embaralhar e trocar de música"><Icon name="shuffle" /></button>
+        <button type="button" className={styles.modeButton} data-radio-flip-key="control-repeat" onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir esta faixa" title={radio.repeatOne ? "Desligar repetição da faixa" : "Repetir esta faixa"}><Icon name="repeat" /></button>
         <button type="button" data-radio-flip-key="control-previous" onClick={transportPrevious} disabled={!canPlay} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
         <button
           type="button"
@@ -564,37 +553,37 @@ function RadioContent({
       <RadioVisualizer className={styles.visualizer} motionKey="visualizer" />
 
       <div className={styles.queueHeader} data-radio-motion-key="queue-header">
-        <h3>A seguir</h3>
-        <label className={styles.searchField}>
-          <span className={styles.srOnly}>Buscar nas próximas músicas</span>
-          <Icon name="search" />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar em A seguir..."
-          />
-        </label>
+        <h3>Playlist</h3>
+        {(!mobile || mobilePanel === "playlist") ? (
+          <label className={styles.searchField}>
+            <span className={styles.srOnly}>Buscar na playlist</span>
+            <Icon name="search" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar na playlist..."
+            />
+          </label>
+        ) : null}
+        {mobile ? (
+          <button type="button" className={styles.panelToggle} onClick={() => setMobilePanel((panel) => panel === "playlist" ? "lyrics" : "playlist")} aria-label={mobilePanel === "playlist" ? "Expandir letra" : "Expandir playlist"}>
+            {mobilePanel === "playlist" ? "Letra ↓" : "↑"}
+          </button>
+        ) : null}
       </div>
 
       <ol
         className={styles.trackList}
-        aria-label="Próximas músicas na ordem de reprodução"
+        aria-label="Músicas da playlist"
         data-radio-motion-key="queue-list"
-        data-queue-motion={queueMotionEnabled ? trackStepKind : undefined}
       >
         {listTracks.map(({ track, position }) => (
-          <li
-            key={`${track.id}-${position}`}
-            style={queueMotionEnabled
-              ? {
-                  viewTransitionName: `cm-${mobile ? "mobile" : "desktop"}-queue-${stableViewTransitionToken(track.id)}`
-                } as CSSProperties
-              : undefined}
-          >
+          <li key={track.id}>
             <button
               type="button"
               className={styles.trackRow}
+              aria-current={track.id === radio.currentTrack?.id ? "true" : undefined}
               onClick={() => selectTrackWithMotion(track.id)}
               data-track-flight-source={trackFlight?.phase === "source" && trackFlight.id === track.id ? "true" : undefined}
             >
@@ -612,7 +601,7 @@ function RadioContent({
           </li>
         ))}
         {listTracks.length === 0 ? (
-          <li className={styles.emptyState}>{normalizedQuery ? "Nenhuma próxima música encontrada." : "Não há próximas músicas nesta fila."}</li>
+          <li className={styles.emptyState}>{normalizedQuery ? "Nenhuma música encontrada." : "A playlist está vazia."}</li>
         ) : null}
       </ol>
       {mobile || expanded ? (
@@ -620,6 +609,8 @@ function RadioContent({
           trackId={radio.currentTrack?.id}
           title={radio.currentTrack?.title}
           headingId={mobile ? "mobile-radio-lyrics-title" : "radio-lyrics-title"}
+          active={!mobile || mobilePanel === "lyrics"}
+          onClose={mobile ? () => setMobilePanel("playlist") : undefined}
         />
       ) : null}
       {radio.error ? <p className={styles.playerMessage} role="alert">{radio.error} <button type="button" onClick={radio.retry}>Tentar novamente</button></p> : null}
@@ -657,7 +648,10 @@ export function StudioRadioShell() {
   const motionResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dividerSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
+  const [shellWidth, setShellWidth] = useState<number | null>(null);
+  const [desktopLayout, setDesktopLayout] = useState(false);
   const [radioExpanded, setRadioExpanded] = useState(false);
+  const [showResizeHint, setShowResizeHint] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [radioFullscreen, setRadioFullscreen] = useState(false);
   const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
@@ -758,6 +752,8 @@ export function StudioRadioShell() {
 
     const observer = new ResizeObserver(() => {
       const width = shell.getBoundingClientRect().width;
+      setShellWidth(width);
+      setDesktopLayout(window.matchMedia("(min-width: 73.75rem)").matches);
       setRadioWidth((current) =>
         radioExpanded
           ? getExpandedWidth(width)
@@ -794,6 +790,7 @@ export function StudioRadioShell() {
       runRadioMotion("closing", () => {
         setRadioWidth(getDefaultWidth(shellWidth));
         setRadioExpanded(false);
+        setShowResizeHint(false);
       });
       return;
     }
@@ -801,6 +798,7 @@ export function StudioRadioShell() {
     runRadioMotion("opening", () => {
       setRadioWidth(getExpandedWidth(shellWidth));
       setRadioExpanded(true);
+      setShowResizeHint(true);
     });
   }
 
@@ -906,10 +904,6 @@ export function StudioRadioShell() {
 
   function nextTrack() {
     runTrackStepMotion("next", radio.next);
-  }
-
-  function reshuffleTracks() {
-    runTrackStepMotion("shuffle", radio.reshuffle);
   }
 
   const handleRadioShortcut = useEffectEvent((event: globalThis.KeyboardEvent) => {
@@ -1056,6 +1050,7 @@ export function StudioRadioShell() {
     dragFullscreenRef.current = true;
     runRadioMotion("opening", () => {
       clearDragPreview();
+      setShowResizeHint(false);
       setRadioFullscreen(true);
     });
   }
@@ -1126,6 +1121,7 @@ export function StudioRadioShell() {
     returnDistanceRef.current = Math.max(0, rect.width - initialRadioWidthRef.current - event.currentTarget.getBoundingClientRect().width);
     pointerActiveRef.current = true;
     pointerMovedRef.current = false;
+    setShowResizeHint(false);
     clearDragPreview();
     clearReturnPreview();
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -1392,8 +1388,14 @@ export function StudioRadioShell() {
       )
   );
 
+  const radioAtMaximumWidth =
+    desktopLayout &&
+    shellWidth !== null &&
+    radioWidth !== null &&
+    radioWidth >= clampRadioWidth(shellWidth, Number.POSITIVE_INFINITY) - 1;
+
   const activeNav =
-    radioFullscreen || radioExpanded || mobileRadioOpen
+    radioFullscreen || radioExpanded || mobileRadioOpen || radioAtMaximumWidth
       ? "radio"
       : studioRoute === "detail"
         ? "studio"
@@ -1411,7 +1413,7 @@ export function StudioRadioShell() {
             : "";
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-wider-than-default={shellWidth !== null && radioWidth !== null && radioWidth > getDefaultWidth(shellWidth) ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
         {playbackStatusMessage}
       </span>
@@ -1526,8 +1528,8 @@ export function StudioRadioShell() {
           <RadioVisualizer className={`${styles.visualizer} ${styles.miniVisualizer}`} barCount={24} active={!mobileRadioOpen} />
         </div>
         <div className={styles.miniControls}>
-          <button type="button" className={styles.miniStep} onClick={reshuffleTracks} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória"><Icon name="shuffle" /></button>
-          <button type="button" className={styles.miniStep} onClick={radio.toggleRepeatOne} disabled={!radio.currentTrack} aria-pressed={radio.repeatOne} aria-label="Repetir faixa"><Icon name="repeat" /></button>
+          <button type="button" className={styles.miniStep} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Embaralhar e trocar de música" title="Embaralhar e trocar de música"><Icon name="shuffle" /></button>
+          <button type="button" className={styles.miniStep} onClick={radio.toggleRepeatOne} disabled={!radio.currentTrack} aria-pressed={radio.repeatOne} aria-label="Repetir esta faixa" title={radio.repeatOne ? "Desligar repetição da faixa" : "Repetir esta faixa"}><Icon name="repeat" /></button>
           <button type="button" className={styles.miniStep} onClick={previousTrack} disabled={!radio.currentTrack} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
           <button
             type="button"
@@ -1678,6 +1680,7 @@ export function StudioRadioShell() {
         <div
           ref={resizeHandleRef}
           className={styles.resizeHandle}
+          data-resize-hint={showResizeHint && radioExpanded && !radioFullscreen ? "true" : undefined}
           role={radioFullscreen ? "button" : "separator"}
           aria-label={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Redimensionar ou expandir CM Rádio"}
           aria-orientation={radioFullscreen ? undefined : "vertical"}
@@ -1700,7 +1703,7 @@ export function StudioRadioShell() {
             trackStepKind={trackStepMotion?.kind}
             onPrevious={previousTrack}
             onNext={nextTrack}
-            onReshuffle={reshuffleTracks}
+            onReshuffle={radio.reshuffle}
           />
         </aside>
       </div>
@@ -1722,7 +1725,7 @@ export function StudioRadioShell() {
           trackStepKind={trackStepMotion?.kind}
           onPrevious={previousTrack}
           onNext={nextTrack}
-          onReshuffle={reshuffleTracks}
+          onReshuffle={radio.reshuffle}
           onClose={closeMobileRadio}
         />
       </dialog>

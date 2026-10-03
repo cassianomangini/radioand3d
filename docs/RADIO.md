@@ -17,15 +17,15 @@ Isso cobre navegação interna, não continuidade sonora durante refresh, fecham
 
 Mini player **mobile**: faixa/capa ou fallback CM, play/pause, anterior/próxima, barras ligadas ao mesmo analisador, indicação de progresso e ação de abrir a Rádio completa. Volume, fila completa e controles adicionais ficam na Rádio completa quando faltar espaço.
 
-Rádio completa: no desktop fica acoplada à composição e pode ser redimensionada/expandida; no mobile abre sob demanda. Contém a lista única **A seguir**, busca simples entre as faixas dessa lista, seleção direta, posição/duração, seek e volume quando suportado. Ao abrir o site, a playlist nasce em ordem aleatória, sem repetição automática. O transporte mostra Nova ordem, Repetir faixa, Anterior, Play/Pausa, Próxima, Volume e Coração nessa ordem. Nova ordem tem tooltip; Repetir faixa fica iluminado quando ativo. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
+Rádio completa: no desktop fica acoplada à composição e pode ser redimensionada/expandida; no mobile abre sob demanda. Contém a **Playlist** inicialmente embaralhada, busca simples entre suas faixas, seleção direta, posição/duração, seek e volume quando suportado. A reprodução abre em modo aleatório, sem repetição automática. O transporte mostra Embaralhar novamente, Repetir faixa, Anterior, Play/Pausa, Próxima, Volume e Coração nessa ordem. Repetir faixa indica quando está ativo. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
 
 O botão de volume fica depois de Próxima no transporte, abre um slider e uma ação de mudo. Ao sair do mudo, restaura o último volume audível; mover o slider para acima de zero também reativa o som. Desktop e Rádio completa mobile compartilham o mesmo volume do motor. Fechar o controle não altera o volume nem a reprodução.
 
-A lista **A seguir** tem rolagem própria. Em ordem aleatória, mostra primeiro as entradas ainda não ouvidas neste ciclo, na ordem decidida pelo controller, e em seguida as já ouvidas, no fim da fila, na ordem em que deixaram a reprodução. As dez primeiras ainda não ouvidas são sempre as próximas dez quando existem. A lista atualiza após avanço e seleção manual. Quando não restam entradas novas, a reprodução para e as já ouvidas continuam na lista para uma escolha explícita. A UI não inventa títulos nem repete itens só para preencher a lista. A rolagem não desloca os controles ou a Rádio inteira.
+A **Playlist** tem rolagem própria, abre em ordem aleatória e mantém essa ordem ao tocar ou avançar. A faixa atual fica identificada. O botão Embaralhar cria uma nova ordem visível, troca imediatamente a faixa atual por outra quando há pelo menos duas e reinicia o ciclo sem repetição automática. Se estava tocando, a nova faixa toca; se estava pausada, permanece pausada na nova faixa. Embaralhar desliga Repetir faixa. A UI não inventa títulos nem repete itens só para preencher a lista. A rolagem não desloca os controles ou a Rádio inteira. No mobile, playlist e letra alternam o espaço principal com setas; a letra pode ser fechada.
 
-Na Rádio completa, o título **A seguir** e o campo de busca ocupam a mesma linha. Não exibir contador de faixas; o espaço inicial da lista deve comportar três músicas completas em alturas de tela comuns, preservando rolagem para as demais.
+Na Rádio completa, o título **Playlist** e o campo de busca ocupam a mesma linha quando há espaço. Não exibir contador de faixas; o espaço inicial da lista deve comportar três músicas completas em alturas de tela comuns, preservando rolagem para as demais.
 
-Com **Repetir faixa** ligado, a faixa atual aparece como próxima e volta a tocar ao terminar. O botão **Próxima faixa** avança para uma entrada ainda não percorrida quando existe. Desligar a repetição restaura a sequência restante.
+Com **Repetir faixa** ligado, a faixa atual volta a tocar ao terminar, sem mover sua linha na **Playlist**. O botão **Próxima faixa** avança para uma entrada ainda não percorrida quando existe. Desligar a repetição restaura a sequência restante.
 
 Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, painel de histórico, favoritos e equalização sonora avançada são evoluções. O histórico mínimo para o botão anterior faz parte do motor inicial.
 
@@ -33,12 +33,11 @@ Busca e seleção manual pertencem à V1. Skins, visualizadores adicionais, pain
 
 Validar estes padrões operacionais na entrega 01:
 
-- A abertura cria uma ordem aleatória para as entradas elegíveis. A mesma ordem é usada na renderização inicial e pela fila do navegador, sem discrepância entre a lista e o botão próxima.
-- Selecionar uma faixa toca a versão escolhida. As ainda não ouvidas permanecem à frente; a que estava tocando vai para o fim da fila aleatória. Uma seleção explícita pode revisitar uma faixa já ouvida. Os avanços automáticos não a recolocam entre as próximas.
-- Digitar uma busca filtra somente a apresentação da lista **A seguir**, sem alterar a fila em execução. Selecionar uma faixa reorganiza as próximas ainda não ouvidas e mantém as já ouvidas no fim.
-- O controller fornece à interface a ordem já decidida. Enquanto houver faixa ainda não ouvida, o começo da lista coincide com o botão próxima e com o término natural. As já ouvidas ficam depois dessa sequência e não entram no avanço automático.
+- A abertura cria uma ordem aleatória de reprodução para as entradas elegíveis. A **Playlist** exibe essa ordem embaralhada e só muda quando o usuário pede um novo embaralhamento.
+- Selecionar uma faixa toca a versão escolhida sem mover sua linha na **Playlist**. Uma seleção explícita pode revisitar uma faixa já ouvida.
+- Digitar uma busca filtra somente a apresentação da **Playlist**, sem alterar a fila em execução.
+- O controller decide os próximos avanços; Embaralhar cria outra ordem aleatória para a **Playlist** e para as próximas faixas, escolhe uma nova faixa atual e limpa o histórico.
 - Cada entrada toca no máximo uma vez por avanço automático enquanto **Repetir faixa** está desligado. Ao terminar as entradas novas, a reprodução para. Repetir faixa, anterior e seleção direta são ações explícitas e podem revisitar uma entrada que permanece no fim da fila.
-- **Nova ordem** reinicia a playlist com todas as entradas elegíveis em outra sequência aleatória, limpa o histórico, esvazia a fila de já ouvidas e desliga Repetir faixa. Se a Rádio estava tocando, passa a tocar a primeira música da nova ordem; se estava pausada, a nova primeira música fica pronta sem autoplay.
 - Anterior reinicia a faixa se já passou de três segundos; senão usa o histórico realmente ouvido. Com fila vazia, controles ficam desabilitados. Uma faixa sozinha termina em `off` e repete somente quando solicitado.
 - Ao mudar a biblioteca publicada, preservar a faixa atual quando ainda elegível. Uma versão retirada não pode ser selecionada de novo; tratar item indisponível sem loop infinito.
 

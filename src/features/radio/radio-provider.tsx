@@ -35,6 +35,7 @@ export type PlaybackStatus =
 
 interface RadioContextValue {
   tracks: RadioTrack[];
+  playlistTracks: RadioTrack[];
   currentTrack: RadioTrack | null;
   upcomingTracks: RadioTrack[];
   status: PlaybackStatus;
@@ -80,6 +81,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const requestRef = useRef(0);
   const [currentId, setCurrentId] = useState(queue.currentId);
   const [upcomingIds, setUpcomingIds] = useState(() => queue.following());
+  const [playlistIds, setPlaylistIds] = useState(() => queue.currentId ? [queue.currentId, ...queue.following()] : []);
   const [status, setStatus] = useState<PlaybackStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [position, setPosition] = useState(0);
@@ -98,6 +100,10 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   );
   const currentTrack = currentId ? trackById.get(currentId) ?? null : null;
   const upcomingTracks = upcomingIds.flatMap((id) => {
+    const track = trackById.get(id);
+    return track ? [track] : [];
+  });
+  const playlistTracks = playlistIds.flatMap((id) => {
     const track = trackById.get(id);
     return track ? [track] : [];
   });
@@ -268,9 +274,8 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const reshuffle = useCallback(() => {
     const wasPlaying = status === "playing" || status === "loading" || status === "buffering";
     queue.reshuffle();
-    if (audioRef.current?.getAttribute("src")) audioRef.current.currentTime = 0;
-    setPosition(0);
-    setError(null);
+    setPlaylistIds(queue.currentId ? [queue.currentId, ...queue.following()] : []);
+    refreshQueue();
     if (wasPlaying) {
       switchToCurrent();
       return;
@@ -278,8 +283,9 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
     requestRef.current += 1;
     audioRef.current?.pause();
     loadCurrent();
+    setPosition(0);
+    setError(null);
     setStatus(queue.currentId && status !== "idle" ? "paused" : "idle");
-    refreshQueue();
   }, [loadCurrent, queue, refreshQueue, status, switchToCurrent]);
 
   const retry = useCallback(() => {
@@ -302,7 +308,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   }, []);
 
   const value: RadioContextValue = {
-    tracks, currentTrack, upcomingTracks, status, error, position, duration, volume, repeatOne, canSkipNext,
+    tracks, playlistTracks, currentTrack, upcomingTracks, status, error, position, duration, volume, repeatOne, canSkipNext,
     hasPrevious, analyserReady, analyserUnavailable, play, pause, toggle, select, next, previous,
     seek, setVolume, toggleMute, toggleRepeatOne, reshuffle, retry, getAnalyser, getCurrentTime
   };

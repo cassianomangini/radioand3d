@@ -4,9 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFrequencyBarMotion } from "./frequency-bars";
 import { useRadio } from "./radio-provider";
 import {
-  createMusicalVisualizerMotion,
   enhanceVisualizerSpatialContrast,
-  getResampledVisualizerLayout,
   getResampledVisualizerRoles,
   loadMusicalVisualizerAnalysis,
   relaxVisualizerLevel,
@@ -79,22 +77,6 @@ export function RadioVisualizer({
     const synchronizedRoles = currentAnalysis
       ? getResampledVisualizerRoles(currentAnalysis, bars.length)
       : null;
-    const synchronizedMotion = currentAnalysis
-      ? createMusicalVisualizerMotion(
-          bars.length,
-          getResampledVisualizerLayout(currentAnalysis, bars.length)
-        )
-      : null;
-
-    if (synchronizedMotion) {
-      synchronizedMotion.reset(
-        bars.map((bar) =>
-          visualizerLevelFromHeightPercent(
-            Number.parseFloat(bar.style.height || "4")
-          )
-        )
-      );
-    }
 
     const bounds = root.getBoundingClientRect();
     let visible =
@@ -108,7 +90,6 @@ export function RadioVisualizer({
     let frame = 0;
     let frameDelay: number | null = null;
     let previousFrame = 0;
-    let previousPosition = currentAnalysis ? getCurrentTime() : -1;
 
     function scheduleDraw() {
       if (reducedMotion.matches) {
@@ -135,7 +116,7 @@ export function RadioVisualizer({
     function draw(now: number) {
       let heights: number[];
 
-      if (currentAnalysis && synchronizedMotion) {
+      if (currentAnalysis) {
         const position = getCurrentTime();
         const sampledTargets = sampleMusicalVisualizer(
           currentAnalysis,
@@ -145,20 +126,7 @@ export function RadioVisualizer({
         const targets = synchronizedRoles
           ? enhanceVisualizerSpatialContrast(sampledTargets, synchronizedRoles)
           : sampledTargets;
-        const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
-        const jumped =
-          previousPosition >= 0 &&
-          Math.abs(position - previousPosition) > Math.max(0.28, elapsed / 1000 * 3.5);
-
-        if (jumped) {
-          synchronizedMotion.reset(targets);
-        }
-
-        previousPosition = position;
-        previousFrame = now;
-        heights = synchronizedMotion
-          .step(targets, elapsed)
-          .map((level) => 4 + level * 92);
+        heights = targets.map((level) => 4 + level * 92);
       } else if (analyser && levels && moveBars) {
         analyser.getFloatFrequencyData(levels);
         const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
@@ -183,7 +151,6 @@ export function RadioVisualizer({
       cancelScheduledDraw();
       if (visible && !document.hidden) {
         previousFrame = 0;
-        previousPosition = currentAnalysis ? getCurrentTime() : -1;
         scheduleDraw();
       }
     }

@@ -27,16 +27,6 @@ export interface ResampledVisualizerLayout {
 
 export type VisualizerBarRole = "bass" | "drums" | "other" | "voice";
 
-interface VisualizerMotionProfile {
-  attackMs: number;
-  releaseMs: number;
-}
-
-export interface MusicalVisualizerMotion {
-  step: (targets: number[], elapsedMs: number) => number[];
-  reset: (targets?: number[]) => void;
-}
-
 export function visualizerLevelFromHeightPercent(heightPercent: number) {
   if (!Number.isFinite(heightPercent)) return 0;
   return Math.min(1, Math.max(0, (heightPercent - 4) / 92));
@@ -248,58 +238,6 @@ export function enhanceVisualizerSpatialContrast(
   }
 
   return output;
-}
-
-function profileForRole(role: VisualizerBarRole): VisualizerMotionProfile {
-  switch (role) {
-    case "bass":
-      return { attackMs: 62, releaseMs: 220 };
-    case "drums":
-      return { attackMs: 24, releaseMs: 82 };
-    case "voice":
-      return { attackMs: 38, releaseMs: 142 };
-    default:
-      return { attackMs: 44, releaseMs: 168 };
-  }
-}
-
-export function createMusicalVisualizerMotion(
-  barCount: number,
-  layout: ResampledVisualizerLayout
-): MusicalVisualizerMotion {
-  const count = Math.max(0, Math.floor(barCount));
-  const current = new Float32Array(count);
-  let initialized = false;
-
-  function reset(targets?: number[]) {
-    initialized = Boolean(targets);
-    for (let index = 0; index < count; index += 1) {
-      current[index] = Math.min(1, Math.max(0, targets?.[index] ?? 0));
-    }
-  }
-
-  function step(targets: number[], elapsedMs: number) {
-    const elapsed = Math.min(80, Math.max(1, Number.isFinite(elapsedMs) ? elapsedMs : 16));
-
-    if (!initialized) {
-      reset(targets);
-      return Array.from(current);
-    }
-
-    for (let index = 0; index < count; index += 1) {
-      const target = Math.min(1, Math.max(0, targets[index] ?? 0));
-      const previous = current[index];
-      const profile = profileForRole(visualizerBarRole(index, count, layout));
-      const timeConstant = target >= previous ? profile.attackMs : profile.releaseMs;
-      const blend = 1 - Math.exp(-elapsed / timeConstant);
-      const next = previous + (target - previous) * blend;
-      current[index] = Math.abs(next - target) < 0.002 ? target : next;
-    }
-
-    return Array.from(current);
-  }
-
-  return { step, reset };
 }
 
 export function sampleMusicalVisualizer(

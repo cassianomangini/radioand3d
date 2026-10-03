@@ -30,10 +30,10 @@ Os perfis não criam permissões nem garantem isolamento. As permissões reais p
 2. Assumir uma entrega disponível no roadmap. Usar [o modelo](docs/work/TEMPLATE.md) apenas para a entrega atual; não abrir dezenas de checklists vazios.
 3. Registrar objetivo, limites, responsável, contratos lidos e critérios de aceite antes de implementar.
 4. Marcar passos conforme são realmente verificados. Registrar bloqueio e próximo passo exato antes de encerrar a sessão.
-5. Executar verificações de código pertinentes e revisar o diff. Cassiano faz a validação visual e das interações do frontend. Não abrir a aplicação no navegador, gerar capturas ou marcar revisão visual como feita pelo agente sem pedido explícito dele. Build não prova qualidade visual.
+5. Revisar o diff. Executar lint, typecheck, build e testes somente quando Cassiano pedir explicitamente; sem esse pedido, registrar que não foram executados. Cassiano faz a validação visual e das interações do frontend. Não abrir a aplicação no navegador, gerar capturas ou marcar revisão visual como feita pelo agente sem pedido explícito dele. Build não prova qualidade visual.
 6. Atualizar contratos alterados e estado no roadmap. Informar commit/PR, evidência e pendências reais ao usuário.
 
-Usar branches e PRs para implementação. Organização documental solicitada pode ser um commit atômico, sem reescrever histórico. Nunca usar force push ou sobrescrever arquivos concorrentes. Um PR deve ter um resultado verificável; dividir por dependência funcional quando ficar difícil revisar, não por número arbitrário de linhas.
+Implementar diretamente na `main`. Criar branch ou PR somente quando Cassiano pedir explicitamente. Organização documental solicitada pode ser um commit atômico, sem reescrever histórico. Nunca usar force push ou sobrescrever arquivos concorrentes. Um PR solicitado deve ter um resultado verificável; dividir por dependência funcional quando ficar difícil revisar, não por número arbitrário de linhas.
 
 ## Critério de conclusão
 

@@ -126,3 +126,14 @@ Responsável: CM Audio. Contratos: [Rádio](../RADIO.md) e [plano de movimento](
 - [ ] Registrar faixas, resultados observados, correções e verificações de código pertinentes antes de pedir avanço de C2 e C3 no roadmap.
 
 Próximo passo desta frente: aguardar C1 e então selecionar a amostra real do sync para a comparação acima. Implementação antecipada não equivale a aceite musical.
+
+## Resposta lenta das barras no desktop em 03/10/2026
+
+Responsável: CM Audio. Destino: `main`. Contrato lido: [Rádio](../RADIO.md). Objetivo: fazer as barras com sidecar v3 acompanharem os quadros sincronizados sem acrescentar atraso perceptível. Limite: somente o renderer; preservar o fallback ao vivo, os derivados já gerados e as alterações locais de outras entregas. Critério de aceite técnico: o renderer usa diretamente o quadro interpolado na posição atual do áudio e mantém pausa e seek coerentes. A avaliação do ritmo com música real continua com Cassiano.
+
+- [x] Conferir branch, diff local, contrato, checklist e presença dos 343 sidecars v3 locais.
+- [x] Remover a segunda suavização aplicada pelo renderer ao sidecar já suavizado na análise offline.
+- [x] Revisar o diff da correção isolada.
+- [ ] Cassiano conferir a resposta das barras no desktop com músicas reais.
+
+Evidência: os 343 sidecars v3 estão disponíveis no ambiente local; o renderer deixou de aplicar attack/release adicional aos quadros já suavizados do derivado. Nesta sessão, antes de Cassiano esclarecer a regra de execução, foram rodados `pnpm test` (63 passaram), `pnpm lint`, `pnpm typecheck` e `pnpm build` (passaram). A correção ainda não teve revisão perceptiva. Próximo passo: Cassiano ouvir uma faixa no desktop e comparar a resposta das barras com a batida e a voz.

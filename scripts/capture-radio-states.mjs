@@ -321,7 +321,9 @@ try {
     })()`
   );
   if (!interruptionReopened) throw new Error("Could not reopen Radio after reversal.");
-  await delay(1050);
+  // Allow the staged focus -> fullscreen signature and its cleanup window
+  // to finish before asserting that no layout animation remains.
+  await delay(1280);
 
   const interruptionSettled = await evaluate(
     client,

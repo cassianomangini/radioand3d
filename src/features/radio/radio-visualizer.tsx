@@ -5,6 +5,7 @@ import { createFrequencyBarMotion } from "./frequency-bars";
 import { useRadio } from "./radio-provider";
 import {
   createMusicalVisualizerMotion,
+  enhanceVisualizerSpatialContrast,
   getResampledVisualizerLayout,
   getResampledVisualizerRoles,
   loadMusicalVisualizerAnalysis,
@@ -75,6 +76,9 @@ export function RadioVisualizer({
     const bars = Array.from(root.querySelectorAll<HTMLSpanElement>(":scope > span"));
     const levels = analyser ? new Float32Array(analyser.frequencyBinCount) : null;
     const moveBars = analyser ? createFrequencyBarMotion(bars.length) : null;
+    const synchronizedRoles = currentAnalysis
+      ? getResampledVisualizerRoles(currentAnalysis, bars.length)
+      : null;
     const synchronizedMotion = currentAnalysis
       ? createMusicalVisualizerMotion(
           bars.length,
@@ -133,11 +137,14 @@ export function RadioVisualizer({
 
       if (currentAnalysis && synchronizedMotion) {
         const position = getCurrentTime();
-        const targets = sampleMusicalVisualizer(
+        const sampledTargets = sampleMusicalVisualizer(
           currentAnalysis,
           position,
           bars.length
         );
+        const targets = synchronizedRoles
+          ? enhanceVisualizerSpatialContrast(sampledTargets, synchronizedRoles)
+          : sampledTargets;
         const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
         const jumped =
           previousPosition >= 0 &&

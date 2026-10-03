@@ -203,6 +203,53 @@ export function getResampledVisualizerRoles(
   );
 }
 
+function spatialContrastFactor(role: VisualizerBarRole) {
+  switch (role) {
+    case "drums":
+      return 1.16;
+    case "other":
+      return 1.12;
+    case "bass":
+      return 1.08;
+    case "voice":
+      return 1.06;
+  }
+}
+
+export function enhanceVisualizerSpatialContrast(
+  values: number[],
+  roles: VisualizerBarRole[]
+) {
+  if (values.length !== roles.length) return [...values];
+
+  const output = [...values];
+  let start = 0;
+
+  while (start < values.length) {
+    const role = roles[start];
+    let end = start + 1;
+    while (end < values.length && roles[end] === role) end += 1;
+
+    if (end - start > 1) {
+      const segment = values.slice(start, end);
+      const average =
+        segment.reduce((sum, value) => sum + value, 0) / segment.length;
+      const factor = spatialContrastFactor(role);
+
+      for (let index = start; index < end; index += 1) {
+        output[index] = Math.min(
+          1,
+          Math.max(0, average + (values[index] - average) * factor)
+        );
+      }
+    }
+
+    start = end;
+  }
+
+  return output;
+}
+
 function profileForRole(role: VisualizerBarRole): VisualizerMotionProfile {
   switch (role) {
     case "bass":

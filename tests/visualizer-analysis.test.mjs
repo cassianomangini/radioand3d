@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   createMusicalVisualizerMotion,
   decodeMusicalVisualizerAnalysis,
+  enhanceVisualizerSpatialContrast,
   getResampledVisualizerLayout,
   getResampledVisualizerRoles,
   relaxVisualizerLevel,
@@ -147,4 +148,28 @@ test("paused visualizer relaxation decays smoothly without overshooting below ba
     level = next;
   }
   assert.ok(level < 0.001);
+});
+
+
+test("spatial contrast amplifies only differences already present in each real region", () => {
+  const roles = ["bass", "bass", "drums", "drums", "voice", "voice", "other", "other"];
+  const values = [0.3, 0.5, 0.25, 0.55, 0.4, 0.6, 0.2, 0.7];
+  const enhanced = enhanceVisualizerSpatialContrast(values, roles);
+
+  assert.ok(enhanced[0] < values[0]);
+  assert.ok(enhanced[1] > values[1]);
+  assert.ok(enhanced[2] < values[2]);
+  assert.ok(enhanced[3] > values[3]);
+
+  for (const [start, end] of [[0, 2], [2, 4], [4, 6], [6, 8]]) {
+    const before = (values[start] + values[start + 1]) / 2;
+    const after = (enhanced[start] + enhanced[start + 1]) / 2;
+    assert.ok(Math.abs(before - after) < 0.0001);
+  }
+});
+
+test("spatial contrast never invents variation when a region is uniform", () => {
+  const roles = ["bass", "bass", "voice", "voice"];
+  const values = [0.4, 0.4, 0.7, 0.7];
+  assert.deepEqual(enhanceVisualizerSpatialContrast(values, roles), values);
 });

@@ -214,7 +214,10 @@ try {
       if (!(panel instanceof HTMLElement)) return 0;
       return panel
         .getAnimations({ subtree: true })
-        .filter((animation) => animation.playState === "running").length;
+        .filter((animation) =>
+          animation.playState === "running" &&
+          animation.id.startsWith("cm-radio-layout-")
+        ).length;
     })()`
   );
   if (activeRadioAnimations < 8) {
@@ -327,17 +330,28 @@ try {
       if (!(site instanceof HTMLElement)) return false;
       const panel = document.querySelector('[data-radio-flip-root="true"]');
       if (!(panel instanceof HTMLElement)) return false;
-      const running = panel
+      const runningLayoutAnimations = panel
         .getAnimations({ subtree: true })
-        .filter((animation) => animation.playState === "running").length;
-      return site.dataset.radioLayoutMode === "fullscreen" &&
-        !site.hasAttribute("data-radio-layout-motion") &&
-        running === 0 &&
-        document.querySelector("audio") === window.__cmRadioAudioNode;
+        .filter((animation) =>
+          animation.playState === "running" &&
+          animation.id.startsWith("cm-radio-layout-")
+        ).length;
+      return {
+        ok: site.dataset.radioLayoutMode === "fullscreen" &&
+          !site.hasAttribute("data-radio-layout-motion") &&
+          runningLayoutAnimations === 0 &&
+          document.querySelector("audio") === window.__cmRadioAudioNode,
+        layoutMode: site.dataset.radioLayoutMode,
+        motion: site.getAttribute("data-radio-layout-motion"),
+        runningLayoutAnimations,
+        audioPreserved: document.querySelector("audio") === window.__cmRadioAudioNode
+      };
     })()`
   );
-  if (!interruptionSettled) {
-    throw new Error("Radio motion did not settle cleanly after open → reverse → reopen interruption.");
+  if (!interruptionSettled?.ok) {
+    throw new Error(
+      `Radio motion did not settle cleanly after open → reverse → reopen interruption: ${JSON.stringify(interruptionSettled)}`
+    );
   }
 
   await client.send("Emulation.setEmulatedMedia", {

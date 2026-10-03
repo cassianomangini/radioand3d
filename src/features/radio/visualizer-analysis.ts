@@ -19,6 +19,24 @@ export interface DecodedMusicalVisualizerAnalysis extends Omit<MusicalVisualizer
   data: Uint8Array;
 }
 
+export interface ResampledVisualizerLayout {
+  voiceStart: number;
+  voiceCount: number;
+  sideCount: number;
+}
+
+type VisualizerBarRole = "bass" | "drums" | "other" | "voice";
+
+interface VisualizerMotionProfile {
+  attackMs: number;
+  releaseMs: number;
+}
+
+export interface MusicalVisualizerMotion {
+  step: (targets: number[], elapsedMs: number) => number[];
+  reset: (targets?: number[]) => void;
+}
+
 const MAX_ANALYSIS_BYTES = 10 * 1024 * 1024;
 
 function decodeBase64(value: string): Uint8Array {
@@ -93,7 +111,7 @@ function frameValue(analysis: DecodedMusicalVisualizerAnalysis, frame: number, b
 function resample(values: number[], count: number): number[] {
   if (count <= 0) return [];
   if (values.length === 0) return Array(count).fill(0);
-  if (values.length === count) return values;
+  if (values.length === count) return [...values];
   if (count === 1) return [values[Math.floor(values.length / 2)] ?? 0];
   if (values.length === 1) return Array(count).fill(values[0]);
 
@@ -104,6 +122,110 @@ function resample(values: number[], count: number): number[] {
     const mix = source - left;
     return values[left] * (1 - mix) + values[right] * mix;
   });
+}
+
+export function getResampledVisualizerLayout(
+  analysis: DecodedMusicalVisualizerAnalysis,
+  targetBarCount: number
+): ResampledVisualizerLayout {
+  const safeCount = Math.max(0, Math.floor(targetBarCount));
+  if (safeCount === 0) return { voiceStart: 0, voiceCount: 0, sideCount: 0 };
+  if (safeCount <= 2) return { voiceStart: 0, voiceCount: safeCount, sideCount: 0 };
+
+  const voiceRatio = analysis.layout.voiceCount / analysis.barCount;
+  let voiceCount = Math.max(1, Math.round(safeCount * voiceRatio));
+  voiceCount = Math.min(voiceCount, safeCount - 2);
+
+  let outerCount = safeCount - voiceCount;
+  if (outerCount % 2 !== 0) {
+    if (voiceCount < safeCount - 2) voiceCount += 1;
+    else voiceCount = Math.max(1, voiceCount - 1);
+    outerCount = safeCount - voiceCount;
+  }
+
+  const sideCount = Math.max(0, outerCount / 2);
+  return {
+    voiceStart: sideCount,
+    voiceCount,
+    sideCount
+  };
+}
+
+function visualizerBarRole(
+  index: number,
+  barCount: number,
+  layout: ResampledVisualizerLayout
+): VisualizerBarRole {
+  if (
+    index >= layout.voiceStart &&
+    index < layout.voiceStart + layout.voiceCount
+  ) {
+    return "voice";
+  }
+
+  if (layout.sideCount <= 0) return "voice";
+
+  const outerIndex =
+    index < layout.voiceStart
+      ? index
+      : barCount - 1 - index;
+  const position = (outerIndex + 0.5) / layout.sideCount;
+
+  if (position <= 0.21) return "bass";
+  if (position <= 0.5) return "drums";
+  return "other";
+}
+
+function profileForRole(role: VisualizerBarRole): VisualizerMotionProfile {
+  switch (role) {
+    case "bass":
+      return { attackMs: 62, releaseMs: 220 };
+    case "drums":
+      return { attackMs: 24, releaseMs: 82 };
+    case "voice":
+      return { attackMs: 38, releaseMs: 142 };
+    default:
+      return { attackMs: 44, releaseMs: 168 };
+  }
+}
+
+export function createMusicalVisualizerMotion(
+  barCount: number,
+  layout: ResampledVisualizerLayout
+): MusicalVisualizerMotion {
+  const count = Math.max(0, Math.floor(barCount));
+  const current = new Float32Array(count);
+  let initialized = false;
+
+  function reset(targets?: number[]) {
+    initialized = Boolean(targets);
+    for (let index = 0; index < count; index += 1) {
+      current[index] = Math.min(1, Math.max(0, targets?.[index] ?? 0));
+    }
+  }
+
+  function step(targets: number[], elapsedMs: number) {
+    const elapsed = Math.min(80, Math.max(1, Number.isFinite(elapsedMs) ? elapsedMs : 16));
+
+    if (!initialized) {
+      reset(targets);
+      return Array.from(current);
+    }
+
+    for (let index = 0; index < count; index += 1) {
+      const target = Math.min(1, Math.max(0, targets[index] ?? 0));
+      const previous = current[index];
+      const profile = profileForRole(visualizerBarRole(index, count, layout));
+      const timeConstant = target >= previous ? profile.attackMs : profile.releaseMs;
+      const blend = 1 - Math.exp(-elapsed / timeConstant);
+      const next = previous + (target - previous) * blend;
+      current[index] = Math.abs(next - target) < 0.002 ? target : next;
+    }
+
+    return Array.from(current);
+  }
+
+  return { step, reset };
 }
 
 export function sampleMusicalVisualizer(
@@ -129,7 +251,27 @@ export function sampleMusicalVisualizer(
     return left * (1 - mix) + right * mix;
   });
 
-  return resample(values, targetBarCount);
+  const targetLayout = getResampledVisualizerLayout(analysis, targetBarCount);
+  if (targetLayout.sideCount === 0) {
+    return resample(
+      values.slice(
+        analysis.layout.voiceStart,
+        analysis.layout.voiceStart + analysis.layout.voiceCount
+      ),
+      targetBarCount
+    );
+  }
+
+  const sourceVoiceEnd = analysis.layout.voiceStart + analysis.layout.voiceCount;
+  const leftInstruments = values.slice(0, analysis.layout.voiceStart);
+  const voice = values.slice(analysis.layout.voiceStart, sourceVoiceEnd);
+  const rightInstruments = values.slice(sourceVoiceEnd);
+
+  return [
+    ...resample(leftInstruments, targetLayout.sideCount),
+    ...resample(voice, targetLayout.voiceCount),
+    ...resample(rightInstruments, targetLayout.sideCount)
+  ];
 }
 
 const analysisRequests = new Map<string, Promise<DecodedMusicalVisualizerAnalysis | null>>();

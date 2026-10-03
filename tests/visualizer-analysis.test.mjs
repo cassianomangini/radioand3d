@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  createMusicalVisualizerMotion,
   decodeMusicalVisualizerAnalysis,
+  getResampledVisualizerLayout,
   sampleMusicalVisualizer
 } from "../src/features/radio/visualizer-analysis.ts";
 
@@ -58,4 +60,59 @@ test("keeps a centered vocal peak centered after resizing", () => {
   const sample = sampleMusicalVisualizer(analysis, 0, 4);
   assert.ok(sample[1] > sample[0]);
   assert.ok(sample[2] > sample[3]);
+});
+
+
+test("resizes instruments and centered voice without leaking regions together", () => {
+  const bytes = new Uint8Array(16);
+  bytes[3] = 255;
+  bytes[4] = 255;
+  bytes[11] = 255;
+  bytes[12] = 255;
+  const analysis = decodeMusicalVisualizerAnalysis(payload(bytes));
+  assert.ok(analysis);
+
+  const layout = getResampledVisualizerLayout(analysis, 6);
+  assert.deepEqual(layout, { voiceStart: 2, voiceCount: 2, sideCount: 2 });
+
+  const sample = sampleMusicalVisualizer(analysis, 0, 6);
+  assert.ok(sample[0] < 0.01);
+  assert.ok(sample[1] < 0.01);
+  assert.ok(sample[2] > 0.99);
+  assert.ok(sample[3] > 0.99);
+  assert.ok(sample[4] < 0.01);
+  assert.ok(sample[5] < 0.01);
+});
+
+test("gives drums a faster attack and bass a longer release without inventing bar energy", () => {
+  const analysis = decodeMusicalVisualizerAnalysis(payload(new Uint8Array(16)));
+  assert.ok(analysis);
+  const layout = getResampledVisualizerLayout(analysis, 8);
+  const motion = createMusicalVisualizerMotion(8, layout);
+
+  motion.reset(new Array(8).fill(0));
+  const rising = motion.step(new Array(8).fill(1), 16);
+  assert.ok(rising[1] > rising[0]);
+
+  motion.reset(new Array(8).fill(1));
+  const falling = motion.step(new Array(8).fill(0), 16);
+  assert.ok(falling[0] > falling[1]);
+
+  for (const value of [...rising, ...falling]) {
+    assert.ok(value >= 0 && value <= 1);
+  }
+});
+
+test("visualizer motion reset lands immediately on a seek target", () => {
+  const analysis = decodeMusicalVisualizerAnalysis(payload(new Uint8Array(16)));
+  assert.ok(analysis);
+  const layout = getResampledVisualizerLayout(analysis, 8);
+  const motion = createMusicalVisualizerMotion(8, layout);
+  const target = [0, 0.2, 0.4, 0.6, 0.8, 1, 0.5, 0.1];
+
+  motion.reset(target);
+  assert.deepEqual(
+    motion.step(target, 16).map((value) => Number(value.toFixed(4))),
+    target
+  );
 });

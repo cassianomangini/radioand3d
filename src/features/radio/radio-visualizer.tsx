@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { createFrequencyBarMotion } from "./frequency-bars";
 import { useRadio } from "./radio-provider";
 import {
+  createMusicalVisualizerMotion,
+  getResampledVisualizerLayout,
   loadMusicalVisualizerAnalysis,
   sampleMusicalVisualizer,
   type DecodedMusicalVisualizerAnalysis
@@ -70,6 +72,12 @@ export function RadioVisualizer({
     const bars = Array.from(root.querySelectorAll<HTMLSpanElement>(":scope > span"));
     const levels = analyser ? new Float32Array(analyser.frequencyBinCount) : null;
     const moveBars = analyser ? createFrequencyBarMotion(bars.length) : null;
+    const synchronizedMotion = currentAnalysis
+      ? createMusicalVisualizerMotion(
+          bars.length,
+          getResampledVisualizerLayout(currentAnalysis, bars.length)
+        )
+      : null;
     const bounds = root.getBoundingClientRect();
     let visible =
       bounds.width > 0 &&
@@ -80,16 +88,32 @@ export function RadioVisualizer({
       bounds.left < window.innerWidth;
     let frame = 0;
     let previousFrame = 0;
+    let previousPosition = -1;
 
     function draw(now: number) {
       let heights: number[];
 
-      if (currentAnalysis) {
-        heights = sampleMusicalVisualizer(
+      if (currentAnalysis && synchronizedMotion) {
+        const position = getCurrentTime();
+        const targets = sampleMusicalVisualizer(
           currentAnalysis,
-          getCurrentTime(),
+          position,
           bars.length
-        ).map((level) => 4 + level * 92);
+        );
+        const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
+        const jumped =
+          previousPosition >= 0 &&
+          Math.abs(position - previousPosition) > Math.max(0.28, elapsed / 1000 * 3.5);
+
+        if (previousPosition < 0 || jumped) {
+          synchronizedMotion.reset(targets);
+        }
+
+        previousPosition = position;
+        previousFrame = now;
+        heights = synchronizedMotion
+          .step(targets, elapsed)
+          .map((level) => 4 + level * 92);
       } else if (analyser && levels && moveBars) {
         analyser.getFloatFrequencyData(levels);
         const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
@@ -114,6 +138,7 @@ export function RadioVisualizer({
       window.cancelAnimationFrame(frame);
       if (visible && !document.hidden) {
         previousFrame = 0;
+        previousPosition = -1;
         frame = window.requestAnimationFrame(draw);
       }
     }

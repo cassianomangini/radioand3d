@@ -21,7 +21,7 @@ interface LyricsResult extends LyricsResponse {
   failed: boolean;
 }
 
-export function RadioLyrics({ trackId, title, headingId = "radio-lyrics-title" }: { trackId?: string; title?: string; headingId?: string }) {
+export function RadioLyrics({ trackId, title, headingId = "radio-lyrics-title", active = true, onClose }: { trackId?: string; title?: string; headingId?: string; active?: boolean; onClose?: () => void }) {
   const radio = useRadio();
   const [result, setResult] = useState<LyricsResult | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -56,7 +56,7 @@ export function RadioLyrics({ trackId, title, headingId = "radio-lyrics-title" }
     : -1;
 
   useEffect(() => {
-    if (activeLine < 0) return;
+    if (!active || activeLine < 0) return;
     const scroller = scrollRef.current;
     const line = lineRefs.current[activeLine];
     if (!scroller || !line) return;
@@ -66,13 +66,14 @@ export function RadioLyrics({ trackId, title, headingId = "radio-lyrics-title" }
     const target = scroller.scrollTop + lineBox.top - scrollerBox.top - (scroller.clientHeight - lineBox.height) / 2;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     scroller.scrollTo({ top: Math.max(0, target), behavior: reduceMotion ? "auto" : "smooth" });
-  }, [activeLine]);
+  }, [active, activeLine]);
 
   return (
     <section className={shellStyles.lyricsPanel} aria-labelledby={headingId}>
       <div className={shellStyles.lyricsHeader}>
         <h3 id={headingId}>Letra</h3>
         <span title={title}>{title}</span>
+        {onClose ? <button type="button" className={shellStyles.lyricsClose} onClick={onClose} aria-label="Fechar letra">×</button> : null}
       </div>
       <div
         ref={scrollRef}

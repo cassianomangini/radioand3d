@@ -67,6 +67,8 @@ test("new order restarts the full playlist and turns repeat off", () => {
   assert.equal(order.length, ids.length);
   assert.equal(new Set(order).size, ids.length);
   assert.deepEqual(queue.following(), order.slice(1));
+  assert.deepEqual(Array.from({ length: ids.length - 1 }, () => queue.next()), order.slice(1));
+  assert.equal(queue.next(), null);
 });
 
 test("the announced ten tracks are the next ten advances", () => {

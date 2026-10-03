@@ -534,6 +534,32 @@ X1/X2/X3 são extensões condicionais independentes e entram assim que seus pré
 
 C1 pode ser iniciada sem esperar o sync, desde que o roadmap permita. C2/C3 dependem da análise real. Mobile, performance, accessibility e reduced motion não esperam C6/C8: são gates contínuos.
 
+# Estado de implementação — 03/10/2026
+
+Este bloco registra progresso técnico sem confundir implementação com aprovação perceptiva.
+
+| Frente | Estado | O que já entrou na `main` | Gate ainda aberto |
+| --- | --- | --- | --- |
+| C1 Motion Core de Alto Impacto | **in_progress** | shared-element transitions; faixa selecionada -> Now Playing; recomposição split/fullscreen; mini player -> Rádio completa; fila preservando identidade espacial | Cassiano ainda não percebeu mudança visual grande no localhost; o gate de "mudar visivelmente o patamar" **não está fechado** |
+| C2 Audio Motion Contract | **in_progress** | sidecar preserva regiões; roles `bass/drums/other/voice`; attack/release por região; fallback live por frequência; continuidade em seek/pause; ferramenta `visualizer:inspect` | validar sidecars reais gerados pelo sync e comparar músicas de perfis diferentes |
+| C3 Visualizer 2.0 | **in_progress** | voz central e instrumentos preservados no reamostramento; contraste espacial sem inventar energia; pausa relaxa; reduced-motion com baixa cadência; cores sutis por papel real | revisão perceptiva com música real; confirmar que deixou de parecer "uma massa só" |
+| C4 Radio Living Interface | **in_progress** | track change direcional; loading/buffering real; seek/volume táteis; teclado global; fila mantém identidade ao reordenar | ainda falta um momento visual claramente memorável no player completo; Cassiano não aprovou o "wow" |
+| C5 Split / Focus / Divider Signature | **in_progress** | drag existente preservado; magnetismo leve; snap por proximidade; flick; settle elástico; teclado do separator; fullscreen/link convergem | elevar a recomposição interna durante expansão; hoje ainda não deve ser considerado assinatura fechada |
+| C6 Mobile Signature Experience | **in_progress** | mini player compacto; transformação mini -> full -> mini com shared elements; QA de estados mobile aberto/fechado | revisar a transição em uso real no aparelho/navegador; screenshots estáticos não fecham motion |
+| C7 Microinteraction High-Fidelity Pass | **in_progress** | seek/volume próprios; play/loading; controles com press mecânico em vez de `scale(1.05)`; foco/atalhos | revisar busca, tooltips, scroll interno e consistência completa das famílias de controle |
+| C8 Integrated Performance + Experience QA | **not_started** | CI opt-in já captura desktop amplo, desktop baixo, mobile, fullscreen e Rádio mobile aberta | ainda falta prova integrada com áudio tocando, tracks reais variados, reduced motion e interação contínua |
+
+### Estado perceptivo atual
+
+Cassiano verificou o localhost em 03/10/2026 e relatou que, visualmente, a única mudança claramente percebida até então foi o botão de play.
+
+Consequência:
+
+- **nenhuma frente acima pode ser marcada `done` apenas porque CI/build passou**;
+- os próximos blocos devem aumentar a escala perceptiva das mecânicas, especialmente C1/C4/C5;
+- microajuste isolado não pode substituir a transformação visível prometida pelo artefato;
+- C2/C3 continuam dependentes da validação das análises reais geradas pelo sync.
+
 # Definition of done por frente
 
 Uma frente só pode ser concluída quando:
@@ -559,5 +585,7 @@ Uma frente só pode ser concluída quando:
 - artifact_ref: `CM3D-MOTION-EXPERIENCE-v1`
 - approved_by: Cassiano
 - approved_scope: experiência extrema com disciplina técnica; não baseline conservador
-- ready_for_frontend: `no`
-- motivo: cada recorte executável ainda precisa ser aberto no roadmap/checklist vigente. C2/C3 também aguardam validação perceptiva de uma amostra real do sync.
+- ready_for_frontend: `yes`
+- implementation_status: `in_progress`
+- perceptual_approval: `pending`
+- motivo: a direção está aprovada e a implementação já está em andamento na `main`; nenhuma frente pode ser marcada concluída até passar seus gates técnicos e a revisão perceptiva correspondente. C2/C3 ainda aguardam validação das análises reais geradas pelo sync.

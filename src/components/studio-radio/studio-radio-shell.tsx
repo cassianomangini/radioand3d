@@ -3,6 +3,7 @@
 import Image from "next/image";
 import {
   useEffect,
+  useEffectEvent,
   useMemo,
   useRef,
   useState,
@@ -537,15 +538,6 @@ export function StudioRadioShell() {
   const mobileMotionActiveRef = useRef(false);
   const mobileMotionTokenRef = useRef(0);
   const trackStepMotionTokenRef = useRef(0);
-  const radioShortcutActionsRef = useRef<{
-    toggle: () => void;
-    seek: (seconds: number) => void;
-    mute: () => void;
-    previous: () => void;
-    next: () => void;
-    hasTrack: boolean;
-    canSkipNext: boolean;
-  } | null>(null);
 
   const shellStyle = useMemo(
     () =>
@@ -758,48 +750,35 @@ export function StudioRadioShell() {
     runTrackStepMotion("shuffle", radio.reshuffle);
   }
 
-  radioShortcutActionsRef.current = {
-    toggle: radio.toggle,
-    seek: (seconds) => radio.seek(radio.position + seconds),
-    mute: radio.toggleMute,
-    previous: previousTrack,
-    next: nextTrack,
-    hasTrack: Boolean(radio.currentTrack),
-    canSkipNext: radio.canSkipNext
-  };
+  const handleRadioShortcut = useEffectEvent((event: globalThis.KeyboardEvent) => {
+    if (shouldIgnoreRadioShortcutTarget(event.target)) return;
+
+    const command = resolveRadioKeyboardCommand(event);
+    if (!command || !radio.currentTrack) return;
+    if (command.type === "next" && !radio.canSkipNext) return;
+
+    event.preventDefault();
+
+    switch (command.type) {
+      case "toggle":
+        radio.toggle();
+        break;
+      case "seek":
+        radio.seek(radio.position + command.seconds);
+        break;
+      case "mute":
+        radio.toggleMute();
+        break;
+      case "previous":
+        previousTrack();
+        break;
+      case "next":
+        nextTrack();
+        break;
+    }
+  });
 
   useEffect(() => {
-    function handleRadioShortcut(event: globalThis.KeyboardEvent) {
-      if (shouldIgnoreRadioShortcutTarget(event.target)) return;
-
-      const command = resolveRadioKeyboardCommand(event);
-      if (!command) return;
-
-      const actions = radioShortcutActionsRef.current;
-      if (!actions?.hasTrack) return;
-      if (command.type === "next" && !actions.canSkipNext) return;
-
-      event.preventDefault();
-
-      switch (command.type) {
-        case "toggle":
-          actions.toggle();
-          break;
-        case "seek":
-          actions.seek(command.seconds);
-          break;
-        case "mute":
-          actions.mute();
-          break;
-        case "previous":
-          actions.previous();
-          break;
-        case "next":
-          actions.next();
-          break;
-      }
-    }
-
     window.addEventListener("keydown", handleRadioShortcut);
     return () => window.removeEventListener("keydown", handleRadioShortcut);
   }, []);

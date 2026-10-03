@@ -57,6 +57,103 @@ type TrackStepMotionState = {
   phase: "source" | "destination";
 };
 
+type RadioFlipSnapshot = Map<string, DOMRect>;
+
+const RADIO_FLIP_TIMING: Record<string, { open: [number, number]; close: [number, number] }> = {
+  header: { open: [0, 620], close: [300, 560] },
+  cover: { open: [45, 980], close: [245, 820] },
+  progress: { open: [125, 760], close: [185, 650] },
+  visualizer: { open: [165, 900], close: [135, 720] },
+  "control-shuffle": { open: [225, 720], close: [110, 600] },
+  "control-repeat": { open: [255, 720], close: [95, 600] },
+  "control-previous": { open: [285, 760], close: [80, 620] },
+  "control-play": { open: [315, 820], close: [65, 660] },
+  "control-next": { open: [345, 760], close: [50, 620] },
+  "control-volume": { open: [375, 720], close: [35, 600] },
+  "control-favorite": { open: [405, 720], close: [20, 600] },
+  "queue-header": { open: [455, 760], close: [0, 560] },
+  "queue-list": { open: [500, 900], close: [0, 640] }
+};
+
+function collectRadioFlipSnapshot(panel: HTMLElement): RadioFlipSnapshot {
+  const snapshot: RadioFlipSnapshot = new Map();
+
+  panel
+    .querySelectorAll<HTMLElement>("[data-radio-motion-key], [data-radio-flip-key]")
+    .forEach((element) => {
+      const key = element.dataset.radioFlipKey ?? element.dataset.radioMotionKey;
+      if (!key || key === "transport") return;
+      snapshot.set(key, element.getBoundingClientRect());
+    });
+
+  return snapshot;
+}
+
+function animateRadioFlip(
+  panel: HTMLElement,
+  before: RadioFlipSnapshot,
+  direction: "opening" | "closing"
+) {
+  const animations: Animation[] = [];
+
+  panel
+    .querySelectorAll<HTMLElement>("[data-radio-motion-key], [data-radio-flip-key]")
+    .forEach((element) => {
+      const key = element.dataset.radioFlipKey ?? element.dataset.radioMotionKey;
+      if (!key || key === "transport") return;
+
+      const previous = before.get(key);
+      if (!previous) return;
+
+      const next = element.getBoundingClientRect();
+      if (!next.width || !next.height) return;
+
+      const dx = previous.left - next.left;
+      const dy = previous.top - next.top;
+      const sx = Math.max(0.62, Math.min(1.65, previous.width / next.width));
+      const sy = Math.max(0.62, Math.min(1.65, previous.height / next.height));
+      const moved =
+        Math.hypot(dx, dy) > 1.5 ||
+        Math.abs(1 - sx) > 0.015 ||
+        Math.abs(1 - sy) > 0.015;
+
+      if (!moved) return;
+
+      const [delay, duration] =
+        RADIO_FLIP_TIMING[key]?.[direction === "opening" ? "open" : "close"] ??
+        (direction === "opening" ? [180, 760] : [80, 640]);
+
+      const animation = element.animate(
+        [
+          {
+            transform: `translate3d(${dx}px, ${dy}px, 0) scale(${sx}, ${sy})`,
+            transformOrigin: "0 0"
+          },
+          {
+            transform: "translate3d(0, 0, 0) scale(1, 1)",
+            transformOrigin: "0 0"
+          }
+        ],
+        {
+          duration,
+          delay,
+          easing:
+            direction === "opening"
+              ? "cubic-bezier(0.16, 1, 0.3, 1)"
+              : "cubic-bezier(0.4, 0, 0.2, 1)",
+          fill: "both"
+        }
+      );
+
+      animation.finished
+        .catch(() => undefined)
+        .finally(() => animation.cancel());
+      animations.push(animation);
+    });
+
+  return animations;
+}
+
 const previewTrack = {
   title: "Limite Elástico",
   artist: "CM",
@@ -403,12 +500,13 @@ function RadioContent({
       </div>
 
       <div className={styles.transport} aria-label="Controles da rádio" data-radio-motion-key="transport">
-        <button type="button" className={styles.modeButton} onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória" data-tooltip="Embaralhar lista do zero"><Icon name="shuffle" /></button>
-        <button type="button" className={styles.modeButton} onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir faixa" title={radio.repeatOne ? "Desligar repetição" : "Repetir faixa"}><Icon name="repeat" /></button>
-        <button type="button" onClick={transportPrevious} disabled={!canPlay} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
+        <button type="button" className={styles.modeButton} data-radio-flip-key="control-shuffle" onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória" data-tooltip="Embaralhar lista do zero"><Icon name="shuffle" /></button>
+        <button type="button" className={styles.modeButton} data-radio-flip-key="control-repeat" onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir faixa" title={radio.repeatOne ? "Desligar repetição" : "Repetir faixa"}><Icon name="repeat" /></button>
+        <button type="button" data-radio-flip-key="control-previous" onClick={transportPrevious} disabled={!canPlay} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
         <button
           type="button"
           className={styles.playButton}
+          data-radio-flip-key="control-play"
           onClick={radio.toggle}
           disabled={!canPlay}
           data-playback-state={radio.status}
@@ -418,7 +516,7 @@ function RadioContent({
         >
           <Icon name={playing || pending ? "pause" : "play"} />
         </button>
-        <button type="button" onClick={transportNext} disabled={!canPlay || !radio.canSkipNext} aria-keyshortcuts="N" aria-label="Próxima faixa"><Icon name="next" /></button>
+        <button type="button" data-radio-flip-key="control-next" onClick={transportNext} disabled={!canPlay || !radio.canSkipNext} aria-keyshortcuts="N" aria-label="Próxima faixa"><Icon name="next" /></button>
         <div
           ref={volumeMenuRef}
           className={styles.volumeMenu}
@@ -430,6 +528,7 @@ function RadioContent({
             ref={volumeButtonRef}
             type="button"
             className={`${styles.modeButton} ${styles.volumeTrigger}`}
+            data-radio-flip-key="control-volume"
             onClick={() => setVolumeOpen((open) => !open)}
             disabled={!canPlay}
             aria-label={`Volume ${Math.round(radio.volume * 100)}%. ${volumeOpen ? "Fechar" : "Abrir"} controle`}
@@ -459,7 +558,7 @@ function RadioContent({
             </div>
           ) : null}
         </div>
-        <button type="button" className={styles.modeButton} disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
+        <button type="button" className={styles.modeButton} data-radio-flip-key="control-favorite" disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
       </div>
 
       <RadioVisualizer className={styles.visualizer} motionKey="visualizer" />
@@ -913,36 +1012,36 @@ export function StudioRadioShell() {
       motionResetTimerRef.current = null;
     }
 
-    if (reduce) {
-      delete document.documentElement.dataset.radioTransition;
-      setLayoutMotionDirection(null);
-      update();
-      return;
-    }
+    const panel = shellRef.current?.querySelector<HTMLElement>("#radio");
+    const before = !reduce && panel ? collectRadioFlipSnapshot(panel) : null;
 
     const clearMotionState = () => {
-      delete document.documentElement.dataset.radioTransition;
       setLayoutMotionDirection(null);
       motionResetTimerRef.current = null;
     };
 
-    const documentWithTransition = document as DocumentWithViewTransition;
-    if (documentWithTransition.startViewTransition) {
-      document.documentElement.dataset.radioTransition = direction;
-      const transition = documentWithTransition.startViewTransition(() => {
-        flushSync(() => {
-          setLayoutMotionDirection(direction);
-          update();
-        });
-      });
-      void transition.finished.finally(clearMotionState);
+    flushSync(() => {
+      setLayoutMotionDirection(reduce ? null : direction);
+      update();
+    });
+
+    if (reduce || !panel || !before) {
+      clearMotionState();
       return;
     }
 
-    document.documentElement.dataset.radioTransition = direction;
-    setLayoutMotionDirection(direction);
-    update();
-    motionResetTimerRef.current = setTimeout(clearMotionState, 920);
+    const animations = animateRadioFlip(panel, before, direction);
+    const totalDuration = direction === "opening" ? 1450 : 1120;
+
+    if (animations.length === 0) {
+      motionResetTimerRef.current = setTimeout(clearMotionState, totalDuration);
+      return;
+    }
+
+    void Promise.allSettled(animations.map((animation) => animation.finished)).finally(
+      clearMotionState
+    );
+    motionResetTimerRef.current = setTimeout(clearMotionState, totalDuration + 120);
   }
 
   function openRadioFullscreen(fromDrag: boolean) {
@@ -1564,7 +1663,7 @@ export function StudioRadioShell() {
           title={radioFullscreen ? "Arraste para a direita ou clique para mostrar o Estúdio" : "Clique para expandir ou recolher; arraste para ajustar a largura ou abrir a Rádio"}
         />
 
-        <aside id="radio" className={styles.radioPanel} aria-label="CM Rádio">
+        <aside id="radio" className={styles.radioPanel} data-radio-flip-root="true" aria-label="CM Rádio">
           <RadioContent
             focus={radioExpanded && !radioFullscreen}
             expanded={radioFullscreen}

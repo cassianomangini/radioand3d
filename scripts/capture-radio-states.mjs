@@ -196,6 +196,21 @@ try {
   );
   if (!desktopClicked) throw new Error("Desktop Radio navigation control was not found.");
   await delay(140);
+  const activeRadioAnimations = await evaluate(
+    client,
+    `(() => {
+      const panel = document.querySelector('[data-radio-flip-root="true"]');
+      if (!(panel instanceof HTMLElement)) return 0;
+      return panel
+        .getAnimations({ subtree: true })
+        .filter((animation) => animation.playState === "running").length;
+    })()`
+  );
+  if (activeRadioAnimations < 8) {
+    throw new Error(
+      `Radio fullscreen transition exposed only ${activeRadioAnimations} active element animations.`
+    );
+  }
   await screenshot(client, "desktop-radio-transition-140ms.png");
   await delay(220);
   await screenshot(client, "desktop-radio-transition-360ms.png");

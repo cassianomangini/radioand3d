@@ -3620,13 +3620,15 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
 .studioDetailRail {
   position: absolute;
+  top: 37%;
   right: 4.5%;
   bottom: 4.5%;
   left: 4.5%;
   z-index: 3;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(0.65rem, 1.15cqw, 1rem);
+  grid-template-columns: minmax(0, 1.28fr) minmax(15rem, 0.92fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.65rem, 1.05cqw, 0.9rem);
   opacity: 0;
   pointer-events: none;
   transform: translateY(2.25rem) scale(0.985);
@@ -3645,51 +3647,51 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 .studioDetailCard {
   position: relative;
   min-width: 0;
-  min-height: clamp(8.7rem, 16dvh, 10.8rem);
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   overflow: hidden;
-  padding: clamp(0.9rem, 1.25cqw, 1.15rem);
-  background: linear-gradient(145deg, rgb(13 18 25 / 96%), rgb(5 8 13 / 94%));
-  border: 1px solid rgb(139 166 191 / 18%);
-  border-radius: 0.78rem;
+  padding: clamp(1rem, 1.35cqw, 1.3rem);
+  background:
+    linear-gradient(180deg, rgb(14 18 24 / 42%) 0%, rgb(7 10 15 / 76%) 46%, rgb(3 5 8 / 98%) 100%),
+    #0a0d12;
+  border: 1px solid rgb(145 167 188 / 20%);
+  border-radius: 0.58rem;
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 3%),
-    0 0.8rem 2rem rgb(0 0 0 / 22%);
+    0 0.9rem 2.2rem rgb(0 0 0 / 24%);
   color: inherit;
   text-decoration: none;
 }
 
-.studioDetailCard::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0.9rem;
-  left: 0.9rem;
-  height: 2px;
-  background: linear-gradient(90deg, #42c9ff, #4f74ff);
-  opacity: 0.82;
+.studioDetailCard[data-studio-card="prints"] {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  padding: clamp(1.15rem, 1.6cqw, 1.5rem);
 }
 
-.studioDetailCard[data-studio-card="materials"]::before {
-  background: linear-gradient(90deg, #7f7cff, #ba64dc);
+.studioDetailCard[data-studio-card="materials"] {
+  grid-column: 2;
+  grid-row: 1;
 }
 
-.studioDetailCard[data-studio-card="store"]::before {
-  background: linear-gradient(90deg, #ff8157, #ee4d2d);
+.studioDetailCard[data-studio-card="store"] {
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .studioCardLabel {
-  margin: 0 0 0.78rem;
-  color: #85dfff;
+  margin: 0 0 0.34rem;
+  color: #67d8ff;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.61rem;
   font-weight: 650;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
 }
 
 .studioDetailCard[data-studio-card="materials"] .studioCardLabel {
-  color: #c0adff;
+  color: #bba7ff;
 }
 
 .studioDetailCard[data-studio-card="store"] .studioCardLabel,
@@ -3698,25 +3700,29 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 .studioDetailCard strong {
-  max-width: 19ch;
+  max-width: 20ch;
   color: #f6f9fc;
-  font-size: clamp(1rem, 1.28cqw, 1.18rem);
-  line-height: 1.18;
+  font-size: clamp(1.15rem, 1.65cqw, 1.55rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.studioDetailCard[data-studio-card="prints"] strong {
+  font-size: clamp(1.6rem, 2.45cqw, 2.3rem);
 }
 
 .studioDetailCard p {
-  max-width: 34ch;
-  margin: 0.5rem 0 0;
-  color: #91a4b7;
-  font-size: clamp(0.75rem, 0.88cqw, 0.84rem);
-  line-height: 1.48;
+  max-width: 36ch;
+  margin: 0.45rem 0 0;
+  color: #a3b0bd;
+  font-size: clamp(0.72rem, 0.82cqw, 0.82rem);
+  line-height: 1.45;
 }
 
 .studioCardAction {
-  margin-top: auto;
-  padding-top: 0.75rem;
+  margin-top: 0.72rem;
   font-family: var(--font-mono);
-  font-size: 0.67rem;
+  font-size: 0.65rem;
   font-weight: 650;
   letter-spacing: 0.08em;
 }
@@ -3858,8 +3864,12 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     position: relative;
     top: auto;
     right: auto;
+    bottom: auto;
     left: auto;
     z-index: 3;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 0.75rem;
     margin: -1.3rem 1.1rem 3rem;
     opacity: 0;
     transform: translateY(1.5rem);
@@ -3870,14 +3880,18 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transform: translateY(0);
   }
 
-  .studioDetailRail {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+  .studioDetailCard,
+  .studioDetailCard[data-studio-card="prints"],
+  .studioDetailCard[data-studio-card="materials"],
+  .studioDetailCard[data-studio-card="store"] {
+    grid-column: auto;
+    grid-row: auto;
+    min-height: 10rem;
+    padding: 1rem;
   }
 
-  .studioDetailCard {
-    min-height: 0;
-    padding: 1rem;
+  .studioDetailCard[data-studio-card="prints"] {
+    min-height: 15rem;
   }
 
   .studioDetailCard strong,

@@ -16,6 +16,7 @@ import styles from "./studio-radio-shell.module.css";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
+import { resolveRadioKeyboardCommand } from "@/features/radio/radio-keyboard";
 import {
   createRadioSnapPoints,
   getRadioDragMagnet,
@@ -159,6 +160,19 @@ function getDefaultWidth(shellWidth: number) {
 
 function getExpandedWidth(shellWidth: number) {
   return clampRadioWidth(shellWidth, shellWidth * 0.48);
+}
+
+function shouldIgnoreRadioShortcutTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  if (
+    target.closest(
+      'input, textarea, select, button, a[href], [contenteditable="true"], [role="slider"]'
+    )
+  ) {
+    return true;
+  }
+  return target !== document.body && target.tabIndex >= 0;
 }
 
 function formatTime(seconds: number) {
@@ -354,6 +368,7 @@ function RadioContent({
           }}
           disabled={!canPlay || radio.duration === 0}
           aria-label="Posição da música"
+          aria-keyshortcuts="ArrowLeft ArrowRight J L"
           aria-valuetext={formatTime(displayedPosition)}
         />
         <output className={styles.seekPreview} aria-hidden="true">
@@ -368,7 +383,7 @@ function RadioContent({
       <div className={styles.transport} aria-label="Controles da rádio" data-radio-motion-key="transport">
         <button type="button" className={styles.modeButton} onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória" data-tooltip="Embaralhar lista do zero"><Icon name="shuffle" /></button>
         <button type="button" className={styles.modeButton} onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir faixa" title={radio.repeatOne ? "Desligar repetição" : "Repetir faixa"}><Icon name="repeat" /></button>
-        <button type="button" onClick={transportPrevious} disabled={!canPlay} aria-label="Faixa anterior"><Icon name="previous" /></button>
+        <button type="button" onClick={transportPrevious} disabled={!canPlay} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
         <button
           type="button"
           className={styles.playButton}
@@ -376,11 +391,12 @@ function RadioContent({
           disabled={!canPlay}
           data-playback-state={radio.status}
           aria-busy={pending}
+          aria-keyshortcuts="Space K"
           aria-label={pending ? "Cancelar reprodução" : playing ? "Pausar" : "Tocar"}
         >
           <Icon name={playing || pending ? "pause" : "play"} />
         </button>
-        <button type="button" onClick={transportNext} disabled={!canPlay || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
+        <button type="button" onClick={transportNext} disabled={!canPlay || !radio.canSkipNext} aria-keyshortcuts="N" aria-label="Próxima faixa"><Icon name="next" /></button>
         <div
           ref={volumeMenuRef}
           className={styles.volumeMenu}
@@ -521,6 +537,15 @@ export function StudioRadioShell() {
   const mobileMotionActiveRef = useRef(false);
   const mobileMotionTokenRef = useRef(0);
   const trackStepMotionTokenRef = useRef(0);
+  const radioShortcutActionsRef = useRef<{
+    toggle: () => void;
+    seek: (seconds: number) => void;
+    mute: () => void;
+    previous: () => void;
+    next: () => void;
+    hasTrack: boolean;
+    canSkipNext: boolean;
+  } | null>(null);
 
   const shellStyle = useMemo(
     () =>
@@ -732,6 +757,52 @@ export function StudioRadioShell() {
   function reshuffleTracks() {
     runTrackStepMotion("shuffle", radio.reshuffle);
   }
+
+  radioShortcutActionsRef.current = {
+    toggle: radio.toggle,
+    seek: (seconds) => radio.seek(radio.position + seconds),
+    mute: radio.toggleMute,
+    previous: previousTrack,
+    next: nextTrack,
+    hasTrack: Boolean(radio.currentTrack),
+    canSkipNext: radio.canSkipNext
+  };
+
+  useEffect(() => {
+    function handleRadioShortcut(event: globalThis.KeyboardEvent) {
+      if (shouldIgnoreRadioShortcutTarget(event.target)) return;
+
+      const command = resolveRadioKeyboardCommand(event);
+      if (!command) return;
+
+      const actions = radioShortcutActionsRef.current;
+      if (!actions?.hasTrack) return;
+      if (command.type === "next" && !actions.canSkipNext) return;
+
+      event.preventDefault();
+
+      switch (command.type) {
+        case "toggle":
+          actions.toggle();
+          break;
+        case "seek":
+          actions.seek(command.seconds);
+          break;
+        case "mute":
+          actions.mute();
+          break;
+        case "previous":
+          actions.previous();
+          break;
+        case "next":
+          actions.next();
+          break;
+      }
+    }
+
+    window.addEventListener("keydown", handleRadioShortcut);
+    return () => window.removeEventListener("keydown", handleRadioShortcut);
+  }, []);
 
   function runMobileRadioMotion(direction: "opening" | "closing") {
     if (mobileMotionActiveRef.current) return;
@@ -1194,7 +1265,7 @@ export function StudioRadioShell() {
         <div className={styles.miniControls}>
           <button type="button" className={styles.miniStep} onClick={reshuffleTracks} disabled={radio.tracks.length < 2} aria-label="Nova ordem aleatória"><Icon name="shuffle" /></button>
           <button type="button" className={styles.miniStep} onClick={radio.toggleRepeatOne} disabled={!radio.currentTrack} aria-pressed={radio.repeatOne} aria-label="Repetir faixa"><Icon name="repeat" /></button>
-          <button type="button" className={styles.miniStep} onClick={previousTrack} disabled={!radio.currentTrack} aria-label="Faixa anterior"><Icon name="previous" /></button>
+          <button type="button" className={styles.miniStep} onClick={previousTrack} disabled={!radio.currentTrack} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
           <button
             type="button"
             className={styles.miniPlay}
@@ -1202,11 +1273,12 @@ export function StudioRadioShell() {
             disabled={!radio.currentTrack}
             data-playback-state={radio.status}
             aria-busy={radio.status === "loading" || radio.status === "buffering"}
+            aria-keyshortcuts="Space K"
             aria-label={radio.status === "loading" || radio.status === "buffering" ? "Cancelar reprodução" : radio.status === "playing" ? "Pausar" : "Tocar"}
           >
             <Icon name={radio.status === "playing" || radio.status === "loading" || radio.status === "buffering" ? "pause" : "play"} />
           </button>
-          <button type="button" className={styles.miniStep} onClick={nextTrack} disabled={!radio.currentTrack || !radio.canSkipNext} aria-label="Próxima faixa"><Icon name="next" /></button>
+          <button type="button" className={styles.miniStep} onClick={nextTrack} disabled={!radio.currentTrack || !radio.canSkipNext} aria-keyshortcuts="N" aria-label="Próxima faixa"><Icon name="next" /></button>
           <div
             ref={miniVolumeMenuRef}
             className={styles.volumeMenu}

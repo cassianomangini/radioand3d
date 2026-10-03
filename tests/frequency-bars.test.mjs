@@ -132,3 +132,30 @@ test("a steady spectrum settles instead of inventing continuous motion", () => {
   );
   assert.ok(drift < 0.01);
 });
+
+
+test("live fallback lets treble attack faster than bass while bass decays longer", () => {
+  const bassMotion = createFrequencyBarMotion(BAR_COUNT);
+  const trebleMotion = createFrequencyBarMotion(BAR_COUNT);
+
+  const bassAttack = Math.max(
+    ...bassMotion(withTone(90), SAMPLE_RATE, FFT_SIZE, 16)
+  );
+  const trebleAttack = Math.max(
+    ...trebleMotion(withTone(15_000), SAMPLE_RATE, FFT_SIZE, 16)
+  );
+  assert.ok(trebleAttack > bassAttack);
+
+  for (let frame = 0; frame < 24; frame += 1) {
+    bassMotion(withTone(90), SAMPLE_RATE, FFT_SIZE, 16);
+    trebleMotion(withTone(15_000), SAMPLE_RATE, FFT_SIZE, 16);
+  }
+
+  const bassRelease = Math.max(
+    ...bassMotion(silentSpectrum(), SAMPLE_RATE, FFT_SIZE, 16)
+  );
+  const trebleRelease = Math.max(
+    ...trebleMotion(silentSpectrum(), SAMPLE_RATE, FFT_SIZE, 16)
+  );
+  assert.ok(bassRelease > trebleRelease);
+});

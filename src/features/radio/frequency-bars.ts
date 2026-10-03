@@ -4,8 +4,12 @@ const MIN_FREQUENCY = 40;
 const MAX_FREQUENCY = 18_000;
 const VISUAL_FLOOR_DB = -72;
 const VISUAL_CEILING_DB = -8;
-const ATTACK_MS = 20;
-const RELEASE_MS = 90;
+const LOW_ATTACK_MS = 58;
+const LOW_RELEASE_MS = 230;
+const MID_ATTACK_MS = 34;
+const MID_RELEASE_MS = 138;
+const HIGH_ATTACK_MS = 18;
+const HIGH_RELEASE_MS = 74;
 
 function clamp01(value: number): number {
   return Math.min(1, Math.max(0, value));
@@ -106,21 +110,45 @@ export function centeredLiveSpectrumLevels(levels: number[], count: number): num
   return [...left, ...center, ...right];
 }
 
+function liveFrequencyResponse(index: number, count: number) {
+  const position = count <= 1 ? 0.5 : index / (count - 1);
+
+  if (position < 0.24) {
+    return { attackMs: LOW_ATTACK_MS, releaseMs: LOW_RELEASE_MS };
+  }
+  if (position < 0.62) {
+    return { attackMs: MID_ATTACK_MS, releaseMs: MID_RELEASE_MS };
+  }
+  return { attackMs: HIGH_ATTACK_MS, releaseMs: HIGH_RELEASE_MS };
+}
+
 export function createFrequencyBarMotion(count: number) {
-  const displayed = new Float32Array(count).fill(MIN_HEIGHT);
   const sourceCount = Math.max(48, count * 2);
+  const displayedSpectrum = new Float32Array(sourceCount);
+  const displayedBars = new Float32Array(count).fill(MIN_HEIGHT);
 
   return (levelsDb: Float32Array, sampleRate: number, fftSize: number, elapsedMs: number): number[] => {
     const spectrum = frequencyBandLevels(levelsDb, sampleRate, fftSize, sourceCount);
-    const levels = centeredLiveSpectrumLevels(spectrum, count);
     const elapsed = Math.min(100, Math.max(1, elapsedMs));
 
-    return levels.map((level, index) => {
-      const target = MIN_HEIGHT + level * (MAX_HEIGHT - MIN_HEIGHT);
-      const responseMs = target > displayed[index] ? ATTACK_MS : RELEASE_MS;
+    for (let index = 0; index < sourceCount; index += 1) {
+      const target = spectrum[index] ?? 0;
+      const previous = displayedSpectrum[index];
+      const profile = liveFrequencyResponse(index, sourceCount);
+      const responseMs = target >= previous ? profile.attackMs : profile.releaseMs;
       const response = 1 - Math.exp(-elapsed / responseMs);
-      displayed[index] += (target - displayed[index]) * response;
-      return displayed[index];
+      displayedSpectrum[index] += (target - previous) * response;
+    }
+
+    const spatialLevels = centeredLiveSpectrumLevels(
+      Array.from(displayedSpectrum),
+      count
+    );
+
+    return spatialLevels.map((level, index) => {
+      const target = MIN_HEIGHT + level * (MAX_HEIGHT - MIN_HEIGHT);
+      displayedBars[index] = target;
+      return displayedBars[index];
     });
   };
 }

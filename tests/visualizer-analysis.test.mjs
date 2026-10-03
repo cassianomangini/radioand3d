@@ -162,8 +162,10 @@ test("spatial contrast amplifies only differences already present in each real r
   assert.ok(enhanced[3] > values[3]);
 
   for (const [start, end] of [[0, 2], [2, 4], [4, 6], [6, 8]]) {
-    const before = (values[start] + values[start + 1]) / 2;
-    const after = (enhanced[start] + enhanced[start + 1]) / 2;
+    const beforeSegment = values.slice(start, end);
+    const afterSegment = enhanced.slice(start, end);
+    const before = beforeSegment.reduce((sum, value) => sum + value, 0) / beforeSegment.length;
+    const after = afterSegment.reduce((sum, value) => sum + value, 0) / afterSegment.length;
     assert.ok(Math.abs(before - after) < 0.0001);
   }
 });

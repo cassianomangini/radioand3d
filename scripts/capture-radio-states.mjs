@@ -195,7 +195,13 @@ try {
     })()`
   );
   if (!desktopClicked) throw new Error("Desktop Radio navigation control was not found.");
-  await delay(1100);
+  await delay(140);
+  await screenshot(client, "desktop-radio-transition-140ms.png");
+  await delay(220);
+  await screenshot(client, "desktop-radio-transition-360ms.png");
+  await delay(420);
+  await screenshot(client, "desktop-radio-transition-780ms.png");
+  await delay(360);
   const desktopFullscreen = await evaluate(
     client,
     `document.querySelector('[data-radio-fullscreen="true"]') !== null`

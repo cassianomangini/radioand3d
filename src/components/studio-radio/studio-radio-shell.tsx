@@ -892,18 +892,21 @@ export function StudioRadioShell() {
     }
 
     if (reduce) {
+      delete document.documentElement.dataset.radioTransition;
       setLayoutMotionDirection(null);
       update();
       return;
     }
 
     const clearMotionState = () => {
+      delete document.documentElement.dataset.radioTransition;
       setLayoutMotionDirection(null);
       motionResetTimerRef.current = null;
     };
 
     const documentWithTransition = document as DocumentWithViewTransition;
     if (documentWithTransition.startViewTransition) {
+      document.documentElement.dataset.radioTransition = direction;
       const transition = documentWithTransition.startViewTransition(() => {
         flushSync(() => {
           setLayoutMotionDirection(direction);
@@ -914,9 +917,10 @@ export function StudioRadioShell() {
       return;
     }
 
+    document.documentElement.dataset.radioTransition = direction;
     setLayoutMotionDirection(direction);
     update();
-    motionResetTimerRef.current = setTimeout(clearMotionState, 720);
+    motionResetTimerRef.current = setTimeout(clearMotionState, 920);
   }
 
   function openRadioFullscreen(fromDrag: boolean) {

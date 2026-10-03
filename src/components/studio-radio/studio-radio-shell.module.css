@@ -2064,6 +2064,7 @@
 .studio {
   background: #020305;
   container: studio / inline-size;
+  view-transition-name: cm-studio-surface;
 }
 
 .hero {
@@ -2430,15 +2431,58 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   mix-blend-mode: normal;
 }
 
-:global(::view-transition-group(cm-radio-surface)),
-:global(::view-transition-group(cm-radio-header)),
-:global(::view-transition-group(cm-radio-cover)),
-:global(::view-transition-group(cm-radio-progress)),
-:global(::view-transition-group(cm-radio-transport)),
-:global(::view-transition-group(cm-radio-visualizer)),
-:global(::view-transition-group(cm-radio-queue-header)),
+:global(::view-transition-group(cm-radio-surface)) {
+  z-index: 70;
+  animation-duration: 920ms;
+  animation-timing-function: cubic-bezier(0.14, 0.88, 0.18, 1);
+}
+
+:global(::view-transition-group(cm-radio-header)) {
+  z-index: 90;
+  animation-duration: 520ms;
+  animation-delay: 70ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-group(cm-radio-cover)) {
+  z-index: 92;
+  animation-duration: 860ms;
+  animation-delay: 55ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(::view-transition-group(cm-radio-progress)) {
+  z-index: 93;
+  animation-duration: 620ms;
+  animation-delay: 135ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-group(cm-radio-visualizer)) {
+  z-index: 94;
+  animation-duration: 720ms;
+  animation-delay: 165ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(::view-transition-group(cm-radio-transport)) {
+  z-index: 95;
+  animation-duration: 640ms;
+  animation-delay: 215ms;
+  animation-timing-function: var(--ease-signature);
+}
+
+:global(::view-transition-group(cm-radio-queue-header)) {
+  z-index: 96;
+  animation-duration: 560ms;
+  animation-delay: 255ms;
+  animation-timing-function: var(--ease-signature);
+}
+
 :global(::view-transition-group(cm-radio-queue-list)) {
-  animation-duration: var(--motion-signature);
+  z-index: 96;
+  animation-duration: 650ms;
+  animation-delay: 285ms;
   animation-timing-function: var(--ease-signature);
 }
 
@@ -2458,9 +2502,132 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 :global(::view-transition-new(cm-radio-queue-header)),
 :global(::view-transition-old(cm-radio-queue-list)),
 :global(::view-transition-new(cm-radio-queue-list)) {
-  animation-duration: var(--motion-signature);
-  animation-timing-function: var(--ease-signature);
   mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="opening"]::view-transition-old(cm-studio-surface)) {
+  animation: c1-studio-exit 430ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="opening"]::view-transition-new(cm-studio-surface)) {
+  animation: c1-studio-settle 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="closing"]::view-transition-old(cm-studio-surface)) {
+  animation: c1-studio-old-close 380ms ease-out both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="closing"]::view-transition-new(cm-studio-surface)) {
+  animation: c1-studio-return 720ms 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="opening"]::view-transition-new(cm-radio-cover)) {
+  animation: c1-cover-dock 720ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="opening"]::view-transition-new(cm-radio-visualizer)) {
+  animation: c1-visualizer-open 560ms 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: 50% 100%;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="opening"]::view-transition-new(cm-radio-transport)) {
+  animation: c1-transport-in 500ms 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="opening"]::view-transition-new(cm-radio-queue-header)),
+:global(html[data-radio-transition="opening"]::view-transition-new(cm-radio-queue-list)) {
+  animation: c1-queue-in 500ms 305ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="closing"]::view-transition-old(cm-radio-queue-header)),
+:global(html[data-radio-transition="closing"]::view-transition-old(cm-radio-queue-list)) {
+  animation: c1-queue-out 230ms ease-in both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="closing"]::view-transition-old(cm-radio-transport)) {
+  animation: c1-transport-out 260ms 40ms ease-in both;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="closing"]::view-transition-old(cm-radio-visualizer)) {
+  animation: c1-visualizer-close 300ms 80ms ease-in both;
+  transform-origin: 50% 100%;
+  mix-blend-mode: normal;
+}
+
+:global(html[data-radio-transition="closing"]::view-transition-old(cm-radio-cover)) {
+  animation: c1-cover-undock 430ms 110ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  mix-blend-mode: normal;
+}
+
+@keyframes c1-studio-exit {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to { opacity: 0.18; transform: translateX(-2.5rem) scale(0.985); }
+}
+
+@keyframes c1-studio-settle {
+  from { opacity: 0.22; transform: translateX(-1.8rem) scale(0.987); }
+  to { opacity: 0.72; transform: translateX(-1.25rem) scale(1); }
+}
+
+@keyframes c1-studio-old-close {
+  from { opacity: 0.72; transform: translateX(-1.25rem); }
+  to { opacity: 0; transform: translateX(-2rem); }
+}
+
+@keyframes c1-studio-return {
+  from { opacity: 0; transform: translateX(-2rem) scale(0.988); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes c1-cover-dock {
+  from { opacity: 0.64; filter: brightness(0.78); }
+  55% { opacity: 0.92; filter: brightness(0.96); }
+  to { opacity: 1; filter: brightness(1); }
+}
+
+@keyframes c1-cover-undock {
+  from { opacity: 1; filter: brightness(1); }
+  to { opacity: 0.72; filter: brightness(0.82); }
+}
+
+@keyframes c1-visualizer-open {
+  from { opacity: 0.18; transform: scaleY(0.58); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+@keyframes c1-visualizer-close {
+  from { opacity: 1; transform: scaleY(1); }
+  to { opacity: 0.2; transform: scaleY(0.62); }
+}
+
+@keyframes c1-transport-in {
+  from { opacity: 0; transform: translateY(0.8rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes c1-transport-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(0.55rem); }
+}
+
+@keyframes c1-queue-in {
+  from { opacity: 0; transform: translateX(1rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes c1-queue-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(0.7rem); }
 }
 
 .radioPanel {

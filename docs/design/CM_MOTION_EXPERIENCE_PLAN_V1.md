@@ -181,49 +181,89 @@ Estas frentes descrevem o comportamento esperado. A ordem vigente, os bloqueios 
 
 ## C1 — Motion Core de Alto Impacto
 
-Objetivo: introduzir a base técnica necessária e já provar o padrão com **uma mecânica de assinatura real**. Esta etapa não fecha com tokens e helpers apenas.
+Objetivo: provar o novo patamar de movimento com **uma única mecânica de assinatura real**, sustentada por um spine interrompível e testável. C1 não fecha com helpers, tokens ou commits isolados.
 
-Inclui:
+### C1.1 — Motion Spine
 
-- consolidar tokens de duração/easing existentes;
-- definir política de interruption/cancelamento;
-- definir reduced motion;
-- definir ownership entre CSS e a primeira biblioteca adotada;
-- criar primitives usadas por casos reais;
-- introduzir Motion quando necessário;
-- implementar pelo menos uma transição/recomposição perceptivelmente superior ao CSS atual;
-- implementar continuidade espacial Home -> Estúdio -> Home com rota pública real;
-- manter Rádio, fila, posição, volume e estado visual fora do teardown da rota;
-- medir custo da dependência introduzida;
-- preservar o player existente.
+Responsabilidade: tornar o estado espacial da Rádio previsível antes de aumentar o espetáculo visual.
 
-A prova de C1 precisa demonstrar o tipo de qualidade esperado para o restante do projeto. Pode ser, conforme o estado do frontend no momento:
+Estados conceituais:
 
-- playlist -> Now Playing com continuidade espacial;
-- split -> focus/fullscreen com recomposição real;
-- Home -> Estúdio com shared elements e Rádio persistente;
-- mini player -> Rádio completa;
-- outra mecânica de assinatura aprovada.
+- `split`: largura inicial aprovada;
+- `custom`: largura livre escolhida pelo usuário;
+- `focus`: workstation intermediária com recomposição interna;
+- `fullscreen`: Rádio domina a tela, preservando a mesma instância de áudio.
 
-Para o código atual, a prova escolhida é **Rádio acoplada → focus workstation → tela inteira → retorno**. A pessoa deve perceber a mudança de hierarquia e de composição durante a passagem: arte, informação da faixa, visualizador, transporte e fila ganham posições e espaço próprios na tela grande. Mover elementos por código ou aumentar a largura do painel, por si só, não satisfaz essa prova. O mesmo fluxo precisa preservar a música e permitir voltar sem perder o contexto. Cassiano avalia o efeito executado; uma captura estática ou um teste que detecta animações não substitui essa avaliação.
+Regras:
 
-Não inclui:
+- uma nova transição invalida a anterior;
+- animações WAAPI antigas não podem continuar controlando o mesmo elemento;
+- callbacks/timers antigos não podem limpar o estado de uma transição nova;
+- ao interromper, o novo FLIP parte da geometria **visível naquele instante**, não da geometria antiga;
+- reduced motion muda estado imediatamente e não deixa resíduos;
+- resize e drag não criam outro dono de layout;
+- estado conceitual deve ficar observável no DOM para diagnóstico e QA.
 
-- abstrações sem consumidor;
-- dez efeitos pequenos vendidos como "motion system";
-- reescrita desnecessária do player;
-- instalar bibliotecas que ainda não tenham uma mecânica responsável por elas.
+Gate C1.1:
 
-Gate:
+- abrir e inverter antes do fim não gera salto grosseiro;
+- fechar e reabrir antes do fim não deixa estado fantasma;
+- não existem animations/timers órfãos após substituição ou unmount;
+- `split/custom/focus/fullscreen` têm ownership claro;
+- C5 deixa de ser responsável pela transição de estado e passa a cuidar apenas da física da manipulação direta.
 
-- existe pelo menos uma mecânica que mude visivelmente o patamar da experiência;
-- Home -> Estúdio -> Home não parece teardown/fade entre páginas;
-- a Rádio continua tocando e preserva estado durante a navegação;
-- a mecânica é interrompível e reversível quando aplicável;
-- não existem duas soluções diferentes para a mesma classe de animação;
-- desktop/mobile aplicáveis foram considerados;
-- lint/typecheck/build pertinentes passam;
-- nenhuma regressão de player, resize ou continuidade.
+### C1.2 — Signature Radio
+
+Responsabilidade: fazer **Rádio acoplada → focus workstation → fullscreen → retorno** parecer uma única transformação grande, rápida e inequívoca.
+
+A composição deve mudar de verdade:
+
+- capa/Now Playing ganha território;
+- informação de faixa muda de hierarquia;
+- visualizador cresce como parte da mesma superfície;
+- transporte encontra posição própria;
+- fila passa a ocupar uma coluna funcional;
+- letra aparece quando existe espaço para isso;
+- o Estúdio cede território sem parecer troca de página;
+- retorno refaz a composição no sentido inverso.
+
+A coreografia deve privilegiar poucos movimentos grandes e relacionados. Não usar uma cascata lenta de delays que faça parecer que cada controle chegou separadamente.
+
+Gate C1.2:
+
+- gravada sem áudio, a transformação ainda parece uma cena de assinatura;
+- foco e fullscreen são perceptivelmente diferentes do split;
+- fullscreen não parece sidebar apenas ficando larga;
+- o fluxo completo continua rápido o suficiente para uso repetido;
+- música, fila, posição, volume e estado do player permanecem contínuos.
+
+### C1.3 — Motion QA
+
+Responsabilidade: provar a mecânica antes de declarar C1 concluído.
+
+Matriz mínima:
+
+- split → focus;
+- focus → split;
+- focus → fullscreen;
+- fullscreen → split;
+- abrir e interromper no meio;
+- fechar e interromper no meio;
+- drag lento;
+- drag rápido;
+- soltura em pontos intermediários;
+- fullscreen pelo link e pelo gesto;
+- seek durante motion;
+- troca de faixa durante motion;
+- áudio contínuo;
+- resize da janela;
+- `prefers-reduced-motion`.
+
+C1 só recebe `done` depois dessa matriz e da aprovação perceptiva de Cassiano.
+
+### Stack de C1
+
+CSS, View Transitions e WAAPI continuam válidos. Motion for React entra apenas se a política de interrupção/shared layout continuar cara ou frágil depois do spine. Não empilhar outro motor só para reescrever hover ou transições já resolvidas.
 
 ## C2 — Audio Motion Contract
 
@@ -303,32 +343,35 @@ Gate:
 - áudio não espera a animação;
 - existe pelo menos um momento claramente memorável, não apenas microinterações corretas.
 
-## C5 — Split / Focus / Divider Signature
+## C5 — Física de Manipulação Direta do Divisor
 
-**Esta etapa não cria o fullscreen do zero.**
+**C5 não cria focus/fullscreen e não possui a transição de estado.** Esses estados e sua recomposição pertencem a C1.
 
-O fullscreen por drag e a prévia já pertencem ao trabalho atual da 03b. Esta frente começa do comportamento integrado e leva essa mecânica ao nível de assinatura.
+Objetivo: fazer o divisor parecer uma superfície física sob a mão do usuário.
 
 Pode tratar:
 
-- continuidade entre split e fullscreen;
-- recomposição interna da Rádio conforme largura;
-- mudança gradual de hierarquia;
-- spring/snap quando melhorar controle;
-- estados padrão/personalizado/focus/fullscreen;
-- retorno espacial ao split;
-- resize durante viewport change;
-- reação dos elementos internos durante a expansão, sem simples `width` animado.
+- drag direto sem atraso;
+- magnetismo próximo a larguras úteis;
+- snap;
+- flick/velocidade;
+- thresholds;
+- resistência e retorno;
+- preview de fullscreen;
+- recomposição contínua dos elementos internos enquanto a largura muda;
+- resize de viewport durante um estado customizado.
 
 Gate:
 
 - não recria player;
 - não perde fila/posição/volume;
-- drag continua direto, sem lag;
-- fullscreen pelo link e pelo gesto converge para o mesmo estado;
-- teclado/pointer permanecem previsíveis;
+- o cursor/pointer continua preso ao gesto sem lag;
+- snap não rouba intenção quando o usuário quer largura livre;
+- flick avança de forma previsível;
+- fullscreen pelo gesto converge para o mesmo estado de C1;
+- teclado permanece previsível;
 - layout não sofre thrashing;
-- a expansão altera de verdade a composição interna e não parece apenas "sidebar ficando larga".
+- nenhuma lógica de C5 duplica o motion spine de C1.
 
 ## C6 — Mobile Signature Experience
 

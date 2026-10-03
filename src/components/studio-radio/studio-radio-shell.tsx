@@ -28,7 +28,10 @@ import {
   getRadioReleaseTarget,
   type RadioSnapKind
 } from "./radio-panel-drag";
-import { resolveRadioLayoutMode } from "./radio-motion-spine";
+import {
+  resolveRadioLayoutMode,
+  type RadioLayoutMode
+} from "./radio-motion-spine";
 
 const DEFAULT_RADIO_WIDTH = 480;
 const MIN_RADIO_WIDTH = 400;
@@ -639,6 +642,7 @@ export function StudioRadioShell() {
   const dragStartDistanceRef = useRef(0);
   const dragOriginRef = useRef<"sidebar" | "fullscreen">("sidebar");
   const initialRadioWidthRef = useRef(DEFAULT_RADIO_WIDTH);
+  const initialRadioLayoutModeRef = useRef<RadioLayoutMode>("split");
   const pointerActiveRef = useRef(false);
   const pointerMovedRef = useRef(false);
   const dragFullscreenRef = useRef(false);
@@ -1104,6 +1108,7 @@ export function StudioRadioShell() {
     if (!fromDrag) {
       initialRadioWidthRef.current =
         radioWidth ?? (shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH);
+      initialRadioLayoutModeRef.current = radioLayoutMode;
     }
 
     openedFromDragRef.current = fromDrag;
@@ -1141,12 +1146,13 @@ export function StudioRadioShell() {
 
   function closeRadioFullscreen(restoreFocus = true) {
     clearSignatureStageTimer();
+    const returnMode = initialRadioLayoutModeRef.current;
     runRadioMotion("closing", () => {
       clearDragPreview();
       dragFullscreenRef.current = false;
-      customWidthRef.current = true;
+      customWidthRef.current = returnMode === "custom";
       setRadioWidth(initialRadioWidthRef.current);
-      setRadioExpanded(false);
+      setRadioExpanded(returnMode === "focus");
       setRadioFullscreen(false);
       clearReturnPreview();
     });
@@ -1178,6 +1184,7 @@ export function StudioRadioShell() {
       openedFromDragRef.current = false;
       customWidthRef.current = false;
       initialRadioWidthRef.current = initialWidth;
+      initialRadioLayoutModeRef.current = "split";
       setRadioWidth(initialWidth);
       setRadioExpanded(false);
       setRadioFullscreen(false);
@@ -1197,7 +1204,10 @@ export function StudioRadioShell() {
 
     const rect = shell.getBoundingClientRect();
     dragOriginRef.current = radioFullscreen ? "fullscreen" : "sidebar";
-    if (!radioFullscreen) initialRadioWidthRef.current = radioWidth ?? getDefaultWidth(rect.width);
+    if (!radioFullscreen) {
+      initialRadioWidthRef.current = radioWidth ?? getDefaultWidth(rect.width);
+      initialRadioLayoutModeRef.current = radioLayoutMode;
+    }
     dragFullscreenRef.current = radioFullscreen;
     dragRestoredRef.current = false;
     dragOffsetRef.current = rect.right - event.clientX - initialRadioWidthRef.current;

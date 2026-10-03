@@ -1097,6 +1097,7 @@ export function StudioRadioShell() {
   function openRadioFullscreen(fromDrag: boolean) {
     const shell = shellRef.current;
     const shellWidth = shell?.getBoundingClientRect().width;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     clearSignatureStageTimer();
 
@@ -1118,6 +1119,7 @@ export function StudioRadioShell() {
     };
 
     if (
+      !reduce &&
       !fromDrag &&
       !radioExpanded &&
       !radioFullscreen &&

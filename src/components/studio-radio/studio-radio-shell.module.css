@@ -2783,6 +2783,59 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     box-shadow: 0 0 0 1px rgb(82 214 255 / 8%);
   }
 
+  @container radio-panel (max-width: 39.99rem) {
+    .radioContent[data-radio-focus="true"] {
+      display: flex;
+      flex-direction: column;
+      gap: 0.42rem;
+      padding: 0.65rem 0.75rem;
+      overflow: hidden;
+    }
+
+    .radioContent[data-radio-focus="true"] .radioHeader,
+    .radioContent[data-radio-focus="true"] .coverArt,
+    .radioContent[data-radio-focus="true"] .progressBlock,
+    .radioContent[data-radio-focus="true"] .visualizer,
+    .radioContent[data-radio-focus="true"] .transport,
+    .radioContent[data-radio-focus="true"] .queueHeader,
+    .radioContent[data-radio-focus="true"] .trackList,
+    .radioContent[data-radio-focus="true"] .playerMessage {
+      grid-column: auto;
+      grid-row: auto;
+    }
+
+    .radioContent[data-radio-focus="true"] .coverArt {
+      height: clamp(7rem, 22dvh, 12rem);
+      flex: none;
+    }
+
+    .radioContent[data-radio-focus="true"] .visualizer {
+      height: clamp(4rem, 11dvh, 5.5rem);
+      flex: none;
+    }
+
+    .radioContent[data-radio-focus="true"] .transport {
+      flex: none;
+    }
+
+    .radioContent[data-radio-focus="true"] .queueHeader {
+      flex: none;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      backdrop-filter: none;
+    }
+
+    .radioContent[data-radio-focus="true"] .trackList {
+      min-height: 7rem;
+      flex: 1;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+    }
+  }
+
   .site[data-radio-fullscreen="true"] {
     height: 100dvh;
     overflow: hidden;

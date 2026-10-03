@@ -28,7 +28,7 @@ import {
 
 const DEFAULT_RADIO_WIDTH = 480;
 const MIN_RADIO_WIDTH = 400;
-const MAX_RADIO_WIDTH = 720;
+const MAX_RADIO_WIDTH = 1120;
 const MIN_STUDIO_WIDTH = 640;
 const RESIZE_GUTTER = 32;
 
@@ -160,7 +160,7 @@ function getDefaultWidth(shellWidth: number) {
 }
 
 function getExpandedWidth(shellWidth: number) {
-  return clampRadioWidth(shellWidth, shellWidth * 0.48);
+  return clampRadioWidth(shellWidth, shellWidth * 0.6);
 }
 
 function shouldIgnoreRadioShortcutTarget(target: EventTarget | null) {

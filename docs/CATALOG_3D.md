@@ -6,6 +6,12 @@ Produto é o modelo/peça oferecida. Material define propriedades e acabamento. 
 
 Mostrar uma cor disponível para produzir não significa informar estoque de uma peça pronta. Prazo de produção, prazo de envio e disponibilidade são informações distintas. Uma simulação de cor não equivale à fotografia de uma peça impressa naquela cor.
 
+## Separação entre galeria e produtos comerciais
+
+A área **Impressões** é uma galeria do que saiu das impressoras. Ela pode mostrar fotos de peças pessoais, estudos e trabalhos inspirados em propriedades intelectuais de terceiros quando houver base legítima para exibição, mas esses itens não recebem preço, estoque, CTA de compra, SKU nem link para Shopee apenas por aparecerem na galeria.
+
+A área **Produtos** é comercial. Ela contém somente peças que o estúdio realmente vende e pode publicar como oferta comercial. O card **Loja Shopee** em `/studio` navega primeiro para `/studio/produtos`, onde cada item terá informações próprias; o link externo de compra entra no nível do produto, não no card geral do Estúdio.
+
 ## Conteúdo mínimo
 
 | Entidade | Informação necessária |

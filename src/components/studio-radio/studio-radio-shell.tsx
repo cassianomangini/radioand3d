@@ -1020,6 +1020,19 @@ export function StudioRadioShell() {
     runMobileRadioMotion("closing");
   }
 
+  function cancelRadioMotionForDirectManipulation() {
+    radioMotionTokenRef.current += 1;
+    if (motionResetTimerRef.current !== null) {
+      clearTimeout(motionResetTimerRef.current);
+      motionResetTimerRef.current = null;
+    }
+    for (const animation of activeRadioAnimationsRef.current) {
+      animation.cancel();
+    }
+    activeRadioAnimationsRef.current = [];
+    setLayoutMotionDirection(null);
+  }
+
   function runRadioMotion(direction: "opening" | "closing", update: () => void) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const token = ++radioMotionTokenRef.current;
@@ -1136,6 +1149,8 @@ export function StudioRadioShell() {
     if (!shell) {
       return;
     }
+
+    cancelRadioMotionForDirectManipulation();
 
     const rect = shell.getBoundingClientRect();
     dragOriginRef.current = radioFullscreen ? "fullscreen" : "sidebar";

@@ -2763,19 +2763,23 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     position: absolute;
     top: var(--header-height);
     left: 50%;
-    width: min(1.25rem, calc(var(--rail-width) - 4px));
-    height: 1.25rem;
+    width: min(1.8rem, calc(var(--rail-width) - 2px));
+    height: 1.8rem;
     display: grid;
     place-items: center;
     transform: translate(-50%, -50%);
-    color: #198cff;
+    color: #55d8ff;
     font-family: Arial, sans-serif;
-    font-size: 1.25rem;
-    font-weight: 800;
+    font-size: 1.72rem;
+    font-weight: 900;
     line-height: 1;
-    text-shadow: 0 0 0.25rem #198cff, 0 0 0.5rem #198cff;
+    text-shadow:
+      0 0 0.18rem #55d8ff,
+      0 0 0.48rem #198cff,
+      -0.15rem 0 0.65rem rgb(25 140 255 / 72%),
+      0.15rem 0 0.65rem rgb(207 42 234 / 72%);
     pointer-events: none;
-    animation: resize-hint-blink 1.2s steps(1, end) infinite;
+    animation: resize-hint-blink 1.15s steps(1, end) infinite;
   }
 
   .resizeHandle[data-resize-hint="true"] {
@@ -2786,16 +2790,32 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 @keyframes resize-hint-blink {
   0%, 18%, 100% {
     opacity: 1;
-    color: #198cff;
-    text-shadow: 0 0 0.25rem #198cff, 0 0 0.5rem #198cff;
+    color: #55d8ff;
+    transform: translate(-50%, -50%) scale(1);
+    text-shadow:
+      0 0 0.18rem #55d8ff,
+      0 0 0.5rem #198cff,
+      -0.16rem 0 0.7rem rgb(25 140 255 / 78%),
+      0.16rem 0 0.7rem rgb(207 42 234 / 62%);
   }
-  25%, 43% { opacity: 0.12; }
+  25%, 43% {
+    opacity: 0.18;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
   50%, 68% {
     opacity: 1;
-    color: #cf2aea;
-    text-shadow: 0 0 0.25rem #cf2aea, 0 0 0.5rem #cf2aea;
+    color: #cf4cff;
+    transform: translate(-50%, -50%) scale(1.08);
+    text-shadow:
+      0 0 0.18rem #cf4cff,
+      0 0 0.5rem #9a3cff,
+      -0.16rem 0 0.7rem rgb(25 140 255 / 62%),
+      0.16rem 0 0.7rem rgb(207 42 234 / 82%);
   }
-  75%, 93% { opacity: 0.12; }
+  75%, 93% {
+    opacity: 0.18;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
 }
 
 @media (max-width: 81.25rem) and (min-width: 73.75rem) {

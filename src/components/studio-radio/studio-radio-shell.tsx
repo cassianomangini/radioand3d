@@ -623,7 +623,8 @@ export function StudioRadioShell() {
   const radio = useRadio();
   const pathname = usePathname();
   const router = useRouter();
-  const studioRoute = pathname === "/studio" ? "detail" : "home";
+  const studioRoute = pathname.startsWith("/studio") ? "detail" : "home";
+  const studioProducts = pathname === "/studio/produtos";
   const shellRef = useRef<HTMLDivElement>(null);
   const radioNavRef = useRef<HTMLAnchorElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
@@ -1656,7 +1657,7 @@ export function StudioRadioShell() {
 
           <div
             className={styles.studioDetailRail}
-            aria-hidden={studioRoute !== "detail"}
+            aria-hidden={studioRoute !== "detail" || studioProducts}
           >
             <article className={styles.studioDetailCard} data-studio-card="prints">
               <span className={styles.studioCardLabel}>PEÇAS</span>
@@ -1670,21 +1671,50 @@ export function StudioRadioShell() {
               <p>Filamentos, cores e propriedades que usamos no estúdio.</p>
             </article>
 
-            <a
+            <Link
               className={styles.studioDetailCard}
               data-studio-card="store"
-              href="https://shopee.com.br/artesopolis"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Abrir loja na Shopee em nova aba"
-              tabIndex={studioRoute === "detail" ? 0 : -1}
+              href="/studio/produtos"
+              aria-label="Ver produtos do estúdio vendidos pela Shopee"
+              tabIndex={studioRoute === "detail" && !studioProducts ? 0 : -1}
+              onPointerEnter={() => router.prefetch("/studio/produtos")}
             >
               <span className={styles.studioCardLabel}>LOJA</span>
               <strong>Loja Shopee</strong>
-              <p>Produtos do estúdio disponíveis para compra.</p>
-              <span className={styles.studioCardAction}>Abrir loja</span>
-            </a>
+              <p>Conheça os produtos que vendemos e veja os detalhes de cada peça.</p>
+              <span className={styles.studioCardAction}>Ver produtos</span>
+            </Link>
           </div>
+
+          <section
+            className={styles.studioProducts}
+            aria-hidden={!studioProducts}
+            aria-labelledby="studio-products-title"
+          >
+            <div className={styles.studioProductsHeader}>
+              <Link
+                href="/studio"
+                className={styles.studioProductsBack}
+                aria-label="Voltar ao catálogo do estúdio"
+              >
+                <span aria-hidden="true">←</span>
+                <span>Voltar ao estúdio</span>
+              </Link>
+              <span className={styles.studioProductsKicker}>PRODUTOS</span>
+              <h2 id="studio-products-title">Produtos à venda</h2>
+              <p>
+                Aqui entram somente as peças que o estúdio realmente comercializa.
+                Cada produto terá fotos, medidas, materiais, opções e o caminho de compra na Shopee.
+              </p>
+            </div>
+
+            <div className={styles.studioProductsEmpty}>
+              <strong>Catálogo comercial em preparação</strong>
+              <p>
+                Os produtos serão publicados aqui com informações completas antes do link de compra.
+              </p>
+            </div>
+          </section>
         </main>
 
         <div

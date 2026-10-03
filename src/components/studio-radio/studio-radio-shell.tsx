@@ -1651,15 +1651,15 @@ export function StudioRadioShell() {
             aria-hidden={studioRoute !== "detail"}
           >
             <article className={styles.studioDetailCard} data-studio-card="prints">
-              <span className={styles.studioCardLabel}>IMPRESSÕES</span>
-              <strong>Peças e projetos do estúdio</strong>
-              <p>Uma seleção do que já saiu das impressoras, de testes a trabalhos finalizados.</p>
+              <span className={styles.studioCardLabel}>PEÇAS</span>
+              <strong>Impressões</strong>
+              <p>Peças que já saíram do estúdio. Inspirações, modelos e ideias.</p>
             </article>
 
             <article className={styles.studioDetailCard} data-studio-card="materials">
               <span className={styles.studioCardLabel}>MATERIAIS</span>
-              <strong>Cores, texturas e acabamentos</strong>
-              <p>Os materiais usados nas peças e as opções disponíveis para cada tipo de projeto.</p>
+              <strong>Materiais &amp; Cores</strong>
+              <p>Filamentos, cores e propriedades que usamos no estúdio.</p>
             </article>
 
             <a
@@ -1671,9 +1671,9 @@ export function StudioRadioShell() {
               aria-label="Abrir loja na Shopee em nova aba"
               tabIndex={studioRoute === "detail" ? 0 : -1}
             >
-              <span className={styles.studioCardLabel}>LOJA SHOPEE</span>
-              <strong>Produtos disponíveis para compra</strong>
-              <p>Acesse os itens publicados pelo estúdio diretamente na Shopee.</p>
+              <span className={styles.studioCardLabel}>LOJA</span>
+              <strong>Loja Shopee</strong>
+              <p>Produtos do estúdio disponíveis para compra.</p>
               <span className={styles.studioCardAction}>Abrir loja</span>
             </a>
           </div>

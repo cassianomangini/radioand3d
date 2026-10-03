@@ -25,7 +25,7 @@ export interface ResampledVisualizerLayout {
   sideCount: number;
 }
 
-type VisualizerBarRole = "bass" | "drums" | "other" | "voice";
+export type VisualizerBarRole = "bass" | "drums" | "other" | "voice";
 
 interface VisualizerMotionProfile {
   attackMs: number;
@@ -151,7 +151,7 @@ export function getResampledVisualizerLayout(
   };
 }
 
-function visualizerBarRole(
+export function visualizerBarRole(
   index: number,
   barCount: number,
   layout: ResampledVisualizerLayout
@@ -174,6 +174,17 @@ function visualizerBarRole(
   if (position <= 0.21) return "bass";
   if (position <= 0.5) return "drums";
   return "other";
+}
+
+export function getResampledVisualizerRoles(
+  analysis: DecodedMusicalVisualizerAnalysis,
+  targetBarCount: number
+): VisualizerBarRole[] {
+  const layout = getResampledVisualizerLayout(analysis, targetBarCount);
+  return Array.from(
+    { length: Math.max(0, Math.floor(targetBarCount)) },
+    (_, index) => visualizerBarRole(index, targetBarCount, layout)
+  );
 }
 
 function profileForRole(role: VisualizerBarRole): VisualizerMotionProfile {

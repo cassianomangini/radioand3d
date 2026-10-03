@@ -4,6 +4,7 @@ import {
   createMusicalVisualizerMotion,
   decodeMusicalVisualizerAnalysis,
   getResampledVisualizerLayout,
+  getResampledVisualizerRoles,
   sampleMusicalVisualizer
 } from "../src/features/radio/visualizer-analysis.ts";
 
@@ -114,5 +115,16 @@ test("visualizer motion reset lands immediately on a seek target", () => {
   assert.deepEqual(
     motion.step(target, 16).map((value) => Number(value.toFixed(4))),
     target
+  );
+});
+
+
+test("maps resampled bars to the real sidecar roles", () => {
+  const analysis = decodeMusicalVisualizerAnalysis(payload(new Uint8Array(16)));
+  assert.ok(analysis);
+
+  assert.deepEqual(
+    getResampledVisualizerRoles(analysis, 8),
+    ["bass", "drums", "other", "voice", "voice", "other", "drums", "bass"]
   );
 });

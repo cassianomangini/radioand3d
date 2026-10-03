@@ -1564,6 +1564,23 @@
   mask-image: repeating-linear-gradient(to top, #000 0 6px, transparent 6px 9px);
 }
 
+.visualizer span[data-visualizer-role="bass"] {
+  background: linear-gradient(to top, #08b9e7 5%, #245fd8 72%, #3947b7 100%);
+}
+
+.visualizer span[data-visualizer-role="drums"] {
+  background: linear-gradient(to top, #12d6ef 4%, #3477ff 58%, #8d43e7 100%);
+}
+
+.visualizer span[data-visualizer-role="other"] {
+  background: linear-gradient(to top, #0dc7eb 4%, #4768f2 55%, #a03ce6 100%);
+}
+
+.visualizer span[data-visualizer-role="voice"] {
+  background: linear-gradient(to top, #2dddf2 4%, #69cfff 58%, #b7a4ff 100%);
+  filter: brightness(1.06);
+}
+
 .visualizer p {
   position: absolute;
   inset: 0;

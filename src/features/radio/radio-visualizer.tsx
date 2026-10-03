@@ -6,6 +6,7 @@ import { useRadio } from "./radio-provider";
 import {
   createMusicalVisualizerMotion,
   getResampledVisualizerLayout,
+  getResampledVisualizerRoles,
   loadMusicalVisualizerAnalysis,
   sampleMusicalVisualizer,
   type DecodedMusicalVisualizerAnalysis
@@ -175,6 +176,9 @@ export function RadioVisualizer({
   const synchronized = Boolean(
     status === "playing" && currentAnalysis && active
   );
+  const synchronizedRoles = currentAnalysis
+    ? getResampledVisualizerRoles(currentAnalysis, barCount)
+    : null;
   const live = Boolean(
     status === "playing" && analyserReady && active
   );
@@ -197,7 +201,11 @@ export function RadioVisualizer({
       }
     >
       {Array.from({ length: barCount }, (_, index) => (
-        <span key={index} style={{ height: "4%" }} />
+        <span
+          key={index}
+          data-visualizer-role={synchronizedRoles?.[index]}
+          style={{ height: "4%" }}
+        />
       ))}
       {analyserUnavailable && !currentAnalysis ? (
         <p>Barras indisponíveis nesta reprodução</p>

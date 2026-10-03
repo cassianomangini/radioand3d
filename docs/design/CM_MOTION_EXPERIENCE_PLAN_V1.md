@@ -540,7 +540,7 @@ Este bloco registra progresso técnico sem confundir implementação com aprova�
 
 | Frente | Estado | O que já entrou na `main` | Gate ainda aberto |
 | --- | --- | --- | --- |
-| C1 Motion Core de Alto Impacto | **in_progress** | shared-element transitions; faixa selecionada -> Now Playing; recomposição split/fullscreen; mini player -> Rádio completa; fila preservando identidade espacial | Cassiano ainda não percebeu mudança visual grande no localhost; o gate de "mudar visivelmente o patamar" **não está fechado** |
+| C1 Motion Core de Alto Impacto | **in_progress** | shared-element transitions; faixa selecionada -> Now Playing; **focus workstation intermediário com recomposição em 2 colunas**; focus -> fullscreen; mini player -> Rádio completa; fila preservando identidade espacial | focus workstation implementado e capturado pelo CI, mas o gate de "mudar visivelmente o patamar" só fecha após Cassiano revisar no localhost |
 | C2 Audio Motion Contract | **in_progress** | sidecar preserva regiões; roles `bass/drums/other/voice`; attack/release por região; fallback live por frequência; continuidade em seek/pause; ferramenta `visualizer:inspect` | validar sidecars reais gerados pelo sync e comparar músicas de perfis diferentes |
 | C3 Visualizer 2.0 | **in_progress** | voz central e instrumentos preservados no reamostramento; contraste espacial sem inventar energia; pausa relaxa; reduced-motion com baixa cadência; cores sutis por papel real | revisão perceptiva com música real; confirmar que deixou de parecer "uma massa só" |
 | C4 Radio Living Interface | **in_progress** | track change direcional; loading/buffering real; seek/volume táteis; teclado global; fila mantém identidade ao reordenar | ainda falta um momento visual claramente memorável no player completo; Cassiano não aprovou o "wow" |
@@ -556,7 +556,7 @@ Cassiano verificou o localhost em 03/10/2026 e relatou que, visualmente, a únic
 Consequência:
 
 - **nenhuma frente acima pode ser marcada `done` apenas porque CI/build passou**;
-- os próximos blocos devem aumentar a escala perceptiva das mecânicas, especialmente C1/C4/C5;
+- o próximo gate é exclusivamente C1: validar no localhost a recomposição compacta -> focus workstation -> fullscreen antes de retomar C2-C7;
 - microajuste isolado não pode substituir a transformação visível prometida pelo artefato;
 - C2/C3 continuam dependentes da validação das análises reais geradas pelo sync.
 

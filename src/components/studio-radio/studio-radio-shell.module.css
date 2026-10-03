@@ -2615,6 +2615,174 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     box-shadow: -0.25rem 0 1.25rem rgb(37 129 255 / 32%);
   }
 
+  .site[data-radio-expanded="true"]:not([data-radio-fullscreen="true"]) .radioPanel {
+    background:
+      radial-gradient(ellipse at 18% 10%, rgb(22 84 157 / 24%), transparent 34%),
+      radial-gradient(ellipse at 92% 88%, rgb(96 54 168 / 16%), transparent 32%),
+      #03050a;
+    box-shadow: -1rem 0 3rem rgb(17 92 180 / 18%);
+  }
+
+  .radioContent[data-radio-focus="true"] {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(14.5rem, 0.92fr);
+    grid-template-rows:
+      2.55rem
+      2.75rem
+      minmax(10rem, 1fr)
+      auto
+      clamp(5.75rem, 14dvh, 8.5rem)
+      4.15rem
+      auto;
+    column-gap: clamp(0.7rem, 1.35vw, 1.2rem);
+    row-gap: clamp(0.38rem, 0.75dvh, 0.65rem);
+    padding: clamp(0.7rem, 1.3dvh, 1rem) clamp(0.75rem, 1.25vw, 1.2rem);
+    overflow: hidden;
+  }
+
+  .radioContent[data-radio-focus="true"] .radioHeader {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-height: 0;
+    border-bottom-color: rgb(82 214 255 / 22%);
+  }
+
+  .radioContent[data-radio-focus="true"] .radioHeader h2 {
+    font-size: clamp(1.12rem, 1.35vw, 1.45rem);
+    letter-spacing: -0.055em;
+  }
+
+  .radioContent[data-radio-focus="true"] .coverArt {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    border-color: rgb(82 214 255 / 28%);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 2%),
+      0 1rem 2.4rem rgb(0 0 0 / 26%);
+  }
+
+  .radioContent[data-radio-focus="true"] .coverArt img {
+    object-position: center 42%;
+  }
+
+  .radioContent[data-radio-focus="true"] .coverCaption {
+    gap: 0.2rem;
+    padding:
+      3.75rem
+      clamp(0.9rem, 1.7vw, 1.4rem)
+      clamp(0.85rem, 1.7dvh, 1.25rem);
+  }
+
+  .radioContent[data-radio-focus="true"] .coverCaption strong {
+    font-size: clamp(1.35rem, 1.8vw, 2rem);
+    line-height: 1.04;
+  }
+
+  .radioContent[data-radio-focus="true"] .coverCaption > span {
+    font-size: clamp(0.82rem, 1vw, 1rem);
+  }
+
+  .radioContent[data-radio-focus="true"] .queueHeader {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    min-height: 0;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem 0;
+    background: rgb(2 7 14 / 78%);
+    border: 1px solid rgb(82 214 255 / 20%);
+    border-bottom: 0;
+    border-radius: 0.5rem 0.5rem 0 0;
+    backdrop-filter: blur(8px);
+  }
+
+  .radioContent[data-radio-focus="true"] .queueHeader h3 {
+    font-size: 0.84rem;
+  }
+
+  .radioContent[data-radio-focus="true"] .queueHeader .searchField input {
+    min-height: 2rem;
+    background: rgb(4 10 18 / 88%);
+  }
+
+  .radioContent[data-radio-focus="true"] .trackList {
+    grid-column: 2;
+    grid-row: 3 / 7;
+    min-height: 0;
+    padding: 0.3rem 0.38rem 0.48rem;
+    overflow-y: auto;
+    background: rgb(2 7 14 / 78%);
+    border: 1px solid rgb(82 214 255 / 20%);
+    border-top: 0;
+    border-radius: 0 0 0.5rem 0.5rem;
+    box-shadow: inset 0 1rem 2.5rem rgb(20 72 122 / 5%);
+    scrollbar-color: #4c7395 #050b13;
+  }
+
+  .radioContent[data-radio-focus="true"] .trackRow {
+    min-height: 3.85rem;
+    border-bottom: 1px solid rgb(95 145 191 / 9%);
+  }
+
+  .radioContent[data-radio-focus="true"] .progressBlock {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .radioContent[data-radio-focus="true"] .visualizer {
+    grid-column: 1;
+    grid-row: 5;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0.1rem 0.2rem 0;
+    background:
+      linear-gradient(to top, rgb(13 87 160 / 17%), transparent 68%),
+      linear-gradient(90deg, transparent, rgb(82 214 255 / 4%) 50%, transparent);
+  }
+
+  .radioContent[data-radio-focus="true"] .transport {
+    grid-column: 1;
+    grid-row: 6;
+    justify-content: space-around;
+    padding-inline: clamp(0.15rem, 0.6vw, 0.5rem);
+  }
+
+  .radioContent[data-radio-focus="true"] .transport > button:not(.playButton),
+  .radioContent[data-radio-focus="true"] .transport .volumeTrigger {
+    min-width: 2.7rem;
+    width: 2.7rem;
+    min-height: 2.7rem;
+    height: 2.7rem;
+  }
+
+  .radioContent[data-radio-focus="true"] .transport .playButton {
+    min-width: 3.95rem;
+    width: 3.95rem;
+    min-height: 3.95rem;
+    height: 3.95rem;
+  }
+
+  .radioContent[data-radio-focus="true"] .playerMessage {
+    grid-column: 1;
+    grid-row: 7;
+  }
+
+  .site[data-radio-layout-motion] .radioContent[data-radio-surface="desktop"] {
+    isolation: isolate;
+  }
+
+  .site[data-radio-layout-motion="opening"] .radioContent[data-radio-focus="true"] .coverArt,
+  .site[data-radio-layout-motion="opening"] .radioContent[data-radio-focus="true"] .visualizer {
+    box-shadow: 0 0 0 1px rgb(82 214 255 / 8%);
+  }
+
   .site[data-radio-fullscreen="true"] {
     height: 100dvh;
     overflow: hidden;

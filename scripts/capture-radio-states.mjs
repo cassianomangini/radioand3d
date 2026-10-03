@@ -162,6 +162,29 @@ try {
   await client.send("Runtime.enable");
 
   await navigate(client, 1760, 824, false);
+  const desktopFocused = await evaluate(
+    client,
+    `(() => {
+      const separator = document.querySelector('[role="separator"]');
+      if (!(separator instanceof HTMLElement)) return false;
+      separator.focus();
+      separator.dispatchEvent(new KeyboardEvent("keydown", {
+        key: "Enter",
+        code: "Enter",
+        bubbles: true
+      }));
+      return true;
+    })()`
+  );
+  if (!desktopFocused) throw new Error("Desktop Radio separator was not found.");
+  await delay(1100);
+  const focusLayoutReached = await evaluate(
+    client,
+    `document.querySelector('[data-radio-expanded="true"] [data-radio-focus="true"]') !== null`
+  );
+  if (!focusLayoutReached) throw new Error("Desktop Radio did not reach focus composition.");
+  await screenshot(client, "desktop-radio-focus-1760x824.png");
+
   const desktopClicked = await evaluate(
     client,
     `(() => {

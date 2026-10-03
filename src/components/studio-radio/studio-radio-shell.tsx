@@ -197,6 +197,7 @@ function stableViewTransitionToken(value: string) {
 
 function RadioContent({
   mobile = false,
+  focus = false,
   expanded = false,
   onClose,
   mobileMotionEndpoint = false,
@@ -206,6 +207,7 @@ function RadioContent({
   onReshuffle
 }: {
   mobile?: boolean;
+  focus?: boolean;
   expanded?: boolean;
   onClose?: () => void;
   mobileMotionEndpoint?: boolean;
@@ -307,6 +309,7 @@ function RadioContent({
     <div
       className={styles.radioContent}
       data-radio-surface={mobile ? "mobile" : "desktop"}
+      data-radio-focus={!mobile && focus ? "true" : undefined}
       data-track-flight={trackFlight?.phase}
       data-track-step={trackStepKind}
       data-mobile-motion-endpoint={mobile && mobileMotionEndpoint ? "true" : undefined}
@@ -694,19 +697,29 @@ export function StudioRadioShell() {
   function settleDivider(targetWidth: number, snap: RadioSnapKind | null) {
     if (!snap) return;
 
-    if (dividerSettleTimerRef.current !== null) {
-      clearTimeout(dividerSettleTimerRef.current);
+    const nextFocused = snap === "focus";
+    const applySettle = () => {
+      if (dividerSettleTimerRef.current !== null) {
+        clearTimeout(dividerSettleTimerRef.current);
+      }
+
+      setDividerSettling(true);
+      customWidthRef.current = snap === "compact";
+      setRadioExpanded(nextFocused);
+      setRadioWidth(targetWidth);
+
+      dividerSettleTimerRef.current = setTimeout(() => {
+        setDividerSettling(false);
+        dividerSettleTimerRef.current = null;
+      }, 460);
+    };
+
+    if (nextFocused !== radioExpanded) {
+      runRadioMotion(nextFocused ? "opening" : "closing", applySettle);
+      return;
     }
 
-    setDividerSettling(true);
-    customWidthRef.current = snap === "compact";
-    setRadioExpanded(snap === "focus");
-    setRadioWidth(targetWidth);
-
-    dividerSettleTimerRef.current = setTimeout(() => {
-      setDividerSettling(false);
-      dividerSettleTimerRef.current = null;
-    }, 460);
+    applySettle();
   }
 
   function clearReturnPreview() {
@@ -1377,6 +1390,7 @@ export function StudioRadioShell() {
 
         <aside id="radio" className={styles.radioPanel} aria-label="CM Rádio">
           <RadioContent
+            focus={radioExpanded && !radioFullscreen}
             expanded={radioFullscreen}
             trackStepKind={trackStepMotion?.kind}
             onPrevious={previousTrack}

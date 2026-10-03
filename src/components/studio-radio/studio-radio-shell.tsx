@@ -1121,12 +1121,6 @@ export function StudioRadioShell() {
     returnDistanceRef.current = Math.max(0, rect.width - initialRadioWidthRef.current - event.currentTarget.getBoundingClientRect().width);
     pointerActiveRef.current = true;
     pointerMovedRef.current = false;
-    if (!radioFullscreen) {
-      const handle = event.currentTarget;
-      const handleRect = handle.getBoundingClientRect();
-      const hintY = Math.min(Math.max(event.clientY - handleRect.top + 32, 24), handleRect.height - 24);
-      handle.style.setProperty("--resize-hint-y", `${hintY}px`);
-    }
     setShowResizeHint(!radioFullscreen);
     clearDragPreview();
     clearReturnPreview();
@@ -1222,7 +1216,6 @@ export function StudioRadioShell() {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     if (!pointerActiveRef.current) return;
-    const shouldToggle = event.type === "pointerup" && !pointerMovedRef.current;
     const shouldRestore = event.type === "pointercancel" && dragOriginRef.current === "sidebar" && dragFullscreenRef.current;
     const shouldReturn = event.type === "pointerup" && dragOriginRef.current === "fullscreen" && returnOffsetRef.current >= returnDistanceRef.current / 2;
     const shouldSettle =
@@ -1234,13 +1227,10 @@ export function StudioRadioShell() {
 
     pointerActiveRef.current = false;
     setDragging(false);
-    if (!shouldToggle) setShowResizeHint(false);
+    setShowResizeHint(false);
 
     if (shouldRestore || shouldReturn) {
       closeRadioFullscreen(false);
-    } else if (shouldToggle) {
-      if (radioFullscreen) closeRadioFullscreen();
-      else toggleRadioExpanded();
     } else if (shouldSettle) {
       const shell = shellRef.current;
       if (shell) {
@@ -1688,9 +1678,9 @@ export function StudioRadioShell() {
           ref={resizeHandleRef}
           className={styles.resizeHandle}
           data-resize-hint={showResizeHint && !radioFullscreen ? "true" : undefined}
-          role={radioFullscreen ? "button" : "separator"}
-          aria-label={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Redimensionar ou expandir CM Rádio"}
-          aria-orientation={radioFullscreen ? undefined : "vertical"}
+          role="separator"
+          aria-label={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Arraste para redimensionar CM Rádio"}
+          aria-orientation="vertical"
           aria-valuemin={radioFullscreen ? undefined : MIN_RADIO_WIDTH}
           aria-valuemax={radioFullscreen ? undefined : MAX_RADIO_WIDTH}
           aria-valuenow={radioFullscreen ? undefined : Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)}
@@ -1700,7 +1690,7 @@ export function StudioRadioShell() {
           onPointerUp={stopDragging}
           onPointerCancel={stopDragging}
           onKeyDown={handleResizeKeyDown}
-          title={radioFullscreen ? "Arraste para a direita ou clique para mostrar o Estúdio" : "Clique para expandir ou recolher; arraste para ajustar a largura ou abrir a Rádio"}
+          title={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Arraste para ajustar livremente a largura da CM Rádio"}
         />
 
         <aside id="radio" className={styles.radioPanel} data-radio-flip-root="true" aria-label="CM Rádio">

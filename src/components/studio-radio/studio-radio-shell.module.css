@@ -2750,7 +2750,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     z-index: 15;
     background: #03050a url("/images/cm-radio-divider.webp") center / auto 100% no-repeat;
     border: 0;
-    cursor: grab;
+    cursor: ew-resize;
     filter: saturate(0.72) brightness(0.78);
     transition:
       right var(--motion-expand) var(--ease-standard),
@@ -2759,9 +2759,9 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 
   .resizeHandle[data-resize-hint="true"]::after {
-    content: "←";
+    content: "↔";
     position: absolute;
-    top: var(--resize-hint-y, 50%);
+    top: var(--header-height);
     left: 50%;
     width: min(1.25rem, calc(var(--rail-width) - 4px));
     height: 1.25rem;
@@ -3385,7 +3385,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 
   .site[data-radio-dragging="true"] .resizeHandle {
-    cursor: grabbing;
+    cursor: ew-resize;
   }
 
   .desktopShell[data-radio-magnet] .resizeHandle {

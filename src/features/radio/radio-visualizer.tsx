@@ -18,6 +18,9 @@ interface AnalysisResult {
   analysis: DecodedMusicalVisualizerAnalysis | null;
 }
 
+const SYNCHRONIZED_ATTACK_MS = 45;
+const SYNCHRONIZED_RELEASE_MS = 95;
+
 export function RadioVisualizer({
   className,
   barCount = 36,
@@ -77,6 +80,9 @@ export function RadioVisualizer({
     const synchronizedRoles = currentAnalysis
       ? getResampledVisualizerRoles(currentAnalysis, bars.length)
       : null;
+    const displayedLevels = bars.map((bar) =>
+      visualizerLevelFromHeightPercent(Number.parseFloat(bar.style.height || "4"))
+    );
 
     const bounds = root.getBoundingClientRect();
     let visible =
@@ -86,20 +92,12 @@ export function RadioVisualizer({
       bounds.top < window.innerHeight &&
       bounds.right > 0 &&
       bounds.left < window.innerWidth;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
-    let frameDelay: number | null = null;
     let previousFrame = 0;
+    let previousPosition = currentAnalysis ? getCurrentTime() : -1;
 
     function scheduleDraw() {
-      if (reducedMotion.matches) {
-        frameDelay = window.setTimeout(() => {
-          frameDelay = null;
-          frame = window.requestAnimationFrame(draw);
-        }, 220);
-      } else {
-        frame = window.requestAnimationFrame(draw);
-      }
+      frame = window.requestAnimationFrame(draw);
     }
 
     function cancelScheduledDraw() {
@@ -107,14 +105,14 @@ export function RadioVisualizer({
         window.cancelAnimationFrame(frame);
         frame = 0;
       }
-      if (frameDelay !== null) {
-        window.clearTimeout(frameDelay);
-        frameDelay = null;
-      }
     }
 
     function draw(now: number) {
       let heights: number[];
+      const elapsed = previousFrame === 0
+        ? 16
+        : Math.min(250, Math.max(1, now - previousFrame));
+      previousFrame = now;
 
       if (currentAnalysis) {
         const position = getCurrentTime();
@@ -126,11 +124,23 @@ export function RadioVisualizer({
         const targets = synchronizedRoles
           ? enhanceVisualizerSpatialContrast(sampledTargets, synchronizedRoles)
           : sampledTargets;
-        heights = targets.map((level) => 4 + level * 92);
+        const jumped =
+          previousPosition >= 0 &&
+          Math.abs(position - previousPosition) > Math.max(0.28, elapsed / 1000 * 3.5);
+        previousPosition = position;
+
+        heights = targets.map((target, index) => {
+          const previous = displayedLevels[index];
+          const responseMs = target >= previous
+            ? SYNCHRONIZED_ATTACK_MS
+            : SYNCHRONIZED_RELEASE_MS;
+          const blend = 1 - Math.exp(-elapsed / responseMs);
+          const level = jumped ? target : previous + (target - previous) * blend;
+          displayedLevels[index] = level;
+          return 4 + level * 92;
+        });
       } else if (analyser && levels && moveBars) {
         analyser.getFloatFrequencyData(levels);
-        const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
-        previousFrame = now;
         heights = moveBars(
           levels,
           analyser.context.sampleRate,
@@ -164,13 +174,11 @@ export function RadioVisualizer({
           });
     observer?.observe(root);
     document.addEventListener("visibilitychange", reconcile);
-    reducedMotion.addEventListener("change", reconcile);
     reconcile();
 
     return () => {
       observer?.disconnect();
       document.removeEventListener("visibilitychange", reconcile);
-      reducedMotion.removeEventListener("change", reconcile);
       cancelScheduledDraw();
     };
   }, [

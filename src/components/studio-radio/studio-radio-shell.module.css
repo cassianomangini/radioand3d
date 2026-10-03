@@ -2655,6 +2655,10 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transform: translate(-50%, -50%);
   }
 
+  .site:is([data-radio-expanded="true"], [data-radio-dragging="true"], [data-radio-layout-motion]) .siteHeader > .socialIcons {
+    display: none;
+  }
+
   .site[data-radio-expanded="true"] .hero h1 {
     font-size: clamp(3rem, 6.9cqw, 4.75rem);
   }

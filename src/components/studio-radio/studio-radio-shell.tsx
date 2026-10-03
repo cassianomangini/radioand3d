@@ -1606,7 +1606,7 @@ export function StudioRadioShell() {
 
           <div
             className={styles.studioCatalogHeader}
-            aria-hidden={studioRoute !== "detail"}
+            aria-hidden={studioRoute !== "detail" || studioProducts}
           >
             <strong>ESTÚDIO</strong>
             <span>IMPRESSÕES, MATERIAIS E PRODUTOS EM UM SÓ LUGAR.</span>

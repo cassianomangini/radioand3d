@@ -186,6 +186,15 @@ function formatTrackDuration(seconds?: number) {
   return seconds && Number.isFinite(seconds) && seconds > 0 ? formatTime(seconds) : "—";
 }
 
+function stableViewTransitionToken(value: string) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
 function RadioContent({
   mobile = false,
   expanded = false,
@@ -221,6 +230,10 @@ function RadioContent({
     .filter(({ track }) =>
       `${track.title} ${track.artist}`.toLocaleLowerCase("pt-BR").includes(normalizedQuery)
     );
+  const queueMotionEnabled = Boolean(
+    trackStepKind &&
+      new Set(listTracks.map(({ track }) => track.id)).size === listTracks.length
+  );
   const displayTrack = radio.currentTrack ?? previewTrack;
   const canPlay = Boolean(radio.currentTrack);
   const playing = radio.status === "playing";
@@ -457,9 +470,21 @@ function RadioContent({
         </label>
       </div>
 
-      <ol className={styles.trackList} aria-label="Próximas músicas na ordem de reprodução" data-radio-motion-key="queue-list">
+      <ol
+        className={styles.trackList}
+        aria-label="Próximas músicas na ordem de reprodução"
+        data-radio-motion-key="queue-list"
+        data-queue-motion={queueMotionEnabled ? trackStepKind : undefined}
+      >
         {listTracks.map(({ track, position }) => (
-          <li key={`${track.id}-${position}`}>
+          <li
+            key={`${track.id}-${position}`}
+            style={queueMotionEnabled
+              ? {
+                  viewTransitionName: `cm-${mobile ? "mobile" : "desktop"}-queue-${stableViewTransitionToken(track.id)}`
+                } as CSSProperties
+              : undefined}
+          >
             <button
               type="button"
               className={styles.trackRow}

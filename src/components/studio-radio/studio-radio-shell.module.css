@@ -116,11 +116,11 @@
   font-weight: 600;
 }
 
-.desktopNav a:first-child {
+.desktopNav a[aria-current="page"] {
   color: var(--text-primary);
 }
 
-.desktopNav a:first-child::after {
+.desktopNav a[aria-current="page"]::after {
   content: "";
   position: absolute;
   left: 0;
@@ -764,6 +764,12 @@
     font-weight: 600;
     text-align: left;
     text-decoration: none;
+  }
+
+  .mobileNav a[aria-current="page"],
+  .mobileNav button[aria-current="page"] {
+    color: var(--text-primary);
+    box-shadow: inset 2px 0 0 var(--accent-cyan);
   }
 
   .mobileNav a:hover,

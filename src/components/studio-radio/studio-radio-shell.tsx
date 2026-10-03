@@ -556,6 +556,7 @@ export function StudioRadioShell() {
   const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
   const [dividerSettling, setDividerSettling] = useState(false);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
+  const [studioSection, setStudioSection] = useState<"home" | "studio">("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
   const [mobileRadioMotion, setMobileRadioMotion] = useState<MobileRadioMotionState | null>(null);
@@ -1190,6 +1191,8 @@ export function StudioRadioShell() {
       )
   );
 
+  const activeNav = radioFullscreen || mobileRadioOpen ? "radio" : studioSection;
+
   const playbackStatusMessage =
     radio.status === "loading"
       ? "Carregando áudio."
@@ -1207,14 +1210,14 @@ export function StudioRadioShell() {
         {playbackStatusMessage}
       </span>
       <header className={styles.siteHeader}>
-        <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>
+        <a className={styles.brand} href="#top" aria-label="CM 3D e Rádio, início" onClick={() => { setStudioSection("home"); if (radioFullscreen) closeRadioFullscreen(false); }}>
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
         </a>
 
         <nav className={styles.desktopNav} aria-label="Navegação principal">
-          <a href="#top" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>Início</a>
-          <a href="#studio" onClick={() => { if (radioFullscreen) closeRadioFullscreen(false); }}>Estúdio</a>
-          <a ref={radioNavRef} href="#radio" onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
+          <a href="#top" aria-current={activeNav === "home" ? "page" : undefined} onClick={() => { setStudioSection("home"); if (radioFullscreen) closeRadioFullscreen(false); }}>Início</a>
+          <a href="#studio" aria-current={activeNav === "studio" ? "page" : undefined} onClick={() => { setStudioSection("studio"); if (radioFullscreen) closeRadioFullscreen(false); }}>Estúdio</a>
+          <a ref={radioNavRef} href="#radio" aria-current={activeNav === "radio" ? "page" : undefined} onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
         </nav>
 
         <SocialIcons />
@@ -1235,14 +1238,15 @@ export function StudioRadioShell() {
             className={styles.mobileNav}
             aria-label="Navegação mobile"
           >
-            <a href="#top" onClick={closeMobileMenu}>
+            <a href="#top" aria-current={activeNav === "home" ? "page" : undefined} onClick={() => { setStudioSection("home"); closeMobileMenu(); }}>
               Início
             </a>
-            <a href="#studio" onClick={closeMobileMenu}>
+            <a href="#studio" aria-current={activeNav === "studio" ? "page" : undefined} onClick={() => { setStudioSection("studio"); closeMobileMenu(); }}>
               Estúdio
             </a>
             <button
               type="button"
+              aria-current={activeNav === "radio" ? "page" : undefined}
               onClick={() => {
                 closeMobileMenu();
                 openMobileRadio();

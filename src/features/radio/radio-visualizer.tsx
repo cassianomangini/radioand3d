@@ -100,9 +100,33 @@ export function RadioVisualizer({
       bounds.top < window.innerHeight &&
       bounds.right > 0 &&
       bounds.left < window.innerWidth;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
+    let frameDelay: number | null = null;
     let previousFrame = 0;
     let previousPosition = currentAnalysis ? getCurrentTime() : -1;
+
+    function scheduleDraw() {
+      if (reducedMotion.matches) {
+        frameDelay = window.setTimeout(() => {
+          frameDelay = null;
+          frame = window.requestAnimationFrame(draw);
+        }, 220);
+      } else {
+        frame = window.requestAnimationFrame(draw);
+      }
+    }
+
+    function cancelScheduledDraw() {
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+        frame = 0;
+      }
+      if (frameDelay !== null) {
+        window.clearTimeout(frameDelay);
+        frameDelay = null;
+      }
+    }
 
     function draw(now: number) {
       let heights: number[];
@@ -145,15 +169,15 @@ export function RadioVisualizer({
       bars.forEach((bar, index) => {
         bar.style.height = `${heights[index]}%`;
       });
-      frame = window.requestAnimationFrame(draw);
+      scheduleDraw();
     }
 
     function reconcile() {
-      window.cancelAnimationFrame(frame);
+      cancelScheduledDraw();
       if (visible && !document.hidden) {
         previousFrame = 0;
-        previousPosition = -1;
-        frame = window.requestAnimationFrame(draw);
+        previousPosition = currentAnalysis ? getCurrentTime() : -1;
+        scheduleDraw();
       }
     }
 
@@ -166,12 +190,14 @@ export function RadioVisualizer({
           });
     observer?.observe(root);
     document.addEventListener("visibilitychange", reconcile);
+    reducedMotion.addEventListener("change", reconcile);
     reconcile();
 
     return () => {
       observer?.disconnect();
       document.removeEventListener("visibilitychange", reconcile);
-      window.cancelAnimationFrame(frame);
+      reducedMotion.removeEventListener("change", reconcile);
+      cancelScheduledDraw();
     };
   }, [
     active,

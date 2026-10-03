@@ -650,6 +650,7 @@ export function StudioRadioShell() {
   const motionResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeRadioAnimationsRef = useRef<Animation[]>([]);
   const radioMotionTokenRef = useRef(0);
+  const signatureStageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dividerSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
   const [shellWidth, setShellWidth] = useState<number | null>(null);
@@ -757,6 +758,7 @@ export function StudioRadioShell() {
   useEffect(() => () => {
     radioMotionTokenRef.current += 1;
     if (motionResetTimerRef.current !== null) clearTimeout(motionResetTimerRef.current);
+    if (signatureStageTimerRef.current !== null) clearTimeout(signatureStageTimerRef.current);
     for (const animation of activeRadioAnimationsRef.current) animation.cancel();
     activeRadioAnimationsRef.current = [];
     if (dividerSettleTimerRef.current !== null) clearTimeout(dividerSettleTimerRef.current);
@@ -1020,8 +1022,16 @@ export function StudioRadioShell() {
     runMobileRadioMotion("closing");
   }
 
+  function clearSignatureStageTimer() {
+    if (signatureStageTimerRef.current !== null) {
+      clearTimeout(signatureStageTimerRef.current);
+      signatureStageTimerRef.current = null;
+    }
+  }
+
   function cancelRadioMotionForDirectManipulation() {
     radioMotionTokenRef.current += 1;
+    clearSignatureStageTimer();
     if (motionResetTimerRef.current !== null) {
       clearTimeout(motionResetTimerRef.current);
       motionResetTimerRef.current = null;
@@ -1085,20 +1095,50 @@ export function StudioRadioShell() {
   }
 
   function openRadioFullscreen(fromDrag: boolean) {
+    const shell = shellRef.current;
+    const shellWidth = shell?.getBoundingClientRect().width;
+
+    clearSignatureStageTimer();
+
     if (!fromDrag) {
-      const width = shellRef.current?.getBoundingClientRect().width;
-      initialRadioWidthRef.current = radioWidth ?? (width ? getDefaultWidth(width) : DEFAULT_RADIO_WIDTH);
+      initialRadioWidthRef.current =
+        radioWidth ?? (shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH);
     }
+
     openedFromDragRef.current = fromDrag;
     dragFullscreenRef.current = true;
-    runRadioMotion("opening", () => {
-      clearDragPreview();
-      setShowResizeHint(false);
-      setRadioFullscreen(true);
-    });
+
+    const enterFullscreen = () => {
+      signatureStageTimerRef.current = null;
+      runRadioMotion("opening", () => {
+        clearDragPreview();
+        setShowResizeHint(false);
+        setRadioFullscreen(true);
+      });
+    };
+
+    if (
+      !fromDrag &&
+      !radioExpanded &&
+      !radioFullscreen &&
+      shellWidth
+    ) {
+      customWidthRef.current = false;
+      runRadioMotion("opening", () => {
+        setRadioWidth(getExpandedWidth(shellWidth));
+        setRadioExpanded(true);
+        setShowResizeHint(false);
+      });
+
+      signatureStageTimerRef.current = setTimeout(enterFullscreen, 190);
+      return;
+    }
+
+    enterFullscreen();
   }
 
   function closeRadioFullscreen(restoreFocus = true) {
+    clearSignatureStageTimer();
     runRadioMotion("closing", () => {
       clearDragPreview();
       dragFullscreenRef.current = false;
@@ -1116,6 +1156,7 @@ export function StudioRadioShell() {
   }
 
   function restoreInitialRadioLayout() {
+    clearSignatureStageTimer();
     const shellWidth = shellRef.current?.getBoundingClientRect().width;
     const initialWidth = shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH;
 

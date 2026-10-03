@@ -8,9 +8,24 @@ Naquela consulta o repositório retornou `private: false`. A visibilidade deve s
 
 ## Agora
 
-**03, direção visual CM**, foi aprovada por Cassiano. A Home, o catálogo R2, o player, o mini player mobile, o visualizador e o shell responsivo já estão na `main`. Em 02/10 foi aprovada a direção de análise musical offline com voz no centro, acompanhamento ao redor e fallback live honesto. Em 03/10 começou a execução do [CM Motion Experience Plan V1](design/CM_MOTION_EXPERIENCE_PLAN_V1.md). A `main` já contém focus/fullscreen, mini -> full mobile, faixa -> Now Playing, fila com identidade espacial, teclado global, controles táteis, visualizer por regiões reais e uma rota pública persistente `/studio`. O gate atual voltou a ser explicitamente a **Rádio**: split/focus -> fullscreen agora usa FLIP/WAAPI no DOM real para mover capa, progresso, visualizer, botões individuais e fila entre as duas composições.
+**03, direção visual CM**, foi aprovada por Cassiano. A Home, o catálogo R2, o player, o mini player mobile, o visualizador e o shell responsivo já estão na `main`. Em 02/10 foi aprovada a direção de análise musical offline com voz no centro, acompanhamento ao redor e fallback live honesto. O [plano de movimento](design/CM_MOTION_EXPERIENCE_PLAN_V1.md) define o efeito e seus critérios; a fila de aceite está abaixo. A `main` em `62c2779` contém código para focus/fullscreen, mini -> full mobile, faixa -> Now Playing, visualizador por regiões e rota `/studio`. A transição da Rádio usa FLIP/WAAPI para mover elementos reais entre composições; isso é evidência de implementação, não de resultado percebido.
 
-O estado perceptivo **ainda não está aprovado**: Cassiano verificou o localhost em 03/10 e relatou que a mudança visual grande prometida ainda não é evidente; o botão de play foi a diferença mais clara percebida. Portanto C1/C4/C5 permanecem abertos mesmo com CI verde. C2/C3 aguardam validação das análises reais geradas pelo sync em músicas de perfis diferentes. As entregas **03b**, **06** e **06b** continuam em andamento; 07 permanece macro-bloqueada pelas dependências formais, embora suas mecânicas de base estejam sendo preparadas em 03b/06. [checklist visual](work/03b-frontend-foundation.md), [checklist de áudio](work/06-radio-engine.md) e [checklist de letras](work/06b-synced-lyrics.md).
+Em 03/10, Cassiano informou que ainda não vê a transformação visual prometida; o botão de play foi a mudança mais clara. **A Rádio animada e a passagem para tela grande continuam abertas.** Não há aprovação perceptiva registrada para a versão `62c2779`. O próximo gate é C1, com revisão da Rádio em execução real por Cassiano. C2–C7 têm código antecipado, mas não avançam como entregas até os gates anteriores. As entregas **03b**, **06** e **06b** continuam em andamento; 07 permanece bloqueada pelas dependências formais. Passos e evidências: [03b](work/03b-frontend-foundation.md), [06](work/06-radio-engine.md) e [06b](work/06b-synced-lyrics.md).
+
+## Fila de movimento da Rádio
+
+Os IDs C1–C8 são frentes do plano de movimento, subordinadas às entregas 03b/06/07/09. A ordem abaixo é a fila de **aceite**, mesmo onde já existe código adiantado. Não marcar uma frente `done` por commit, CI ou captura estática. Uma rejeição perceptiva volta à frente correspondente antes de abrir a seguinte. Mobile, acessibilidade e desempenho são verificados em cada frente, sem esperar C6/C8.
+
+| Ordem | Frente e entrega | Estado | Evidência atual | Próximo gate |
+| --- | --- | --- | --- | --- |
+| 1 | C1 Motion Core, 03b | in_progress | FLIP/WAAPI em `62c2779`; inventário técnico no [registro de 03/10](design/CM_MOTION_IMPLEMENTATION_LOG_2026-10-03.md). Cassiano ainda não percebeu a mudança esperada. | Cassiano conferir split → focus → tela inteira e retorno no código atualizado, com capa, visualizador, controles e fila se recompondo visivelmente; registrar defeitos concretos e corrigir até aprovação. |
+| 2 | C2 Contrato de movimento do áudio, 06 | blocked | Consumer por regiões e ferramenta de inspeção implementados. | Após C1, validar sidecars v3 reais gerados pelo sync em faixas de perfis diferentes, com seek, silêncio e fallback. |
+| 3 | C3 Visualizador 2.0, 06 | blocked | Voz central, acompanhamento e fallback implementados no código. | Após C2, Cassiano ouvir e comparar música vocal, instrumental, calma e densa; ajustar até as barras expressarem esses eventos sem movimento inventado. |
+| 4 | C4 Interface viva da Rádio, 03b/07 | blocked | Troca de faixa, estados reais, fila e controles táteis implementados. | Após C3, revisar seleção → Now Playing, transporte, erros, toque e teclado como experiência perceptível e coerente. |
+| 5 | C5 Split/focus/divisor, 03b/07 | blocked | Drag, snap e estados de largura implementados. | Após C4, validar recomposição durante o arraste e a expansão, limiar de tela inteira, retorno e continuidade do áudio. |
+| 6 | C6 Assinatura mobile, 03b/07 | blocked | Mini → full → mini implementado. | Após C5, Cassiano conferir transformação e retorno em uso mobile, com toque, rotação e scroll. |
+| 7 | C7 Acabamento das microinterações, 03b/07 | blocked | Press mecânico, seek, volume e foco implementados parcialmente. | Após C6, revisar famílias de controles, busca, tooltips, scroll e estados de erro/loading. |
+| 8 | C8 QA integrado, 09 | blocked | Capturas e verificações técnicas parciais. | Após C1–C7, verificar áudio e movimento simultâneos em desktop/mobile, desempenho, interrupções e aprovação visual final. |
 
 ## Sequência única
 
@@ -43,7 +58,7 @@ A entrega 06 não precisa esperar a interface do Inbox: usa o mesmo contrato e f
 
 ## Regras de manutenção
 
-Somente esta tabela guarda o estado macro. O checklist da entrega guarda os passos e a evidência, sem outra cópia do roadmap. Dependência bloqueada não autoriza pular para implementação posterior. Um bloqueio localizado não impede trabalho independente.
+Somente este roadmap guarda sequência e estado macro, inclusive C1–C8. O checklist da entrega guarda passos e evidências, sem outra cópia de status. Dependência bloqueada não autoriza pular para implementação posterior. Um bloqueio localizado não impede trabalho independente fora da fila de movimento.
 
 Ao abrir uma entrega posterior, criar seu checklist a partir de [TEMPLATE.md](work/TEMPLATE.md), acrescentar o link à tabela e confirmar que o escopo ainda cabe em uma revisão. Depois do marco 09, priorizar expansão do catálogo e da rádio conforme uso; não abrir antecipadamente tarefas para toda possibilidade futura.
 

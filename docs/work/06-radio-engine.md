@@ -115,3 +115,14 @@ A v3 preserva voz, baixo e bateria da v2 e altera somente o tratamento do stem `
 ## Fila aleatória em 03/10/2026
 
 Cassiano pediu que as músicas já ouvidas não sumam de **A seguir**: elas passam para o fim da ordem aleatória, para poderem ser escolhidas de novo. O avanço automático e o término natural continuam sem repetir a playlist. **Nova ordem** ainda reinicia o ciclo. Responsável: CM Audio. Branch `fix/shuffle-keeps-played-tracks`. Contrato alterado: `docs/RADIO.md`. A escuta dessa fila no navegador continua com Cassiano.
+
+## Retomada do movimento musical — C2/C3
+
+Responsável: CM Audio. Contratos: [Rádio](../RADIO.md) e [plano de movimento](../design/CM_MOTION_EXPERIENCE_PLAN_V1.md). A ordem e o estado destas frentes ficam somente no [roadmap](../ROADMAP.md). O código de sidecar v3, reamostramento, fallback e inspeção já existe; ainda não há evidência registrada aqui de comparação perceptiva entre várias músicas reais após o sync completo.
+
+- [ ] Depois do gate C1, confirmar sidecars v3 atuais para faixas reais de perfis vocal, instrumental, calmo e denso, sem apresentar fixture como acervo publicado.
+- [ ] Inspecionar os derivados e verificar relógio do player, seek, pausas, silêncio e fallback quando faltar sidecar.
+- [ ] Cassiano ouvir as faixas e conferir se voz central, bateria, baixo e instrumentos melódicos/harmônicos aparecem sem pulso inventado ou movimento uniforme.
+- [ ] Registrar faixas, resultados observados, correções e verificações de código pertinentes antes de pedir avanço de C2 e C3 no roadmap.
+
+Próximo passo desta frente: aguardar C1 e então selecionar a amostra real do sync para a comparação acima. Implementação antecipada não equivale a aceite musical.

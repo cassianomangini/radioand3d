@@ -1,6 +1,6 @@
 # CM 3D & Radio — implementation log — 03/10/2026
 
-Este arquivo registra **o que realmente existe na `main`**. Não equivale a aprovação visual de Cassiano.
+Inventário técnico da `main` em `62c2779`. Registra o código observado e as verificações já relatadas; não demonstra o resultado perceptivo nem aprova a interface. A fila e o estado atual de C1–C8 ficam no [roadmap](../ROADMAP.md); os passos e a retomada ficam nos checklists [03b](../work/03b-frontend-foundation.md) e [06](../work/06-radio-engine.md).
 
 ## Head deste fechamento
 
@@ -63,14 +63,3 @@ Base antes deste commit: `d0149d99cfd727435141a4bcff7a3be3fcd10d10`.
 - captura da Rádio mobile aberta;
 - capturas intermediárias de motion;
 - gate do FLIP exige múltiplas animações reais simultâneas no painel.
-
-## Estado de aprovação
-
-- C1: `in_progress`;
-- C2-C7: possuem implementação adiantada, mas não devem ser tratados como concluídos;
-- C8: não iniciado como gate integrado final;
-- aprovação perceptiva de Cassiano: **pendente**.
-
-## Regra de entrega
-
-`CI verde`, screenshot e commit na `main` não significam `done`. Uma frente só fecha quando o comportamento prometido existe ponta a ponta e passa pela revisão perceptiva correspondente.

@@ -10,7 +10,7 @@ A meta perceptiva é: a pessoa deve perceber uma interface com mecânica própri
 
 Este documento **não substitui** o [Roadmap](../ROADMAP.md), [EXPERIENCE.md](../EXPERIENCE.md), [RADIO.md](../RADIO.md) ou [ARCHITECTURE.md](../ARCHITECTURE.md).
 
-- O roadmap continua sendo a única fonte de sequência e estado macro.
+- O roadmap continua sendo a única fonte da fila de aceite e do estado macro de C1–C8. Os IDs abaixo identificam frentes e critérios; não autorizam trabalho fora da fila.
 - EXPERIENCE continua definindo composição, identidade e comportamento visual aprovado.
 - RADIO continua definindo player, fila, áudio, visualizador e continuidade.
 - ARCHITECTURE continua definindo a stack e as regras de dependência.
@@ -175,9 +175,9 @@ Vocabulário de sensação pode incluir nomes como:
 
 O nome deve representar função/sensação real, não mascarar números arbitrários.
 
-# Caminho crítico
+# Frentes e critérios de aceite
 
-As etapas abaixo são o caminho principal. Experimentos opcionais ficam fora dele.
+Estas frentes descrevem o comportamento esperado. A ordem vigente, os bloqueios e a próxima frente ativa ficam somente no [roadmap](../ROADMAP.md). Código antecipado em uma frente posterior não comprova seu aceite.
 
 ## C1 — Motion Core de Alto Impacto
 
@@ -204,6 +204,8 @@ A prova de C1 precisa demonstrar o tipo de qualidade esperado para o restante do
 - Home -> Estúdio com shared elements e Rádio persistente;
 - mini player -> Rádio completa;
 - outra mecânica de assinatura aprovada.
+
+Para o código atual, a prova escolhida é **Rádio acoplada → focus workstation → tela inteira → retorno**. A pessoa deve perceber a mudança de hierarquia e de composição durante a passagem: arte, informação da faixa, visualizador, transporte e fila ganham posições e espaço próprios na tela grande. Mover elementos por código ou aumentar a largura do painel, por si só, não satisfaz essa prova. O mesmo fluxo precisa preservar a música e permitir voltar sem perder o contexto. Cassiano avalia o efeito executado; uma captura estática ou um teste que detecta animações não substitui essa avaliação.
 
 Não inclui:
 
@@ -417,13 +419,13 @@ Matriz mínima:
 
 Nenhuma frente visual fecha sem revisão perceptiva de Cassiano.
 
-# Extensões condicionais — fora do caminho crítico
+# Extensões condicionais
 
 "Fora do caminho crítico" não significa "sem ambição" nem "provavelmente nunca". Significa apenas que não devem bloquear o primeiro marco se o conteúdo ou pré-requisito ainda não existir.
 
-## Continuidade de rota incorporada ao C1
+## X1 — Continuidade de rota
 
-Page continuity deixou de ser extensão condicional. A primeira rota pública real do Estúdio e a navegação Home -> Estúdio -> Home pertencem ao gate do **C1**. A Rádio permanece no shell persistente e não é recriada durante essa navegação.
+Na navegação Home → Estúdio → Home, a Rádio deve permanecer no shell persistente, sem recriar áudio, fila ou posição. A rota real `/studio` permite trabalhar essa continuidade, mas sua implementação não fecha a prova de C1, que nesta rodada é a transformação da **Rádio** entre split, focus e tela inteira. Trabalho adicional de rota segue a prioridade do roadmap.
 
 ## X2 — Studio Scroll Experience
 
@@ -503,57 +505,9 @@ Reprovar por padrão:
 - 08 pode ser entregue sem X2/X3, mas essas extensões permanecem candidatas fortes assim que existir conteúdo real que as justifique.
 - 09 valida o conjunto integrado e não deve esperar uma extensão sem pré-requisito real.
 
-# Ordem pretendida
+# Relação com a execução
 
-Caminho crítico:
-
-```text
-C1 Motion Core de Alto Impacto
-        ↓
-C2 Audio Motion Contract
-        ↓
-C3 Visualizer 2.0
-        ↓
-C4 Radio Living Interface
-        ↓
-C5 Split / Focus / Divider Signature
-        ↓
-C6 Mobile Signature Experience
-        ↓
-C7 Microinteraction High-Fidelity Pass
-        ↓
-C8 Integrated Performance + Experience QA
-```
-
-X1/X2/X3 são extensões condicionais independentes e entram assim que seus pré-requisitos reais existirem.
-
-C1 pode ser iniciada sem esperar o sync, desde que o roadmap permita. C2/C3 dependem da análise real. Mobile, performance, accessibility e reduced motion não esperam C6/C8: são gates contínuos.
-
-# Estado de implementação — 03/10/2026
-
-Este bloco registra progresso técnico sem confundir implementação com aprovação perceptiva.
-
-| Frente | Estado | O que já entrou na `main` | Gate ainda aberto |
-| --- | --- | --- | --- |
-| C1 Motion Core de Alto Impacto | **in_progress** | **Rádio split/focus -> fullscreen com FLIP/WAAPI nos elementos reais**: capa, progresso, visualizer, cada botão de transporte e fila percorrem as posições antigas até o workstation; volta usa movimento inverso. Também existe rota /studio persistente já implementada, mas ela não substitui o gate principal da Rádio. | CI exige múltiplas animações reais simultâneas no painel e captura frames intermediários; gate fecha somente após Cassiano validar a transição da Rádio no localhost |
-| C2 Audio Motion Contract | **in_progress** | sidecar preserva regiões; roles `bass/drums/other/voice`; attack/release por região; fallback live por frequência; continuidade em seek/pause; ferramenta `visualizer:inspect` | validar sidecars reais gerados pelo sync e comparar músicas de perfis diferentes |
-| C3 Visualizer 2.0 | **in_progress** | voz central e instrumentos preservados no reamostramento; contraste espacial sem inventar energia; pausa relaxa; reduced-motion com baixa cadência; cores sutis por papel real | revisão perceptiva com música real; confirmar que deixou de parecer "uma massa só" |
-| C4 Radio Living Interface | **in_progress** | track change direcional; loading/buffering real; seek/volume táteis; teclado global; fila mantém identidade ao reordenar | ainda falta um momento visual claramente memorável no player completo; Cassiano não aprovou o "wow" |
-| C5 Split / Focus / Divider Signature | **in_progress** | drag existente preservado; magnetismo leve; snap por proximidade; flick; settle elástico; teclado do separator; fullscreen/link convergem | elevar a recomposição interna durante expansão; hoje ainda não deve ser considerado assinatura fechada |
-| C6 Mobile Signature Experience | **in_progress** | mini player compacto; transformação mini -> full -> mini com shared elements; QA de estados mobile aberto/fechado | revisar a transição em uso real no aparelho/navegador; screenshots estáticos não fecham motion |
-| C7 Microinteraction High-Fidelity Pass | **in_progress** | seek/volume próprios; play/loading; controles com press mecânico em vez de `scale(1.05)`; foco/atalhos | revisar busca, tooltips, scroll interno e consistência completa das famílias de controle |
-| C8 Integrated Performance + Experience QA | **not_started** | CI opt-in já captura desktop amplo, desktop baixo, mobile, fullscreen e Rádio mobile aberta | ainda falta prova integrada com áudio tocando, tracks reais variados, reduced motion e interação contínua |
-
-### Estado perceptivo atual
-
-Cassiano verificou o localhost em 03/10/2026 e relatou que, visualmente, a única mudança claramente percebida até então foi o botão de play.
-
-Consequência:
-
-- **nenhuma frente acima pode ser marcada `done` apenas porque CI/build passou**;
-- o próximo gate é exclusivamente C1: validar no localhost a recomposição compacta -> focus workstation -> fullscreen antes de retomar C2-C7;
-- microajuste isolado não pode substituir a transformação visível prometida pelo artefato;
-- C2/C3 continuam dependentes da validação das análises reais geradas pelo sync.
+O [roadmap](../ROADMAP.md) registra qual frente pode avançar agora. O [checklist 03b](../work/03b-frontend-foundation.md) guarda os passos e a evidência da transformação visual da Rádio; o [checklist 06](../work/06-radio-engine.md) guarda a análise e a resposta musical. O [inventário de código de 03/10](CM_MOTION_IMPLEMENTATION_LOG_2026-10-03.md) é uma fotografia técnica, sem aprovação perceptiva. X2/X3 continuam condicionais aos seus próprios pré-requisitos.
 
 # Definition of done por frente
 
@@ -581,6 +535,5 @@ Uma frente só pode ser concluída quando:
 - approved_by: Cassiano
 - approved_scope: experiência extrema com disciplina técnica; não baseline conservador
 - ready_for_frontend: `yes`
-- implementation_status: `in_progress`
-- perceptual_approval: `pending`
-- motivo: a direção está aprovada e a implementação já está em andamento na `main`; nenhuma frente pode ser marcada concluída até passar seus gates técnicos e a revisão perceptiva correspondente. C2/C3 ainda aguardam validação das análises reais geradas pelo sync.
+
+A aprovação acima cobre a direção de experiência, não a execução de C1–C8. O estado dessa execução pertence ao roadmap.

@@ -115,9 +115,7 @@ Referência para testar: 120 a 180 ms para resposta curta, 200 a 320 ms para tra
 
 Cada efeito tem gatilho, finalidade, duração, interrupção, estado parado e alternativa reduzida. Preservar scroll nativo, foco e orientação. Evitar cursor personalizado, rolagem sequestrada, animação obrigatória de cada linha e conteúdo escondido até uma sequência terminar.
 
-**Estado implementado em 03/10/2026:** a transição desktop da Rádio entre split/focus e fullscreen usa FLIP/WAAPI nos elementos reais do player. Header, capa, progresso, visualizer, cada controle de transporte e fila recebem identidade estável, são medidos antes/depois da recomposição e percorrem a diferença geométrica; reduced-motion aplica o estado final sem a viagem. A rota `/studio` também está persistente na `main`, mas não é usada como substituta do gate perceptivo principal da Rádio.
-
-CSS para feedback simples; Motion para coordenação; 3D apenas na interação aprovada. Preferir transform/opacity quando adequados e medir o resultado. Suspender efeitos invisíveis/ociosos, adaptar canvas/3D e manter fallback com imagem. Reduzir efeitos não para a música.
+CSS para feedback simples; APIs nativas ou biblioteca justificada para coordenação; 3D apenas na interação aprovada. Preferir transform/opacity quando adequados e medir o resultado. Suspender efeitos invisíveis/ociosos, adaptar canvas/3D e manter fallback com imagem. Reduzir efeitos não para a música.
 
 Respeitar preferência do sistema e dar controle sobre efeitos contínuos. A política alcança CSS, canvas e 3D, não somente Motion. Referência: [acessibilidade no Motion](https://motion.dev/docs/react-accessibility). Gráficos de áudio seguem [RADIO.md](RADIO.md).
 

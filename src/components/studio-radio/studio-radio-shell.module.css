@@ -3618,20 +3618,56 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   transform: translateY(0);
 }
 
+.studioCatalogHeader {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.75rem;
+  left: 0.75rem;
+  z-index: 4;
+  display: grid;
+  gap: 0.34rem;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-0.45rem);
+  transition:
+    opacity 280ms ease,
+    transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.studioCatalogHeader[aria-hidden="false"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.studioCatalogHeader strong {
+  color: #68dcff;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+}
+
+.studioCatalogHeader span {
+  color: #8997a5;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.18em;
+}
+
 .studioDetailRail {
   position: absolute;
-  top: 37%;
-  right: 4.5%;
-  bottom: 4.5%;
-  left: 4.5%;
+  top: 4.35rem;
+  right: 0.45rem;
+  bottom: 0.45rem;
+  left: 0.45rem;
   z-index: 3;
   display: grid;
   grid-template-columns: minmax(0, 1.28fr) minmax(15rem, 0.92fr);
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: clamp(0.65rem, 1.05cqw, 0.9rem);
+  gap: 0.38rem;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(2.25rem) scale(0.985);
+  transform: translateY(1.35rem) scale(0.992);
   transition:
     opacity 420ms ease,
     transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -3654,13 +3690,11 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   overflow: hidden;
   padding: clamp(1rem, 1.35cqw, 1.3rem);
   background:
-    linear-gradient(180deg, rgb(14 18 24 / 42%) 0%, rgb(7 10 15 / 76%) 46%, rgb(3 5 8 / 98%) 100%),
-    #0a0d12;
-  border: 1px solid rgb(145 167 188 / 20%);
-  border-radius: 0.58rem;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 3%),
-    0 0.9rem 2.2rem rgb(0 0 0 / 24%);
+    linear-gradient(180deg, rgb(10 13 17 / 14%) 0%, rgb(7 9 13 / 58%) 58%, rgb(3 5 8 / 98%) 100%),
+    #090c10;
+  border: 1px solid rgb(145 167 188 / 22%);
+  border-radius: 0.42rem;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
   color: inherit;
   text-decoration: none;
 }
@@ -3749,34 +3783,19 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   outline-offset: 3px;
 }
 
-/* Detail route physically folds the same machine into a left equipment bay. */
-.studio[data-studio-route="detail"] .studioMachine {
-  width: 49%;
-  clip-path: polygon(0 0, 91% 0, 100% 50%, 91% 100%, 0 100%);
-  transform: translateX(-1.8%) scale(1.035);
-  filter: brightness(0.84) saturate(1.04);
+/* /studio is a full catalog surface inside the Studio pane. */
+.studio[data-studio-route="detail"] {
+  min-height: calc(100dvh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
+  background: #020305;
 }
 
-.studio[data-studio-route="detail"] .studioStageShade {
-  background:
-    linear-gradient(90deg, transparent 0 35%, rgb(2 3 5 / 28%) 46%, #020305 52%, #020305 100%);
-}
-
+.studio[data-studio-route="detail"] .studioMachine,
+.studio[data-studio-route="detail"] .studioStageShade,
 .studio[data-studio-route="detail"] .studioIdentity {
-  top: 12%;
-  right: 5%;
-  left: 52%;
-  transform: translateY(0);
-}
-
-.studio[data-studio-route="detail"] .studioIdentity h1 {
-  font-size: clamp(3.7rem, 6.1cqw, 6.35rem);
-  letter-spacing: -0.068em;
-}
-
-.studio[data-studio-route="detail"] .studioIdentity .lead {
-  max-width: 42ch;
-  font-size: clamp(1.04rem, 1.35cqw, 1.26rem);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* Extra travel while navigation is active: this is real DOM motion and remains visible in capture. */
@@ -3860,6 +3879,19 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     min-height: 3.4rem;
   }
 
+  .studio[data-studio-route="detail"] {
+    height: auto;
+    min-height: calc(100dvh - var(--header-height));
+  }
+
+  .studioCatalogHeader {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    margin: 1rem 1rem 0.8rem;
+  }
+
   .studioDetailRail {
     position: relative;
     top: auto;
@@ -3869,8 +3901,8 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     z-index: 3;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    gap: 0.75rem;
-    margin: -1.3rem 1.1rem 3rem;
+    gap: 0.5rem;
+    margin: 0 0.5rem 0.5rem;
     opacity: 0;
     transform: translateY(1.5rem);
   }
@@ -3898,26 +3930,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   .studioDetailCard p {
     max-width: none;
   }
-
-  .studio[data-studio-route="detail"] .studioMachine {
-    width: 100%;
-    height: clamp(13rem, 31dvh, 20rem);
-    clip-path: none;
-    transform: scale(1.035) translateY(-1.5%);
-    filter: brightness(0.82) saturate(1.04);
-  }
-
-  .studio[data-studio-route="detail"] .studioIdentity {
-    top: auto;
-    right: auto;
-    left: auto;
-    padding-top: calc(clamp(13rem, 31dvh, 20rem) + 1rem);
-    transform: none;
-  }
-
-  .studio[data-studio-route="detail"] .studioIdentity h1 {
-    font-size: clamp(3rem, 15vw, 4.7rem);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3928,6 +3940,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   .studioIdentity .lead,
   .studioEyebrowStack > span,
   .studioRouteActions .primaryAction,
+  .studioCatalogHeader,
   .studioDetailRail {
     transition: none;
   }

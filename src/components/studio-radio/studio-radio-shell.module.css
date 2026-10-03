@@ -1,6 +1,7 @@
 .site {
   --header-height: 4.25rem;
   --radio-width: clamp(400px, 33.333vw, 480px);
+  --radio-nav-width: clamp(400px, 33.333vw, 480px);
   --rail-width: clamp(22px, 3dvh, 32px);
   min-height: 100dvh;
   background: var(--surface-page);
@@ -2645,6 +2646,13 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 @media (min-width: 73.75rem) {
   .desktopShell {
     grid-template-columns: minmax(40rem, 1fr) var(--rail-width) var(--radio-width);
+  }
+
+  .desktopNav {
+    position: absolute;
+    top: 50%;
+    left: calc((100vw - var(--radio-nav-width) - var(--rail-width)) / 2);
+    transform: translate(-50%, -50%);
   }
 
   .site[data-radio-expanded="true"] .hero h1 {

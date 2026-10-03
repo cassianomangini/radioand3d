@@ -736,7 +736,10 @@ export function StudioRadioShell() {
   useEffect(() => {
     const media = window.matchMedia("(max-width: 73.74rem)");
     function leaveDesktop() {
-      if (media.matches) setRadioFullscreen(false);
+      if (media.matches) {
+        setRadioFullscreen(false);
+        setRadioExpanded(false);
+      }
     }
     media.addEventListener("change", leaveDesktop);
     return () => media.removeEventListener("change", leaveDesktop);
@@ -1074,6 +1077,32 @@ export function StudioRadioShell() {
     }
   }
 
+  function restoreInitialRadioLayout() {
+    const shellWidth = shellRef.current?.getBoundingClientRect().width;
+    const initialWidth = shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH;
+
+    if (
+      !radioFullscreen &&
+      !radioExpanded &&
+      !customWidthRef.current &&
+      (radioWidth === null || radioWidth === initialWidth)
+    ) {
+      return;
+    }
+
+    runRadioMotion("closing", () => {
+      clearDragPreview();
+      clearReturnPreview();
+      dragFullscreenRef.current = false;
+      openedFromDragRef.current = false;
+      customWidthRef.current = false;
+      initialRadioWidthRef.current = initialWidth;
+      setRadioWidth(initialWidth);
+      setRadioExpanded(false);
+      setRadioFullscreen(false);
+    });
+  }
+
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (pointerActiveRef.current || (event.pointerType === "mouse" && event.button !== 0)) return;
     if (previewResetFrameRef.current !== null) cancelAnimationFrame(previewResetFrameRef.current);
@@ -1293,6 +1322,7 @@ export function StudioRadioShell() {
   }
 
   function navigateStudioRoute(href: "/" | "/studio") {
+    restoreInitialRadioLayout();
     if (pathname === href || routeTransitionActiveRef.current) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1363,7 +1393,7 @@ export function StudioRadioShell() {
   );
 
   const activeNav =
-    radioFullscreen || mobileRadioOpen
+    radioFullscreen || radioExpanded || mobileRadioOpen
       ? "radio"
       : studioRoute === "detail"
         ? "studio"

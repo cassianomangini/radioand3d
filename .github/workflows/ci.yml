@@ -46,6 +46,8 @@ jobs:
       - name: Visualizer script syntax
         run: |
           node --check scripts/sync-radio-visualizer.mjs
+          node --check scripts/inspect-radio-visualizer.mjs
+          node --check scripts/lib/visualizer-diagnostics.mjs
           node --check scripts/capture-radio-states.mjs
           python3 -m py_compile scripts/analyze-radio-visualizer.py
 

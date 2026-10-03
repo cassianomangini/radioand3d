@@ -162,6 +162,17 @@ try {
   await client.send("Runtime.enable");
 
   await navigate(client, 1760, 824, false);
+  const desktopAudioStored = await evaluate(
+    client,
+    `(() => {
+      const audio = document.querySelector("audio");
+      if (!(audio instanceof HTMLAudioElement)) return false;
+      window.__cmRadioAudioNode = audio;
+      return true;
+    })()`
+  );
+  if (!desktopAudioStored) throw new Error("Persistent Radio audio element was not found.");
+
   const desktopFocused = await evaluate(
     client,
     `(() => {
@@ -180,7 +191,7 @@ try {
   await delay(1100);
   const focusLayoutReached = await evaluate(
     client,
-    `document.querySelector('[data-radio-expanded="true"] [data-radio-focus="true"]') !== null`
+    `document.querySelector('[data-radio-layout-mode="focus"][data-radio-expanded="true"] [data-radio-focus="true"]') !== null`
   );
   if (!focusLayoutReached) throw new Error("Desktop Radio did not reach focus composition.");
   await screenshot(client, "desktop-radio-focus-1760x824.png");
@@ -219,10 +230,104 @@ try {
   await delay(360);
   const desktopFullscreen = await evaluate(
     client,
-    `document.querySelector('[data-radio-fullscreen="true"]') !== null`
+    `document.querySelector('[data-radio-layout-mode="fullscreen"][data-radio-fullscreen="true"]') !== null`
   );
   if (!desktopFullscreen) throw new Error("Desktop Radio did not reach fullscreen state.");
+
+  const desktopAudioPreserved = await evaluate(
+    client,
+    `document.querySelector("audio") === window.__cmRadioAudioNode`
+  );
+  if (!desktopAudioPreserved) throw new Error("Radio audio element was replaced during focus/fullscreen motion.");
   await screenshot(client, "desktop-radio-fullscreen-1760x824.png");
+
+  await navigate(client, 1760, 824, false);
+  const interruptionAudioStored = await evaluate(
+    client,
+    `(() => {
+      const audio = document.querySelector("audio");
+      if (!(audio instanceof HTMLAudioElement)) return false;
+      window.__cmRadioAudioNode = audio;
+      return true;
+    })()`
+  );
+  if (!interruptionAudioStored) throw new Error("Radio audio element was not found before interruption QA.");
+
+  const interruptionStarted = await evaluate(
+    client,
+    `(() => {
+      const radioLink = document.querySelector('a[href="#radio"]');
+      if (!(radioLink instanceof HTMLElement)) return false;
+      radioLink.click();
+      return true;
+    })()`
+  );
+  if (!interruptionStarted) throw new Error("Could not start interruption QA.");
+  await delay(110);
+
+  const interruptionReversed = await evaluate(
+    client,
+    `(() => {
+      const homeLink = document.querySelector('nav[aria-label="Navegação principal"] a[href="/"]');
+      if (!(homeLink instanceof HTMLElement)) return false;
+      homeLink.click();
+      return true;
+    })()`
+  );
+  if (!interruptionReversed) throw new Error("Could not reverse Radio opening motion.");
+  await delay(110);
+
+  const interruptionReopened = await evaluate(
+    client,
+    `(() => {
+      const radioLink = document.querySelector('a[href="#radio"]');
+      if (!(radioLink instanceof HTMLElement)) return false;
+      radioLink.click();
+      return true;
+    })()`
+  );
+  if (!interruptionReopened) throw new Error("Could not reopen Radio after reversal.");
+  await delay(1050);
+
+  const interruptionSettled = await evaluate(
+    client,
+    `(() => {
+      const site = document.querySelector('[data-radio-layout-mode]');
+      if (!(site instanceof HTMLElement)) return false;
+      const panel = document.querySelector('[data-radio-flip-root="true"]');
+      if (!(panel instanceof HTMLElement)) return false;
+      const running = panel
+        .getAnimations({ subtree: true })
+        .filter((animation) => animation.playState === "running").length;
+      return site.dataset.radioLayoutMode === "fullscreen" &&
+        !site.hasAttribute("data-radio-layout-motion") &&
+        running === 0 &&
+        document.querySelector("audio") === window.__cmRadioAudioNode;
+    })()`
+  );
+  if (!interruptionSettled) {
+    throw new Error("Radio motion did not settle cleanly after open → reverse → reopen interruption.");
+  }
+
+  await client.send("Emulation.setEmulatedMedia", {
+    media: "screen",
+    features: [{ name: "prefers-reduced-motion", value: "reduce" }]
+  });
+  await navigate(client, 1760, 824, false);
+  const reducedMotionOpened = await evaluate(
+    client,
+    `(() => {
+      const radioLink = document.querySelector('a[href="#radio"]');
+      if (!(radioLink instanceof HTMLElement)) return false;
+      radioLink.click();
+      const site = document.querySelector('[data-radio-layout-mode]');
+      return site instanceof HTMLElement &&
+        site.dataset.radioLayoutMode === "fullscreen" &&
+        !site.hasAttribute("data-radio-layout-motion");
+    })()`
+  );
+  if (!reducedMotionOpened) throw new Error("Reduced-motion Radio did not change state immediately.");
+  await client.send("Emulation.setEmulatedMedia", { media: "screen", features: [] });
 
   await navigate(client, 1760, 824, false);
   const studioRouteClicked = await evaluate(

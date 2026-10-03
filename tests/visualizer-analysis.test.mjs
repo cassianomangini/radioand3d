@@ -5,7 +5,9 @@ import {
   decodeMusicalVisualizerAnalysis,
   getResampledVisualizerLayout,
   getResampledVisualizerRoles,
-  sampleMusicalVisualizer
+  relaxVisualizerLevel,
+  sampleMusicalVisualizer,
+  visualizerLevelFromHeightPercent
 } from "../src/features/radio/visualizer-analysis.ts";
 
 function payload(bytes, overrides = {}) {
@@ -127,4 +129,22 @@ test("maps resampled bars to the real sidecar roles", () => {
     getResampledVisualizerRoles(analysis, 8),
     ["bass", "drums", "other", "voice", "voice", "other", "drums", "bass"]
   );
+});
+
+
+test("converts rendered bar heights back into normalized visualizer levels", () => {
+  assert.equal(visualizerLevelFromHeightPercent(4), 0);
+  assert.equal(visualizerLevelFromHeightPercent(96), 1);
+  assert.ok(Math.abs(visualizerLevelFromHeightPercent(50) - 0.5) < 0.0001);
+});
+
+test("paused visualizer relaxation decays smoothly without overshooting below baseline", () => {
+  let level = 1;
+  for (let frame = 0; frame < 90; frame += 1) {
+    const next = relaxVisualizerLevel(level, 16);
+    assert.ok(next >= 0);
+    assert.ok(next <= level);
+    level = next;
+  }
+  assert.ok(level < 0.001);
 });

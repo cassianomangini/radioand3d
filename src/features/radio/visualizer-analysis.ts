@@ -37,6 +37,22 @@ export interface MusicalVisualizerMotion {
   reset: (targets?: number[]) => void;
 }
 
+export function visualizerLevelFromHeightPercent(heightPercent: number) {
+  if (!Number.isFinite(heightPercent)) return 0;
+  return Math.min(1, Math.max(0, (heightPercent - 4) / 92));
+}
+
+export function relaxVisualizerLevel(
+  level: number,
+  elapsedMs: number,
+  releaseMs = 180
+) {
+  const safeLevel = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 0));
+  const elapsed = Math.min(100, Math.max(1, Number.isFinite(elapsedMs) ? elapsedMs : 16));
+  const release = Math.max(1, releaseMs);
+  return safeLevel * Math.exp(-elapsed / release);
+}
+
 const MAX_ANALYSIS_BYTES = 10 * 1024 * 1024;
 
 function decodeBase64(value: string): Uint8Array {

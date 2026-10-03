@@ -8,7 +8,9 @@ import {
   getResampledVisualizerLayout,
   getResampledVisualizerRoles,
   loadMusicalVisualizerAnalysis,
+  relaxVisualizerLevel,
   sampleMusicalVisualizer,
+  visualizerLevelFromHeightPercent,
   type DecodedMusicalVisualizerAnalysis
 } from "./visualizer-analysis";
 
@@ -79,6 +81,17 @@ export function RadioVisualizer({
           getResampledVisualizerLayout(currentAnalysis, bars.length)
         )
       : null;
+
+    if (synchronizedMotion) {
+      synchronizedMotion.reset(
+        bars.map((bar) =>
+          visualizerLevelFromHeightPercent(
+            Number.parseFloat(bar.style.height || "4")
+          )
+        )
+      );
+    }
+
     const bounds = root.getBoundingClientRect();
     let visible =
       bounds.width > 0 &&
@@ -89,7 +102,7 @@ export function RadioVisualizer({
       bounds.left < window.innerWidth;
     let frame = 0;
     let previousFrame = 0;
-    let previousPosition = -1;
+    let previousPosition = currentAnalysis ? getCurrentTime() : -1;
 
     function draw(now: number) {
       let heights: number[];
@@ -106,7 +119,7 @@ export function RadioVisualizer({
           previousPosition >= 0 &&
           Math.abs(position - previousPosition) > Math.max(0.28, elapsed / 1000 * 3.5);
 
-        if (previousPosition < 0 || jumped) {
+        if (jumped) {
           synchronizedMotion.reset(targets);
         }
 
@@ -159,9 +172,6 @@ export function RadioVisualizer({
       observer?.disconnect();
       document.removeEventListener("visibilitychange", reconcile);
       window.cancelAnimationFrame(frame);
-      bars.forEach((bar) => {
-        bar.style.height = "4%";
-      });
     };
   }, [
     active,
@@ -170,6 +180,64 @@ export function RadioVisualizer({
     currentAnalysis,
     getAnalyser,
     getCurrentTime,
+    status
+  ]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const hasVisualizationSource = Boolean(
+      currentAnalysis || (getAnalyser() && analyserReady)
+    );
+    if (status === "playing" && active && hasVisualizationSource) return;
+
+    const bars = Array.from(root.querySelectorAll<HTMLSpanElement>(":scope > span"));
+    if (!bars.length) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      bars.forEach((bar) => {
+        bar.style.height = "4%";
+      });
+      return;
+    }
+
+    let frame = 0;
+    let previousFrame = 0;
+    const levels = bars.map((bar) =>
+      visualizerLevelFromHeightPercent(
+        Number.parseFloat(bar.style.height || "4")
+      )
+    );
+
+    function relax(now: number) {
+      const elapsed = previousFrame === 0 ? 16 : now - previousFrame;
+      previousFrame = now;
+      let moving = false;
+
+      bars.forEach((bar, index) => {
+        levels[index] = relaxVisualizerLevel(levels[index], elapsed);
+        if (levels[index] > 0.002) moving = true;
+        bar.style.height = `${4 + levels[index] * 92}%`;
+      });
+
+      if (moving) {
+        frame = window.requestAnimationFrame(relax);
+      } else {
+        bars.forEach((bar) => {
+          bar.style.height = "4%";
+        });
+      }
+    }
+
+    frame = window.requestAnimationFrame(relax);
+    return () => window.cancelAnimationFrame(frame);
+  }, [
+    active,
+    analyserReady,
+    currentAnalysis,
+    getAnalyser,
     status
   ]);
 

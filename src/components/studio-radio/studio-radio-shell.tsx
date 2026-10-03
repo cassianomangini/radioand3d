@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   useEffect,
@@ -1310,31 +1311,31 @@ export function StudioRadioShell() {
         {playbackStatusMessage}
       </span>
       <header className={styles.siteHeader}>
-        <a
+        <Link
           className={styles.brand}
           href="/"
           aria-label="CM 3D e Rádio, início"
           onClick={(event) => handleStudioRouteLink(event, "/")}
         >
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
-        </a>
+        </Link>
 
         <nav className={styles.desktopNav} aria-label="Navegação principal">
-          <a
+          <Link
             href="/"
             aria-current={activeNav === "home" ? "page" : undefined}
             onClick={(event) => handleStudioRouteLink(event, "/")}
           >
             Início
-          </a>
-          <a
+          </Link>
+          <Link
             href="/studio"
             aria-current={activeNav === "studio" ? "page" : undefined}
             onPointerEnter={() => router.prefetch("/studio")}
             onClick={(event) => handleStudioRouteLink(event, "/studio")}
           >
             Estúdio
-          </a>
+          </Link>
           <a ref={radioNavRef} href="#radio" aria-current={activeNav === "radio" ? "page" : undefined} onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
         </nav>
 
@@ -1356,7 +1357,7 @@ export function StudioRadioShell() {
             className={styles.mobileNav}
             aria-label="Navegação mobile"
           >
-            <a
+            <Link
               href="/"
               aria-current={activeNav === "home" ? "page" : undefined}
               onClick={(event) => {
@@ -1365,8 +1366,8 @@ export function StudioRadioShell() {
               }}
             >
               Início
-            </a>
-            <a
+            </Link>
+            <Link
               href="/studio"
               aria-current={activeNav === "studio" ? "page" : undefined}
               onClick={(event) => {
@@ -1375,7 +1376,7 @@ export function StudioRadioShell() {
               }}
             >
               Estúdio
-            </a>
+            </Link>
             <button
               type="button"
               aria-current={activeNav === "radio" ? "page" : undefined}
@@ -1513,7 +1514,7 @@ export function StudioRadioShell() {
                   Peças, materiais e cores produzidos
                   <br className={styles.leadBreak} /> com precisão, camada por camada.
                 </p>
-                <a
+                <Link
                   href="/studio"
                   className={`${styles.primaryAction} ${styles.routeAction}`}
                   aria-label="Explore o estúdio"
@@ -1522,14 +1523,14 @@ export function StudioRadioShell() {
                 >
                   <span>Explore o estúdio</span>
                   <span aria-hidden="true">→</span>
-                </a>
+                </Link>
               </div>
             </section>
           ) : (
             <section className={styles.studioDetail} aria-labelledby="studio-title">
               <div className={styles.studioDetailMedia} aria-hidden="true" />
               <div className={styles.studioDetailContent}>
-                <a
+                <Link
                   href="/"
                   className={`${styles.primaryAction} ${styles.routeAction} ${styles.studioBack}`}
                   aria-label="Voltar ao início"
@@ -1537,7 +1538,7 @@ export function StudioRadioShell() {
                 >
                   <span aria-hidden="true">←</span>
                   <span>Voltar ao início</span>
-                </a>
+                </Link>
                 <div className={styles.studioDetailIntro}>
                   <p className={`${styles.studioEyebrow} ${styles.routeEyebrow}`}>
                     ESTÚDIO DE IMPRESSÃO 3D

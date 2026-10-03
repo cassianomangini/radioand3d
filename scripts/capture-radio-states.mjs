@@ -241,6 +241,37 @@ try {
   if (!desktopAudioPreserved) throw new Error("Radio audio element was replaced during focus/fullscreen motion.");
   await screenshot(client, "desktop-radio-fullscreen-1760x824.png");
 
+  const fullscreenReturnedToFocus = await evaluate(
+    client,
+    `(() => {
+      const separator = document.querySelector('[role="separator"]');
+      if (!(separator instanceof HTMLElement)) return false;
+      separator.focus();
+      separator.dispatchEvent(new KeyboardEvent("keydown", {
+        key: "Escape",
+        code: "Escape",
+        bubbles: true
+      }));
+      return true;
+    })()`
+  );
+  if (!fullscreenReturnedToFocus) throw new Error("Could not close fullscreen back to focus.");
+  await delay(820);
+
+  const focusRestored = await evaluate(
+    client,
+    `(() => {
+      const site = document.querySelector('[data-radio-layout-mode]');
+      return site instanceof HTMLElement &&
+        site.dataset.radioLayoutMode === "focus" &&
+        site.hasAttribute("data-radio-expanded") &&
+        !site.hasAttribute("data-radio-fullscreen") &&
+        document.querySelector("audio") === window.__cmRadioAudioNode;
+    })()`
+  );
+  if (!focusRestored) throw new Error("Fullscreen did not return to its focus origin cleanly.");
+  await screenshot(client, "desktop-radio-return-focus-1760x824.png");
+
   await navigate(client, 1760, 824, false);
   const interruptionAudioStored = await evaluate(
     client,

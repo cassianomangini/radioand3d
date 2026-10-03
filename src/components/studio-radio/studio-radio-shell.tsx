@@ -43,11 +43,7 @@ type DocumentWithViewTransition = Document & {
   startViewTransition?: (update: () => void | Promise<void>) => ViewTransitionLike;
 };
 
-type RouteTransitionWaiter = {
-  href: string;
-  resolve: () => void;
-  timeout: number;
-};
+type StudioRouteMotion = "entering" | "exiting" | null;
 
 type MobileRadioMotionState = {
   direction: "opening" | "closing";
@@ -572,14 +568,15 @@ export function StudioRadioShell() {
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
   const [mobileRadioMotion, setMobileRadioMotion] = useState<MobileRadioMotionState | null>(null);
   const [trackStepMotion, setTrackStepMotion] = useState<TrackStepMotionState | null>(null);
+  const [studioRouteMotion, setStudioRouteMotion] = useState<StudioRouteMotion>(null);
   const miniVolumeMenuRef = useRef<HTMLDivElement>(null);
   const miniVolumeButtonRef = useRef<HTMLButtonElement>(null);
   const miniOpenButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMotionActiveRef = useRef(false);
   const mobileMotionTokenRef = useRef(0);
   const trackStepMotionTokenRef = useRef(0);
-  const routeTransitionWaiterRef = useRef<RouteTransitionWaiter | null>(null);
   const routeTransitionActiveRef = useRef(false);
+  const routeMotionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const shellStyle = useMemo(
     () =>
@@ -594,21 +591,10 @@ export function StudioRadioShell() {
     router.prefetch("/studio");
   }, [router]);
 
-  useEffect(() => {
-    const waiter = routeTransitionWaiterRef.current;
-    if (!waiter || waiter.href !== pathname) return;
-
-    window.clearTimeout(waiter.timeout);
-    routeTransitionWaiterRef.current = null;
-    waiter.resolve();
-  }, [pathname]);
-
   useEffect(() => () => {
-    const waiter = routeTransitionWaiterRef.current;
-    if (!waiter) return;
-    window.clearTimeout(waiter.timeout);
-    routeTransitionWaiterRef.current = null;
-    waiter.resolve();
+    if (routeMotionTimerRef.current !== null) {
+      clearTimeout(routeMotionTimerRef.current);
+    }
   }, []);
 
   useEffect(() => {
@@ -1211,42 +1197,32 @@ export function StudioRadioShell() {
     if (pathname === href || routeTransitionActiveRef.current) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const documentWithTransition = document as DocumentWithViewTransition;
-
-    if (reduce || !documentWithTransition.startViewTransition) {
+    if (reduce) {
       router.push(href);
       return;
     }
 
-    const previousWaiter = routeTransitionWaiterRef.current;
-    if (previousWaiter) {
-      window.clearTimeout(previousWaiter.timeout);
-      routeTransitionWaiterRef.current = null;
-      previousWaiter.resolve();
+    if (routeMotionTimerRef.current !== null) {
+      clearTimeout(routeMotionTimerRef.current);
+      routeMotionTimerRef.current = null;
     }
 
-    const direction = href === "/studio" ? "studio-enter" : "studio-exit";
+    const direction: StudioRouteMotion = href === "/studio" ? "entering" : "exiting";
     routeTransitionActiveRef.current = true;
-    document.documentElement.dataset.siteRouteTransition = direction;
 
-    const transition = documentWithTransition.startViewTransition(async () => {
-      await new Promise<void>((resolve) => {
-        const timeout = window.setTimeout(() => {
-          if (routeTransitionWaiterRef.current?.href === href) {
-            routeTransitionWaiterRef.current = null;
-          }
-          resolve();
-        }, 2500);
-
-        routeTransitionWaiterRef.current = { href, resolve, timeout };
-        router.push(href);
-      });
+    flushSync(() => {
+      setStudioRouteMotion(direction);
     });
 
-    void transition.finished.finally(() => {
-      delete document.documentElement.dataset.siteRouteTransition;
+    requestAnimationFrame(() => {
+      router.push(href);
+    });
+
+    routeMotionTimerRef.current = setTimeout(() => {
+      setStudioRouteMotion(null);
       routeTransitionActiveRef.current = false;
-    });
+      routeMotionTimerRef.current = null;
+    }, 1280);
   }
 
   function handleStudioRouteLink(
@@ -1493,93 +1469,81 @@ export function StudioRadioShell() {
           id="studio"
           className={styles.studio}
           data-studio-route={studioRoute}
+          data-studio-transition={studioRouteMotion ?? undefined}
           inert={radioFullscreen}
         >
-          {studioRoute === "home" ? (
-            <section className={styles.hero} aria-labelledby="studio-title">
-              <div className={styles.heroMedia} aria-hidden="true" />
-              <div className={styles.heroShade} aria-hidden="true" />
-              <div className={styles.heroContent}>
-                <p className={`${styles.studioEyebrow} ${styles.routeEyebrow}`}>
-                  ESTÚDIO DE CRIAÇÃO
-                </p>
-                <h1
-                  id="studio-title"
-                  className={styles.routeTitle}
-                  aria-label="Ideias que ganham forma."
-                >
-                  Ideias que<br />ganham <span>forma.</span>
-                </h1>
-                <p className={`${styles.lead} ${styles.routeLead}`}>
-                  Peças, materiais e cores produzidos
-                  <br className={styles.leadBreak} /> com precisão, camada por camada.
-                </p>
-                <Link
-                  href="/studio"
-                  className={`${styles.primaryAction} ${styles.routeAction}`}
-                  aria-label="Explore o estúdio"
-                  onPointerEnter={() => router.prefetch("/studio")}
-                  onClick={(event) => handleStudioRouteLink(event, "/studio")}
-                >
-                  <span>Explore o estúdio</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
+          <div className={styles.studioMachine} aria-hidden="true" />
+          <div className={styles.studioStageShade} aria-hidden="true" />
+
+          <section className={styles.studioIdentity} aria-labelledby="studio-title">
+            <div className={styles.studioEyebrowStack} aria-live="off">
+              <span aria-hidden={studioRoute !== "home"}>ESTÚDIO DE CRIAÇÃO</span>
+              <span aria-hidden={studioRoute !== "detail"}>ESTÚDIO DE IMPRESSÃO 3D</span>
+            </div>
+
+            <h1 id="studio-title" aria-label="Ideias que ganham forma.">
+              Ideias que<br />ganham <span>forma.</span>
+            </h1>
+
+            <p className={styles.lead}>
+              Peças, materiais e cores produzidos
+              <br className={styles.leadBreak} /> com precisão, camada por camada.
+            </p>
+
+            <div className={styles.studioRouteActions}>
+              <Link
+                href="/studio"
+                className={styles.primaryAction}
+                aria-label="Explore o estúdio"
+                aria-hidden={studioRoute !== "home"}
+                tabIndex={studioRoute === "home" ? 0 : -1}
+                onPointerEnter={() => router.prefetch("/studio")}
+                onClick={(event) => handleStudioRouteLink(event, "/studio")}
+              >
+                <span>Explore o estúdio</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+
+              <Link
+                href="/"
+                className={styles.primaryAction}
+                aria-label="Voltar ao início"
+                aria-hidden={studioRoute !== "detail"}
+                tabIndex={studioRoute === "detail" ? 0 : -1}
+                onClick={(event) => handleStudioRouteLink(event, "/")}
+              >
+                <span aria-hidden="true">←</span>
+                <span>Voltar ao início</span>
+              </Link>
+            </div>
+          </section>
+
+          <div
+            className={styles.studioDetailRail}
+            aria-hidden={studioRoute !== "detail"}
+          >
+            <article className={styles.studioDetailRow}>
+              <span>PROCESSO</span>
+              <div>
+                <strong>Da ideia à peça</strong>
+                <p>Planejamento, preparação, impressão e acabamento.</p>
               </div>
-            </section>
-          ) : (
-            <section className={styles.studioDetail} aria-labelledby="studio-title">
-              <div className={styles.studioDetailMedia} aria-hidden="true" />
-              <div className={styles.studioDetailContent}>
-                <Link
-                  href="/"
-                  className={`${styles.primaryAction} ${styles.routeAction} ${styles.studioBack}`}
-                  aria-label="Voltar ao início"
-                  onClick={(event) => handleStudioRouteLink(event, "/")}
-                >
-                  <span aria-hidden="true">←</span>
-                  <span>Voltar ao início</span>
-                </Link>
-                <div className={styles.studioDetailIntro}>
-                  <p className={`${styles.studioEyebrow} ${styles.routeEyebrow}`}>
-                    ESTÚDIO DE IMPRESSÃO 3D
-                  </p>
-                  <h1
-                    id="studio-title"
-                    className={styles.routeTitle}
-                    aria-label="Ideias que ganham forma."
-                  >
-                    Ideias que<br />ganham <span>forma.</span>
-                  </h1>
-                  <p className={`${styles.lead} ${styles.routeLead}`}>
-                    Peças, materiais e cores produzidos com precisão, camada por camada.
-                  </p>
-                </div>
-                <div className={styles.studioDetailRail} aria-label="Como o estúdio trabalha">
-                  <article className={styles.studioDetailRow}>
-                    <span>PROCESSO</span>
-                    <div>
-                      <strong>Da ideia à peça</strong>
-                      <p>Planejamento, preparação, impressão e acabamento.</p>
-                    </div>
-                  </article>
-                  <article className={styles.studioDetailRow}>
-                    <span>MATERIAIS</span>
-                    <div>
-                      <strong>Cor e acabamento fazem parte da peça</strong>
-                      <p>Opções entram conforme disponibilidade real e publicação aprovada.</p>
-                    </div>
-                  </article>
-                  <article className={styles.studioDetailRow}>
-                    <span>MOSTRUÁRIO</span>
-                    <div>
-                      <strong>Conteúdo real, progressivo</strong>
-                      <p>Peças e trabalhos aparecem à medida que forem publicados.</p>
-                    </div>
-                  </article>
-                </div>
+            </article>
+            <article className={styles.studioDetailRow}>
+              <span>MATERIAIS</span>
+              <div>
+                <strong>Cor e acabamento fazem parte da peça</strong>
+                <p>Opções entram conforme disponibilidade real e publicação aprovada.</p>
               </div>
-            </section>
-          )}
+            </article>
+            <article className={styles.studioDetailRow}>
+              <span>MOSTRUÁRIO</span>
+              <div>
+                <strong>Conteúdo real, progressivo</strong>
+                <p>Peças e trabalhos aparecem à medida que forem publicados.</p>
+              </div>
+            </article>
+          </div>
         </main>
 
         <div

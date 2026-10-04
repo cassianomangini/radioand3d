@@ -44,47 +44,36 @@ Em menos de um viewport útil, o visitante precisa entender:
 
 Não repetir o hero da Home.
 
-## Estrutura
+## Estrutura aprovada
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────┐
-│ ESTÚDIO DE IMPRESSÃO 3D                                             │
-│ Projetos personalizados, peças que já produzimos e produtos prontos.│
-│                                                                      │
 │ ┌───────────────────────────────────┬──────────────────────────────┐ │
-│ │                                   │ ORÇAMENTO                    │ │
-│ │ IMPRESSÕES                        │ [foto/referência curta]       │ │
-│ │ [FOTO REAL FORTE]                 │ Conte seu projeto             │ │
-│ │                                   │ [Pedir orçamento →]           │ │
-│ │                                   ├──────────────────────────────┤ │
-│ │                                   │ PRODUTOS                      │ │
-│ │ Veja o que já saiu do estúdio     │ [foto de produto real]        │ │
-│ │ [Explorar impressões →]           │ [Ver produtos →]              │ │
+│ │ ESTÚDIO DE IMPRESSÃO 3D           │ PEÇA UM ORÇAMENTO            │ │
+│ │                                   │ copy curta + CTA             │ │
+│ │ foto/prova real                   ├──────────────────────────────┤ │
+│ │                                   │ PRODUTOS                     │ │
+│ │ IMPRESSÕES                        │ copy curta + CTA             │ │
+│ │ Veja o que já saiu...             │                              │ │
+│ │ [Ver impressões →]                │ [Ver produtos →]             │ │
 │ └───────────────────────────────────┴──────────────────────────────┘ │
-│                                                                      │
-│ COMO PODEMOS PRODUZIR PARA VOCÊ                                     │
-│                                                                      │
-│ [FOTO/PROCESSO REAL]  Já tenho um arquivo 3D                        │
-│                       Impressão 3D sob demanda                       │
-│                       [Enviar arquivo para análise →]                │
-│                                                                      │
-│ [FOTO PLACA REAL]     Placas personalizadas                         │
-│                       [Conhecer →]                                   │
-│                                                                      │
-│ [FOTO CAIXA REAL]     Caixas personalizadas                         │
-│                       [Conhecer →]                                   │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
+A superfície grande da esquerda é **uma peça só**: abertura do Estúdio + entrada de Impressões.
+
 ## Regras
 
-- Impressões ocupa cerca de metade do mosaico e recebe a melhor imagem.
-- Orçamento e Produtos têm peso menor.
-- Não usar três cards visualmente idênticos.
-- Não colocar filtros.
-- Não mostrar impressoras/material como “feature”.
-- A área de serviços — **Impressão sob demanda, Placas e Caixas** — vem **depois** dos três pilares.
-- O topo deve caber confortavelmente sem hero de 80vh.
+- exatamente três entradas visuais;
+- Estúdio + Impressões ocupam a superfície dominante da esquerda;
+- Orçamento e Produtos ficam empilhados à direita;
+- não existe card separado de Impressões fora da superfície principal;
+- **a home termina nessa composição**;
+- não adicionar segunda seção de serviços, trabalhos recentes, materiais, Placas ou Caixas na home;
+- Impressão 3D sob demanda, Placas e Caixas continuam existindo nas rotas/branches apropriados;
+- não colocar filtros;
+- não mostrar impressoras/material como “feature”;
+- o topo deve caber confortavelmente sem hero de 80vh.
 
 ## Recursos por bloco
 
@@ -106,38 +95,22 @@ Não repetir o hero da Home.
 [MINI PLAYER]
 
 ESTÚDIO DE IMPRESSÃO 3D
+[mesma superfície de Impressões]
+
 Projetos personalizados, peças que já produzimos
 e produtos prontos.
 
 IMPRESSÕES
-[FOTO REAL LARGA]
 Veja o que já saiu do estúdio.
-[Explorar impressões →]
+[Ver impressões →]
 
-ORÇAMENTO
-[FOTO/REFERÊNCIA]
+PEÇA UM ORÇAMENTO
 Conte o que você precisa.
 [Pedir orçamento →]
 
 PRODUTOS
-[FOTO PRODUTO]
 Peças prontas para comprar.
 [Ver produtos →]
-
-COMO PODEMOS PRODUZIR PARA VOCÊ
-
-[FOTO/PROCESSO REAL]
-Já tenho um arquivo 3D
-Impressão 3D sob demanda
-[Enviar arquivo para análise →]
-
-[FOTO PLACA]
-Placas personalizadas
-[Conhecer →]
-
-[FOTO CAIXA]
-Caixas personalizadas
-[Conhecer →]
 ```
 
 ### Mobile não faz
@@ -555,7 +528,7 @@ Este wireframe resolve **estrutura**, não aprovação visual final.
 
 Para avançar:
 
-- [ ] Cassiano revisa hierarquia do hub após inclusão de Impressão 3D sob demanda;
+- [x] Cassiano aprovou a hierarquia final do hub: Estúdio+Impressões juntos à esquerda; Orçamento e Produtos empilhados à direita; sem segunda seção abaixo;
 - [x] Cassiano aprova ordem da página de Placas;
 - [x] Cassiano aprova fluxo do Orçamento;
 - [x] Cassiano aprova hierarquia Produto → Shopee;

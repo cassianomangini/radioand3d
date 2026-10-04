@@ -2,20 +2,24 @@
 
 ## Propósito
 
-Uma identidade CM conectando objetos físicos e música. A pessoa pode conhecer peças, consultar cores e materiais, ver trabalhos para clientes e ouvir o acervo enquanto navega.
+Uma identidade CM conectando objetos físicos e música. A pessoa pode conhecer peças, ver trabalhos reais, pedir avaliação de um projeto personalizado, comprar produtos publicados e ouvir o acervo enquanto navega.
 
 Este é o contrato de escopo. A sequência e o estado das entregas ficam apenas no [roadmap](ROADMAP.md).
 
 ## Requisitos confirmados por Cassiano
 
 - Identidade CM própria, sem astronauta ou reaproveitamento automático da estética Artesopolis.
-- Catálogo de peças e trabalhos personalizados, com cores e materiais disponíveis.
 - Experiência viva, com muitas animações e boa apresentação em computador e celular.
 - Rádio inspirada no Winamp, com tecnologia atual.
 - No mobile, mini player persistente; no desktop, a Rádio completa/acoplada é a interface de reprodução visível. Ambos usam o mesmo motor e a mesma fila.
 - No desktop, o 3D e a rádio formam uma composição integrada; a rádio pode ganhar largura por arraste e por ação explícita de expandir/recolher.
 - No mobile, o mini player aparece logo abaixo do header e a experiência de Estúdio de Impressão 3D começa imediatamente abaixo dele.
-- O 3D nasce como um estúdio apresentável e expansível; produtos, materiais, fotos e projetos reais entram gradualmente, sem conteúdo fictício usado apenas para preencher a tela.
+- O Estúdio público se organiza em três pilares: **Impressões, Orçamento e Produtos**.
+- **Impressões** prova capacidade e inspira; **Orçamento** qualifica projeto personalizado sem abrir WhatsApp para qualquer visitante; **Produtos** apresenta itens próprios antes do checkout externo.
+- Placas e caixas são as prioridades comerciais iniciais. Luminárias e outras categorias entram quando houver prova real suficiente.
+- Materiais e cores continuam relevantes, mas como conteúdo de apoio dentro de projetos, serviços, produtos e orçamento.
+- Produtos, fotos, materiais e projetos reais entram gradualmente, sem conteúdo fictício usado apenas para preencher a tela.
+- Search/SEO faz parte da arquitetura do produto, não é uma tarefa cosmética no final.
 - Reduzir o trabalho manual entre criação no Suno e publicação no site.
 - Rever criticamente o legado antes de reaproveitar código.
 - Agentes, padrões e checklists que permitam continuar o projeto entre sessões.
@@ -24,37 +28,63 @@ Este é o contrato de escopo. A sequência e o estado das entregas ficam apenas 
 
 | Área | Primeira experiência útil | Contrato |
 | --- | --- | --- |
-| Home / Estúdio | Apresentar claramente **Estúdio de Impressão 3D** e CM Rádio como duas partes da mesma experiência, sem obrigar catálogo completo no lançamento | [Experiência](EXPERIENCE.md) |
-| 3D inicial | Estrutura preparada para receber peças, materiais, fotos e trabalhos reais conforme forem cadastrados; nenhuma grade fictícia é requisito de lançamento | [Catálogo 3D](CATALOG_3D.md) |
-| Trabalhos para clientes | Estrutura de caso e caminho de contato, usando apenas material autorizado | [Catálogo 3D](CATALOG_3D.md) |
+| Home / Estúdio | Apresentar claramente Estúdio de Impressão 3D e CM Rádio como duas partes da mesma experiência | [Experiência](EXPERIENCE.md) |
+| Hub do Estúdio | Distribuir para Impressões, Orçamento e Produtos, sem parecer grade genérica de features | [Plano do Estúdio](STUDIO_GROWTH_PLAN_V1.md) |
+| Impressões | Mostrar trabalhos reais e conceitos claramente identificados; gerar prova antes da venda | [Catálogo 3D](CATALOG_3D.md) |
+| Placas | Primeira landing comercial prioritária | [Plano do Estúdio](STUDIO_GROWTH_PLAN_V1.md) |
+| Caixas | Segunda landing comercial prioritária | [Plano do Estúdio](STUDIO_GROWTH_PLAN_V1.md) |
+| Orçamento | Fluxo progressivo por tipo de projeto, com referências/anexos e triagem | [Fluxo de Orçamento](STUDIO_QUOTE_FLOW_V1.md) |
+| Produtos | Catálogo próprio com página individual e link Shopee no nível do item | [Catálogo 3D](CATALOG_3D.md) |
+| Search | Descoberta, rastreamento, indexação, imagens, metadata e medição | [Search Discovery](STUDIO_SEARCH_DISCOVERY_V1.md) |
 | Biblioteca privada | Importar em lote, revisar versões e publicar sem editar JSON ou Git | [Biblioteca](MUSIC_PIPELINE.md) |
 | CM Radio | Acervo selecionável, mini/full sincronizados e visualizador real | [Rádio](RADIO.md) |
 
-A V1 proposta é pública para ouvir e explorar; somente a gestão exige login do proprietário. Contato/orçamento e links de compra serão definidos sem presumir checkout próprio. Reprodução individual, não transmissão ao vivo sincronizada entre ouvintes.
+A V1 é pública para ouvir, explorar e converter. Somente gestão exige login do proprietário. Checkout próprio não é requisito: quando aplicável, a Shopee continua como camada transacional.
 
 ## Primeiro marco integrado
 
-O primeiro marco visível não depende de um catálogo 3D completo. Ele entrega duas coisas bem acabadas:
+O primeiro marco visível entrega duas frentes bem acabadas:
 
 1. **CM Rádio funcional e visualmente pronta**, com Rádio completa no desktop e mini player no mobile compartilhando a mesma reprodução, seleção manual de músicas, shuffle e visualizador.
-2. **Entrada pública do Estúdio de Impressão 3D**, com hero, identidade, navegação e estrutura preparada para receber conteúdo real progressivamente.
+2. **Estúdio público funcional**, com hero, três pilares, páginas comerciais prioritárias, caminho de orçamento e catálogo de produtos construídos apenas com conteúdo real.
 
 Desktop: o Estúdio ocupa a área principal e a Rádio completa aparece acoplada à direita, com ação de expandir/recolher e redimensionamento quando suportado pela interação aprovada. **Não existe mini player adicional no desktop.**
 
-Mobile: header, mini player compacto e, logo abaixo, a entrada do Estúdio de Impressão 3D. A rádio completa abre sob demanda sem empurrar uma sidebar estreita para dentro da tela.
+Mobile: header, mini player compacto e, logo abaixo, a entrada do Estúdio. A rádio completa abre sob demanda.
 
-Materiais, produtos, fotos e trabalhos entram somente quando existirem e estiverem aprovados. Uma seção vazia ou um placeholder honesto é preferível a cards inventados para preencher layout.
+O marco exige validação de ponta a ponta em desktop e mobile: reprodução, continuidade, expansão/recolhimento da rádio, navegação, conteúdo do Estúdio e composição responsiva.
 
-O marco exige validação de ponta a ponta em desktop e mobile: reprodução, continuidade, expansão/recolhimento da rádio, navegação e composição responsiva. Importação e publicação real da biblioteca continuam sendo exigidas antes da publicação final do marco.
+## Aquisição orgânica
+
+O Estúdio precisa ser encontrável por quem ainda não conhece a CM.
+
+Regras:
+
+- produção indexável somente no gate de lançamento;
+- preview/desenvolvimento continuam `noindex`;
+- páginas existem por intenção real, não por variação artificial de keyword;
+- links internos e sitemap ajudam descoberta;
+- cada página comercial recebe metadata e canonical próprios;
+- fotos reais são conteúdo indexável, não apenas decoração;
+- Search Console orienta iterações depois do lançamento;
+- desempenho da Rádio não pode tornar as páginas comerciais opacas ou lentas.
+
+O contrato completo está em [STUDIO_SEARCH_DISCOVERY_V1.md](STUDIO_SEARCH_DISCOVERY_V1.md).
 
 ## Fora do primeiro marco
 
-Checkout, gestão financeira ou de produção, contas de ouvintes, app nativo, sincronizador local de pastas, scraping do Suno, transmissão ao vivo, múltiplas skins, equalizador que altera o som e catálogo completo com configurador 3D.
+Checkout próprio, gestão financeira ou de produção, contas de ouvintes, app nativo, sincronizador local de pastas, scraping do Suno, transmissão ao vivo, múltiplas skins, equalizador que altera o som e configurador 3D completo.
 
-Essas possibilidades não estão descartadas. Entram no roadmap somente quando houver necessidade e decisão explícita; não devem atrasar a prova inicial.
+Essas possibilidades entram no roadmap somente quando houver necessidade e decisão explícita.
 
 ## Decisões ainda abertas
 
-A entrega 01 deve fechar stack e versões, serviços/ambientes, autenticação do proprietário, origem dos dados 3D, arquivos piloto, direitos de publicação e caminho de contato. O logo fornecido por Cassiano e a composição em revisão ficam na [experiência](EXPERIENCE.md). A escolha de fornecedor não autoriza gastos nem conexão a produção.
+- cobertura geográfica de projetos personalizados;
+- até onde o Estúdio modela a partir de ideia, foto, logo ou desenho;
+- origem/atualização dos dados de produtos;
+- backend e retenção dos pedidos de orçamento;
+- contato de continuidade após triagem;
+- configuração local/área de serviço no Google;
+- domínio público definitivo.
 
 As propostas técnicas estão em [ARCHITECTURE.md](ARCHITECTURE.md). A auditoria do legado é uma referência histórica, não um segundo plano de execução.

@@ -1,6 +1,6 @@
 # STUDIO_COMMERCE_WIREFRAMES_V1 — Wireframes funcionais
 
-Status: **estrutura aprovada por Cassiano; mock visual final pendente**  
+Status: **estrutura-base aprovada; revisão reaberta para incluir Impressão 3D sob demanda e remover linguagem visual genérica/IA**  
 depends_on: [STUDIO_COMMERCE_EXPERIENCE_V1.md](STUDIO_COMMERCE_EXPERIENCE_V1.md)  
 ready_for_frontend: **no**  
 approved_by: **Cassiano — 04/10/2026**  
@@ -62,12 +62,17 @@ Não repetir o hero da Home.
 │ │ [Explorar impressões →]           │ [Ver produtos →]              │ │
 │ └───────────────────────────────────┴──────────────────────────────┘ │
 │                                                                      │
-│ O QUE MAIS FAZEMOS SOB MEDIDA                                       │
-│ ┌────────────────────────────┐  ┌────────────────────────────────┐  │
-│ │ [foto placa]               │  │ [foto caixa]                   │  │
-│ │ Placas personalizadas      │  │ Caixas personalizadas          │  │
-│ │ [Conhecer →]               │  │ [Conhecer →]                   │  │
-│ └────────────────────────────┘  └────────────────────────────────┘  │
+│ COMO PODEMOS PRODUZIR PARA VOCÊ                                     │
+│                                                                      │
+│ [FOTO/PROCESSO REAL]  Já tenho um arquivo 3D                        │
+│                       Impressão 3D sob demanda                       │
+│                       [Enviar arquivo para análise →]                │
+│                                                                      │
+│ [FOTO PLACA REAL]     Placas personalizadas                         │
+│                       [Conhecer →]                                   │
+│                                                                      │
+│ [FOTO CAIXA REAL]     Caixas personalizadas                         │
+│                       [Conhecer →]                                   │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -89,6 +94,7 @@ Não repetir o hero da Home.
 | Impressões | foto real |
 | Orçamento | foto/referência discreta + CTA |
 | Produtos | foto real de produto |
+| Impressão sob demanda | foto real de processo/peça ou tipografia simples |
 | Placas | foto real |
 | Caixas | foto real |
 
@@ -118,7 +124,12 @@ PRODUTOS
 Peças prontas para comprar.
 [Ver produtos →]
 
-O QUE MAIS FAZEMOS SOB MEDIDA
+COMO PODEMOS PRODUZIR PARA VOCÊ
+
+[FOTO/PROCESSO REAL]
+Já tenho um arquivo 3D
+Impressão 3D sob demanda
+[Enviar arquivo para análise →]
 
 [FOTO PLACA]
 Placas personalizadas
@@ -138,7 +149,43 @@ Caixas personalizadas
 
 ---
 
-# 4. PLACAS — desktop
+# 4. IMPRESSÃO 3D SOB DEMANDA — desktop
+
+URL: `/studio/impressao-3d-sob-demanda`
+
+```text
+IMPRESSÃO 3D SOB DEMANDA
+
+Já tem o arquivo 3D?
+Envie para análise e verificamos se conseguimos produzir a peça.
+
+[FOTO REAL DE PROCESSO OU PEÇA]
+
+[Enviar arquivo para análise →]
+
+COMO FUNCIONA
+
+Você envia o arquivo.
+Nós analisamos impressão, tamanho, material e quantidade.
+Se for viável, seguimos com orçamento e produção.
+```
+
+Sem fileira de ícones. Sem “benefícios” em quadrinhos. Texto, fotografia real e divisões tipográficas.
+
+## Mobile
+
+Ordem:
+
+1. título;
+2. frase “Já tem o arquivo?”;
+3. CTA;
+4. foto real;
+5. explicação curta do processo;
+6. CTA final.
+
+---
+
+# 5. PLACAS — desktop
 
 URL: `/studio/placas-personalizadas`
 
@@ -205,7 +252,7 @@ O botão abre `/studio/orcamento?tipo=placa`.
 
 ---
 
-# 5. PLACAS — mobile
+# 6. PLACAS — mobile
 
 Ordem:
 
@@ -221,7 +268,7 @@ Não colocar a foto antes de a pessoa entender onde chegou se isso empurrar o t�
 
 ---
 
-# 6. ORÇAMENTO — shell comum
+# 7. ORÇAMENTO — shell comum
 
 URL: `/studio/orcamento`
 
@@ -264,20 +311,36 @@ TÍTULO
 
 ---
 
-# 7. ORÇAMENTO — fluxo completo
+# 8. ORÇAMENTO — fluxo completo
 
-## Etapa 1 — Tipo
+## Etapa 1 — Intenção
 
-**O que você quer fazer?**
+**O que você precisa?**
 
-- Placa
-- Caixa
-- Luminária
-- Outra peça
+- **Imprimir um arquivo 3D que já tenho**
+- Criar uma placa personalizada
+- Criar uma caixa sob medida
+- Outro projeto
+
+Se a pessoa escolhe “Imprimir um arquivo 3D que já tenho”, o fluxo pula perguntas de criação e vai direto para arquivo + dados de produção.
 
 Imagem só entra se houver foto real útil. Sem foto, escolha textual é suficiente.
 
-## Etapa 2 — Ponto de partida
+## Branch — arquivo 3D pronto
+
+Ordem preferida:
+
+1. enviar arquivo;
+2. quantidade;
+3. escala/tamanho, se houver exigência;
+4. material/cor, com opção “não sei”;
+5. prazo desejado opcional;
+6. contato;
+7. revisão.
+
+O envio é “para análise”; não prometer produção antes de verificar o arquivo.
+
+## Etapa 2 — Ponto de partida para projetos personalizados
 
 **De onde estamos começando?**
 
@@ -382,7 +445,7 @@ Sem CTA obrigatório para WhatsApp.
 
 ---
 
-# 8. PRODUTO INDIVIDUAL — desktop
+# 9. PRODUTO INDIVIDUAL — desktop
 
 URL: `/studio/produtos/[slug]`
 
@@ -425,7 +488,7 @@ PRECISA DE ALGO PARECIDO, MAS COM OUTRA MEDIDA?
 
 ---
 
-# 9. PRODUTO INDIVIDUAL — mobile
+# 10. PRODUTO INDIVIDUAL — mobile
 
 Ordem:
 
@@ -442,7 +505,7 @@ Não usar botão Shopee sticky na primeira versão.
 
 ---
 
-# 10. Catálogo /studio/produtos
+# 11. Catálogo /studio/produtos
 
 Enquanto o catálogo for pequeno:
 
@@ -472,7 +535,7 @@ Sem:
 
 ---
 
-# 11. Recursos que não devem ser resolvidos em CSS
+# 12. Recursos que não devem ser resolvidos em CSS
 
 | Necessidade | Recurso correto |
 | --- | --- |
@@ -486,13 +549,13 @@ Sem:
 
 ---
 
-# 12. Gate de revisão
+# 13. Gate de revisão
 
 Este wireframe resolve **estrutura**, não aprovação visual final.
 
 Para avançar:
 
-- [x] Cassiano aprova hierarquia do hub;
+- [ ] Cassiano revisa hierarquia do hub após inclusão de Impressão 3D sob demanda;
 - [x] Cassiano aprova ordem da página de Placas;
 - [x] Cassiano aprova fluxo do Orçamento;
 - [x] Cassiano aprova hierarquia Produto → Shopee;

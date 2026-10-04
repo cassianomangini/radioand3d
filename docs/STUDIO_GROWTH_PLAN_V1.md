@@ -159,6 +159,57 @@ A página deve ser funcional e orientada ao problema:
 
 A proposta de valor é fabricação sob medida, não apenas “imprimir uma caixa”.
 
+## Design e experiência como gate de produto
+
+O Estúdio não deve ser implementado como coleção de cards e depois “embelezado”.
+
+A composição parte da necessidade do visitante e do tipo correto de recurso:
+
+- **fotografia real** quando precisamos provar peça, acabamento ou produto;
+- **asset gráfico/diagrama** quando precisamos explicar dimensão, encaixe ou informação técnica;
+- **texto HTML** para contexto, decisão e Search;
+- **componente interativo** apenas quando há estado/comportamento real;
+- **nada** quando o bloco só preencheria espaço.
+
+### Direção do hub
+
+`/studio` é hub, não outro hero e não catálogo completo.
+
+Desktop: **Impressões** é a área dominante; **Orçamento** e **Produtos** têm peso menor e ação clara. Os três pilares não viram três cards idênticos.
+
+Mobile: ordem deliberada **Impressões → Orçamento → Produtos**, sem comprimir o mosaico desktop.
+
+### Direção do orçamento
+
+O formulário deve funcionar como conversa guiada:
+
+- começar pelo que a pessoa quer fazer, não pelo nome/telefone;
+- mostrar apenas perguntas relevantes ao tipo de projeto;
+- permitir “não sei ainda” e “preciso de ajuda nisso” quando apropriado;
+- contato entra no final;
+- upload usa seletor normal em qualquer dispositivo e drag-and-drop apenas como melhoria desktop;
+- antes do envio, mostrar resumo editável;
+- após envio, não empurrar o visitante automaticamente para WhatsApp.
+
+### Direção de Produtos/Shopee
+
+Nosso domínio apresenta e explica; a Shopee finaliza a compra.
+
+- preview de produto é principalmente fotografia;
+- página individual concentra detalhes;
+- CTA chama **Comprar na Shopee**;
+- deixar claro que pagamento/finalização acontecem externamente;
+- não duplicar preço/estoque sem sincronização confiável;
+- sem sincronização, usar “Ver preço e disponibilidade na Shopee”.
+
+### Regra de mídia versus CSS
+
+CSS resolve layout, tipografia, espaçamento, responsividade, bordas, estados e transições simples.
+
+CSS **não** deve improvisar fotografia, render de produto, diagrama técnico, textura física ou objeto 3D que deveria existir como asset real.
+
+O handoff completo está em [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md).
+
 ## Pesquisa e SEO como parte do produto
 
 SEO não entra no final como checklist cosmético. Toda nova página comercial deve responder antes da implementação:
@@ -271,12 +322,35 @@ Métricas de negócio do próprio site:
 
 ## Fases de execução
 
-### S1.0 — Contrato comercial e de aquisição
+### S1.0A — Contrato comercial e de aquisição
 
 - [x] Fixar os três pilares: Impressões, Orçamento e Produtos.
 - [x] Fixar Placas e Caixas como prioridades.
 - [x] Tirar Materiais & Cores da posição de pilar de primeiro nível.
 - [ ] Fechar decisões abertas listadas neste documento.
+- [x] Criar o handoff de experiência [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md).
+- [ ] Aprovar o handoff visual antes de implementação visível substancial.
+
+### S1.0B — Gate de experiência antes do frontend
+
+O Estúdio **não** avança para composição visual final apenas porque rotas e conteúdo já estão definidos.
+
+Antes de gastar CSS, fechar:
+
+- wireframe do hub `/studio` em desktop e mobile;
+- página de Placas em desktop e mobile;
+- fluxo completo de Orçamento em wireframe e pelo menos uma etapa com direção visual final;
+- página individual de Produto em desktop e mobile;
+- inventário de fotos/assets existentes e faltantes;
+- decisão explícita por bloco: **foto real / asset gráfico / texto HTML / componente / não existe**;
+- comportamento mobile separado do desktop;
+- hierarquia Shopee aprovada;
+- componentes realmente necessários;
+- lista do que o frontend não pode improvisar.
+
+Artefato canônico: [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md).
+
+Enquanto esse artefato estiver com `ready_for_frontend: no`, trabalho técnico independente de Search/rotas pode avançar, mas **layout visível substancial não deve ser cristalizado em CSS**.
 
 ### S1.1 — Fundação técnica de Search
 

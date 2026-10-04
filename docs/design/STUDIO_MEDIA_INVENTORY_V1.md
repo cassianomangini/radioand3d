@@ -90,6 +90,16 @@ Precisa:
 
 Status: **não encontrado na main**.
 
+### Impressão 3D sob demanda
+
+Precisa de mídia que prove **processo real**, não uma categoria específica:
+
+- peça real saindo da impressora, ou;
+- conjunto pequeno de peças variadas realmente produzidas, ou;
+- close de processo/mesa/peça com boa leitura.
+
+Status: **não existe ainda um asset comercial específico versionado para essa função**.
+
 ### Placas
 
 Precisa:
@@ -186,6 +196,7 @@ public/images/studio/
   projects/
     mano-jotta/
   services/
+    impressao-sob-demanda/
     placas/
     caixas/
   products/
@@ -199,6 +210,7 @@ Não mover assets atuais antes de existir necessidade real; isso é convenção 
 
 ## 8. Pendências de mídia
 
+- [ ] selecionar/fotografar uma prova real para Impressão 3D sob demanda;
 - [ ] receber/versionar foto original da placa Mano Jotta;
 - [ ] confirmar autorização de exposição;
 - [ ] receber fotos de pelo menos uma caixa real;

@@ -227,7 +227,8 @@ Não mover assets atuais antes de existir necessidade real; isso é convenção 
 Se uma página depende de mídia que ainda não existe:
 
 - não fabricar o asset em CSS;
-- não gerar render que pareça prova real;
+- não gerar render/imagem sintética que pareça prova real;
+- em mock, usar placeholder neutro com rótulo `FOTO REAL PENDENTE` quando o asset ainda não existir;
 - não preencher a seção com produto fictício;
 - manter o bloco fora do frontend ou usar placeholder editorial explicitamente identificado em ambiente de design.
 

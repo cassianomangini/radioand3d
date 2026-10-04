@@ -14,6 +14,25 @@ O orçamento existe para transformar interesse em uma solicitação analisável 
 - preservar a origem da intenção;
 - permitir triagem antes do contato manual.
 
+## Princípio de interação
+
+O fluxo deve parecer uma **conversa guiada**, não um formulário cadastral.
+
+Regras de experiência:
+
+- começar por “O que você quer fazer?”;
+- não começar por nome, telefone ou e-mail;
+- apresentar uma decisão ou pequeno grupo coerente por etapa;
+- usar branching para esconder perguntas irrelevantes;
+- mesmo no desktop, não aproveitar espaço apenas para despejar campos;
+- oferecer “Não sei ainda” ou “Preciso de ajuda nisso” quando a pessoa não precisa dominar termos técnicos;
+- preservar respostas ao voltar;
+- contato entra no final;
+- antes do envio, mostrar um resumo editável.
+
+Referência de padrão de pergunta/branching:  
+https://design-system.service.gov.uk/patterns/question-pages/
+
 ## Entrada
 
 CTAs podem entrar com contexto:
@@ -142,6 +161,21 @@ Não prometer prazo só porque o usuário informou uma data.
 
 ## Etapa 6 — Contato
 
+Contato só aparece depois que o projeto já foi descrito.
+
+Pergunta principal:
+
+**Como podemos falar com você?**
+
+Opções iniciais:
+
+- WhatsApp;
+- E-mail.
+
+Mostrar somente o campo correspondente. Pedir outros dados apenas quando houver necessidade operacional real.
+
+
+
 Campos mínimos:
 
 - nome;
@@ -150,6 +184,19 @@ Campos mínimos:
 - preferência de retorno.
 
 Evitar solicitar dados que não serão usados.
+
+## Revisão antes do envio
+
+Antes de enviar, mostrar um resumo legível com:
+
+- tipo de projeto;
+- medidas informadas;
+- quantidade;
+- opções relevantes;
+- arquivos anexados;
+- canal de contato.
+
+Cada grupo deve permitir edição sem apagar as respostas já preenchidas.
 
 ## CTA final
 
@@ -162,6 +209,24 @@ Evitar:
 - “Comprar agora” em serviço sob medida;
 - “Falar no WhatsApp” como primeira ação;
 - texto que prometa orçamento instantâneo se houver análise manual.
+
+## Upload — comportamento visual
+
+Desktop:
+
+- seletor normal sempre disponível;
+- drag-and-drop pode complementar;
+- limites/formats claros;
+- anexos selecionados visíveis.
+
+Mobile:
+
+- usar o seletor nativo;
+- não depender de drag-and-drop.
+
+Referências:
+- https://design-system.service.gov.uk/components/file-upload/
+- https://design-system.dwp.gov.uk/contribute/file-upload/discoverable
 
 ## Confirmação
 

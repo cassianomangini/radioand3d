@@ -16,7 +16,7 @@ Este é o contrato de escopo. A sequência e o estado das entregas ficam apenas 
 - No mobile, o mini player aparece logo abaixo do header e a experiência de Estúdio de Impressão 3D começa imediatamente abaixo dele.
 - O Estúdio público se organiza em três pilares: **Impressões, Orçamento e Produtos**.
 - **Impressões** prova capacidade e inspira; **Orçamento** qualifica projeto personalizado sem abrir WhatsApp para qualquer visitante; **Produtos** apresenta itens próprios antes do checkout externo.
-- Placas e caixas são as prioridades comerciais iniciais. Luminárias e outras categorias entram quando houver prova real suficiente.
+- Impressão 3D sob demanda para quem já tem arquivo é um serviço-base explícito. Placas e caixas são as especialidades comerciais iniciais. Luminárias e outras categorias entram quando houver prova real suficiente.
 - Materiais e cores continuam relevantes, mas como conteúdo de apoio dentro de projetos, serviços, produtos e orçamento.
 - Produtos, fotos, materiais e projetos reais entram gradualmente, sem conteúdo fictício usado apenas para preencher a tela.
 - Search/SEO faz parte da arquitetura do produto, não é uma tarefa cosmética no final.
@@ -31,7 +31,8 @@ Este é o contrato de escopo. A sequência e o estado das entregas ficam apenas 
 | Home / Estúdio | Apresentar claramente Estúdio de Impressão 3D e CM Rádio como duas partes da mesma experiência | [Experiência](EXPERIENCE.md) |
 | Hub do Estúdio | Distribuir para Impressões, Orçamento e Produtos, sem parecer grade genérica de features | [Plano do Estúdio](STUDIO_GROWTH_PLAN_V1.md) |
 | Impressões | Mostrar trabalhos reais e conceitos claramente identificados; gerar prova antes da venda | [Catálogo 3D](CATALOG_3D.md) |
-| Placas | Primeira landing comercial prioritária | [Plano do Estúdio](STUDIO_GROWTH_PLAN_V1.md) |
+| Impressão sob demanda | Página para quem já tem arquivo 3D e quer análise/fabricação | [Plano do Estúdio](STUDIO_GROWTH_PLAN_V1.md) |
+| Placas | Landing comercial prioritária | [Plano do Estúdio](STUDIO_GROWTH_PLAN_V1.md) |
 | Caixas | Segunda landing comercial prioritária | [Plano do Estúdio](STUDIO_GROWTH_PLAN_V1.md) |
 | Orçamento | Fluxo progressivo por tipo de projeto, com referências/anexos e triagem | [Fluxo de Orçamento](STUDIO_QUOTE_FLOW_V1.md) |
 | Produtos | Catálogo próprio com página individual e link Shopee no nível do item | [Catálogo 3D](CATALOG_3D.md) |

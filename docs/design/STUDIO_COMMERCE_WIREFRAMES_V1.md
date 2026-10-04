@@ -6,9 +6,9 @@ ready_for_frontend: **no**
 approved_by: **Cassiano — 04/10/2026**  
 Versão: **V1 — 04/10/2026**
 
-Este documento fecha a disposição funcional das quatro superfícies que precisam estar resolvidas antes do frontend visual: hub `/studio`, Placas, Orçamento e Produto individual.
+Este documento fecha a disposição funcional das superfícies que precisam estar resolvidas antes do frontend visual: hub `/studio`, Impressão 3D sob demanda, Placas, Orçamento e Produto individual.
 
-Não é especificação de CSS. Os blocos identificam **função, ordem, peso e tipo de recurso**.
+Não é especificação de CSS. Os blocos identificam **função, ordem, peso e tipo de recurso**. Onde ainda não existir foto real, o mock usa placeholder neutro; não usa imagem sintética como prova.
 
 ---
 
@@ -83,7 +83,7 @@ Não repetir o hero da Home.
 - Não usar três cards visualmente idênticos.
 - Não colocar filtros.
 - Não mostrar impressoras/material como “feature”.
-- A área de Placas/Caixas vem **depois** dos três pilares.
+- A área de serviços — **Impressão sob demanda, Placas e Caixas** — vem **depois** dos três pilares.
 - O topo deve caber confortavelmente sem hero de 80vh.
 
 ## Recursos por bloco

@@ -1,6 +1,6 @@
 # STUDIO_COMMERCE_EXPERIENCE_V1 — Handoff de experiência do Estúdio
 
-Status: **estrutura-base aprovada; direção visual reaberta após feedback sobre iconografia genérica e inclusão de Impressão 3D sob demanda**  
+Status: **hub `/studio` aprovado; demais superfícies ainda em direção visual**  
 ready_for_frontend: **no**  
 approved_by: **estrutura-base: Cassiano — 04/10/2026; revisão atual: pending**  
 artifact_ref: **docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md**  
@@ -114,61 +114,45 @@ Não colocar na abertura:
 
 ## 5. /studio — composição principal desktop
 
-Os três pilares têm pesos diferentes. Eles **não são três cards equivalentes**.
+A composição aprovada tem **três entradas visuais**:
 
-### Peso visual
-
-| Pilar | Peso | Papel |
-| --- | ---: | --- |
-| Impressões | ~50% | prova e impacto |
-| Orçamento | ~25% | contratação |
-| Produtos | ~25% | compra |
-
-Composição de referência:
+- superfície grande à esquerda: **Estúdio de Impressão 3D + Impressões**;
+- topo da direita: **Peça um orçamento**;
+- base da direita: **Produtos**.
 
 ```text
 ┌──────────────────────────────┬───────────────────┐
+│ ESTÚDIO DE IMPRESSÃO 3D      │ PEÇA UM ORÇAMENTO│
 │                              │                   │
-│        IMPRESSÕES            │    ORÇAMENTO      │
-│                              │                   │
-│   fotografia real forte      │ imagem/referência │
-│                              │ + ação clara       │
-│                              ├───────────────────┤
-│                              │                   │
-│                              │    PRODUTOS       │
-│                              │ produto real      │
+│ foto/prova real              ├───────────────────┤
+│                              │ PRODUTOS          │
+│ IMPRESSÕES                   │                   │
+│ [Ver impressões →]           │ [Ver produtos →] │
 └──────────────────────────────┴───────────────────┘
 ```
 
-A mídia conduz a composição. CSS resolve grid, ritmo e responsividade; CSS não precisa “fabricar” interesse visual.
+A superfície de Impressões **é a própria abertura do Estúdio**. Não criar outro card para ela.
+
+**A home termina depois desses três blocos.** Não existe segunda fileira de serviços, galeria, trabalhos recentes, Placas ou Caixas na home.
 
 ### Mobile
 
-A ordem é linear e intencional:
+A hierarquia continua: **Estúdio+Impressões → Orçamento → Produtos**.
 
-1. Impressões;
-2. Orçamento;
-3. Produtos.
 
-Cada bloco usa imagem e ação sem tentar reproduzir o mosaico desktop comprimido.
+## 6. /studio — o que não entra na home
 
-## 6. /studio — serviços abaixo dos pilares
+Não entram abaixo dos três blocos aprovados:
 
-Depois dos três caminhos, apresentar uma área de serviço mais direta:
+- seção “Serviços do estúdio”;
+- Impressão sob demanda como card adicional;
+- Placas/Caixas como cards adicionais;
+- trabalhos recentes;
+- galeria adicional;
+- materiais/categorias.
 
-### Como podemos produzir para você
+Essas superfícies existem em suas rotas ou dentro do fluxo de orçamento.
 
-1. **Já tenho um arquivo 3D** — Impressão 3D sob demanda.
-2. **Placas personalizadas**
-3. **Caixas personalizadas**
-
-A primeira opção é fundamental porque não pressupõe modelagem nem projeto criado pelo Estúdio: o cliente pode chegar com um arquivo pronto e querer análise + fabricação.
-
-Cada entrada usa fotografia real ou, se a mídia ainda não existir, composição tipográfica simples.
-
-**Não usar ícones de impressora, cubo, régua, QR, paleta, material etc. para ornamentar essa área.**
-
-Também não transformar esse trecho em grade de mini-benefícios. Detalhes pertencem às páginas específicas de serviço.
 
 ## 6B. /studio/impressao-3d-sob-demanda
 

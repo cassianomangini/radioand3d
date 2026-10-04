@@ -37,10 +37,12 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 1. [Plano do produto](docs/PROJECT_PLAN.md): escopo, decisões e limites.
 2. [Plano de crescimento do Estúdio](docs/STUDIO_GROWTH_PLAN_V1.md): Impressões, Orçamento, Produtos, serviços prioritários e aquisição.
 3. [Handoff comercial do Estúdio](docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md): composição, mídia, formulário, Shopee, mobile e gate antes do frontend.
-4. [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md): crawling, indexação, canonical, sitemap, imagens, schema, Search Console e gate de lançamento.
-5. [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md): qualificação progressiva antes de contato manual.
-6. [Roadmap](docs/ROADMAP.md): estado real, dependências e próxima entrega.
-7. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
+4. [Wireframes comerciais](docs/design/STUDIO_COMMERCE_WIREFRAMES_V1.md): disposição funcional desktop/mobile de Hub, Placas, Orçamento e Produto.
+5. [Inventário de mídia](docs/design/STUDIO_MEDIA_INVENTORY_V1.md): assets existentes, referências conhecidas e fotos/diagramas ainda necessários.
+6. [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md): crawling, indexação, canonical, sitemap, imagens, schema, Search Console e gate de lançamento.
+7. [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md): qualificação progressiva antes de contato manual.
+8. [Roadmap](docs/ROADMAP.md): estado real, dependências e próxima entrega.
+9. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
 
 ## Mapa da documentação
 
@@ -51,6 +53,8 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 | [Catálogo 3D](docs/CATALOG_3D.md) | Peças, materiais, cores, disponibilidade, portfólio e separação entre prova, serviço e produto |
 | [Plano de crescimento do Estúdio](docs/STUDIO_GROWTH_PLAN_V1.md) | Três pilares, páginas comerciais prioritárias, aquisição e fases S1 |
 | [Handoff comercial do Estúdio](docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md) | Composição, inventário de mídia, orçamento, produtos/Shopee e bloqueio visual antes do frontend |
+| [Wireframes comerciais](docs/design/STUDIO_COMMERCE_WIREFRAMES_V1.md) | Ordem, peso e recursos das superfícies principais em desktop/mobile |
+| [Inventário de mídia](docs/design/STUDIO_MEDIA_INVENTORY_V1.md) | Assets existentes, referências, mídia faltante e bloqueios de fotografia/diagramas |
 | [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md) | Contrato técnico de SEO/Search baseado em documentação oficial |
 | [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md) | Wizard, anexos, triagem, analytics e continuidade por contato |
 | [Checklist 08](docs/work/08-studio-growth.md) | Execução do Estúdio sem interferir no motion spine da Rádio |

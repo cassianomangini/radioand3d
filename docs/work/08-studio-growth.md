@@ -3,7 +3,8 @@
 Estado: **in_progress_parallel**  
 Plano: [STUDIO_GROWTH_PLAN_V1.md](../STUDIO_GROWTH_PLAN_V1.md)  
 Search: [STUDIO_SEARCH_DISCOVERY_V1.md](../STUDIO_SEARCH_DISCOVERY_V1.md)  
-Orçamento: [STUDIO_QUOTE_FLOW_V1.md](../STUDIO_QUOTE_FLOW_V1.md)
+Orçamento: [STUDIO_QUOTE_FLOW_V1.md](../STUDIO_QUOTE_FLOW_V1.md)  
+Design: [STUDIO_COMMERCE_EXPERIENCE_V1.md](../design/STUDIO_COMMERCE_EXPERIENCE_V1.md)
 
 ## Objetivo
 
@@ -26,16 +27,48 @@ Este trabalho corre em paralelo à fila da Rádio e **não pode alterar o motion
 - Search como requisito transversal;
 - preview continua `noindex` até gate de lançamento.
 
-## Bloco S1.0 — Documentação
+## Bloco S1.0A — Documentação
 
 - [x] plano de crescimento;
 - [x] contrato de Search;
 - [x] fluxo de orçamento;
 - [x] checklist de execução;
-- [ ] alinhar PROJECT_PLAN;
-- [ ] alinhar CATALOG_3D;
-- [ ] alinhar ROADMAP;
-- [ ] alinhar README.
+- [x] alinhar PROJECT_PLAN;
+- [x] alinhar CATALOG_3D;
+- [x] alinhar ROADMAP;
+- [x] alinhar README;
+- [x] criar handoff de experiência do Estúdio.
+
+## Bloco S1.0B — Gate de experiência
+
+Estado atual: **ready_for_frontend: no**
+
+Antes de layout visível substancial:
+
+- [ ] wireframe do hub `/studio` desktop;
+- [ ] wireframe do hub `/studio` mobile;
+- [ ] wireframe da página Placas desktop/mobile;
+- [ ] wireframe do fluxo completo de Orçamento;
+- [ ] pelo menos uma etapa do Orçamento com direção visual final;
+- [ ] wireframe da página individual de Produto desktop/mobile;
+- [ ] inventário de mídia existente;
+- [ ] lista de mídia a fotografar;
+- [ ] lista de assets/diagramas a produzir;
+- [ ] classificar cada bloco como foto / asset / HTML / componente / não existe;
+- [ ] revisar composição mobile sem simplesmente empilhar desktop;
+- [ ] aprovar hierarquia do CTA Shopee;
+- [ ] aprovar conjunto mínimo de componentes;
+- [ ] revisão de Cassiano;
+- [ ] mudar `ready_for_frontend` para `yes` somente após aprovação.
+
+### Regra S1.0B
+
+Enquanto o gate estiver aberto:
+
+- pode avançar infraestrutura e Search que não cristalizem layout;
+- não criar CSS ornamental para substituir mídia ausente;
+- não criar componentes genéricos só para preencher tela;
+- não implementar filtros, configuradores, sticky CTAs ou cards adicionais sem necessidade aprovada.
 
 ## Bloco S1.1 — Fundação de rotas e Search
 
@@ -63,13 +96,18 @@ Este trabalho corre em paralelo à fila da Rádio e **não pode alterar o motion
 
 ## Bloco S1.2 — Hub do Estúdio
 
+Dependência visual: **S1.0B aprovado**.
+
 - [ ] substituir entrada Materiais por Orçamento;
 - [ ] renomear Loja Shopee para Produtos na hierarquia principal;
 - [ ] manter material/cores dentro do conteúdo de apoio;
-- [ ] três caminhos visualmente distintos;
+- [ ] Impressões com maior peso visual que Orçamento e Produtos;
+- [ ] não usar três cards idênticos;
 - [ ] prova visual real;
 - [ ] links para Impressões, Orçamento e Produtos;
-- [ ] links contextuais para Placas e Caixas sem transformar o topo em menu de keywords.
+- [ ] links contextuais para Placas e Caixas sem transformar o topo em menu de keywords;
+- [ ] não repetir hero gigante da Home;
+- [ ] usar fotografia/asset aprovado em vez de CSS decorativo quando mídia for a resposta correta.
 
 ### Aceite S1.2
 
@@ -112,12 +150,18 @@ Visitante frio entende em poucos segundos:
 
 ## Bloco S1.6 — Orçamento
 
+- [ ] experiência de conversa guiada;
+- [ ] começar pelo tipo de projeto, não por contato;
 - [ ] wizard progressivo;
 - [ ] perguntas por tipo;
+- [ ] opção “não sei”/“preciso de ajuda” quando aplicável;
+- [ ] contato somente no final;
+- [ ] upload nativo em mobile e drag-and-drop apenas como melhoria desktop;
+- [ ] resumo editável antes do envio;
 - [ ] anexos privados;
 - [ ] persistência;
 - [ ] estados de erro;
-- [ ] confirmação;
+- [ ] confirmação sem CTA forçado para WhatsApp;
 - [ ] triagem;
 - [ ] analytics sem PII;
 - [ ] mobile/teclado/acessibilidade.
@@ -125,10 +169,15 @@ Visitante frio entende em poucos segundos:
 ## Bloco S1.7 — Produtos
 
 - [ ] catálogo interno;
+- [ ] sem filtros/ordenação enquanto o volume não justificar;
+- [ ] preview principalmente fotográfico;
 - [ ] páginas individuais;
 - [ ] fotos/medidas/material/opções reais;
-- [ ] CTA Shopee no produto;
+- [ ] CTA explícito “Comprar na Shopee” no produto;
+- [ ] explicar que finalização/pagamento acontecem na Shopee;
+- [ ] não duplicar preço/estoque sem sincronização confiável;
 - [ ] indisponível/sob consulta sem mentira;
+- [ ] ponte “precisa de outra medida?” → orçamento;
 - [ ] metadata;
 - [ ] dados estruturados aplicáveis;
 - [ ] nenhum produto fake para preencher grade.

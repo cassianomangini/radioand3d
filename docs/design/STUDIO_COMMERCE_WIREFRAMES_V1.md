@@ -1,9 +1,9 @@
 # STUDIO_COMMERCE_WIREFRAMES_V1 — Wireframes funcionais
 
-Status: **proposta para revisão de Cassiano**  
+Status: **estrutura aprovada por Cassiano; mock visual final pendente**  
 depends_on: [STUDIO_COMMERCE_EXPERIENCE_V1.md](STUDIO_COMMERCE_EXPERIENCE_V1.md)  
 ready_for_frontend: **no**  
-approved_by: **pending**  
+approved_by: **Cassiano — 04/10/2026**  
 Versão: **V1 — 04/10/2026**
 
 Este documento fecha a disposição funcional das quatro superfícies que precisam estar resolvidas antes do frontend visual: hub `/studio`, Placas, Orçamento e Produto individual.
@@ -492,12 +492,12 @@ Este wireframe resolve **estrutura**, não aprovação visual final.
 
 Para avançar:
 
-- [ ] Cassiano aprova hierarquia do hub;
-- [ ] Cassiano aprova ordem da página de Placas;
-- [ ] Cassiano aprova fluxo do Orçamento;
-- [ ] Cassiano aprova hierarquia Produto → Shopee;
+- [x] Cassiano aprova hierarquia do hub;
+- [x] Cassiano aprova ordem da página de Placas;
+- [x] Cassiano aprova fluxo do Orçamento;
+- [x] Cassiano aprova hierarquia Produto → Shopee;
 - [ ] assets mínimos são selecionados;
-- [ ] então criar mock visual final das quatro superfícies.
+- [ ] criar e aprovar mock visual final das quatro superfícies.
 
 ready_for_frontend: **no**
 approved_by: **pending**

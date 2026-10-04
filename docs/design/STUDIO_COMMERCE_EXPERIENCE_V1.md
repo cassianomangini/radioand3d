@@ -1,8 +1,8 @@
 # STUDIO_COMMERCE_EXPERIENCE_V1 — Handoff de experiência do Estúdio
 
-Status: **design gate aberto**  
+Status: **estrutura aprovada; direção visual final em elaboração**  
 ready_for_frontend: **no**  
-approved_by: **pending**  
+approved_by: **estrutura: Cassiano — 04/10/2026; visual final: pending**  
 artifact_ref: **docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md**  
 Versão: **V1 — 04/10/2026**
 
@@ -765,4 +765,4 @@ Mudar para `ready_for_frontend: yes` somente quando:
 Até lá:
 
 ready_for_frontend: **no**  
-approved_by: **pending**
+approved_by: **estrutura aprovada por Cassiano em 04/10/2026; mock visual final pendente**

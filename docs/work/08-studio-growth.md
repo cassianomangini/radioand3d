@@ -22,9 +22,10 @@ Este trabalho corre em paralelo à fila da Rádio e **não pode alterar o motion
 ## Escopo congelado desta fase
 
 - três pilares: Impressões, Orçamento, Produtos;
-- prioridade comercial: Placas e Caixas;
+- serviço-base: Impressão 3D sob demanda para arquivo pronto;
+- especialidades prioritárias: Placas e Caixas;
 - Materiais & Cores como conteúdo de apoio;
-- páginas próprias para Placas e Caixas;
+- páginas próprias para Impressão 3D sob demanda, Placas e Caixas;
 - páginas de produto antes do link Shopee;
 - Search como requisito transversal;
 - preview continua `noindex` até gate de lançamento.
@@ -60,7 +61,10 @@ Antes de layout visível substancial:
 - [x] revisar composição mobile sem simplesmente empilhar desktop;
 - [x] aprovar hierarquia do CTA Shopee;
 - [x] aprovar conjunto mínimo de componentes;
-- [x] revisão estrutural de Cassiano;
+- [x] revisão estrutural inicial de Cassiano;
+- [x] feedback: rejeitar layout com iconografia decorativa/visual de IA;
+- [x] incluir serviço explícito de Impressão 3D sob demanda para arquivo pronto;
+- [ ] revisar wireframe atualizado do hub;
 - [ ] revisão do mock visual final por Cassiano;
 - [ ] mudar `ready_for_frontend` para `yes` somente após aprovação.
 
@@ -108,7 +112,7 @@ Dependência visual: **S1.0B aprovado**.
 - [ ] não usar três cards idênticos;
 - [ ] prova visual real;
 - [ ] links para Impressões, Orçamento e Produtos;
-- [ ] links contextuais para Placas e Caixas sem transformar o topo em menu de keywords;
+- [ ] links contextuais para Impressão 3D sob demanda, Placas e Caixas sem transformar o topo em menu de keywords;
 - [ ] não repetir hero gigante da Home;
 - [ ] usar fotografia/asset aprovado em vez de CSS decorativo quando mídia for a resposta correta.
 
@@ -131,6 +135,18 @@ Visitante frio entende em poucos segundos:
 - [ ] filtros somente se houver volume que justifique;
 - [ ] CTA contextual para orçamento;
 - [ ] respeitar IP e permissões.
+
+## Bloco S1.3B — Impressão 3D sob demanda
+
+- [ ] rota própria;
+- [ ] copy “Já tem o arquivo? Envie para análise”;
+- [ ] branch de orçamento `tipo=impressao`;
+- [ ] upload como ação principal;
+- [ ] quantidade/material/cor/escala com opção “não sei”;
+- [ ] explicar que produção depende de análise;
+- [ ] sem iconografia decorativa;
+- [ ] foto real de processo/peça quando disponível;
+- [ ] metadata/canonical/OG.
 
 ## Bloco S1.4 — Placas personalizadas
 

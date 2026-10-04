@@ -196,9 +196,11 @@ A composição parte da necessidade do visitante e do tipo correto de recurso:
 
 `/studio` é hub, não outro hero e não catálogo completo.
 
-Desktop: **Impressões** é a área dominante; **Orçamento** e **Produtos** têm peso menor e ação clara. Os três pilares não viram três cards idênticos.
+Desktop: a superfície dominante da esquerda combina **Estúdio de Impressão 3D + Impressões**. **Orçamento** e **Produtos** ficam empilhados à direita. São exatamente três entradas visuais.
 
-Mobile: ordem deliberada **Impressões → Orçamento → Produtos**, sem comprimir o mosaico desktop.
+Mobile: ordem **Estúdio+Impressões → Orçamento → Produtos**.
+
+A home termina depois desses três blocos. Serviços específicos continuam acessíveis por rotas e pelo orçamento, sem segunda grade na home.
 
 ### Direção do orçamento
 

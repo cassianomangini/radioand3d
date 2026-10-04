@@ -128,6 +128,24 @@ A arquitetura, o nível de ambição e os gates de qualidade da próxima camada 
 
 A geometria, o shell responsivo, os limites da Rádio, a ordem mobile e a estratégia de crescimento progressivo do 3D estão documentados em [STUDIO_RADIO_HANDOFF_V1.md](design/STUDIO_RADIO_HANDOFF_V1.md). A proposta de tipografia, paleta, superfícies e motion está em [CM_VISUAL_SYSTEM_V1.md](design/CM_VISUAL_SYSTEM_V1.md). Os estados, responsabilidades e limites dos componentes do primeiro recorte estão em [CM_COMPONENT_STATES_V1.md](design/CM_COMPONENT_STATES_V1.md). Os três artefatos permanecem sujeitos à aprovação visual de Cassiano.
 
+## Handoff comercial do Estúdio
+
+A expansão de `/studio`, Placas, Caixas, Orçamento e Produtos usa o artefato [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md).
+
+Esse handoff é deliberadamente anterior ao frontend visível e define:
+
+- peso diferente entre Impressões, Orçamento e Produtos;
+- composição desktop/mobile;
+- onde fotografia real é obrigatória;
+- onde diagrama/asset é mais adequado que CSS;
+- fluxo do orçamento;
+- hierarquia da Shopee;
+- componentes mínimos;
+- mídia necessária;
+- itens proibidos.
+
+Estado atual: `ready_for_frontend: no`. A implementação visual substancial só deve começar quando o handoff for aprovado por Cassiano. Trabalho técnico independente de Search/rotas pode avançar sem cristalizar composição visual.
+
 ## Artefato de aprovação da entrega 03
 
 O artefato final deve transformar a referência visual aprovada em especificação reproduzível, sem depender da interpretação de quem implementar.

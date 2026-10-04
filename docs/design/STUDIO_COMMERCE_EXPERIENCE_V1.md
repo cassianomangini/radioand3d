@@ -10,7 +10,9 @@ Este artefato define o que precisa existir na tela, o que não deve existir, qua
 
 Plano comercial: [../STUDIO_GROWTH_PLAN_V1.md](../STUDIO_GROWTH_PLAN_V1.md)  
 Search: [../STUDIO_SEARCH_DISCOVERY_V1.md](../STUDIO_SEARCH_DISCOVERY_V1.md)  
-Orçamento: [../STUDIO_QUOTE_FLOW_V1.md](../STUDIO_QUOTE_FLOW_V1.md)
+Orçamento: [../STUDIO_QUOTE_FLOW_V1.md](../STUDIO_QUOTE_FLOW_V1.md)  
+Wireframes: [STUDIO_COMMERCE_WIREFRAMES_V1.md](STUDIO_COMMERCE_WIREFRAMES_V1.md)  
+Mídia: [STUDIO_MEDIA_INVENTORY_V1.md](STUDIO_MEDIA_INVENTORY_V1.md)
 
 ## 1. Calibração de experiência
 
@@ -689,12 +691,14 @@ A Rádio continua sendo a superfície que “dança”.
 
 Antes de implementar superfícies visíveis, fechar nesta ordem:
 
-1. **Hub `/studio` desktop + mobile**
-2. **Página Placas desktop + mobile**
-3. **Fluxo completo de Orçamento em wireframe + pelo menos uma etapa visual final**
-4. **Página individual de Produto desktop + mobile**
-5. **Impressões**
-6. **Caixas**
+1. **Hub `/studio` desktop + mobile** — wireframe criado
+2. **Página Placas desktop + mobile** — wireframe criado
+3. **Fluxo completo de Orçamento em wireframe** — criado; etapa visual final ainda pendente
+4. **Página individual de Produto desktop + mobile** — wireframe criado
+5. **Impressões** — estrutura funcional definida; visual final posterior
+6. **Caixas** — estrutura funcional definida; visual final posterior
+
+Referência: [STUDIO_COMMERCE_WIREFRAMES_V1.md](STUDIO_COMMERCE_WIREFRAMES_V1.md).
 
 Essas quatro primeiras superfícies definem a gramática real do sistema; as seguintes reutilizam a linguagem já aprovada.
 

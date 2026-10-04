@@ -170,7 +170,7 @@ Visitante frio entende em poucos segundos:
 ## Bloco S1.6 — Orçamento
 
 - [ ] experiência de conversa guiada;
-- [ ] começar pelo tipo de projeto, não por contato;
+- [ ] começar pela intenção — arquivo pronto / placa / caixa / outro — e não por contato;
 - [ ] wizard progressivo;
 - [ ] perguntas por tipo;
 - [ ] opção “não sei”/“preciso de ajuda” quando aplicável;

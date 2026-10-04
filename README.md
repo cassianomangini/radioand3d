@@ -36,10 +36,11 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 
 1. [Plano do produto](docs/PROJECT_PLAN.md): escopo, decisões e limites.
 2. [Plano de crescimento do Estúdio](docs/STUDIO_GROWTH_PLAN_V1.md): Impressões, Orçamento, Produtos, serviços prioritários e aquisição.
-3. [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md): crawling, indexação, canonical, sitemap, imagens, schema, Search Console e gate de lançamento.
-4. [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md): qualificação progressiva antes de contato manual.
-5. [Roadmap](docs/ROADMAP.md): estado real, dependências e próxima entrega.
-6. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
+3. [Handoff comercial do Estúdio](docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md): composição, mídia, formulário, Shopee, mobile e gate antes do frontend.
+4. [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md): crawling, indexação, canonical, sitemap, imagens, schema, Search Console e gate de lançamento.
+5. [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md): qualificação progressiva antes de contato manual.
+6. [Roadmap](docs/ROADMAP.md): estado real, dependências e próxima entrega.
+7. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
 
 ## Mapa da documentação
 
@@ -49,6 +50,7 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 | [Experiência CM](docs/EXPERIENCE.md) | Identidade, movimento, responsividade e aprovação visual |
 | [Catálogo 3D](docs/CATALOG_3D.md) | Peças, materiais, cores, disponibilidade, portfólio e separação entre prova, serviço e produto |
 | [Plano de crescimento do Estúdio](docs/STUDIO_GROWTH_PLAN_V1.md) | Três pilares, páginas comerciais prioritárias, aquisição e fases S1 |
+| [Handoff comercial do Estúdio](docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md) | Composição, inventário de mídia, orçamento, produtos/Shopee e bloqueio visual antes do frontend |
 | [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md) | Contrato técnico de SEO/Search baseado em documentação oficial |
 | [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md) | Wizard, anexos, triagem, analytics e continuidade por contato |
 | [Checklist 08](docs/work/08-studio-growth.md) | Execução do Estúdio sem interferir no motion spine da Rádio |

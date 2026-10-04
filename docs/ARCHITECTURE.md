@@ -34,7 +34,7 @@ src/config/              configuração validada, sem segredos no cliente
 tests/                   testes de integração e navegação
 ```
 
-Rotas públicas prioritárias do Estúdio: `/`, `/studio`, `/studio/impressoes`, `/studio/placas-personalizadas`, `/studio/caixas-personalizadas`, `/studio/orcamento`, `/studio/produtos` e `/studio/produtos/[slug]`. Rotas adicionais entram somente com conteúdo e intenção próprios. A navegação pública deve preservar o estado da Rádio entre rotas do Estúdio. A gestão é uma área privada, não a exposição do Admin operacional.
+Rotas públicas prioritárias do Estúdio: `/`, `/studio`, `/studio/impressoes`, `/studio/impressao-3d-sob-demanda`, `/studio/placas-personalizadas`, `/studio/caixas-personalizadas`, `/studio/orcamento`, `/studio/produtos` e `/studio/produtos/[slug]`. Rotas adicionais entram somente com conteúdo e intenção próprios. A navegação pública deve preservar o estado da Rádio entre rotas do Estúdio. A gestão é uma área privada, não a exposição do Admin operacional.
 
 Server Components por padrão para leitura e composição. Interatividade e áudio em componentes cliente delimitados. O provider persistente não deve transformar toda a aplicação em código cliente nem ser recriado por mudança de rota ou modo do player. Layouts compartilhados preservam estado na navegação interna: [Next.js layouts](https://nextjs.org/docs/app/getting-started/layouts-and-pages). A fronteira deve manter código estático fora do bundle interativo: [Server e Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components).
 

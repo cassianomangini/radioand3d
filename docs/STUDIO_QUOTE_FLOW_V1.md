@@ -179,11 +179,10 @@ Mostrar somente o campo correspondente. Pedir outros dados apenas quando houver 
 Campos mínimos:
 
 - nome;
-- e-mail;
-- telefone/WhatsApp;
-- preferência de retorno.
+- escolha entre WhatsApp ou e-mail;
+- somente o número **ou** o e-mail correspondente à escolha.
 
-Evitar solicitar dados que não serão usados.
+Cidade, CEP, estado e outros dados entram apenas quando houver necessidade operacional real. Evitar solicitar dados que não serão usados.
 
 ## Revisão antes do envio
 

@@ -9,7 +9,7 @@ O orçamento existe para transformar interesse em uma solicitação analisável 
 
 - reduzir contato sem contexto;
 - não assustar cliente legítimo com formulário enorme;
-- fazer perguntas diferentes para placas, caixas e outros projetos;
+- distinguir rapidamente quem já tem um arquivo 3D pronto de quem precisa de placa, caixa ou outro projeto;
 - receber referência visual e arquivos;
 - preservar a origem da intenção;
 - permitir triagem antes do contato manual.
@@ -37,6 +37,7 @@ https://design-system.service.gov.uk/patterns/question-pages/
 
 CTAs podem entrar com contexto:
 
+- `/studio/orcamento?tipo=impressao`
 - `/studio/orcamento?tipo=placa`
 - `/studio/orcamento?tipo=caixa`
 - `/studio/orcamento?tipo=placa&referencia=mano-jotta`
@@ -44,22 +45,41 @@ CTAs podem entrar com contexto:
 
 Esses parâmetros auxiliam preenchimento e analytics. Não criam URLs canônicas separadas.
 
-## Etapa 1 — Tipo de projeto
+## Etapa 1 — Intenção
 
 Pergunta:
 
-**O que você quer criar?**
+**O que você precisa?**
 
 Opções iniciais:
 
-- Placa
-- Caixa
-- Luminária
-- Outra peça
+- **Imprimir um arquivo 3D que já tenho**
+- Criar uma placa personalizada
+- Criar uma caixa sob medida
+- Outro projeto
 
-A lista pode crescer apenas quando o Estúdio realmente oferecer outra categoria com frequência.
+“Imprimir um arquivo 3D” é um branch próprio. Essa pessoa não deve atravessar perguntas de criação/modelagem que não se aplicam.
 
-## Etapa 2 — Ponto de partida
+## Branch — impressão a partir de arquivo pronto
+
+Ordem recomendada:
+
+1. arquivo 3D;
+2. quantidade;
+3. escala/tamanho desejado, quando relevante;
+4. preferência de material/cor ou **“não sei, preciso de orientação”**;
+5. prazo desejado opcional;
+6. observação curta;
+7. contato;
+8. revisão e envio.
+
+Mensagem-chave:
+
+> Envie o arquivo para análise. A produção depende da viabilidade do modelo e das condições do pedido.
+
+Não prometer que todo arquivo enviado será aceito ou impresso.
+
+## Etapa 2 — Ponto de partida para projeto personalizado
 
 Pergunta:
 
@@ -77,6 +97,19 @@ Permitir múltipla escolha quando fizer sentido:
 Esta etapa é um dos principais sinais de complexidade do lead.
 
 ## Etapa 3 — Perguntas específicas
+
+### Impressão de arquivo pronto
+
+Perguntas candidatas:
+
+- Quantas unidades?
+- Existe um tamanho/escala obrigatório?
+- Tem preferência de material?
+- Tem preferência de cor?
+- Existe prazo desejado?
+- Há alguma exigência funcional importante da peça?
+
+Perguntas de modelagem, logo, QR, tampa ou encaixe só aparecem se realmente forem necessárias ao pedido.
 
 ### Placa
 

@@ -44,9 +44,11 @@ Contratos:
 - [Catálogo 3D](CATALOG_3D.md)
 - [Checklist 08](work/08-studio-growth.md)
 
-Sequência interna: **S1.0 documentação → S1.1 fundação Search/rotas → S1.2 hub → S1.3 Impressões → S1.4 Placas → S1.5 Caixas → S1.6 Orçamento → S1.7 Produtos → S1.8 gate de lançamento → S1.9 crescimento por dados**.
+Sequência interna: **S1.0A contrato/documentação → S1.0B gate de experiência → S1.1 fundação Search/rotas → S1.2 hub → S1.3 Impressões → S1.4 Placas → S1.5 Caixas → S1.6 Orçamento → S1.7 Produtos → S1.8 gate de lançamento → S1.9 crescimento por dados**.
 
 Essa sequência não altera a fila C1–C8 da Rádio. Se uma etapa do Estúdio exigir mudança no motion spine, física do divisor ou semântica do áudio, ela deixa de ser paralela e precisa ser coordenada.
+
+O frontend visual do Estúdio está bloqueado pelo handoff [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md), atualmente com `ready_for_frontend: no`. Infraestrutura/Search independente pode avançar sem cristalizar o layout.
 
 ## Sequência única
 

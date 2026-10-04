@@ -4,7 +4,9 @@ Estado: **in_progress_parallel**
 Plano: [STUDIO_GROWTH_PLAN_V1.md](../STUDIO_GROWTH_PLAN_V1.md)  
 Search: [STUDIO_SEARCH_DISCOVERY_V1.md](../STUDIO_SEARCH_DISCOVERY_V1.md)  
 Orçamento: [STUDIO_QUOTE_FLOW_V1.md](../STUDIO_QUOTE_FLOW_V1.md)  
-Design: [STUDIO_COMMERCE_EXPERIENCE_V1.md](../design/STUDIO_COMMERCE_EXPERIENCE_V1.md)
+Design: [STUDIO_COMMERCE_EXPERIENCE_V1.md](../design/STUDIO_COMMERCE_EXPERIENCE_V1.md)  
+Wireframes: [STUDIO_COMMERCE_WIREFRAMES_V1.md](../design/STUDIO_COMMERCE_WIREFRAMES_V1.md)  
+Mídia: [STUDIO_MEDIA_INVENTORY_V1.md](../design/STUDIO_MEDIA_INVENTORY_V1.md)
 
 ## Objetivo
 
@@ -45,17 +47,17 @@ Estado atual: **ready_for_frontend: no**
 
 Antes de layout visível substancial:
 
-- [ ] wireframe do hub `/studio` desktop;
-- [ ] wireframe do hub `/studio` mobile;
-- [ ] wireframe da página Placas desktop/mobile;
-- [ ] wireframe do fluxo completo de Orçamento;
+- [x] wireframe do hub `/studio` desktop;
+- [x] wireframe do hub `/studio` mobile;
+- [x] wireframe da página Placas desktop/mobile;
+- [x] wireframe do fluxo completo de Orçamento;
 - [ ] pelo menos uma etapa do Orçamento com direção visual final;
-- [ ] wireframe da página individual de Produto desktop/mobile;
-- [ ] inventário de mídia existente;
-- [ ] lista de mídia a fotografar;
-- [ ] lista de assets/diagramas a produzir;
-- [ ] classificar cada bloco como foto / asset / HTML / componente / não existe;
-- [ ] revisar composição mobile sem simplesmente empilhar desktop;
+- [x] wireframe da página individual de Produto desktop/mobile;
+- [x] inventário de mídia existente;
+- [x] lista de mídia a fotografar;
+- [x] lista de assets/diagramas a produzir;
+- [x] classificar cada bloco como foto / asset / HTML / componente / não existe;
+- [x] revisar composição mobile sem simplesmente empilhar desktop;
 - [ ] aprovar hierarquia do CTA Shopee;
 - [ ] aprovar conjunto mínimo de componentes;
 - [ ] revisão de Cassiano;

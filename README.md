@@ -35,8 +35,11 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 ## Comece aqui
 
 1. [Plano do produto](docs/PROJECT_PLAN.md): escopo, decisões e limites.
-2. [Roadmap](docs/ROADMAP.md): estado real, dependências e próxima entrega.
-3. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
+2. [Plano de crescimento do Estúdio](docs/STUDIO_GROWTH_PLAN_V1.md): Impressões, Orçamento, Produtos, serviços prioritários e aquisição.
+3. [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md): crawling, indexação, canonical, sitemap, imagens, schema, Search Console e gate de lançamento.
+4. [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md): qualificação progressiva antes de contato manual.
+5. [Roadmap](docs/ROADMAP.md): estado real, dependências e próxima entrega.
+6. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
 
 ## Mapa da documentação
 
@@ -44,7 +47,11 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 | --- | --- |
 | [Arquitetura](docs/ARCHITECTURE.md) | Stack, módulos, segurança, infraestrutura e estratégia de frontend |
 | [Experiência CM](docs/EXPERIENCE.md) | Identidade, movimento, responsividade e aprovação visual |
-| [Catálogo 3D](docs/CATALOG_3D.md) | Peças, materiais, cores, disponibilidade e portfólio |
+| [Catálogo 3D](docs/CATALOG_3D.md) | Peças, materiais, cores, disponibilidade, portfólio e separação entre prova, serviço e produto |
+| [Plano de crescimento do Estúdio](docs/STUDIO_GROWTH_PLAN_V1.md) | Três pilares, páginas comerciais prioritárias, aquisição e fases S1 |
+| [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md) | Contrato técnico de SEO/Search baseado em documentação oficial |
+| [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md) | Wizard, anexos, triagem, analytics e continuidade por contato |
+| [Checklist 08](docs/work/08-studio-growth.md) | Execução do Estúdio sem interferir no motion spine da Rádio |
 | [Biblioteca musical](docs/MUSIC_PIPELINE.md) | Importação, versões, publicação, permissões e acervo antigo |
 | [Rádio](docs/RADIO.md) | Reprodução, fila, mini/full player e visualizador |
 | [Auditoria do legado](docs/REUSE_AUDIT_ARTESOPOLIS_LANDING.md) | Evidências e limites do reaproveitamento |

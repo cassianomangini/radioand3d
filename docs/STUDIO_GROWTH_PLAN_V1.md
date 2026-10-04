@@ -30,13 +30,16 @@ Esta V1 substitui esse recorte por:
 
 **Materiais & Cores continuam importantes**, mas deixam de ser um pilar comercial de primeiro nível. Eles entram como conteúdo de apoio em trabalhos, páginas de serviço, produtos e orçamento.
 
-## Prioridade comercial
+## Serviço-base e especialidades prioritárias
 
-O Estúdio pode produzir placas, caixas, luminárias e outras peças, mas a prioridade inicial é:
+O Estúdio não atende apenas projetos desenhados por nós. Existe um serviço-base separado:
 
-1. **Placas personalizadas**
-2. **Caixas personalizadas**
-3. Luminárias e outras categorias somente quando houver prova e conteúdo real suficientes
+1. **Impressão 3D sob demanda** — a pessoa já tem um arquivo 3D; o Estúdio analisa se o modelo é imprimível e, dependendo da peça, material, tamanho, quantidade e demais condições, pode produzir.
+2. **Placas personalizadas** — especialidade comercial prioritária.
+3. **Caixas personalizadas** — especialidade comercial prioritária.
+4. Luminárias e outras categorias entram quando houver prova e conteúdo real suficientes.
+
+A mensagem pública precisa deixar clara a diferença entre **“já tenho o arquivo e quero imprimir”** e **“preciso de uma peça/projeto personalizado”**.
 
 A arquitetura deve permitir expansão sem criar páginas vazias ou genéricas.
 
@@ -46,6 +49,7 @@ A arquitetura deve permitir expansão sem criar páginas vazias ou genéricas.
 | --- | --- | --- |
 | `/studio` | Hub do Estúdio e distribuição para os três pilares | lançamento |
 | `/studio/impressoes` | Galeria/prova do que saiu das impressoras | lançamento |
+| `/studio/impressao-3d-sob-demanda` | Serviço para quem já possui arquivo 3D e quer análise/produção | lançamento |
 | `/studio/placas-personalizadas` | Landing comercial prioritária | lançamento |
 | `/studio/caixas-personalizadas` | Landing comercial prioritária | lançamento |
 | `/studio/orcamento` | Fluxo progressivo de qualificação | lançamento |
@@ -125,6 +129,23 @@ Evitar:
 Cada produto próprio deve ter página indexável com informação real suficiente para justificar sua existência.
 
 ## Serviços prioritários
+
+### Impressão 3D sob demanda
+
+É o serviço mais direto para quem **já possui o arquivo 3D**.
+
+A página deve comunicar sem rodeios:
+
+- “Já tem o arquivo? Envie para análise.”
+- o envio não garante produção automática;
+- o Estúdio verifica se o modelo é imprimível no processo disponível;
+- podem ser necessários ajustes de escala, orientação, material ou suporte;
+- quantidade, cor/material e prazo desejado entram como contexto de orçamento;
+- o cliente pode marcar “não sei” quando não dominar uma decisão técnica.
+
+O CTA deve abrir o orçamento no branch de **arquivo pronto**, evitando que a pessoa responda perguntas de placa/caixa que não têm relação com o pedido.
+
+Essa página não é modelagem 3D. Ela vende **capacidade de fabricação a partir de um arquivo existente**.
 
 ### Placas personalizadas
 
@@ -265,6 +286,7 @@ A hierarquia deve ser navegável por links HTML reais.
 Exemplos:
 
 `/studio`
+→ impressão 3D sob demanda  
 → placas personalizadas  
 → caixas personalizadas  
 → impressões  
@@ -325,7 +347,7 @@ Métricas de negócio do próprio site:
 ### S1.0A — Contrato comercial e de aquisição
 
 - [x] Fixar os três pilares: Impressões, Orçamento e Produtos.
-- [x] Fixar Placas e Caixas como prioridades.
+- [x] Fixar Impressão 3D sob demanda como serviço-base e Placas/Caixas como especialidades prioritárias.
 - [x] Tirar Materiais & Cores da posição de pilar de primeiro nível.
 - [ ] Fechar decisões abertas listadas neste documento.
 - [x] Criar o handoff de experiência [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md).
@@ -378,6 +400,15 @@ Enquanto esse artefato estiver com `ready_for_frontend: no`, trabalho técnico i
 - diferença visível entre impresso, conceito e produto;
 - CTA contextual para orçamento;
 - estrutura preparada para casos futuros.
+
+### S1.3B — Impressão 3D sob demanda
+
+- página própria para quem já tem arquivo 3D;
+- CTA “Enviar arquivo para análise”;
+- branch de orçamento específico;
+- sem exigir conhecimento técnico desnecessário;
+- explicar que produção depende de análise;
+- prova fotográfica de processo/peças reais quando disponível.
 
 ### S1.4 — Placas personalizadas
 
@@ -459,7 +490,7 @@ O Estúdio está cumprindo este plano quando:
 
 - uma pessoa que não conhece a CM consegue entender rapidamente o que fazemos;
 - vê prova real antes de precisar confiar em texto promocional;
-- encontra uma página específica para placas ou caixas;
+- entende que pode enviar um arquivo 3D pronto para análise, além de encontrar páginas específicas para placas ou caixas;
 - consegue explicar um projeto sem abrir WhatsApp;
 - um lead chega com contexto suficiente para análise;
 - um produto pode ser descoberto no nosso domínio antes da compra na Shopee;

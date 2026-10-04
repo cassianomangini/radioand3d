@@ -64,8 +64,9 @@ Antes de layout visível substancial:
 - [x] revisão estrutural inicial de Cassiano;
 - [x] feedback: rejeitar layout com iconografia decorativa/visual de IA;
 - [x] incluir serviço explícito de Impressão 3D sob demanda para arquivo pronto;
-- [ ] revisar wireframe atualizado do hub;
-- [ ] revisão do mock visual final por Cassiano;
+- [x] revisar wireframe atualizado do hub;
+- [x] aprovar mock visual final do hub `/studio` desktop/mobile;
+- [ ] revisão visual das próximas superfícies por Cassiano;
 - [ ] mudar `ready_for_frontend` para `yes` somente após aprovação.
 
 ### Regra S1.0B
@@ -108,12 +109,15 @@ Dependência visual: **S1.0B aprovado**.
 - [ ] substituir entrada Materiais por Orçamento;
 - [ ] renomear Loja Shopee para Produtos na hierarquia principal;
 - [ ] manter material/cores dentro do conteúdo de apoio;
-- [ ] Impressões com maior peso visual que Orçamento e Produtos;
-- [ ] não usar três cards idênticos;
+- [x] Estúdio + Impressões ocupam a superfície grande da esquerda;
+- [x] Orçamento e Produtos ficam empilhados à direita;
+- [x] exatamente três entradas visuais;
+- [x] não usar três cards idênticos;
 - [ ] prova visual real;
 - [ ] links para Impressões, Orçamento e Produtos;
-- [ ] links contextuais para Impressão 3D sob demanda, Placas e Caixas sem transformar o topo em menu de keywords;
-- [ ] não repetir hero gigante da Home;
+- [ ] links contextuais para Impressão 3D sob demanda, Placas e Caixas nas rotas apropriadas, não como cards extras na home;
+- [x] não criar segunda seção abaixo dos três blocos;
+- [x] não repetir hero gigante da Home;
 - [ ] usar fotografia/asset aprovado em vez de CSS decorativo quando mídia for a resposta correta.
 
 ### Aceite S1.2

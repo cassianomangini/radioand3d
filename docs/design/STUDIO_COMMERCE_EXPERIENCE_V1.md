@@ -1,8 +1,8 @@
 # STUDIO_COMMERCE_EXPERIENCE_V1 — Handoff de experiência do Estúdio
 
-Status: **estrutura aprovada; direção visual final em elaboração**  
+Status: **estrutura-base aprovada; direção visual reaberta após feedback sobre iconografia genérica e inclusão de Impressão 3D sob demanda**  
 ready_for_frontend: **no**  
-approved_by: **estrutura: Cassiano — 04/10/2026; visual final: pending**  
+approved_by: **estrutura-base: Cassiano — 04/10/2026; revisão atual: pending**  
 artifact_ref: **docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md**  
 Versão: **V1 — 04/10/2026**
 
@@ -748,6 +748,8 @@ Para cada superfície registrar:
 
 Frontend não cria placeholder sofisticado para esconder falta de mídia.
 
+Durante mock visual, quando a fotografia real ainda não existir, usar **placeholder neutro explicitamente marcado como FOTO REAL PENDENTE**. Não gerar caixa, produto, placa ou processo sintético com aparência de prova real apenas para completar a composição.
+
 ## 28. Gate de design
 
 Não iniciar implementação visual substancial enquanto faltarem:
@@ -800,4 +802,4 @@ Mudar para `ready_for_frontend: yes` somente quando:
 Até lá:
 
 ready_for_frontend: **no**  
-approved_by: **estrutura aprovada por Cassiano em 04/10/2026; mock visual final pendente**
+approved_by: **estrutura-base aprovada por Cassiano em 04/10/2026; revisão do hub/serviço sob demanda e mock visual final pendentes**

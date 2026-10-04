@@ -37,9 +37,16 @@ Fluxo:
 
 O link externo de compra entra no nível do produto. A página própria precisa ter valor mesmo quando o checkout acontece na Shopee.
 
-## Serviços personalizados
+## Serviços
 
-Placas e caixas são as prioridades iniciais.
+Existe uma separação importante:
+
+- **Impressão 3D sob demanda** — cliente já possui arquivo 3D e quer análise/fabricação;
+- **Projeto personalizado** — cliente precisa adaptar/criar uma solução, como placa, caixa ou outra peça.
+
+Placas e caixas são as especialidades personalizadas prioritárias.
+
+Impressão sob demanda não deve ficar escondida dentro de “outra peça”: é um serviço-base próprio.
 
 Serviço personalizado não é “produto com preço escondido”. A página de serviço explica possibilidades, prova real, limitações e informações necessárias; o próximo passo é [Orçamento](STUDIO_QUOTE_FLOW_V1.md).
 
@@ -69,11 +76,12 @@ Campos de preço e prazo só devem ser exibidos quando confirmados e com origem 
 
 O primeiro recorte comercial prioriza:
 
-1. uma ou mais provas fortes para **Placas personalizadas**;
-2. prova suficiente para **Caixas personalizadas**;
-3. galeria de Impressões honesta;
-4. fluxo de Orçamento;
-5. primeiros Produtos próprios com página individual.
+1. página clara de **Impressão 3D sob demanda** para arquivo pronto;
+2. uma ou mais provas fortes para **Placas personalizadas**;
+3. prova suficiente para **Caixas personalizadas**;
+4. galeria de Impressões honesta;
+5. fluxo de Orçamento;
+6. primeiros Produtos próprios com página individual.
 
 Cadastro completo, estoque em tempo real, cálculo automático de orçamento e configurador 3D não são pré-requisitos.
 

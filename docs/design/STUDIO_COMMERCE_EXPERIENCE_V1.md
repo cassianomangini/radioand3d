@@ -65,7 +65,10 @@ Se a resposta correta for fotografia ou asset, o frontend **não inventa** uma v
 - azul/ciano/roxo podem aparecer como acento, não como preenchimento constante;
 - borda, raio e sombra têm poucos níveis;
 - evitar “card dentro de card”;
-- ícone não substitui foto quando existe algo físico para mostrar.
+- ícone não substitui foto quando existe algo físico para mostrar;
+- **ícones decorativos de serviço/benefício não entram no conteúdo editorial**;
+- ícones ficam restritos principalmente a controles funcionais inequívocos (voltar, fechar, upload, navegação etc.);
+- listas de características de Placas, Caixas e Impressão sob demanda usam tipografia, fotografia e diagramas reais — não fileiras de pictogramas genéricos.
 
 ### Rádio x Estúdio
 
@@ -149,27 +152,46 @@ A ordem é linear e intencional:
 
 Cada bloco usa imagem e ação sem tentar reproduzir o mosaico desktop comprimido.
 
-## 6. /studio — serviços prioritários abaixo dos pilares
+## 6. /studio — serviços abaixo dos pilares
 
-Depois dos três caminhos, apresentar:
+Depois dos três caminhos, apresentar uma área de serviço mais direta:
 
-### O que mais fazemos sob medida
+### Como podemos produzir para você
 
-- **Placas personalizadas**
-- **Caixas personalizadas**
+1. **Já tenho um arquivo 3D** — Impressão 3D sob demanda.
+2. **Placas personalizadas**
+3. **Caixas personalizadas**
 
-Cada entrada deve usar **uma fotografia real forte** e copy curta.
+A primeira opção é fundamental porque não pressupõe modelagem nem projeto criado pelo Estúdio: o cliente pode chegar com um arquivo pronto e querer análise + fabricação.
 
-Não transformar esse trecho em grade de mini-benefícios como:
+Cada entrada usa fotografia real ou, se a mídia ainda não existir, composição tipográfica simples.
 
-- QR Code;
-- Logo;
-- Pix;
-- Multicolor;
-- PLA;
-- Personalizado.
+**Não usar ícones de impressora, cubo, régua, QR, paleta, material etc. para ornamentar essa área.**
 
-Essas possibilidades pertencem às páginas específicas de serviço.
+Também não transformar esse trecho em grade de mini-benefícios. Detalhes pertencem às páginas específicas de serviço.
+
+## 6B. /studio/impressao-3d-sob-demanda
+
+Essa página atende a pergunta:
+
+> “Eu já tenho o arquivo. Vocês conseguem imprimir?”
+
+Primeira dobra:
+
+- título **Impressão 3D sob demanda**;
+- frase curta: **“Já tem o arquivo 3D? Envie para análise.”**;
+- fotografia real de processo ou peça impressa;
+- CTA **Enviar arquivo para análise**.
+
+Depois, explicar em texto simples:
+
+- o Estúdio analisa o arquivo;
+- a produção depende de compatibilidade com o processo, tamanho, material, quantidade e demais condições;
+- a pessoa pode informar preferência de material/cor ou marcar que não sabe;
+- pode existir necessidade de ajuste de escala/orientação/suporte;
+- envio para análise não significa aceite automático da produção.
+
+Não transformar a página em tabela técnica extensa nem em feature grid com ícones.
 
 ## 7. /studio/impressoes
 
@@ -319,30 +341,42 @@ https://design-system.service.gov.uk/patterns/question-pages/
 
 ## 11. Orçamento — fluxo visual
 
-### Passo 1 — O que você quer fazer?
+### Passo 1 — O que você precisa?
 
 Opções:
 
-- Placa;
-- Caixa;
-- Luminária;
-- Outra peça.
+- **Imprimir um arquivo 3D que já tenho**;
+- Criar uma placa personalizada;
+- Criar uma caixa sob medida;
+- Outro projeto.
+
+Se a pessoa escolhe arquivo pronto, o fluxo pula perguntas de criação e vai direto para upload + informações de produção.
 
 Quando houver foto real útil, ela pode apoiar a escolha.
 
 Se não houver asset adequado, preferir escolha textual limpa a um ícone 3D genérico.
 
-### Passo 2 — De onde estamos começando?
+### Branch — arquivo 3D pronto
+
+Perguntar apenas o necessário:
+
+- arquivo;
+- quantidade;
+- tamanho/escala, se houver exigência;
+- preferência de material/cor ou “não sei”;
+- prazo desejado opcional;
+- contato.
+
+### Passo 2 — De onde estamos começando? — somente para projetos personalizados
 
 Opções:
 
-- já tenho arquivo 3D;
 - tenho logo, desenho ou arte;
 - tenho foto ou referência;
 - tenho as medidas;
 - tenho apenas a ideia.
 
-A interface deve deixar claro que não possuir STL não impede o contato.
+A interface deve deixar claro que não possuir arquivo 3D não impede o contato.
 
 ### Passo 3 em diante — branching
 
@@ -682,7 +716,7 @@ A Rádio continua sendo a superfície que “dança”.
 | avaliações/depoimentos inventados | sem prova |
 | contador de peças produzidas | sem necessidade |
 | animação em todo bloco | ruído |
-| ícone para toda informação | aparência de template |
+| ícone para toda informação | aparência de template/IA; conteúdo editorial deve usar texto, foto ou diagrama real |
 | cards de materiais no hub | material deixou de ser pilar |
 | mapa/endereço | depende do modelo local |
 | IA no orçamento | primeiro entender fluxo real |
@@ -694,9 +728,9 @@ Antes de implementar superfícies visíveis, fechar nesta ordem:
 1. **Hub `/studio` desktop + mobile** — wireframe criado
 2. **Página Placas desktop + mobile** — wireframe criado
 3. **Fluxo completo de Orçamento em wireframe** — criado; etapa visual final ainda pendente
-4. **Página individual de Produto desktop + mobile** — wireframe criado
-5. **Impressões** — estrutura funcional definida; visual final posterior
-6. **Caixas** — estrutura funcional definida; visual final posterior
+5. **Página individual de Produto desktop + mobile** — wireframe criado
+6. **Impressões** — estrutura funcional definida; visual final posterior
+7. **Caixas** — estrutura funcional definida; visual final posterior
 
 Referência: [STUDIO_COMMERCE_WIREFRAMES_V1.md](STUDIO_COMMERCE_WIREFRAMES_V1.md).
 
@@ -736,6 +770,7 @@ Reprovar antes do frontend se houver:
 
 - três cards iguais para os três pilares;
 - ícone antes de todo título;
+- fileira de ícones para explicar benefícios, materiais ou serviços;
 - gradiente usado como substituto de mídia;
 - fundo neon no Estúdio;
 - card dentro de card;

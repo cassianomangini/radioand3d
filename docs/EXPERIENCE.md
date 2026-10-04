@@ -55,7 +55,7 @@ Cassiano pediu também que, no desktop, arrastar a divisória para a esquerda al
 - Não criar produtos, materiais, números, depoimentos ou categorias falsas para completar composição.
 - Se ainda não houver conteúdo suficiente, mostrar menos seções com mais qualidade.
 - Produtos, materiais, fotos e projetos reais entram progressivamente sem exigir redesenho da base.
-- Em 03/10/2026, o recorte inicial de `/studio` foi reduzido a três entradas visuais: **Impressões**, **Materiais** e **Loja Shopee**. O card **Loja Shopee** não abre a Shopee diretamente: ele leva à área interna `/studio/produtos`, onde ficam somente os produtos realmente vendidos, com informações detalhadas e link de compra no nível do item. **Impressões** permanece galeria e pode mostrar fotos de peças não comerciais; itens com propriedade intelectual de terceiros não recebem CTA de venda. Não criar cards adicionais até existir conteúdo real que justifique outra seção.
+- Em 04/10/2026, o recorte comercial de `/studio` passou a três pilares: **Impressões**, **Peça um orçamento** e **Produtos**. **Materiais & Cores** deixa de ser entrada de primeiro nível e passa a apoiar projetos, serviços, produtos e orçamento. **Impressões** continua sendo prova/galeria e diferencia peça produzida de conceito. **Orçamento** qualifica o projeto antes de qualquer contato manual ou WhatsApp. **Produtos** leva primeiro ao catálogo interno e às páginas próprias; o link Shopee entra no nível do item. Placas e caixas são as prioridades iniciais. O contrato completo está em [STUDIO_GROWTH_PLAN_V1.md](STUDIO_GROWTH_PLAN_V1.md).
 
 ## Hipótese visual para apresentar
 

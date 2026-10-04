@@ -30,6 +30,7 @@ Arquitetura inicial:
 
 - `/studio`
 - `/studio/impressoes`
+- `/studio/impressao-3d-sob-demanda`
 - `/studio/placas-personalizadas`
 - `/studio/caixas-personalizadas`
 - `/studio/orcamento`
@@ -72,6 +73,7 @@ Exemplo de hierarquia:
 
 `/studio`
 → `/studio/impressoes`  
+→ `/studio/impressao-3d-sob-demanda`  
 → `/studio/placas-personalizadas`  
 → `/studio/caixas-personalizadas`  
 → `/studio/orcamento`  
@@ -154,6 +156,7 @@ Cada página precisa responder a uma necessidade real com conteúdo demonstráve
 Para serviços:
 
 - problema que resolvemos;
+- no caso de **Impressão 3D sob demanda**, deixar explícito que a intenção atendida é “já tenho um arquivo e quero fabricar”;
 - exemplos reais;
 - opções e limitações;
 - processo;

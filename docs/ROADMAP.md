@@ -23,7 +23,7 @@ A fila abaixo é de **aceite perceptivo**, não apenas de implementação. Códi
 | 3 | **C1.3 Motion QA**, 03b/09 | blocked | Abrir, voltar, interromper nos dois sentidos, drag lento/rápido, fullscreen por navegação e gesto, seek/troca de faixa durante motion, áudio contínuo e reduced motion passam sem estado fantasma. Só então C1 fecha. |
 | 4 | **C2 Freeze do contrato de áudio**, 06 | blocked | Sidecar v3 é validado em faixas vocal, instrumental/harmônica, calma, densa/percussiva, além de seek, silêncio e fallback. Passou: o significado dos dados congela. |
 | 5 | **C3 Visualizer final**, 06 | blocked | Expressão visual usa o contrato congelado: voz/bateria/baixo/campo harmônico, attack/release, profundidade e mini player. Problema visual não reabre a semântica do pipeline. |
-| P | **S1 Estúdio real**, 08 | in_progress_parallel | `/studio` evolui em paralelo para Impressões, Materiais & Cores e Produtos/Shopee, preservando Rádio persistente. Impressões é galeria; Produtos é a área comercial detalhada antes do link de compra. Não bloquear C1 nem alterar seu motion spine. |
+| P | **S1 Estúdio: aquisição + Search**, 08 | in_progress_parallel | `/studio` evolui para **Impressões, Orçamento e Produtos**, com Placas e Caixas como landings prioritárias. Search/SEO entra desde a arquitetura: rotas, metadata, canonical, sitemap, imagens, performance e Search Console. Preservar Rádio persistente e não alterar C1. [checklist](work/08-studio-growth.md) |
 | 6 | **C4 Interface viva da Rádio**, 03b/07 | blocked | Seleção → Now Playing, troca de faixa, metadata, controles, buffering/error, teclado/touch e respostas táteis parecem partes do mesmo software vivo. |
 | 7 | **C5 Física de manipulação direta**, 03b/07 | blocked | C5 não recria fullscreen. Fica restrito à física do divisor: drag, magnetismo, snap, flick, thresholds, resistência/retorno e recomposição contínua enquanto a mão move o painel. |
 | 8 | **C6 Assinatura mobile**, 03b/07 | blocked | Mini player → Rádio completa → mini parece transformação do mesmo produto, preservando touch, scroll, rotação e estado. |
@@ -33,6 +33,20 @@ A fila abaixo é de **aceite perceptivo**, não apenas de implementação. Códi
 ### Regra de prioridade
 
 O caminho crítico perceptivo é **C1.1 → C1.2 → C1.3 → C2 → C3 → C4 → C5 → C6 → C7 → C8**. O Estúdio segue em paralelo apenas quando o trabalho não interfere nesse caminho. Três mudanças grandes seguidas sem ganho visível para Cassiano são sinal de desvio: parar e revisar antes de continuar.
+
+## Frente paralela S1 — Estúdio
+
+Plano canônico: [STUDIO_GROWTH_PLAN_V1.md](STUDIO_GROWTH_PLAN_V1.md)
+
+Contratos:
+- [Search Discovery](STUDIO_SEARCH_DISCOVERY_V1.md)
+- [Fluxo de Orçamento](STUDIO_QUOTE_FLOW_V1.md)
+- [Catálogo 3D](CATALOG_3D.md)
+- [Checklist 08](work/08-studio-growth.md)
+
+Sequência interna: **S1.0 documentação → S1.1 fundação Search/rotas → S1.2 hub → S1.3 Impressões → S1.4 Placas → S1.5 Caixas → S1.6 Orçamento → S1.7 Produtos → S1.8 gate de lançamento → S1.9 crescimento por dados**.
+
+Essa sequência não altera a fila C1–C8 da Rádio. Se uma etapa do Estúdio exigir mudança no motion spine, física do divisor ou semântica do áudio, ela deixa de ser paralela e precisa ser coordenada.
 
 ## Sequência única
 
@@ -48,7 +62,7 @@ O caminho crítico perceptivo é **C1.1 → C1.2 → C1.3 → C2 → C3 → C4 �
 | 06 | Motor de rádio e análise isolados | CM Audio | 02 + contrato de leitura da biblioteca | in_progress | Motor/fila e consumer do visualizador ligados ao catálogo; sidecar por regiões, dynamics/fallback/diagnóstico implementados; sync real e revisão perceptiva de Cassiano pendentes; [checklist](work/06-radio-engine.md) |
 | 06b | Sincronizar letras da Rádio | CM Audio | 06 + letras canônicas | in_progress | Pipeline offline áudio + letra → timestamps e painel ligado à posição do player; primeira faixa real e revisão perceptiva pendentes; [checklist](work/06b-synced-lyrics.md) |
 | 07 | Rádio CM pronta na interface | CM Frontend | 03b + 04 + 06 | blocked | Desktop com rádio acoplada/redimensionável e expansível; mobile com mini player sob o header e full player sob demanda; seleção, controles, visualizador e sincronização revisados |
-| 08 | Entrada do Estúdio de Impressão 3D | CM Frontend | 03b | blocked | Hero e navegação pública do estúdio, preparados para crescimento progressivo; nenhuma seção fictícia exigida e conteúdo real adicionado apenas quando disponível |
+| 08 | Estúdio público: aquisição, orçamento e produtos | CM Frontend | 03b | in_progress_parallel | Hub com Impressões/Orçamento/Produtos; Placas e Caixas; catálogo próprio antes da Shopee; fundação de Search; fluxo de orçamento qualificado; conteúdo real e Rádio persistente. [checklist](work/08-studio-growth.md) |
 | 09 | Validar marco Estúdio + Rádio | CM Review | 05 + 07 + 08 + acesso aos ambientes | blocked | Experiência integrada em desktop/mobile, continuidade de áudio, resize/expand, mídia real disponível, privacidade e aprovação visual final |
 
 A entrega 06 não precisa esperar a interface do Inbox: usa o mesmo contrato e fixtures apenas no ambiente de teste. A 03b pode usar estados controlados, sem substituir o motor ou a biblioteca finais. O marco 09 exige a importação real da 05. Não publicar protótipos como produto concluído.

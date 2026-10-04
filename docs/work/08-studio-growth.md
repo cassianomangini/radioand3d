@@ -58,9 +58,10 @@ Antes de layout visível substancial:
 - [x] lista de assets/diagramas a produzir;
 - [x] classificar cada bloco como foto / asset / HTML / componente / não existe;
 - [x] revisar composição mobile sem simplesmente empilhar desktop;
-- [ ] aprovar hierarquia do CTA Shopee;
-- [ ] aprovar conjunto mínimo de componentes;
-- [ ] revisão de Cassiano;
+- [x] aprovar hierarquia do CTA Shopee;
+- [x] aprovar conjunto mínimo de componentes;
+- [x] revisão estrutural de Cassiano;
+- [ ] revisão do mock visual final por Cassiano;
 - [ ] mudar `ready_for_frontend` para `yes` somente após aprovação.
 
 ### Regra S1.0B

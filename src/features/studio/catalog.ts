@@ -23,6 +23,11 @@ export type StudioPrintEntry = {
   intellectualPropertyNote?: string;
 };
 
+export type StudioProductAvailability =
+  | "disponivel"
+  | "sob-consulta"
+  | "indisponivel";
+
 export type StudioProduct = {
   slug: string;
   title: string;
@@ -32,6 +37,9 @@ export type StudioProduct = {
   materials: string[];
   dimensions?: string;
   options: string[];
+  availability: StudioProductAvailability;
+  source: string;
+  lastVerifiedAt: string;
   shopeeUrl?: string;
 };
 

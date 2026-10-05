@@ -560,13 +560,22 @@ try {
   }
   await screenshot(client, "mobile-studio-quote-390x844.png");
 
-  const readyFileBranchOpened = await evaluate(
+  const readyFileBranchSelected = await evaluate(
     client,
     `(() => {
       const button = Array.from(document.querySelectorAll("button"))
         .find((item) => item.textContent?.includes("Imprimir um arquivo 3D que já tenho"));
       if (!(button instanceof HTMLButtonElement)) return false;
       button.click();
+      return true;
+    })()`
+  );
+  if (!readyFileBranchSelected) throw new Error("Quote ready-file branch could not be selected.");
+  await delay(120);
+
+  const readyFileBranchOpened = await evaluate(
+    client,
+    `(() => {
       const continueButton = Array.from(document.querySelectorAll("button"))
         .find((item) => item.textContent?.includes("Continuar"));
       if (!(continueButton instanceof HTMLButtonElement)) return false;
@@ -650,31 +659,34 @@ try {
   if (!preferenceFieldVisible) throw new Error("Material preference input did not render.");
   await screenshot(client, "mobile-studio-quote-material-preference-390x844.png");
 
-  const quoteReviewReached = await evaluate(
+  const quotePreferenceFilled = await evaluate(
     client,
     `(() => {
-      const setInput = (selector, value) => {
-        const input = document.querySelector(selector);
-        if (!(input instanceof HTMLInputElement)) return false;
-        const setter = Object.getOwnPropertyDescriptor(
-          HTMLInputElement.prototype,
-          "value"
-        )?.set;
-        setter?.call(input, value);
-        input.dispatchEvent(new Event("input", { bubbles: true }));
-        return true;
-      };
-      if (!setInput("#material-preference", "PLA fosco")) return false;
-
-      let continueButton = Array.from(document.querySelectorAll("button"))
-        .find((item) => item.textContent?.includes("Continuar"));
-      if (!(continueButton instanceof HTMLButtonElement)) return false;
-      continueButton.click();
-
+      const input = document.querySelector("#material-preference");
+      if (!(input instanceof HTMLInputElement)) return false;
+      const setter = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value"
+      )?.set;
+      setter?.call(input, "PLA fosco");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
       return true;
     })()`
   );
-  if (!quoteReviewReached) throw new Error("Quote material preference could not be filled.");
+  if (!quotePreferenceFilled) throw new Error("Quote material preference could not be filled.");
+  await delay(120);
+
+  const quoteProductionCompleted = await evaluate(
+    client,
+    `(() => {
+      const continueButton = Array.from(document.querySelectorAll("button"))
+        .find((item) => item.textContent?.includes("Continuar"));
+      if (!(continueButton instanceof HTMLButtonElement)) return false;
+      continueButton.click();
+      return true;
+    })()`
+  );
+  if (!quoteProductionCompleted) throw new Error("Quote production step could not be completed.");
   await delay(180);
 
   const quoteContactFilled = await evaluate(
@@ -691,9 +703,16 @@ try {
         input.dispatchEvent(new Event("input", { bubbles: true }));
         return true;
       };
-      if (!setInput("#name", "Teste visual")) return false;
-      if (!setInput("#contact", "11999999999")) return false;
+      return setInput("#name", "Teste visual") &&
+        setInput("#contact", "11999999999");
+    })()`
+  );
+  if (!quoteContactFilled) throw new Error("Quote contact fields could not be completed.");
+  await delay(120);
 
+  const quoteContactSubmitted = await evaluate(
+    client,
+    `(() => {
       const continueButton = Array.from(document.querySelectorAll("button"))
         .find((item) => item.textContent?.includes("Continuar"));
       if (!(continueButton instanceof HTMLButtonElement)) return false;
@@ -701,7 +720,7 @@ try {
       return true;
     })()`
   );
-  if (!quoteContactFilled) throw new Error("Quote contact step could not be completed.");
+  if (!quoteContactSubmitted) throw new Error("Quote contact step could not be completed.");
   await delay(220);
 
   const quoteReviewState = await evaluate(

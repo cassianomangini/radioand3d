@@ -184,12 +184,15 @@ Visitante frio entende em poucos segundos:
 - [x] seleção mantém os objetos `File` reais no estado local, não apenas nomes;
 - [x] política V1 de arquivo: STL/3MF/OBJ/STEP/STP/PDF/PNG/JPG/JPEG/WebP; até 5 arquivos, 50 MB por arquivo e 100 MB no total;
 - [x] validação local de extensão/tamanho/quantidade com erro acessível;
+- [x] contrato serializável `schemaVersion: 1` para a solicitação, sem dependência de provider;
+- [x] validação estrutural do payload reutilizável no runtime server;
+- [x] classificação inicial determinística: pronto para revisão / faltam informações / incompleto, sem recusa automática;
 - [ ] anexos privados no backend remoto;
-- [ ] validação server-side por conteúdo antes da persistência;
+- [ ] inspeção server-side do conteúdo real do arquivo antes da persistência;
 - [ ] persistência;
 - [x] estados de erro e validação local;
 - [ ] confirmação sem CTA forçado para WhatsApp;
-- [ ] triagem;
+- [ ] execução/persistência da triagem no backend remoto;
 - [x] eventos do funil instrumentados por contrato local sem PII; adaptador para provedor real fica no gate de lançamento;
 - [x] labels, foco por etapa, teclado e composição mobile validados estruturalmente no CI; auditoria final de lançamento continua em S1.8.
 
@@ -386,3 +389,15 @@ Decisão desta fase:
 - nenhuma mídia é enviada ou persistida nesta etapa;
 - a mesma política deverá rodar no servidor, somada à inspeção do conteúdo;
 - storage privado, retenção e persistência continuam bloqueados até a escolha explícita do projeto/backend remoto.
+
+
+## Orçamento — contrato de solicitação backend-neutral — 05/10/2026
+
+- payload público interno versionado com `schemaVersion: 1`;
+- tipos de projeto, contato, produção, origem e metadados de anexo têm contrato único;
+- o wizard reutiliza os mesmos tipos canônicos, evitando divergência entre UI e futuro adapter server-side;
+- validação estrutural cobre coerência do tipo de projeto, arquivos, quantidade, detalhes mínimos e contato;
+- classificação inicial separa `ready-for-review`, `needs-information` e `incomplete`;
+- nenhuma regra automática marca projeto como “não atendido”; casos fora de escopo continuam decisão humana;
+- nenhum arquivo, contato ou solicitação é enviado nesta etapa;
+- inspeção binária, storage privado, retenção, persistência, confirmação e fila operacional continuam bloqueados por E2.

@@ -1,6 +1,7 @@
 import {
   MediaPlaceholder,
   PrimaryLink,
+  StudioMaterialGuidance,
   StudioPageShell,
   StudioSection,
   TextList
@@ -54,6 +55,7 @@ export default function OnDemandPrintingPage() {
           Começar análise
         </PrimaryLink>
       </StudioSection>
+      <StudioMaterialGuidance />
     </StudioPageShell>
   );
 }

@@ -8,6 +8,12 @@ import {
   type ChangeEvent,
   type DragEvent
 } from "react";
+import {
+  formatQuoteFileSize,
+  QUOTE_FILE_ACCEPT,
+  quoteFilePolicyLabel,
+  validateQuoteFiles
+} from "@/features/studio/quote-contract";
 import { trackPublicEvent } from "@/lib/public-analytics";
 import styles from "./quote-wizard.module.css";
 
@@ -39,9 +45,22 @@ function toggleValue(list: string[], value: string) {
     : [...list, value];
 }
 
-function fileNames(fileList: FileList | null) {
-  if (!fileList) return [];
-  return Array.from(new Set(Array.from(fileList).map((file) => file.name)));
+function fileIdentity(file: File) {
+  return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+function mergeUniqueFiles(current: readonly File[], incoming: readonly File[]) {
+  const files = [...current];
+  const identities = new Set(files.map(fileIdentity));
+
+  for (const file of incoming) {
+    const identity = fileIdentity(file);
+    if (identities.has(identity)) continue;
+    identities.add(identity);
+    files.push(file);
+  }
+
+  return files;
 }
 
 function FilePicker({
@@ -51,24 +70,36 @@ function FilePicker({
   onNoFileChange,
   required
 }: {
-  files: string[];
+  files: File[];
   noFile: boolean;
-  onFilesChange: (files: string[]) => void;
+  onFilesChange: (files: File[]) => void;
   onNoFileChange: (value: boolean) => void;
   required?: boolean;
 }) {
-  function addFiles(nextFiles: string[]) {
-    onFilesChange(Array.from(new Set([...files, ...nextFiles])));
+  const [fileError, setFileError] = useState("");
+
+  function addFiles(nextFiles: File[]) {
+    const merged = mergeUniqueFiles(files, nextFiles);
+    const validation = validateQuoteFiles(merged);
+
+    if (!validation.ok) {
+      setFileError(validation.message);
+      return;
+    }
+
+    setFileError("");
+    onFilesChange(merged);
     if (nextFiles.length) onNoFileChange(false);
   }
 
   function handleInput(event: ChangeEvent<HTMLInputElement>) {
-    addFiles(fileNames(event.target.files));
+    addFiles(Array.from(event.target.files ?? []));
+    event.target.value = "";
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
-    addFiles(fileNames(event.dataTransfer.files));
+    addFiles(Array.from(event.dataTransfer.files));
   }
 
   return (
@@ -85,23 +116,35 @@ function FilePicker({
           id="quote-files"
           type="file"
           multiple
+          accept={QUOTE_FILE_ACCEPT}
           onChange={handleInput}
           aria-describedby="quote-files-help"
         />
         <small id="quote-files-help">
-          No celular, use o seletor nativo. No desktop, você também pode arrastar arquivos.
-          Nesta prévia, nada é enviado para o servidor.
+          {quoteFilePolicyLabel()}. No celular, use o seletor nativo; no desktop, você
+          também pode arrastar. A seleção permanece local até o envio seguro ser habilitado.
         </small>
       </div>
+
+      {fileError ? (
+        <p className={styles.error} role="alert">{fileError}</p>
+      ) : null}
 
       {files.length ? (
         <ul className={styles.fileList} aria-label="Arquivos selecionados">
           {files.map((file) => (
-            <li key={file}>
-              <span>{file}</span>
+            <li key={fileIdentity(file)}>
+              <span>
+                <strong>{file.name}</strong>
+                <small>{formatQuoteFileSize(file.size)}</small>
+              </span>
               <button
                 type="button"
-                onClick={() => onFilesChange(files.filter((item) => item !== file))}
+                onClick={() =>
+                  onFilesChange(
+                    files.filter((item) => fileIdentity(item) !== fileIdentity(file))
+                  )
+                }
               >
                 Remover
               </button>
@@ -139,7 +182,7 @@ export function QuoteWizard({
   const [step, setStep] = useState(initialType ? 2 : 1);
   const [type, setType] = useState<ProjectType | null>(initialType ?? null);
   const [startingPoints, setStartingPoints] = useState<string[]>([]);
-  const [files, setFiles] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
   const [noFile, setNoFile] = useState(false);
 
   const [details, setDetails] = useState("");
@@ -207,7 +250,7 @@ export function QuoteWizard({
 
     if (type === "impressao") {
       if (step === 2 && files.length === 0) {
-        return "Selecione pelo menos um arquivo para a análise local desta prévia.";
+        return "Selecione pelo menos um arquivo para análise.";
       }
       if (step === 3 && !quantity.trim()) {
         return "Informe a quantidade ou escreva uma estimativa.";
@@ -716,7 +759,7 @@ export function QuoteWizard({
               <>
                 <div>
                   <dt>Arquivo</dt>
-                  <dd>{files.length ? files.join(", ") : "Nenhum arquivo selecionado"}</dd>
+                  <dd>{files.length ? files.map((file) => file.name).join(", ") : "Nenhum arquivo selecionado"}</dd>
                   <button type="button" onClick={() => edit(2)}>Editar</button>
                 </div>
                 <div>
@@ -736,7 +779,7 @@ export function QuoteWizard({
               <div>
                 <dt>Referências e produção</dt>
                 <dd>
-                  {files.length ? files.join(", ") : "sem arquivo agora"} · {quantity || "quantidade não informada"}
+                  {files.length ? files.map((file) => file.name).join(", ") : "sem arquivo agora"} · {quantity || "quantidade não informada"}
                   {material === "nao-sei" ? " · precisa de orientação" : ""}
                   {material === "tenho-preferencia" ? " · tem preferência de material/cor" : ""}
                 </dd>

@@ -1,6 +1,7 @@
 import {
   MediaPlaceholder,
   PrimaryLink,
+  StudioMaterialGuidance,
   StudioPageShell,
   StudioSection,
   TextList
@@ -58,6 +59,7 @@ export default function CustomBoxesPage() {
           Descrever a caixa
         </PrimaryLink>
       </StudioSection>
+      <StudioMaterialGuidance />
     </StudioPageShell>
   );
 }

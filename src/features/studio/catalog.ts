@@ -7,6 +7,8 @@ export type StudioPrintStatus =
 export type StudioImage = {
   src: string;
   alt: string;
+  width: number;
+  height: number;
 };
 
 export type StudioPrintEntry = {

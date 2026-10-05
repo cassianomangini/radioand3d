@@ -391,7 +391,7 @@ Decisão desta fase:
 - seleção inválida é rejeitada antes de avançar no fluxo;
 - nenhuma mídia é enviada ou persistida nesta etapa;
 - a mesma política deverá rodar no servidor, somada à inspeção do conteúdo;
-- storage privado, retenção e persistência continuam bloqueados até a escolha explícita do projeto/backend remoto.
+- backend, storage, upload e retenção foram definidos em [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md); implementação local pode avançar, enquanto apply/validação remota continuam bloqueados por E2.
 
 
 ## Orçamento — contrato de solicitação backend-neutral — 05/10/2026
@@ -403,7 +403,7 @@ Decisão desta fase:
 - classificação inicial separa `ready-for-review`, `needs-information` e `incomplete`;
 - nenhuma regra automática marca projeto como “não atendido”; casos fora de escopo continuam decisão humana;
 - nenhum arquivo, contato ou solicitação é enviado nesta etapa;
-- inspeção binária, storage privado, retenção, persistência, confirmação e fila operacional continuam bloqueados por E2.
+- inspeção de conteúdo, storage, retenção e persistência têm arquitetura Supabase definida; provisionamento remoto, secrets e validação live continuam bloqueados por E2.
 
 
 ## Revisão pós-PRs #29/#30 — contrato do Orçamento — 05/10/2026
@@ -415,3 +415,18 @@ Decisão desta fase:
 - “tenho preferência” exige registrar qual preferência de material/acabamento;
 - o wizard valida o mesmo contrato canônico antes da tela final de revisão;
 - `manual-review` não é um status automático: revisão humana de escopo permanece decisão operacional posterior.
+
+
+## Infra Supabase do Estúdio — decisão 05/10/2026
+
+- projeto Supabase próprio do CM 3D & Radio definido para Orçamento;
+- região: `sa-east-1`;
+- Supabase do Artesopolis Admin continua owner da ponte Produtos/Shopee;
+- novo projeto CM não espelha catálogo, estoque ou ERP;
+- Orçamento: PostgreSQL + bucket privado `quote-intake`;
+- upload: signed resumable/TUS direto para Storage;
+- nenhum secret Supabase no browser;
+- Route Handlers Next server-side fazem sessão, init/complete de attachment e submit;
+- retenção: draft/órfão 24 h, arquivos submetidos 90 d, conteúdo/contato 180 d, eventos técnicos 365 d;
+- produção real exige projeto remoto + secrets + migration/bucket + validação live;
+- documento canônico de infra: [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md).

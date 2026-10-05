@@ -7,15 +7,17 @@ import styles from "./studio-content.module.css";
 export function TrackedShopeeLink({
   href,
   productSlug,
-  children
+  children,
+  className
 }: {
   href: string;
   productSlug: string;
   children: ReactNode;
+  className?: string;
 }) {
   return (
     <a
-      className={styles.primaryLink}
+      className={className ? `${styles.primaryLink} ${className}` : styles.primaryLink}
       href={href}
       onClick={() => {
         trackPublicEvent("product_shopee_exit", { productSlug });

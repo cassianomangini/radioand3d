@@ -1,7 +1,8 @@
 # Fluxo de Orçamento do Estúdio
 
 Status: **contrato de produto**  
-Versão: **V1 — 04/10/2026**
+Versão: **V1 — 04/10/2026**  
+Infra backend: [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md)
 
 O orçamento existe para transformar interesse em uma solicitação analisável sem abrir o WhatsApp para qualquer visitante.
 
@@ -337,7 +338,23 @@ A triagem estrutural inicial pode resultar em:
 
 “Revisão manual / fora de escopo” é uma decisão operacional posterior, não um status automático calculado pelo contrato.
 
-Storage, inspeção binária, retenção, persistência e confirmação continuam responsabilidades do adapter/backend remoto escolhido depois.
+Storage, persistência, retenção, rate limiting e ingestão remota estão definidos no contrato de infraestrutura Supabase.
+
+Resumo vigente:
+
+- projeto Supabase próprio do CM 3D & Radio;
+- região `sa-east-1`;
+- bucket privado `quote-intake`;
+- upload direto por signed resumable upload/TUS;
+- nenhum secret Supabase no browser;
+- Route Handlers server-side como boundary do Orçamento;
+- validação de conteúdo depois do upload e antes do submit;
+- draft/upload órfão: 24 h;
+- arquivos submetidos: 90 dias;
+- conteúdo/contato do intake: 180 dias;
+- eventos técnicos sem PII: 365 dias.
+
+O arquivo de infraestrutura é a autoridade para implementação desses itens.
 
 ## Continuidade por WhatsApp
 
@@ -397,8 +414,10 @@ A landing de serviço deve apontar para orçamento. O formulário não precisa c
 
 ## Decisões abertas
 
-- armazenamento/backend remoto;
-- retenção;
+Infra e retenção **não estão mais abertas**; foram fechadas em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md).
+
+Continuam abertas apenas decisões de operação/comercial:
+
 - quem recebe a triagem;
 - SLA real de retorno;
 - cobertura geográfica;

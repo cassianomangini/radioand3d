@@ -41,7 +41,7 @@ export function buildPublicMetadata({
   const canonical = absoluteSiteUrl(pathname);
 
   return {
-    title,
+    title: { absolute: title },
     description,
     robots: {
       index: siteIndexable,

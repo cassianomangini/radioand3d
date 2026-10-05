@@ -4202,3 +4202,15 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     overflow: visible;
   }
 }
+
+
+@media (max-width: 73.74rem) {
+  /* On Studio routes the home identity is not only invisible: it must leave the mobile flow. */
+  .studio[data-studio-route="detail"] .studioIdentity {
+    display: none;
+  }
+
+  .studio[data-studio-route="detail"] .studioCatalogHeader {
+    margin-top: 1.1rem;
+  }
+}

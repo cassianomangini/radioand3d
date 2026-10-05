@@ -68,7 +68,7 @@
 
 .mainMedia {
   position: relative;
-  min-height: 30rem;
+  min-height: 0;
   aspect-ratio: 1.28;
   overflow: hidden;
   background: #070b10;
@@ -134,7 +134,7 @@
   max-width: 15ch;
   margin: 0;
   color: #f8fbff;
-  font-size: clamp(2.25rem, 4.2vw, 4.6rem);
+  font-size: clamp(2.25rem, 4.4cqi, 3.8rem);
   line-height: 0.96;
   letter-spacing: -0.055em;
 }
@@ -143,7 +143,7 @@
   max-width: 48rem;
   margin: 0;
   color: #acb9c5;
-  font-size: clamp(1rem, 1.45vw, 1.16rem);
+  font-size: clamp(1rem, 1.35cqi, 1.12rem);
   line-height: 1.62;
 }
 
@@ -263,6 +263,71 @@
 .shopeeButton:hover,
 .shopeeButton:focus-visible {
   background: linear-gradient(110deg, #2f68ff, #7d59ff) !important;
+}
+
+@container (max-width: 58rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1.08fr) minmax(16rem, 0.92fr);
+    gap: 1.2rem;
+  }
+
+  .gallery {
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+
+  .decision h1 {
+    max-width: 14ch;
+    font-size: clamp(2rem, 4.8cqi, 2.8rem);
+  }
+
+  .variantGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 46rem) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 1.7rem;
+  }
+
+  .gallery {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "thumbs";
+  }
+
+  .mainMedia {
+    grid-area: main;
+  }
+
+  .thumbnails {
+    grid-area: thumbs;
+    grid-auto-flow: column;
+    grid-auto-columns: 4.5rem;
+    grid-template-columns: none;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.25rem;
+  }
+
+  .decision h1 {
+    max-width: 16ch;
+    font-size: clamp(2.15rem, 7cqi, 3.1rem);
+  }
+
+  .variantHeading {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .variantHeading span {
+    text-align: left;
+  }
 }
 
 @media (max-width: 86rem) and (min-width: 73.75rem) {

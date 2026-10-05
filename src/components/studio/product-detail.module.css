@@ -176,13 +176,17 @@
 }
 
 .variantGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr));
-  gap: 0.7rem;
+  display: flex;
+  gap: 0.65rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+  overscroll-behavior-inline: contain;
 }
 
 .variant {
   min-width: 0;
+  flex: 0 0 4.75rem;
   display: grid;
   gap: 0.45rem;
   padding: 0;
@@ -281,9 +285,6 @@
     font-size: clamp(2rem, 4.8cqi, 2.8rem);
   }
 
-  .variantGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @container (max-width: 46rem) {
@@ -379,9 +380,6 @@
     text-align: left;
   }
 
-  .variantGrid {
-    grid-template-columns: repeat(auto-fill, minmax(4.9rem, 1fr));
-  }
 }
 
 @media (max-width: 34rem) {
@@ -390,8 +388,8 @@
     height: 2.35rem;
   }
 
-  .variantGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .variant {
+    flex-basis: 4.55rem;
   }
 }
 

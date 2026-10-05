@@ -88,10 +88,10 @@ Enquanto o gate estiver aberto:
 - [x] definir origem única para base URL/canonical;
 - [x] metadata específica por rota;
 - [x] Open Graph textual por superfície estratégica; imagem OG específica fica para a etapa final de mídia;
-- [ ] breadcrumbs quando fizer sentido;
-- [x] usar links HTML rastreáveis nas jornadas implementadas; validação renderizada ainda pendente;
+- [x] breadcrumbs visíveis nas rotas internas + `BreadcrumbList` condicional quando existe URL pública;
+- [x] links HTML rastreáveis validados no QA renderizado, incluindo navegação interna com o mesmo elemento de áudio;
 - [x] garantir conteúdo principal das páginas comerciais em Server Components;
-- [ ] revisar impacto de `connection()`/dinamismo da Rádio nas páginas comerciais.
+- [x] revisar impacto de `connection()`/dinamismo da Rádio nas páginas comerciais — conteúdo comercial segue SSR/rastreável, mas o root continua dinâmico por catálogo/seed da Rádio; otimização exige gate separado para não alterar o contrato de áudio.
 
 ### Aceite S1.1
 
@@ -108,14 +108,14 @@ Dependência visual: **S1.0B aprovado**.
 
 - [x] substituir entrada Materiais por Orçamento;
 - [x] renomear Loja Shopee para Produtos na hierarquia principal;
-- [ ] manter material/cores dentro do conteúdo de apoio;
+- [x] manter material/cores dentro do conteúdo de apoio, sem virar quarto pilar nem grid fictício;
 - [x] Estúdio + Impressões ocupam a superfície grande da esquerda;
 - [x] Orçamento e Produtos ficam empilhados à direita;
 - [x] exatamente três entradas visuais;
 - [x] não usar três cards idênticos;
 - [ ] prova visual real;
 - [x] links para Impressões, Orçamento e Produtos;
-- [ ] links contextuais para Impressão 3D sob demanda, Placas e Caixas nas rotas apropriadas, não como cards extras na home;
+- [x] links contextuais para Impressão 3D sob demanda, Placas e Caixas nas rotas apropriadas, não como cards extras na home;
 - [x] não criar segunda seção abaixo dos três blocos;
 - [x] não repetir hero gigante da Home;
 - [ ] substituir placeholders neutros pelas fotografias/assets aprovados na última etapa de mídia.
@@ -133,83 +133,83 @@ Visitante frio entende em poucos segundos:
 
 - [x] rota própria;
 - [ ] dataset editorial mínimo;
-- [ ] status: produzido / conceito / produto / cliente;
+- [x] contrato editorial suporta status produzido / conceito / produto / cliente; dataset real continua pendente;
 - [ ] foto real como conteúdo;
 - [ ] alt/contexto;
-- [ ] filtros somente se houver volume que justifique;
-- [ ] CTA contextual para orçamento;
-- [ ] respeitar IP e permissões.
+- [x] nenhum filtro implementado enquanto não houver volume que justifique;
+- [x] CTA contextual para orçamento;
+- [x] contrato exige `canPublish` e permite nota de propriedade intelectual; seleção/permissão das peças reais continua pendente.
 
 ## Bloco S1.3B — Impressão 3D sob demanda
 
-- [ ] rota própria;
-- [ ] copy “Já tem o arquivo? Envie para análise”;
-- [ ] branch de orçamento `tipo=impressao`;
-- [ ] upload como ação principal;
-- [ ] quantidade/material/cor/escala com opção “não sei”;
-- [ ] explicar que produção depende de análise;
-- [ ] sem iconografia decorativa;
+- [x] rota própria;
+- [x] copy “Já tem o arquivo? Envie para análise”;
+- [x] branch de orçamento `tipo=impressao`;
+- [x] seleção local de arquivo como ação principal; upload remoto continua bloqueado até storage privado;
+- [x] quantidade/material/cor/escala com opção “não sei”;
+- [x] explicar que produção depende de análise;
+- [x] sem iconografia decorativa;
 - [ ] foto real de processo/peça quando disponível;
-- [ ] metadata/canonical/OG.
+- [x] metadata/canonical/OG textual.
 
 ## Bloco S1.4 — Placas personalizadas
 
-- [ ] conteúdo específico;
+- [x] conteúdo específico;
 - [ ] pelo menos uma prova real forte;
 - [ ] usos reais;
-- [ ] opções e limitações;
-- [ ] CTA para orçamento;
+- [x] opções e limitações;
+- [x] CTA para orçamento;
 - [ ] ligações para projetos relacionados;
 - [ ] metadata/canonical/OG;
 - [ ] schema somente se aplicável.
 
 ## Bloco S1.5 — Caixas personalizadas
 
-- [ ] conteúdo específico;
-- [ ] foco em função e medida;
+- [x] conteúdo específico;
+- [x] foco em função e medida;
 - [ ] pelo menos uma prova real suficiente para lançamento;
-- [ ] CTA para orçamento;
-- [ ] metadata/canonical/OG.
+- [x] CTA para orçamento;
+- [x] metadata/canonical/OG textual.
 
 ## Bloco S1.6 — Orçamento
 
-- [ ] experiência de conversa guiada;
-- [ ] começar pela intenção — arquivo pronto / placa / caixa / outro — e não por contato;
-- [ ] wizard progressivo;
-- [ ] perguntas por tipo;
-- [ ] opção “não sei”/“preciso de ajuda” quando aplicável;
-- [ ] contato somente no final;
-- [ ] upload nativo em mobile e drag-and-drop apenas como melhoria desktop;
-- [ ] resumo editável antes do envio;
+- [x] experiência de conversa guiada;
+- [x] começar pela intenção — arquivo pronto / placa / caixa / outro — e não por contato;
+- [x] wizard progressivo;
+- [x] perguntas por tipo;
+- [x] opção “não sei”/“preciso de ajuda” quando aplicável;
+- [x] contato somente no final;
+- [x] seletor nativo em mobile e drag-and-drop apenas como melhoria desktop;
+- [x] resumo editável antes do envio;
 - [ ] anexos privados;
 - [ ] persistência;
-- [ ] estados de erro;
+- [x] estados de erro e validação local;
 - [ ] confirmação sem CTA forçado para WhatsApp;
 - [ ] triagem;
-- [ ] analytics sem PII;
-- [ ] mobile/teclado/acessibilidade.
+- [x] eventos do funil instrumentados por contrato local sem PII; adaptador para provedor real fica no gate de lançamento;
+- [x] labels, foco por etapa, teclado e composição mobile validados estruturalmente no CI; auditoria final de lançamento continua em S1.8.
 
 ## Bloco S1.7 — Produtos
 
-- [ ] catálogo interno;
-- [ ] sem filtros/ordenação enquanto o volume não justificar;
-- [ ] preview principalmente fotográfico;
-- [ ] páginas individuais;
+- [x] contrato de catálogo interno criado e deliberadamente vazio até existirem itens reais;
+- [x] sem filtros/ordenação enquanto o volume não justificar;
+- [x] preview preparado para mídia fotográfica real, sem item sintético quando catálogo está vazio;
+- [x] rota individual `/studio/produtos/[slug]` preparada;
 - [ ] fotos/medidas/material/opções reais;
-- [ ] CTA explícito “Comprar na Shopee” no produto;
-- [ ] explicar que finalização/pagamento acontecem na Shopee;
-- [ ] não duplicar preço/estoque sem sincronização confiável;
-- [ ] indisponível/sob consulta sem mentira;
-- [ ] ponte “precisa de outra medida?” → orçamento;
-- [ ] metadata;
+- [x] CTA externo preparado no nível do produto como “Ver preço e disponibilidade na Shopee” quando houver URL real;
+- [x] explicar que finalização/pagamento acontecem na Shopee;
+- [x] não duplicar preço/estoque sem sincronização confiável;
+- [x] contrato de disponibilidade: disponível / sob consulta / indisponível, com data e origem de verificação;
+- [x] ponte “precisa de outra medida?” → orçamento;
+- [x] metadata individual preparada;
 - [ ] dados estruturados aplicáveis;
-- [ ] nenhum produto fake para preencher grade.
+- [x] nenhum produto fake para preencher grade.
 
 ## Bloco S1.8 — Gate de lançamento
 
 - [ ] domínio definitivo;
 - [ ] produção sem `noindex`;
-- [ ] preview ainda `noindex`;
+- [x] preview/ambiente sem flag explícita continua `noindex` por padrão;
 - [ ] Search Console;
 - [ ] sitemap enviado;
 - [ ] inspeção das URLs prioritárias;
@@ -217,10 +217,10 @@ Visitante frio entende em poucos segundos:
 - [ ] validação mobile;
 - [ ] CWV/performance básica;
 - [ ] imagens rastreáveis;
-- [ ] links internos;
+- [x] links internos das jornadas estruturais validados no CI;
 - [ ] analytics de orçamento e saída para Shopee;
 - [ ] revisão de privacidade de anexos;
-- [ ] nenhuma promessa comercial não confirmada.
+- [x] copy evita prometer aceite, prazo, preço ou disponibilidade não confirmados.
 
 ## Bloco S1.9 — Crescimento
 
@@ -296,3 +296,39 @@ Continua pendente e **não deve ser marcado como pronto**:
 - decisões operacionais de logística/cobertura/modelagem;
 - validação renderizada desktop/mobile;
 - retirada do `noindex` em produção.
+
+
+## Evidência — PRs #23 e #24
+
+### PR #23 — fundação estrutural
+
+- merge: `668fa7a27b6c8e6e419eee8febec79a347e9353a`;
+- rotas públicas e Search base;
+- hub com três entradas;
+- placeholders neutros;
+- primeiro wizard;
+- CI verde em lint, typecheck, testes, build e captura visual.
+
+### PR #24 — orçamento/search/catalog contracts
+
+- merge: `9aeb80fe236e40acfabad217a1687f137a9cb2f7`;
+- breadcrumbs + `BreadcrumbList`;
+- branching específico de arquivo/placa/caixa/outro;
+- revisão editável;
+- contrato vazio de Impressões/Produtos sem dados fake;
+- rota `/studio/produtos/[slug]`;
+- sitemap inclui produtos somente quando eles realmente existirem;
+- QA confirmou `/studio → /studio/impressoes → /studio` e `/studio → /studio/orcamento` preservando o mesmo `<audio>`;
+- capturas desktop/mobile e CI completamente verdes.
+
+## Revisão de renderização da Rádio
+
+O `RootLayout` ainda chama `connection()`, lê o catálogo da Rádio e gera um seed por request. Isso faz o shell público continuar dinâmico mesmo quando o conteúdo comercial é Server Component.
+
+Decisão desta fase:
+
+- **não remover `connection()` por impulso**;
+- **não mover seed/catalog para cliente dentro do trabalho do Estúdio**, porque isso altera lifecycle, fila e comportamento percebido da Rádio;
+- o conteúdo comercial já chega como HTML útil e rastreável;
+- otimização de custo/cache da Rádio deve ser um recorte separado, com QA de continuidade de áudio e fila.
+

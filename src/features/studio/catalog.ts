@@ -23,6 +23,21 @@ export type StudioPrintEntry = {
   intellectualPropertyNote?: string;
 };
 
+export type StudioMaterialAvailability =
+  | "disponivel"
+  | "sob-consulta"
+  | "indisponivel";
+
+export type StudioMaterialColor = {
+  id: string;
+  name: string;
+  finish: string;
+  sample: StudioImage;
+  availability: StudioMaterialAvailability;
+  source: string;
+  lastVerifiedAt: string;
+};
+
 export type StudioProductAvailability =
   | "disponivel"
   | "sob-consulta"
@@ -48,6 +63,12 @@ export type StudioProduct = {
  * Do not add synthetic/example entries just to populate the interface.
  */
 export const studioPrints: readonly StudioPrintEntry[] = [];
+
+/**
+ * Deliberately empty until real material/color samples are photographed and their
+ * current availability has a known source. Do not populate this from generic swatches.
+ */
+export const studioMaterialColors: readonly StudioMaterialColor[] = [];
 
 /**
  * Deliberately empty until a real product is approved for publication.

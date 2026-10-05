@@ -160,7 +160,7 @@ Visitante frio entende em poucos segundos:
 - [x] opções e limitações;
 - [x] CTA para orçamento;
 - [ ] ligações para projetos relacionados;
-- [ ] metadata/canonical/OG;
+- [x] metadata/canonical/OG textual;
 - [ ] schema somente se aplicável.
 
 ## Bloco S1.5 — Caixas personalizadas

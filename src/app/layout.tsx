@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { getRadioTracks } from "@/features/radio/catalog";
 import { RadioProvider } from "@/features/radio/radio-provider";
 import { PublicExperience } from "@/components/studio-radio/public-experience";
+import { siteIndexable, siteUrl } from "@/lib/site-config";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -24,12 +25,16 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "CM 3D & Radio | Estúdio de Impressão 3D",
+  metadataBase: siteUrl ?? undefined,
+  title: {
+    default: "CM 3D & Radio | Estúdio de Impressão 3D",
+    template: "%s | CM 3D & Radio"
+  },
   description:
     "Estúdio de Impressão 3D e CM Rádio em uma experiência integrada.",
   robots: {
-    index: false,
-    follow: false
+    index: siteIndexable,
+    follow: siteIndexable
   }
 };
 

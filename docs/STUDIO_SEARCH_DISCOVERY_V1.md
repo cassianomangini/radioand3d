@@ -96,6 +96,7 @@ Criar sitemap apenas com URLs públicas indexáveis.
 - Impressões;
 - serviços publicados;
 - produtos publicados;
+- data real de atualização quando existir fonte confiável;
 - projetos/cases publicados quando existirem.
 
 ### Não deve incluir
@@ -199,10 +200,13 @@ Mídia importante deve ser rastreável e semanticamente ligada ao texto.
 - imagem responsiva;
 - nome de arquivo legível quando possível;
 - imagem de projeto próxima ao texto do projeto;
-- considerar image sitemap quando útil.
+- considerar image sitemap quando útil;
+- enquanto a mídia de Produto estiver hospedada apenas no CDN da Shopee, **não** publicar essas URLs em image sitemap do CM;
+- image sitemap de Produtos entra quando os ativos públicos estiverem sob host controlado/verificável pela CM.
 
-Referência oficial: Google Images SEO  
-https://developers.google.com/search/docs/appearance/google-images
+Referências oficiais:  
+https://developers.google.com/search/docs/appearance/google-images  
+https://developers.google.com/search/docs/crawling-indexing/sitemaps/image-sitemaps
 
 ## 10. Dados estruturados
 
@@ -213,7 +217,8 @@ Dados estruturados são auxiliares de entendimento e elegibilidade de rich resul
 - `Organization`;
 - `LocalBusiness` quando a operação e os dados públicos justificarem;
 - `BreadcrumbList`;
-- `Product` em páginas de produto quando os campos reais permitirem;
+- `Product` em páginas de produto **somente** quando os campos reais e visíveis permitirem cumprir os requisitos aplicáveis;
+- `WebSite` para identificar o site quando a produção estiver indexável;
 - outros tipos somente após verificar elegibilidade e documentação oficial.
 
 ### Regras
@@ -222,10 +227,13 @@ Dados estruturados são auxiliares de entendimento e elegibilidade de rich resul
 - não marcar avaliação inexistente;
 - não marcar preço/estoque não confirmado;
 - não fingir checkout próprio se a compra acontece externamente;
-- validar no Rich Results Test quando aplicável.
+- validar no Rich Results Test quando aplicável;
+- não emitir `Product` apenas para “ter schema”: para snippet de produto, o Google exige `name` e pelo menos um entre `offers`, `review` ou `aggregateRating`;
+- como o CM hoje não publica oferta/preço local e não possui avaliações próprias, o rich-result markup de `Product` fica **adiado** em vez de gerar marcação incompleta.
 
-Referência oficial: Search Gallery / structured data  
-https://developers.google.com/search/docs/appearance/structured-data/search-gallery
+Referências oficiais:  
+https://developers.google.com/search/docs/appearance/structured-data/search-gallery  
+https://developers.google.com/search/docs/appearance/structured-data/product-snippet
 
 ## 11. Produtos e Shopee
 

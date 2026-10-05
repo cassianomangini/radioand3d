@@ -16,13 +16,20 @@ const publicRoutes = [
 export default function sitemap(): MetadataRoute.Sitemap {
   if (!siteIndexable) return [];
 
-  const routes = [
-    ...publicRoutes,
-    ...studioProducts.map((product) => `/studio/produtos/${product.slug}`)
-  ];
-
-  return routes.flatMap((pathname) => {
+  const publicEntries = publicRoutes.flatMap((pathname) => {
     const url = absoluteSiteUrl(pathname);
     return url ? [{ url }] : [];
   });
+
+  const productEntries = studioProducts.flatMap((product) => {
+    const url = absoluteSiteUrl(`/studio/produtos/${product.slug}`);
+    return url
+      ? [{
+          url,
+          lastModified: product.lastVerifiedAt
+        }]
+      : [];
+  });
+
+  return [...publicEntries, ...productEntries];
 }

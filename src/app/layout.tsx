@@ -46,6 +46,18 @@ export default async function RootLayout({
   await connection();
   const tracks = await getRadioTracks();
   const playlistSeed = randomInt(0, 4294967296);
+  const websiteSchema =
+    siteIndexable && siteUrl
+      ? {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "CM 3D & Radio",
+          url: siteUrl.toString(),
+          inLanguage: "pt-BR",
+          description:
+            "Estúdio de Impressão 3D e CM Rádio em uma experiência integrada."
+        }
+      : null;
 
   return (
     <html lang="pt-BR">
@@ -53,6 +65,12 @@ export default async function RootLayout({
         <RadioProvider tracks={tracks} playlistSeed={playlistSeed}>
           <PublicExperience>{children}</PublicExperience>
         </RadioProvider>
+        {websiteSchema ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          />
+        ) : null}
       </body>
     </html>
   );

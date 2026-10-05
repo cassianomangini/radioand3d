@@ -13,6 +13,7 @@ test("public studio catalog contains only explainable Shopee products", () => {
     assert.ok(product.images.length >= 3);
     assert.ok(product.measurements.length >= 1);
     assert.ok(product.specs.length >= 3);
+    assert.ok(Number.isFinite(Date.parse(product.lastVerifiedAt)));
     assert.match(product.shopeeUrl ?? "", /^https:\/\/shopee\.com\.br\/product\//);
     assert.equal("price" in product, false);
     assert.equal("stock" in product, false);

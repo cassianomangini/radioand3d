@@ -207,9 +207,10 @@ Visitante frio entende em poucos segundos:
 - [x] contrato de disponibilidade: disponível / sob consulta / indisponível, com data e origem de verificação;
 - [x] ponte “precisa de outra medida?” → orçamento;
 - [x] metadata individual preparada;
-- [x] `Product` nas páginas individuais e `ItemList` no catálogo sem inventar oferta/preço;
+- [x] `ItemList` no catálogo sem inventar oferta/preço;
+- [x] `Product` rich-result markup adiado enquanto não houver `Offer`, review ou aggregate rating real e visível;
 - [x] nenhum produto fake para preencher grade;
-- [ ] QA renderizado desktop/mobile da implementação visual aprovada.
+- [x] QA renderizado desktop/mobile da implementação visual aprovada no PR #27.
 
 ## Bloco S1.8 — Gate de lançamento
 
@@ -222,7 +223,8 @@ Visitante frio entende em poucos segundos:
 - [ ] Rich Results Test onde aplicável;
 - [ ] validação mobile;
 - [ ] CWV/performance básica;
-- [ ] imagens rastreáveis;
+- [x] imagens de Produto renderizadas como HTML/Next Image;
+- [ ] image sitemap de Produto após migrar mídia para host controlado/verificável pela CM;
 - [x] links internos das jornadas estruturais validados no CI;
 - [ ] analytics de orçamento e saída para Shopee;
 - [ ] revisão de privacidade de anexos;
@@ -361,3 +363,12 @@ Decisão desta fase:
 - páginas individuais geram `Product` sem `Offer` inventado;
 - catálogo gera `ItemList` quando a URL pública está configurada;
 - QA renderizado e validação final de CI ficam como gate antes do merge.
+
+
+## SEO técnico pós-Produto — 05/10/2026
+
+- markup `Product` incompleto removido para não gerar falsa expectativa/erro de rich result;
+- `WebSite` estruturado somente quando a produção estiver indexável e houver URL pública;
+- sitemap usa `lastVerifiedAt` real nas URLs de Produto;
+- image sitemap deliberadamente adiado enquanto os ativos estiverem apenas no CDN da Shopee;
+- nenhuma avaliação, oferta, preço, estoque ou presença local foi inventada para satisfazer schema.

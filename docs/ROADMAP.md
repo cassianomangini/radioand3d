@@ -8,10 +8,10 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 
 ## Próximos passos
 
-1. Fechar o contrato serializável do Orçamento: payload versionado, validação estrutural compartilhável e triagem inicial sem depender de provider remoto.
-2. Backend remoto do Orçamento: storage privado, inspeção de conteúdo server-side, retenção, persistência, execução da triagem e confirmação — bloqueado até a escolha explícita do alvo em E2.
-3. Conteúdo real de Impressões/Placas/Caixas e revisão visual final ficam para a etapa de mídia, conforme decisão de deixar imagens por último.
-4. Publicação continua bloqueada por E2; produção permanece `noindex` até o gate de lançamento.
+1. **Concluído nos PRs #29 e #30:** contrato local/serializável do Orçamento, arquivos reais em memória, política de formatos/limites, payload versionado, validação estrutural compartilhável e triagem inicial backend-neutral.
+2. **Próximo bloco técnico depende de E2:** backend remoto do Orçamento — storage privado, inspeção de conteúdo server-side, retenção, persistência, execução da triagem e confirmação.
+3. **Próximo bloco de conteúdo depende de E3:** dataset/fotos reais de Impressões, Placas e Caixas e revisão visual final das superfícies restantes.
+4. **Gate de lançamento:** domínio/alvo público, retirada controlada do `noindex`, Search Console e validações finais continuam depois de E2/E3.
 
 Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio não altera o motion spine da Rádio.
 

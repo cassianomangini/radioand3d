@@ -141,6 +141,24 @@ export function MediaPlaceholder({
   );
 }
 
+
+export function StudioMaterialGuidance() {
+  return (
+    <StudioSection eyebrow="Materiais & cores" title="A escolha vem depois da função.">
+      <p>
+        Material, cor e acabamento dependem do uso da peça, das dimensões e das condições
+        de produção. Não exibimos uma grade genérica de materiais como se toda combinação
+        estivesse automaticamente disponível.
+      </p>
+      <TextList>
+        <li>Se você já tem preferência de material, cor ou acabamento, informe no orçamento.</li>
+        <li>Se não souber, marque que precisa de orientação e avaliamos junto com o projeto.</li>
+        <li>Disponibilidade e combinação final só são confirmadas durante a análise.</li>
+      </TextList>
+    </StudioSection>
+  );
+}
+
 export function PrimaryLink({
   href,
   children

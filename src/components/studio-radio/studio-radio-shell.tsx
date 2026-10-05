@@ -1809,7 +1809,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           </div>
 
           {studioNestedRoute ? (
-            <div className={styles.studioRouteContent}>{children}</div>
+            <div className={styles.studioRouteContent} data-studio-route-content="true">{children}</div>
           ) : null}
         </main>
 

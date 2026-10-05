@@ -34,7 +34,7 @@ src/config/              configuração validada, sem segredos no cliente
 tests/                   testes de integração e navegação
 ```
 
-Rotas propostas: `/`, `/pecas`, `/pecas/[slug]`, `/materiais`, `/clientes`, `/radio` e `/gestao/musicas`. Confirmar na entrega 01. A navegação pública deve compartilhar o layout persistente da rádio. A gestão é uma área privada, não a exposição do Admin operacional.
+Rotas públicas prioritárias do Estúdio: `/`, `/studio`, `/studio/impressoes`, `/studio/impressao-3d-sob-demanda`, `/studio/placas-personalizadas`, `/studio/caixas-personalizadas`, `/studio/orcamento`, `/studio/produtos` e `/studio/produtos/[slug]`. Rotas adicionais entram somente com conteúdo e intenção próprios. A navegação pública deve preservar o estado da Rádio entre rotas do Estúdio. A gestão é uma área privada, não a exposição do Admin operacional.
 
 Server Components por padrão para leitura e composição. Interatividade e áudio em componentes cliente delimitados. O provider persistente não deve transformar toda a aplicação em código cliente nem ser recriado por mudança de rota ou modo do player. Layouts compartilhados preservam estado na navegação interna: [Next.js layouts](https://nextjs.org/docs/app/getting-started/layouts-and-pages). A fronteira deve manter código estático fora do bundle interativo: [Server e Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components).
 
@@ -107,6 +107,25 @@ Dados do visualizador não disparam rerender de catálogo ou da página inteira 
 Por componente aplicável: normal, hover, focus-visible, pressionado, selecionado, disabled, loading, empty e error. Testar títulos longos, ausência de mídia e listas reais. Estados automatizados, regressão visual e análise de acessibilidade ajudam a detectar defeitos; beleza e facilidade exigem revisão renderizada contra EXPERIENCE.
 
 Aprovar a base em contexto antes de expandir páginas. Alterar um token ou primitiva compartilhada exige revisar as superfícies consumidoras afetadas. Não marcar UI pronta apenas porque build ou captura isolada passou.
+
+## Arquitetura de Search e renderização pública
+
+Search é requisito arquitetural do Estúdio. O contrato detalhado está em [STUDIO_SEARCH_DISCOVERY_V1.md](STUDIO_SEARCH_DISCOVERY_V1.md).
+
+Regras:
+
+- preview/desenvolvimento permanecem `noindex`;
+- produção só remove `noindex` no gate de lançamento;
+- usar `robots.ts`, `sitemap.ts`, canonical e metadata por rota;
+- páginas comerciais devem produzir conteúdo principal útil sem depender de interação do player;
+- preservar Server Components para conteúdo editorial sempre que possível;
+- o estado dinâmico/aleatório da Rádio não deve obrigar toda a árvore comercial a comportamento dinâmico desnecessário;
+- links estratégicos precisam ser links HTML rastreáveis;
+- imagens de prova entram como mídia HTML, não apenas background CSS;
+- dados estruturados refletem somente fatos visíveis e confirmados;
+- parâmetros de origem/referência do orçamento não criam documentos canônicos separados.
+
+O shell persistente precisa equilibrar duas exigências: continuidade do áudio e páginas comerciais rastreáveis/perfomáticas. A solução pode mudar durante implementação, mas nenhuma delas pode ser sacrificada silenciosamente.
 
 ## Segurança e publicação
 

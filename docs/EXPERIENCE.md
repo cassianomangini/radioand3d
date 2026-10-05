@@ -55,7 +55,7 @@ Cassiano pediu também que, no desktop, arrastar a divisória para a esquerda al
 - Não criar produtos, materiais, números, depoimentos ou categorias falsas para completar composição.
 - Se ainda não houver conteúdo suficiente, mostrar menos seções com mais qualidade.
 - Produtos, materiais, fotos e projetos reais entram progressivamente sem exigir redesenho da base.
-- Em 03/10/2026, o recorte inicial de `/studio` foi reduzido a três entradas visuais: **Impressões**, **Materiais** e **Loja Shopee**. O card **Loja Shopee** não abre a Shopee diretamente: ele leva à área interna `/studio/produtos`, onde ficam somente os produtos realmente vendidos, com informações detalhadas e link de compra no nível do item. **Impressões** permanece galeria e pode mostrar fotos de peças não comerciais; itens com propriedade intelectual de terceiros não recebem CTA de venda. Não criar cards adicionais até existir conteúdo real que justifique outra seção.
+- Em 04/10/2026, o recorte comercial de `/studio` passou a três pilares: **Impressões**, **Peça um orçamento** e **Produtos**. **Materiais & Cores** deixa de ser entrada de primeiro nível e passa a apoiar projetos, serviços, produtos e orçamento. **Impressões** continua sendo prova/galeria e diferencia peça produzida de conceito. **Orçamento** qualifica o projeto antes de qualquer contato manual ou WhatsApp. **Produtos** leva primeiro ao catálogo interno e às páginas próprias; o link Shopee entra no nível do item. Placas e caixas são as prioridades iniciais. O contrato completo está em [STUDIO_GROWTH_PLAN_V1.md](STUDIO_GROWTH_PLAN_V1.md).
 
 ## Hipótese visual para apresentar
 
@@ -127,6 +127,24 @@ A arquitetura, o nível de ambição e os gates de qualidade da próxima camada 
 ## Handoff estrutural
 
 A geometria, o shell responsivo, os limites da Rádio, a ordem mobile e a estratégia de crescimento progressivo do 3D estão documentados em [STUDIO_RADIO_HANDOFF_V1.md](design/STUDIO_RADIO_HANDOFF_V1.md). A proposta de tipografia, paleta, superfícies e motion está em [CM_VISUAL_SYSTEM_V1.md](design/CM_VISUAL_SYSTEM_V1.md). Os estados, responsabilidades e limites dos componentes do primeiro recorte estão em [CM_COMPONENT_STATES_V1.md](design/CM_COMPONENT_STATES_V1.md). Cassiano aprovou esse conjunto na entrega 03. O pacote está em [STUDIO_RADIO_APPROVAL_PACKAGE_V1.md](design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md).
+
+## Handoff comercial do Estúdio
+
+A expansão de `/studio`, Placas, Caixas, Orçamento e Produtos usa o artefato [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md).
+
+Esse handoff é deliberadamente anterior ao frontend visível e define:
+
+- peso diferente entre Impressões, Orçamento e Produtos;
+- composição desktop/mobile;
+- onde fotografia real é obrigatória;
+- onde diagrama/asset é mais adequado que CSS;
+- fluxo do orçamento;
+- hierarquia da Shopee;
+- componentes mínimos;
+- mídia necessária;
+- itens proibidos.
+
+Estado atual: `ready_for_frontend: no`. A implementação visual substancial só deve começar quando o handoff for aprovado por Cassiano. Trabalho técnico independente de Search/rotas pode avançar sem cristalizar composição visual.
 
 ## Artefato de aprovação da entrega 03
 

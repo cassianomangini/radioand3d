@@ -2,11 +2,16 @@
 
 ## Agora
 
-O site ainda não foi lançado. Em 05/10/2026 Cassiano aceitou os três passos que estavam abertos: a passagem da Rádio no desktop, as barras numa faixa real e a entrada do Estúdio em `/studio`. Não há correção de movimento, visualizador ou Estúdio na fila.
+O site ainda não foi lançado. Em 05/10/2026 Cassiano aceitou a passagem da Rádio, as barras e a entrada do Estúdio que já estava na Home. A fila da Rádio está fechada. C1–C8 não voltam como implementação.
+
+A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com Impressão 3D sob demanda, Placas e Caixas. O plano está em [STUDIO_GROWTH_PLAN_V1.md](STUDIO_GROWTH_PLAN_V1.md) e a execução em [08](work/08-studio-growth.md). O hub visual foi aprovado. O frontend comercial continua bloqueado enquanto o handoff [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md) estiver com `ready_for_frontend: no`.
 
 ## Próximos passos
 
-Não há passo de produto aberto. Publicar espera Cassiano definir o alvo (E2). Conteúdo novo do Estúdio entra quando ele entregar peça e fotos (E3). Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila.
+1. Fechar o gate de experiência do Estúdio: revisão visual das próximas superfícies e uma etapa do Orçamento com direção visual final. Só então `ready_for_frontend` passa a `yes`.
+2. Publicar espera Cassiano definir o alvo (E2). Fotos e peças reais seguem o [inventário de mídia](design/STUDIO_MEDIA_INVENTORY_V1.md).
+
+Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio não altera o motion spine da Rádio.
 
 ## Sequência
 
@@ -22,8 +27,14 @@ Não há passo de produto aberto. Publicar espera Cassiano definir o alvo (E2). 
 | 06 | Motor de rádio e visualizador | done | Cassiano aceitou as barras em 05/10/2026; [checklist](work/06-radio-engine.md) |
 | 06b | Letras sincronizadas | blocked | Painel e pipeline existem. Uma faixa real só quando Cassiano pedir; [checklist](work/06b-synced-lyrics.md) |
 | 07 | Rádio pronta na interface | dropped | A Rádio visível é a da Home, nas entregas 03b e 06. Não há uma segunda construção |
-| 08 | Entrada do Estúdio | done | Cassiano aceitou a entrada atual em 05/10/2026. Peça e fotos novas esperam E3 |
-| 09 | Validar marco para lançamento | blocked | Espera o alvo de publicação (E2) |
+| 08 | Estúdio público: aquisição, orçamento e produtos | in_progress | Hub, orçamento, produtos, impressão sob demanda, Placas, Caixas e Search. [checklist](work/08-studio-growth.md) |
+| 09 | Validar marco para lançamento | blocked | Espera o gate do Estúdio e o alvo de publicação (E2) |
+
+## Frente do Estúdio
+
+Contratos: [Search](STUDIO_SEARCH_DISCOVERY_V1.md), [Orçamento](STUDIO_QUOTE_FLOW_V1.md), [Catálogo 3D](CATALOG_3D.md), [wireframes](design/STUDIO_COMMERCE_WIREFRAMES_V1.md) e [mídia](design/STUDIO_MEDIA_INVENTORY_V1.md).
+
+Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hub, Impressões, impressão sob demanda, Placas, Caixas, Orçamento, Produtos, gate de lançamento e crescimento por dados. Infraestrutura de Search que não cristalize layout pode avançar com o gate visual ainda aberto.
 
 ## Bloqueios externos
 
@@ -36,4 +47,4 @@ Não há passo de produto aberto. Publicar espera Cassiano definir o alvo (E2). 
 
 ## Regras
 
-Este arquivo é a única sequência. O checklist da entrega guarda evidência e não abre outra fila. Um passo fechado não volta como trabalho novo. C1–C8, quando citados no [plano de movimento](design/CM_MOTION_EXPERIENCE_PLAN_V1.md), descrevem qualidade; não autorizam implementação enquanto esta fila estiver vazia.
+Este arquivo é a única sequência. O checklist da entrega guarda evidência e não abre outra fila. Um passo fechado não volta como trabalho novo. C1–C8, quando citados no [plano de movimento](design/CM_MOTION_EXPERIENCE_PLAN_V1.md), descrevem qualidade; não autorizam implementação enquanto a Rádio estiver aceita.

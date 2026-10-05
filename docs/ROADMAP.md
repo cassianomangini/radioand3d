@@ -8,10 +8,10 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 
 ## Próximos passos
 
-1. Fechar QA visual/renderizado do Produto individual e continuar o conteúdo real ainda faltante: Impressões, Placas/Caixas e permissões de publicação.
-2. Fechar backend seguro do Orçamento: storage privado, validação, retenção, persistência, triagem e confirmação.
-3. Fazer a revisão visual final das superfícies restantes e substituir placeholders somente na última etapa.
-4. Publicar espera Cassiano definir o alvo (E2); produção permanece `noindex` até o gate de lançamento.
+1. Fechar o contrato local seguro do Orçamento: arquivos reais no estado, formatos, limites e validação reutilizável no servidor.
+2. Backend remoto do Orçamento: storage privado, inspeção server-side, retenção, persistência, triagem e confirmação — bloqueado até a escolha explícita do alvo em E2.
+3. Conteúdo real de Impressões/Placas/Caixas e revisão visual final ficam para a etapa de mídia, conforme decisão de deixar imagens por último.
+4. Publicação continua bloqueada por E2; produção permanece `noindex` até o gate de lançamento.
 
 Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio não altera o motion spine da Rádio.
 
@@ -43,7 +43,7 @@ Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hu
 | Código | Pendência | Quem resolve | O que bloqueia |
 | --- | --- | --- | --- |
 | E1 | Confirmar repositório privado | Cassiano | Cópia de conteúdo privado |
-| E2 | Aprovar alvo, autenticação e orçamento | Cassiano | Escritas remotas e publicação |
+| E2 | Definir o projeto/backend remoto do CM e o alvo de publicação | Cassiano | Storage/persistência do Orçamento e publicação |
 | E3 | Selecionar peça, fotos e permissões | Cassiano | Conteúdo real do Estúdio no lançamento |
 | E5 | Definir contato comercial de continuidade | Cassiano | Chamadas comerciais e continuidade após triagem |
 

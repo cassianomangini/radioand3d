@@ -438,7 +438,7 @@ try {
     client,
     `(() => {
       const pathOk = window.location.pathname === "/studio/impressoes";
-      const heading = document.querySelector("h1")?.textContent ?? "";
+      const heading = document.querySelector('[data-studio-route-content="true"] h1')?.textContent ?? "";
       const headingOk = heading.includes("O que já saiu");
       const audioPreserved = document.querySelector("audio") === window.__cmStudioNestedAudioNode;
       return {
@@ -564,7 +564,7 @@ try {
   const onDemandRouteReached = await evaluate(
     client,
     `window.location.pathname === "/studio/impressao-3d-sob-demanda" &&
-      document.querySelector("h1")?.textContent?.includes("Já tem o arquivo 3D") === true`
+      document.querySelector('[data-studio-route-content="true"] h1')?.textContent?.includes("Já tem o arquivo 3D") === true`
   );
   if (!onDemandRouteReached) throw new Error("On-demand Studio route did not render its main content.");
   await screenshot(client, "desktop-studio-on-demand-1440x900.png");

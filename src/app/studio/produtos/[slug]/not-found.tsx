@@ -12,6 +12,7 @@ export default function ProductNotFound() {
       lead="A URL não corresponde a um produto disponível no catálogo público do Estúdio."
       pathname="/studio/produtos"
       breadcrumbLabel="Produto não encontrado"
+      breadcrumbParents={[{ name: "Produtos", href: "/studio/produtos" }]}
     >
       <StudioSection title="Veja somente o que está realmente publicado">
         <p>

@@ -7,8 +7,8 @@ import { StudioRadioShell } from "./studio-radio-shell";
 export function PublicExperience({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  if (pathname === "/" || pathname === "/studio") {
-    return <StudioRadioShell />;
+  if (pathname === "/" || pathname.startsWith("/studio")) {
+    return <StudioRadioShell>{children}</StudioRadioShell>;
   }
 
   return <>{children}</>;

@@ -8,9 +8,9 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 
 ## Próximos passos
 
-1. Fechar o que ainda depende de conteúdo real: fotos/provas, primeiros itens de Impressões, primeiros Produtos e permissões de publicação.
+1. Fechar QA visual/renderizado do Produto individual e continuar o conteúdo real ainda faltante: Impressões, Placas/Caixas e permissões de publicação.
 2. Fechar backend seguro do Orçamento: storage privado, validação, retenção, persistência, triagem e confirmação.
-3. Fazer a revisão visual final das superfícies e substituir placeholders somente na última etapa.
+3. Fazer a revisão visual final das superfícies restantes e substituir placeholders somente na última etapa.
 4. Publicar espera Cassiano definir o alvo (E2); produção permanece `noindex` até o gate de lançamento.
 
 Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio não altera o motion spine da Rádio.
@@ -36,7 +36,7 @@ Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio
 
 Contratos: [Search](STUDIO_SEARCH_DISCOVERY_V1.md), [Orçamento](STUDIO_QUOTE_FLOW_V1.md), [Catálogo 3D](CATALOG_3D.md), [wireframes](design/STUDIO_COMMERCE_WIREFRAMES_V1.md) e [mídia](design/STUDIO_MEDIA_INVENTORY_V1.md).
 
-Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hub, Impressões, impressão sob demanda, Placas, Caixas, Orçamento, Produtos, gate de lançamento e crescimento por dados. Infraestrutura de Search que não cristalize layout pode avançar com o gate visual ainda aberto.
+Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hub, Impressões, impressão sob demanda, Placas, Caixas, Orçamento, Produtos, gate de lançamento e crescimento por dados. A origem pública inicial de Produtos está resolvida como projeção editorial controlada do Artesópolis Admin/Shopee; sincronização dinâmica não é requisito desta etapa. Infraestrutura de Search que não cristalize layout pode avançar com o gate visual ainda aberto.
 
 ## Bloqueios externos
 
@@ -45,7 +45,7 @@ Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hu
 | E1 | Confirmar repositório privado | Cassiano | Cópia de conteúdo privado |
 | E2 | Aprovar alvo, autenticação e orçamento | Cassiano | Escritas remotas e publicação |
 | E3 | Selecionar peça, fotos e permissões | Cassiano | Conteúdo real do Estúdio no lançamento |
-| E5 | Definir origem dos dados 3D e o contato | Cassiano | Catálogo 3D e chamadas comerciais |
+| E5 | Definir contato comercial de continuidade | Cassiano | Chamadas comerciais e continuidade após triagem |
 
 ## Regras
 

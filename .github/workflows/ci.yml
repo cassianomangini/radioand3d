@@ -87,6 +87,10 @@ jobs:
 
           "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=1600             --run-all-compositor-stages-before-draw             --window-size=390,844             --screenshot="$GITHUB_WORKSPACE/visual-review/mobile-390.png"             http://127.0.0.1:3000/
 
+          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=2200             --run-all-compositor-stages-before-draw             --window-size=1440,1000             --screenshot="$GITHUB_WORKSPACE/visual-review/product-desktop-1440.png"             http://127.0.0.1:3000/studio/produtos/porta-curativos-compacto
+
+          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=2200             --run-all-compositor-stages-before-draw             --window-size=390,844             --screenshot="$GITHUB_WORKSPACE/visual-review/product-mobile-390.png"             http://127.0.0.1:3000/studio/produtos/porta-curativos-compacto
+
           BROWSER="$BROWSER" node scripts/capture-radio-states.mjs "$GITHUB_WORKSPACE/visual-review"
 
       - name: Upload visual review

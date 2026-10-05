@@ -91,9 +91,11 @@ Cadastro completo, estoque em tempo real, cálculo automático de orçamento e c
 
 ## Origem e atualização
 
-Decidir entre leitura pública controlada do Admin ou cadastro editorial mínimo mantido no CM.
+A origem pública inicial de Produtos está definida como **projeção editorial controlada do catálogo live do Artesópolis Admin/Shopee**.
 
-Registrar origem e data de atualização; dados desconhecidos ficam como “sob consulta”, nunca como estoque garantido.
+Nesta fase o CM mantém um snapshot público curado no código com somente mídia, nome, descrição sanitizada, medidas, material, variações e link comercial. Custos, SKU, quantidade de estoque, payload bruto e demais dados operacionais não entram no site público.
+
+Sincronização dinâmica pode ser adicionada depois; não é pré-requisito para publicar a página de produto. Registrar origem e data de atualização; dados desconhecidos ficam como “sob consulta”, nunca como estoque garantido.
 
 Separar estado editorial (`draft`, `published`, `archived`) de disponibilidade física. Um item publicado pode estar indisponível.
 

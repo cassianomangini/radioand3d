@@ -44,7 +44,7 @@ Este trabalho corre em paralelo à fila da Rádio e **não pode alterar o motion
 
 ## Bloco S1.0B — Gate de experiência
 
-Estado atual: **ready_for_frontend: no**
+Estado atual: **ready_for_frontend: parcial — Produto individual aprovado; demais superfícies visuais ainda pendentes**
 
 Antes de layout visível substancial:
 
@@ -66,8 +66,9 @@ Antes de layout visível substancial:
 - [x] incluir serviço explícito de Impressão 3D sob demanda para arquivo pronto;
 - [x] revisar wireframe atualizado do hub;
 - [x] aprovar mock visual final do hub `/studio` desktop/mobile;
-- [ ] revisão visual das próximas superfícies por Cassiano;
-- [ ] mudar `ready_for_frontend` para `yes` somente após aprovação.
+- [x] direção visual final do Produto individual aprovada por Cassiano em 05/10/2026;
+- [ ] revisão visual das demais superfícies por Cassiano;
+- [ ] mudar o gate global para `yes` somente após aprovação das superfícies restantes.
 
 ### Regra S1.0B
 
@@ -196,9 +197,9 @@ Visitante frio entende em poucos segundos:
 - [x] preview preparado para mídia fotográfica real, sem item sintético quando catálogo está vazio;
 - [x] rota individual `/studio/produtos/[slug]` preparada;
 - [x] direção visual final da página individual aprovada em 05/10/2026 e documentada em `docs/design/STUDIO_PRODUCT_PAGE_VISUAL_V1.md`;
-- [ ] fotos/medidas/material/opções reais;
-- [ ] galeria real com suporte a vídeo quando o produto tiver mídia útil;
-- [ ] diagrama visual de dimensões para produtos em que medida externa/interna muda a decisão;
+- [x] primeiro recorte com fotos/medidas/material/opções reais do Admin/Shopee;
+- [x] galeria real com suporte a vídeo quando o produto tiver mídia útil;
+- [x] diagrama visual de dimensões para produtos em que medida externa/interna muda a decisão;
 - [x] CTA comercial definido como **Comprar na Shopee**;
 - [x] sem carrinho, sem checkout próprio e sem botão “Adicionar ao carrinho”;
 - [x] explicar que finalização/pagamento acontecem na Shopee;
@@ -206,8 +207,9 @@ Visitante frio entende em poucos segundos:
 - [x] contrato de disponibilidade: disponível / sob consulta / indisponível, com data e origem de verificação;
 - [x] ponte “precisa de outra medida?” → orçamento;
 - [x] metadata individual preparada;
-- [ ] dados estruturados aplicáveis;
-- [x] nenhum produto fake para preencher grade.
+- [x] `Product` nas páginas individuais e `ItemList` no catálogo sem inventar oferta/preço;
+- [x] nenhum produto fake para preencher grade;
+- [ ] QA renderizado desktop/mobile da implementação visual aprovada.
 
 ## Bloco S1.8 — Gate de lançamento
 
@@ -293,7 +295,6 @@ Continua pendente e **não deve ser marcado como pronto**:
 
 - fotos/prova real;
 - catálogo/dataset de Impressões;
-- produtos reais e páginas individuais;
 - armazenamento privado e validação de upload;
 - persistência/triagem do orçamento;
 - envio final do orçamento;
@@ -345,3 +346,18 @@ Decisão desta fase:
 - o conteúdo comercial já chega como HTML útil e rastreável;
 - otimização de custo/cache da Rádio deve ser um recorte separado, com QA de continuidade de áudio e fila.
 
+
+
+## Implementação Produto individual — branch `feat/studio-product-detail-v1`
+
+- primeiro recorte público derivado do catálogo live do Artesópolis Admin/Shopee;
+- somente campos úteis ao visitante: mídia, medidas, material, variações, descrição e link comercial;
+- custos, SKU, quantidade de estoque e dados operacionais não são publicados;
+- galeria navegável e preview de variações usam mídia real do anúncio;
+- dimensões aparecem como informação técnica de primeira classe;
+- CTA comercial único: **Comprar na Shopee**;
+- sem carrinho, checkout, frete ou seletor de quantidade local;
+- metadata recebe imagem real do produto;
+- páginas individuais geram `Product` sem `Offer` inventado;
+- catálogo gera `ItemList` quando a URL pública está configurada;
+- QA renderizado e validação final de CI ficam como gate antes do merge.

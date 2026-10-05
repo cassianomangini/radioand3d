@@ -436,7 +436,7 @@ Enquanto esse artefato estiver com `ready_for_frontend: no`, trabalho técnico i
 
 ### S1.7 — Produtos
 
-- catálogo interno;
+- catálogo público derivado de projeção editorial controlada do Admin/Shopee;
 - páginas individuais;
 - direção visual individual aprovada em `docs/design/STUDIO_PRODUCT_PAGE_VISUAL_V1.md`;
 - galeria real com foto/vídeo;
@@ -444,7 +444,7 @@ Enquanto esse artefato estiver com `ready_for_frontend: no`, trabalho técnico i
 - link externo no nível do produto;
 - CTA único **Comprar na Shopee**;
 - sem carrinho/checkout interno;
-- schema aplicável sem inventar checkout próprio.
+- `Product`/`ItemList` somente com dados visíveis e sem oferta inventada.
 
 ### S1.8 — Gate de lançamento SEO
 
@@ -490,7 +490,7 @@ Enquanto esse artefato estiver com `ready_for_frontend: no`, trabalho técnico i
 4. **Contato de continuidade** — e-mail, WhatsApp ou ambos depois da triagem.
 5. **Perfil da Empresa no Google** — endereço físico público, operação híbrida ou área de serviço.
 6. **Domínio público definitivo** — necessário para canonical, Search Console e produção.
-7. **Fonte de produtos** — cadastro editorial no site ou leitura controlada de fonte já existente.
+7. **Fonte de produtos — resolvida em 05/10/2026:** projeção editorial controlada do catálogo live do Artesópolis Admin/Shopee. O frontend publica somente campos seguros e úteis; sincronização dinâmica fica para etapa posterior.
 
 ## Critério de sucesso
 

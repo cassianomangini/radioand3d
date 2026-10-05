@@ -8,7 +8,7 @@ type StudioBreadcrumbItem = {
   href: string;
 };
 
-function StudioBreadcrumbs({
+export function StudioBreadcrumbs({
   currentLabel,
   pathname,
   parents = []

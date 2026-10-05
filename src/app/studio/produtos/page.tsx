@@ -8,31 +8,50 @@ import {
 } from "@/components/studio/studio-content";
 import catalogStyles from "@/components/studio/studio-catalog.module.css";
 import { studioProducts } from "@/features/studio/catalog";
-import { buildPublicMetadata } from "@/lib/site-config";
+import {
+  absoluteSiteUrl,
+  buildPublicMetadata
+} from "@/lib/site-config";
 
 export const metadata = buildPublicMetadata({
   title: "Produtos do Estúdio | CM 3D & Radio",
   description:
-    "Produtos próprios do Estúdio apresentados com fotos, medidas, materiais e informações antes da compra na Shopee.",
+    "Produtos impressos em 3D apresentados com fotos, medidas, materiais e variações antes da compra na Shopee.",
   pathname: "/studio/produtos"
 });
 
 export default function StudioProductsPage() {
+  const itemList = studioProducts.flatMap((product, index) => {
+    const url = absoluteSiteUrl(`/studio/produtos/${product.slug}`);
+    return url
+      ? [{
+          "@type": "ListItem",
+          position: index + 1,
+          name: product.title,
+          url
+        }]
+      : [];
+  });
+
   return (
     <StudioPageShell
       eyebrow="Produtos"
-      title="Conheça aqui. Compre na Shopee."
-      lead="O nosso domínio explica cada peça. Quando o produto estiver publicado, a Shopee entra somente no passo de finalizar a compra, pagamento e disponibilidade."
+      title="Conheça a peça antes de comprar."
+      lead="Fotos, medidas, variações e detalhes ficam organizados aqui. A Shopee entra somente no momento de finalizar a compra."
       pathname="/studio/produtos"
       breadcrumbLabel="Produtos"
     >
-      <StudioSection title="Catálogo sem produto fictício">
+      <StudioSection title="Produtos do Estúdio">
         {studioProducts.length ? (
           <div className={catalogStyles.grid}>
             {studioProducts.map((product) => {
               const image = product.images[0];
               return (
-                <Link className={catalogStyles.item} href={`/studio/produtos/${product.slug}`} key={product.slug}>
+                <Link
+                  className={catalogStyles.item}
+                  href={`/studio/produtos/${product.slug}`}
+                  key={product.slug}
+                >
                   {image ? (
                     <div className={catalogStyles.media}>
                       <Image
@@ -59,16 +78,18 @@ export default function StudioProductsPage() {
           />
         )}
         <p>
-          Cada produto real terá página própria com fotos, medidas, material, opções e
-          contexto suficiente para a pessoa decidir se faz sentido antes de sair do site.
+          Cada produto abre uma página própria com galeria, medidas, ficha técnica e
+          variações reais antes da saída para a Shopee.
         </p>
       </StudioSection>
 
-      <StudioSection eyebrow="Compra externa" title="Preço e disponibilidade ficam onde são confiáveis">
+      <StudioSection
+        eyebrow="Compra externa"
+        title="Preço e disponibilidade são confirmados na Shopee"
+      >
         <p>
-          Enquanto não existir sincronização segura de preço e estoque, o site não replica
-          números que podem ficar desatualizados. A página do produto usa “Ver preço e
-          disponibilidade na Shopee”.
+          O site não replica preço ou estoque sem sincronização confiável. A página
+          própria explica a peça e mantém um único CTA comercial: “Comprar na Shopee”.
         </p>
       </StudioSection>
 
@@ -79,6 +100,19 @@ export default function StudioProductsPage() {
         </p>
         <PrimaryLink href="/studio/orcamento">Pedir algo personalizado</PrimaryLink>
       </StudioSection>
+
+      {itemList.length === studioProducts.length ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              itemListElement: itemList
+            })
+          }}
+        />
+      ) : null}
     </StudioPageShell>
   );
 }

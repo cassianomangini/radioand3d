@@ -314,20 +314,28 @@ Não usar IA ou regras automáticas para recusar silenciosamente um cliente sem 
 
 O payload interno usa `schemaVersion: 1` e não depende de URL pública de arquivo nem de um provider específico.
 
+Antes da validação de negócio, o backend deve decodificar a entrada como `unknown` e aceitar somente o formato `schemaVersion: 1`.
+
 A validação compartilhável cobre:
 
+- versão e forma estrutural do payload;
 - coerência entre tipo e detalhes do projeto;
 - presença e política estrutural dos anexos;
+- estado coerente entre “tenho referência” e “não tenho arquivo agora”;
 - quantidade;
+- preferência de material/acabamento quando o visitante declarar que possui uma;
+- observação do arquivo pronto quando informada;
 - dados mínimos específicos de placa/caixa/outro;
 - nome e canal de contato;
 - formato básico do e-mail ou WhatsApp.
 
-A triagem inicial pode resultar em:
+A triagem estrutural inicial pode resultar em:
 
 - `ready-for-review`;
 - `needs-information`;
 - `incomplete`.
+
+“Revisão manual / fora de escopo” é uma decisão operacional posterior, não um status automático calculado pelo contrato.
 
 Storage, inspeção binária, retenção, persistência e confirmação continuam responsabilidades do adapter/backend remoto escolhido depois.
 

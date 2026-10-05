@@ -31,7 +31,7 @@ export async function generateMetadata({
   }
 
   return buildPublicMetadata({
-    title: `${product.title} | Produtos do Estúdio`,
+    title: `${product.title} | Produtos do Estúdio | CM 3D & Radio`,
     description: product.summary,
     pathname: `/studio/produtos/${product.slug}`
   });

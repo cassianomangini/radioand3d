@@ -20,6 +20,8 @@ export default function OnDemandPrintingPage() {
       eyebrow="Impressão 3D sob demanda"
       title="Já tem o arquivo 3D?"
       lead="Envie para análise e verificamos se conseguimos produzir a peça. O envio não significa aceite automático: primeiro avaliamos a viabilidade do modelo e as condições do pedido."
+      pathname="/studio/impressao-3d-sob-demanda"
+      breadcrumbLabel="Impressão 3D sob demanda"
     >
       <PrimaryLink href="/studio/orcamento?tipo=impressao">
         Enviar arquivo para análise

@@ -14,12 +14,13 @@ import {
   quoteFilePolicyLabel,
   validateQuoteFiles
 } from "@/features/studio/quote-contract";
+import type {
+  QuoteContactMethod as ContactMethod,
+  QuoteMaterialChoice as MaterialChoice,
+  QuoteProjectType as ProjectType
+} from "@/features/studio/quote-request-contract";
 import { trackPublicEvent } from "@/lib/public-analytics";
 import styles from "./quote-wizard.module.css";
-
-type ProjectType = "impressao" | "placa" | "caixa" | "outro";
-type ContactMethod = "whatsapp" | "email";
-type MaterialChoice = "" | "nao-sei" | "tenho-preferencia";
 
 const labels: Record<ProjectType, string> = {
   impressao: "Imprimir um arquivo 3D que já tenho",

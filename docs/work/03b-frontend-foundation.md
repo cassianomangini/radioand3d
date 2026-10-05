@@ -1,5 +1,7 @@
 # Entrega 03b: base visual compartilhada Estúdio + Rádio
 
+Passo atual: nenhum. Cassiano aceitou a passagem da Rádio em 05/10/2026. O restante deste arquivo é evidência. Um item antigo desmarcado não reabre trabalho. A fila está no [roadmap](../ROADMAP.md).
+
 ## Objetivo
 
 Implementar a primeira superfície real a partir do pacote visual aprovado por Cassiano, sem reabrir composição no código.
@@ -31,9 +33,7 @@ Artefato aprovado: `docs/design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md`.
 
 ## Limite desta entrega
 
-O transporte da Rádio neste PR demonstra estado visual. O motor de áudio, biblioteca real, storage e visualizador conectado ao áudio pertencem às entregas 04/06/07.
-
-A Home continua `noindex` enquanto o marco integrado não estiver pronto.
+O shell da Home está na `main`, com o motor de áudio da entrega 06. A entrega 07 não existe mais como construção separada.
 
 ## Aceite
 
@@ -243,42 +243,19 @@ Objetivo: aplicar `x1_fundo.png` enviado por Cassiano e reproduzir texto, alinha
 - [ ] Executar lint, typecheck e revisar diff.
 - [ ] Cassiano conferir o resultado visual.
 
-## Retomada da transformação da Rádio — C1, 03/10/2026
+## Passagem da Rádio
 
-Responsável: CM Frontend. Base de código revisada: `origin/main` `62c2779`. Contratos lidos: [Experiência](../EXPERIENCE.md), [Rádio](../RADIO.md) e [plano de movimento](../design/CM_MOTION_EXPERIENCE_PLAN_V1.md). A fila e o estado de C1–C8 ficam no [roadmap](../ROADMAP.md). A revisão documental ocorreu em `docs/motion-sequence`; nenhuma mudança de interface foi feita nesta retomada.
+A implementação está na `main`, incluindo o spine interrompível e a coreografia de focus/tela inteira, até `6ca9a13`. A fila vigente está no [roadmap](../ROADMAP.md).
 
-Objetivo observável: ao sair da Rádio acoplada, passar pelo focus workstation e abrir a tela grande, Cassiano consegue ver uma recomposição expressiva da arte, faixa atual, visualizador, controles e fila, com retorno coerente ao split. O áudio, a fila, a posição e o volume continuam os mesmos. O botão/link e o arraste devem convergir para o mesmo estado. A prova precisa ocorrer no HEAD atualizado que contém a transição. O Estúdio `/studio`, letras e microefeitos isolados não substituem esse resultado.
+- [x] Spine, estados de layout e coreografia da passagem entraram na `main` depois de `62c2779`.
+- [x] Cassiano aceitou a passagem em 05/10/2026.
 
-Limites: não modificar o título do Estúdio nesta frente; não publicar mídia nem concluir C2–C7 como compensação. A revisão visual e das interações pertence a Cassiano. Código e testes automáticos podem apoiar a correção, mas não demonstram a percepção do movimento.
-
-- [x] Conferir branch, HEAD, diff local e seis commits adicionais de `origin/main`. O checkout principal recebeu um `pull` externo durante a revisão e terminou em `62c2779`, sem diff local; a branch documental não modificou seu código.
-- [x] Conferir no código `62c2779` a medição dos elementos reais, a animação FLIP/WAAPI e o caminho inverso; consultar o [inventário técnico](../design/CM_MOTION_IMPLEMENTATION_LOG_2026-10-03.md).
-- [ ] Identificar o HEAD servido pelo localhost usado na comparação; confirmar que contém `62c2779` antes de atribuir o resultado à transição atual.
-- [ ] Cassiano verificar em desktop a Rádio acoplada, focus, tela inteira e retorno, tanto pelo controle/link quanto pelo arraste, com música tocando.
-- [ ] Registrar quais elementos ganharam presença e detalhe e quais continuam parecendo uma barra lateral ampliada; corrigir os defeitos observados dentro de C1.
-- [ ] Após cada correção, verificar interrupção/reversão, continuidade do áudio, teclado, movimento reduzido e verificações de código pertinentes.
-- [ ] Registrar a avaliação perceptiva de Cassiano e somente então avançar a fila no roadmap.
-
-| Critério | Evidência disponível nesta retomada | Limite |
-| --- | --- | --- |
-| Elementos animados entre as composições | Leitura estática de `collectRadioFlipSnapshot`/`animateRadioFlip` e commit `62c2779` | O código não prova que a transformação é visível ou convincente. |
-| Verificações anteriores | [Inventário técnico de 03/10](../design/CM_MOTION_IMPLEMENTATION_LOG_2026-10-03.md) relata lint, tipos, testes, build e capturas | Não foram reexecutadas nesta mudança documental. |
-| Percepção do efeito | Cassiano informou em 03/10 que ainda não vê a mudança grande prometida | Requer comparação no HEAD servido e correção guiada pelo que ele observar. |
-
-Retomada exata: conferir o HEAD do servidor local e fazer a revisão de C1 na versão atualizada; anotar o primeiro defeito perceptivo da passagem split → focus → tela inteira e corrigi-lo antes de seguir para C2. A edição local vista na inspeção inicial deixou de aparecer no checkout principal após o `pull` externo; confirmar com seu responsável se ela ainda era necessária.
+Não acrescentar coreografia, atraso nem outro motor de animação.
 
 ## Ajustes da Rádio pedidos em 03/10/2026
 
 Responsável: CM Frontend. Contrato lido: [Rádio](../RADIO.md). Objetivo: corrigir o formato dos controles no Full e permitir alternar o espaço entre playlist e letra com ação de fechar. A playlist abre embaralhada e mantém a ordem durante a reprodução. Cassiano corrigiu o aceite do botão Embaralhar: ele também deve trocar a faixa atual, respeitando o estado tocando/pausado. Os ícones de Embaralhar e Repetir faixa devem comunicar melhor cada ação. Limites: preservar arquivos de mídia, Estúdio e alterações locais existentes. Aceite pendente de Cassiano: controles compactos e circulares no mobile, playlist com mais espaço por padrão, letra que abre e fecha, troca imediata de faixa ao embaralhar e ícones claros. Na correção anterior, Cassiano pediu que não fossem executados testes nem aberto o navegador; nesta revisão, os 15 testes da fila e os 65 testes gerais passaram, assim como lint, typecheck, build e `git diff --check`. A validação visual e das interações continua com Cassiano.
 
-## Seta da divisória desktop em 03/10/2026
+## Seta da divisória desktop
 
-Responsável: CM Frontend. Contratos lidos: [Experiência](../EXPERIENCE.md) e [Rádio](../RADIO.md). Objetivo: fazer a seta piscante indicar o arraste assim que Cassiano pressiona a divisória, integrada à barra. Limites: preservar o redimensionamento, os estados de expansão/tela inteira e o comportamento mobile. Aceite: a seta aparece dentro da largura da barra, alterna azul e rosa sem círculo ciano, acompanha a divisória durante o arraste e some ao soltar ou entrar em tela inteira; um clique sem arrastar continua expandindo/recolhendo. Cassiano confere aparência e interação.
-
-- [x] Conferir `main`, HEAD, diff, contratos e condição atual da seta.
-- [x] Corrigir o estado e a posição da seta.
-- [ ] Corrigir a aparência após Cassiano rejeitar o círculo ciano mostrado na captura: seta pequena dentro da barra, piscando em azul e rosa.
-- [ ] Revisar o diff e executar `git diff --check` após a correção visual.
-- [ ] Cassiano conferir a seta piscando no clique e durante o arraste, seu desaparecimento ao soltar e o clique simples para expandir/recolher.
-
-Evidência de código: antes, `handlePointerDown` desligava a dica e o atributo visual exigia `radioExpanded`; agora o atributo acompanha `showResizeHint` durante o gesto. A primeira tentativa usou um círculo ciano que Cassiano rejeitou na captura enviada. Lint, typecheck, build e testes não foram executados nesta correção, conforme a regra de execução apenas por pedido explícito. A aplicação não foi aberta no navegador e não houve validação visual pelo agente. Próximo passo: Cassiano conferir o comportamento e a aparência da seta na divisória desktop; corrigir qualquer defeito observado antes de considerar este ajuste aprovado.
+Esta frente saiu da fila. A divisória segue o comportamento que está na `main`. Não retomar a seta piscante nem o círculo ciano como passo seguinte.

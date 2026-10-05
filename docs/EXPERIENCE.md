@@ -126,7 +126,7 @@ A arquitetura, o nível de ambição e os gates de qualidade da próxima camada 
 
 ## Handoff estrutural
 
-A geometria, o shell responsivo, os limites da Rádio, a ordem mobile e a estratégia de crescimento progressivo do 3D estão documentados em [STUDIO_RADIO_HANDOFF_V1.md](design/STUDIO_RADIO_HANDOFF_V1.md). A proposta de tipografia, paleta, superfícies e motion está em [CM_VISUAL_SYSTEM_V1.md](design/CM_VISUAL_SYSTEM_V1.md). Os estados, responsabilidades e limites dos componentes do primeiro recorte estão em [CM_COMPONENT_STATES_V1.md](design/CM_COMPONENT_STATES_V1.md). Os três artefatos permanecem sujeitos à aprovação visual de Cassiano.
+A geometria, o shell responsivo, os limites da Rádio, a ordem mobile e a estratégia de crescimento progressivo do 3D estão documentados em [STUDIO_RADIO_HANDOFF_V1.md](design/STUDIO_RADIO_HANDOFF_V1.md). A proposta de tipografia, paleta, superfícies e motion está em [CM_VISUAL_SYSTEM_V1.md](design/CM_VISUAL_SYSTEM_V1.md). Os estados, responsabilidades e limites dos componentes do primeiro recorte estão em [CM_COMPONENT_STATES_V1.md](design/CM_COMPONENT_STATES_V1.md). Cassiano aprovou esse conjunto na entrega 03. O pacote está em [STUDIO_RADIO_APPROVAL_PACKAGE_V1.md](design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md).
 
 ## Artefato de aprovação da entrega 03
 
@@ -147,7 +147,7 @@ Aplicar a mesma linguagem ao Inbox somente no nível necessário para manter coe
 
 Handoff: grade, hierarquia, proporções, conteúdo disponível, fotos/capas, componentes mínimos, estados, mapa de tokens, motion, fallback, foco e comportamento responsivo. Registrar o que o frontend não pode inventar; vários agentes não podem decidir fontes, cores ou ornamentos independentemente.
 
-Registrar `ready_for_frontend: yes|no`, `artifact_ref`, `approved_by` e referência da aprovação recebida. O pacote consolidado de decisão está em [STUDIO_RADIO_APPROVAL_PACKAGE_V1.md](design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md). Até Cassiano aprovar, manter `ready_for_frontend: no`. Provas técnicas neutras ficam fora de produção. Construir a base visual aprovada antes de multiplicar páginas.
+A entrega 03 está aprovada por Cassiano. O pacote está em [STUDIO_RADIO_APPROVAL_PACKAGE_V1.md](design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md), com `ready_for_frontend: yes`. Provas técnicas neutras ficam fora de produção.
 
 ## Verificação e rejeição
 

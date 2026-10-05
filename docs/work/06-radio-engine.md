@@ -1,5 +1,7 @@
 # Entrega 06: motor e fila da CM Rádio
 
+Passo atual: nenhum. Cassiano aceitou as barras em 05/10/2026. O restante deste arquivo é evidência. Um item antigo desmarcado não reabre o pipeline. A fila está no [roadmap](../ROADMAP.md).
+
 ## Identificação
 
 ID do roadmap: 06. Responsável: CM Audio. Branch atual: `feat/radio-r2-catalog`, baseada em `fix/radio-mockup-fidelity` (`f67701b`). Contratos lidos: [Rádio](../RADIO.md), [biblioteca](../MUSIC_PIPELINE.md) e [arquitetura](../ARCHITECTURE.md). A entrega 02 fornece o projeto local; o contrato editorial definitivo da entrega 04 continua pendente.
@@ -116,25 +118,18 @@ A v3 preserva voz, baixo e bateria da v2 e altera somente o tratamento do stem `
 
 Cassiano pediu que as músicas já ouvidas não sumam de **A seguir**: elas passam para o fim da ordem aleatória, para poderem ser escolhidas de novo. O avanço automático e o término natural continuam sem repetir a playlist. **Nova ordem** ainda reinicia o ciclo. Responsável: CM Audio. Branch `fix/shuffle-keeps-played-tracks`. Contrato alterado: `docs/RADIO.md`. A escuta dessa fila no navegador continua com Cassiano.
 
-## Retomada do movimento musical — C2/C3
+## Visualizador
 
-Responsável: CM Audio. Contratos: [Rádio](../RADIO.md) e [plano de movimento](../design/CM_MOTION_EXPERIENCE_PLAN_V1.md). A ordem e o estado destas frentes ficam somente no [roadmap](../ROADMAP.md). O código de sidecar v3, reamostramento, fallback e inspeção já existe; ainda não há evidência registrada aqui de comparação perceptiva entre várias músicas reais após o sync completo.
+Os sidecars v3 e o renderer estão na `main`. C2 e C3 não são passos atuais. A fila vigente está no [roadmap](../ROADMAP.md).
 
-- [ ] Depois do gate C1, confirmar sidecars v3 atuais para faixas reais de perfis vocal, instrumental, calmo e denso, sem apresentar fixture como acervo publicado.
-- [ ] Inspecionar os derivados e verificar relógio do player, seek, pausas, silêncio e fallback quando faltar sidecar.
-- [ ] Cassiano ouvir as faixas e conferir se voz central, bateria, baixo e instrumentos melódicos/harmônicos aparecem sem pulso inventado ou movimento uniforme.
-- [ ] Registrar faixas, resultados observados, correções e verificações de código pertinentes antes de pedir avanço de C2 e C3 no roadmap.
-
-Próximo passo desta frente: aguardar C1 e então selecionar a amostra real do sync para a comparação acima. Implementação antecipada não equivale a aceite musical.
+- [x] Cassiano aceitou as barras em 05/10/2026. Não gerar outro sidecar nem reabrir o pipeline.
 
 ## Resposta lenta das barras no desktop em 03/10/2026
 
-Responsável: CM Audio. Destino: `main`. Contrato lido: [Rádio](../RADIO.md). Objetivo: fazer as barras com sidecar v3 acompanharem os quadros sincronizados com subida e descida perceptíveis, sem atraso excessivo. Limite: somente o renderer; preservar o fallback ao vivo, os derivados já gerados e as alterações locais de outras entregas. Critério de aceite técnico: o renderer consulta a posição atual do áudio a cada quadro visível, suaviza brevemente cada barra e mantém pausa e seek coerentes. A avaliação do ritmo com música real continua com Cassiano.
+Responsável: CM Audio. Destino: `main`. Contrato lido: [Rádio](../RADIO.md). Objetivo: fazer as barras com sidecar v3 acompanharem os quadros sincronizados com subida e descida perceptíveis, sem atraso excessivo. Limite: somente o renderer; preservar o fallback ao vivo, os derivados já gerados e as alterações locais de outras entregas. Critério de aceite técnico: o renderer consulta a posição atual do áudio a cada quadro visível, suaviza brevemente cada barra e mantém pausa e seek coerentes. Cassiano aceitou as barras em 05/10/2026.
 
 - [x] Conferir branch, diff local, contrato, checklist e presença dos 343 sidecars v3 locais.
 - [x] Primeira tentativa: remover a segunda suavização aplicada ao sidecar. Cassiano relatou que as barras passaram a piscar em vez de subir e descer progressivamente.
 - [x] Corrigir a atualização espaçada por `prefers-reduced-motion` e aplicar uma transição curta por barra.
-- [x] Revisar o diff da nova correção, sem executar verificações automáticas sem pedido.
-- [ ] Cassiano conferir a resposta das barras no desktop com músicas reais.
-
-Evidência: os 343 sidecars v3 estão disponíveis no ambiente local. Na primeira tentativa, o renderer deixou de aplicar attack/release adicional aos quadros já suavizados do derivado. Antes de Cassiano esclarecer a regra de execução, foram rodados `pnpm test` (63 passaram), `pnpm lint`, `pnpm typecheck` e `pnpm build` (passaram); essas verificações não abrangem a correção nova. Cassiano rejeitou o resultado perceptivo da primeira tentativa porque as barras ficaram como piscadas. A correção atual desenha por `requestAnimationFrame` também sob preferência de movimento reduzido e interpola cada barra com 45 ms de subida e 95 ms de descida; seek reposiciona as barras de imediato. O diff recebeu apenas autorrevisão estática, sem lint, typecheck, build, testes, navegador ou escuta nesta correção. Próximo passo: Cassiano ouvir uma faixa no desktop e conferir se as barras agora sobem e descem continuamente com os eventos da música.
+- [x] Revisar o diff da correção que faz as barras subirem e descerem.
+- [x] Cassiano aceitou esta correção em 05/10/2026.

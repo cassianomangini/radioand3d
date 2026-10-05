@@ -4,7 +4,7 @@ Catálogo das criações em impressão 3D de Cassiano e experiência musical CM 
 
 ## Estado do código
 
-A fundação Next.js e a Home Estúdio + Rádio estão em construção. A Home já recebeu a direção visual aprovada e usa o catálogo real da rádio no ambiente local configurado, mas a revisão visual e das interações por Cassiano ainda está pendente.
+A Home Estúdio + Rádio está na `main` e usa o catálogo real da rádio no ambiente local configurado. Em 05/10/2026 Cassiano aceitou a passagem da Rádio, as barras e a entrada do Estúdio. O site ainda não foi lançado; a publicação espera o alvo definido por ele. O estado está no [roadmap](docs/ROADMAP.md).
 
 ### Ambiente local
 

@@ -10,7 +10,7 @@ A meta perceptiva é: a pessoa deve perceber uma interface com mecânica própri
 
 Este documento **não substitui** o [Roadmap](../ROADMAP.md), [EXPERIENCE.md](../EXPERIENCE.md), [RADIO.md](../RADIO.md) ou [ARCHITECTURE.md](../ARCHITECTURE.md).
 
-- O roadmap continua sendo a única fonte da fila de aceite e do estado macro de C1–C8. Os IDs abaixo identificam frentes e critérios; não autorizam trabalho fora da fila.
+- O roadmap é a única fila. Os IDs abaixo são critérios de qualidade, não uma segunda lista de implementação.
 - EXPERIENCE continua definindo composição, identidade e comportamento visual aprovado.
 - RADIO continua definindo player, fila, áudio, visualizador e continuidade.
 - ARCHITECTURE continua definindo a stack e as regras de dependência.
@@ -538,19 +538,9 @@ Reprovar por padrão:
 - biblioteca adicionada sem caso de uso aprovado;
 - solução "segura" que tecnicamente funciona, mas visualmente continua parecendo site comum.
 
-# Dependências com o roadmap atual
-
-- 03b já contém shell, resize e fullscreen por drag em andamento. Motion novo deve elevar, não reimplementar.
-- 06 fornece motor, analyzer, sidecars e contrato de áudio.
-- O sync atual desbloqueia C2/C3 após validação de uma amostra real.
-- 06b usa o mesmo relógio do player, mas não depende deste plano para funcionar.
-- 07 é o principal consumidor de C3-C6.
-- 08 pode ser entregue sem X2/X3, mas essas extensões permanecem candidatas fortes assim que existir conteúdo real que as justifique.
-- 09 valida o conjunto integrado e não deve esperar uma extensão sem pré-requisito real.
-
 # Relação com a execução
 
-O [roadmap](../ROADMAP.md) registra qual frente pode avançar agora. O [checklist 03b](../work/03b-frontend-foundation.md) guarda os passos e a evidência da transformação visual da Rádio; o [checklist 06](../work/06-radio-engine.md) guarda a análise e a resposta musical. O [inventário de código de 03/10](CM_MOTION_IMPLEMENTATION_LOG_2026-10-03.md) é uma fotografia técnica, sem aprovação perceptiva. X2/X3 continuam condicionais aos seus próprios pré-requisitos.
+O [roadmap](../ROADMAP.md) é a única fila. Os critérios C1–C8 deste documento não abrem implementação nova. Cassiano aceitou a passagem da Rádio e as barras em 05/10/2026. X2 e X3 continuam condicionais a conteúdo real.
 
 # Definition of done por frente
 

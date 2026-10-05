@@ -48,4 +48,4 @@ Fora de escopo: identidade final, Motion, 3D, player, biblioteca musical, banco,
 
 ## Retomada
 
-Próxima ação: revisão/merge do PR #1. O CI está verde; corrigir apenas achados técnicos desta fundação. A direção visual final continua bloqueada pela aprovação da entrega 03 e não deve ser inventada neste PR.
+A fundação está na `main`. Esta entrega não tem próximo passo.

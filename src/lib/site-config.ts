@@ -32,13 +32,30 @@ export function absoluteSiteUrl(pathname: string) {
 export function buildPublicMetadata({
   title,
   description,
-  pathname
+  pathname,
+  image
 }: {
   title: string;
   description: string;
   pathname: string;
+  image?: {
+    url: string;
+    alt: string;
+    width?: number;
+    height?: number;
+  };
 }): Metadata {
   const canonical = absoluteSiteUrl(pathname);
+  const openGraphImages = image
+    ? [
+        {
+          url: image.url,
+          alt: image.alt,
+          width: image.width,
+          height: image.height
+        }
+      ]
+    : undefined;
 
   return {
     title: { absolute: title },
@@ -54,12 +71,14 @@ export function buildPublicMetadata({
       type: "website",
       locale: "pt_BR",
       siteName: "CM 3D & Radio",
-      url: canonical
+      url: canonical,
+      images: openGraphImages
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description
+      description,
+      images: image ? [image.url] : undefined
     }
   };
 }

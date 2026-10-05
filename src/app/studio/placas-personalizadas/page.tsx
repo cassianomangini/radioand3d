@@ -20,6 +20,8 @@ export default function CustomSignsPage() {
       eyebrow="Placas personalizadas"
       title="Uma placa feita para o espaço, a marca e a função."
       lead="Logo, texto, QR Code, apoio de mesa, balcão ou parede entram como partes do projeto — não como um modelo genérico com preço escondido."
+      pathname="/studio/placas-personalizadas"
+      breadcrumbLabel="Placas personalizadas"
     >
       <PrimaryLink href="/studio/orcamento?tipo=placa">Pedir orçamento de placa</PrimaryLink>
 

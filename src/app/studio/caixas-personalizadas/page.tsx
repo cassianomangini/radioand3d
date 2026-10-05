@@ -20,6 +20,8 @@ export default function CustomBoxesPage() {
       eyebrow="Caixas personalizadas"
       title="A caixa começa pelo que precisa caber."
       lead="Medidas, tampa, encaixe, divisórias, passagem de cabo e função vêm antes da aparência. A proposta é resolver o objeto, não apenas imprimir um formato de caixa."
+      pathname="/studio/caixas-personalizadas"
+      breadcrumbLabel="Caixas personalizadas"
     >
       <PrimaryLink href="/studio/orcamento?tipo=caixa">Pedir orçamento de caixa</PrimaryLink>
 

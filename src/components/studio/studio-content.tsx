@@ -3,16 +3,24 @@ import type { ReactNode } from "react";
 import { absoluteSiteUrl } from "@/lib/site-config";
 import styles from "./studio-content.module.css";
 
+type StudioBreadcrumbItem = {
+  name: string;
+  href: string;
+};
+
 function StudioBreadcrumbs({
   currentLabel,
-  pathname
+  pathname,
+  parents = []
 }: {
   currentLabel: string;
   pathname: string;
+  parents?: StudioBreadcrumbItem[];
 }) {
   const items = [
     { name: "Início", href: "/" },
     { name: "Estúdio", href: "/studio" },
+    ...parents,
     { name: currentLabel, href: pathname }
   ];
 
@@ -66,6 +74,7 @@ export function StudioPageShell({
   lead,
   pathname,
   breadcrumbLabel,
+  breadcrumbParents,
   children
 }: {
   eyebrow: string;
@@ -73,12 +82,17 @@ export function StudioPageShell({
   lead: string;
   pathname: string;
   breadcrumbLabel: string;
+  breadcrumbParents?: StudioBreadcrumbItem[];
   children: ReactNode;
 }) {
   return (
     <article className={styles.page}>
       <header className={styles.pageHeader}>
-        <StudioBreadcrumbs currentLabel={breadcrumbLabel} pathname={pathname} />
+        <StudioBreadcrumbs
+          currentLabel={breadcrumbLabel}
+          pathname={pathname}
+          parents={breadcrumbParents}
+        />
         <p className={styles.eyebrow}>{eyebrow}</p>
         <h1>{title}</h1>
         <p className={styles.lead}>{lead}</p>

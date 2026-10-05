@@ -67,6 +67,7 @@ export default async function StudioProductPage({
       lead={product.summary}
       pathname={`/studio/produtos/${product.slug}`}
       breadcrumbLabel={product.title}
+      breadcrumbParents={[{ name: "Produtos", href: "/studio/produtos" }]}
     >
       <StudioSection title="Fotos do produto">
         <div className={styles.gallery}>

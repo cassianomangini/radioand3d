@@ -163,23 +163,37 @@ Perguntas curtas:
 
 ## Etapa 4 — Arquivos e referências
 
-Permitir anexos seguros de tipos aprovados, por exemplo:
+### Política V1 de seleção
 
-- imagem;
-- PDF;
-- arquivo 3D quando suportado;
-- outros formatos somente após validação.
+Formatos aceitos:
+
+- 3D: `.stl`, `.3mf`, `.obj`, `.step`, `.stp`;
+- documento: `.pdf`;
+- imagem: `.png`, `.jpg`, `.jpeg`, `.webp`.
+
+Limites:
+
+- até **5 arquivos** por solicitação;
+- até **50 MB por arquivo**;
+- até **100 MB no total**.
+
+Não aceitar ZIP, executáveis ou G-code na V1. Compactação dificulta inspeção segura e G-code é saída de máquina, não fonte necessária para orçamento.
+
+### Segurança
+
+A validação no navegador existe apenas para feedback rápido. O backend futuro deve repetir os limites e validar o conteúdo antes de persistir.
 
 Requisitos de engenharia:
 
-- limite de tamanho;
-- lista explícita de MIME/extensões;
+- extensão e MIME fornecido pelo navegador não são prova de formato;
 - nome do arquivo não é confiável;
 - armazenamento privado por padrão;
-- não executar arquivo enviado;
+- validar conteúdo/assinatura quando aplicável antes da gravação definitiva;
+- não executar, renderizar ou interpretar arquivo enviado no processo de ingestão;
 - não publicar anexos automaticamente;
-- retenção e exclusão definidas;
-- proteção contra upload abusivo.
+- retenção e exclusão definidas antes de habilitar envio;
+- proteção contra upload abusivo e volume excessivo;
+- o registro do lead não deve depender de URL pública de arquivo.
 
 ## Etapa 5 — Produção
 
@@ -354,9 +368,7 @@ A landing de serviço deve apontar para orçamento. O formulário não precisa c
 
 ## Decisões abertas
 
-- armazenamento/backend;
-- limite de arquivo;
-- formatos aceitos;
+- armazenamento/backend remoto;
 - retenção;
 - quem recebe a triagem;
 - SLA real de retorno;

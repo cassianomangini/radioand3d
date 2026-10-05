@@ -8,8 +8,6 @@ export type PublicAnalyticsEvent =
 export type PublicAnalyticsPayload = {
   projectType?: "impressao" | "placa" | "caixa" | "outro";
   step?: number;
-  origin?: string;
-  reference?: string;
   productSlug?: string;
 };
 

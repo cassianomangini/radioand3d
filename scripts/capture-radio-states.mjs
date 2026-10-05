@@ -131,6 +131,19 @@ async function evaluate(client, expression) {
   return result.result?.value;
 }
 
+async function waitForEvaluation(client, expression, timeoutMilliseconds = 10000) {
+  const deadline = Date.now() + timeoutMilliseconds;
+  let lastValue = null;
+
+  while (Date.now() < deadline) {
+    lastValue = await evaluate(client, expression);
+    if (lastValue?.ok) return lastValue;
+    await delay(150);
+  }
+
+  return lastValue;
+}
+
 async function screenshot(client, fileName) {
   const result = await client.send("Page.captureScreenshot", {
     format: "png",
@@ -421,16 +434,25 @@ try {
     })()`
   );
   if (!printsRouteClicked) throw new Error("Studio Prints route link was not found.");
-  await delay(950);
-
-  const printsRouteReached = await evaluate(
+  const printsRouteState = await waitForEvaluation(
     client,
-    `window.location.pathname === "/studio/impressoes" &&
-      document.querySelector("h1")?.textContent?.includes("O que já saiu") === true &&
-      document.querySelector("audio") === window.__cmStudioNestedAudioNode`
+    `(() => {
+      const pathOk = window.location.pathname === "/studio/impressoes";
+      const heading = document.querySelector("h1")?.textContent ?? "";
+      const headingOk = heading.includes("O que já saiu");
+      const audioPreserved = document.querySelector("audio") === window.__cmStudioNestedAudioNode;
+      return {
+        ok: pathOk && headingOk && audioPreserved,
+        pathname: window.location.pathname,
+        heading,
+        audioPreserved
+      };
+    })()`
   );
-  if (!printsRouteReached) {
-    throw new Error("Studio nested route did not preserve the Radio audio element.");
+  if (!printsRouteState?.ok) {
+    throw new Error(
+      `Studio nested-route QA failed: ${JSON.stringify(printsRouteState)}`
+    );
   }
   await screenshot(client, "desktop-studio-prints-1760x824.png");
 
@@ -516,15 +538,26 @@ try {
     })()`
   );
   if (!mobileQuoteClicked) throw new Error("Mobile quote route link was not found.");
-  await delay(950);
-
-  const mobileQuoteReached = await evaluate(
+  const mobileQuoteState = await waitForEvaluation(
     client,
-    `window.location.pathname === "/studio/orcamento" &&
-      document.querySelector("h1")?.textContent?.includes("Conte o que você precisa") === true &&
-      document.querySelector("audio") === window.__cmMobileStudioAudioNode`
+    `(() => {
+      const pathOk = window.location.pathname === "/studio/orcamento";
+      const heading = document.querySelector("h1")?.textContent ?? "";
+      const headingOk = heading.includes("Conte o que você precisa");
+      const audioPreserved = document.querySelector("audio") === window.__cmMobileStudioAudioNode;
+      return {
+        ok: pathOk && headingOk && audioPreserved,
+        pathname: window.location.pathname,
+        heading,
+        audioPreserved
+      };
+    })()`
   );
-  if (!mobileQuoteReached) throw new Error("Mobile quote route did not preserve the Radio audio element.");
+  if (!mobileQuoteState?.ok) {
+    throw new Error(
+      `Mobile quote route QA failed: ${JSON.stringify(mobileQuoteState)}`
+    );
+  }
   await screenshot(client, "mobile-studio-quote-390x844.png");
 
   await navigate(client, 1440, 900, false, "/studio/impressao-3d-sob-demanda");

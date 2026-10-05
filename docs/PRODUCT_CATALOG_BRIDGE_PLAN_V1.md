@@ -609,7 +609,7 @@ Responsabilidades:
 ### Proibido
 
 - fetch no browser para montar conteúdo principal;
-- Supabase service key no `radioand3d`;
+- secret/service-role key do **Supabase do Artesopolis Admin** no `radioand3d`; o site usa apenas o token dedicado `ARTESOPOLIS_CATALOG_TOKEN` para essa ponte;
 - acesso direto às tabelas do Admin;
 - acesso direto à Shopee;
 - duplicar lógica Shopee no site;

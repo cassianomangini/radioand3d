@@ -321,6 +321,15 @@ Continua pendente e **não deve ser marcado como pronto**:
 - QA confirmou `/studio → /studio/impressoes → /studio` e `/studio → /studio/orcamento` preservando o mesmo `<audio>`;
 - capturas desktop/mobile e CI completamente verdes.
 
+## Evidência — PR #25
+
+- Materiais & Cores adicionados como apoio nas páginas de serviço, sem catálogo fictício;
+- contrato de analytics browser-only sem PII;
+- funil de orçamento instrumentado sem nome, contato, descrição, arquivo ou parâmetros livres;
+- saída futura para Shopee instrumentada por slug interno do produto;
+- disponibilidade de Produto modelada com estado, origem e data de verificação;
+- roadmap/handoff reconciliados com a autorização de implementação estrutural de 05/10/2026.
+
 ## Revisão de renderização da Rádio
 
 O `RootLayout` ainda chama `connection()`, lê o catálogo da Rádio e gera um seed por request. Isso faz o shell público continuar dinâmico mesmo quando o conteúdo comercial é Server Component.

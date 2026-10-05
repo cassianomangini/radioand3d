@@ -19,6 +19,8 @@ export default function StudioPrintsPage() {
       eyebrow="Impressões"
       title="O que já saiu das impressoras."
       lead="Esta área é portfólio e prova de capacidade. Só entram peças realmente produzidas, projetos autorizados ou conceitos claramente identificados como conceito."
+      pathname="/studio/impressoes"
+      breadcrumbLabel="Impressões"
     >
       <StudioSection title="Peças reais, sem catálogo inventado">
         <MediaPlaceholder

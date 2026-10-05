@@ -51,7 +51,7 @@ export function ProductDetail({ product }: { product: StudioProduct }) {
 
   function chooseVariant(name: string, image?: StudioImage) {
     setSelectedVariant(name);
-    if (image) setVariantPreview(image);
+    setVariantPreview(image ?? null);
   }
 
   return (

@@ -560,6 +560,171 @@ try {
   }
   await screenshot(client, "mobile-studio-quote-390x844.png");
 
+  const readyFileBranchOpened = await evaluate(
+    client,
+    `(() => {
+      const button = Array.from(document.querySelectorAll("button"))
+        .find((item) => item.textContent?.includes("Imprimir um arquivo 3D que já tenho"));
+      if (!(button instanceof HTMLButtonElement)) return false;
+      button.click();
+      const continueButton = Array.from(document.querySelectorAll("button"))
+        .find((item) => item.textContent?.includes("Continuar"));
+      if (!(continueButton instanceof HTMLButtonElement)) return false;
+      continueButton.click();
+      return true;
+    })()`
+  );
+  if (!readyFileBranchOpened) throw new Error("Quote ready-file branch could not be opened.");
+  await delay(180);
+
+  const quoteFileSelected = await evaluate(
+    client,
+    `(() => {
+      const input = document.querySelector('input[type="file"]');
+      if (!(input instanceof HTMLInputElement)) return false;
+      const transfer = new DataTransfer();
+      transfer.items.add(new File(["solid"], "modelo.stl", { type: "model/stl" }));
+      input.files = transfer.files;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+
+      const notes = document.querySelector("#print-notes");
+      if (notes instanceof HTMLTextAreaElement) {
+        const setter = Object.getOwnPropertyDescriptor(
+          HTMLTextAreaElement.prototype,
+          "value"
+        )?.set;
+        setter?.call(notes, "Precisa encaixar em outra peça.");
+        notes.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      return true;
+    })()`
+  );
+  if (!quoteFileSelected) throw new Error("Quote file input could not receive a test file.");
+  await delay(180);
+
+  const quoteProductionStepOpened = await evaluate(
+    client,
+    `(() => {
+      const continueButton = Array.from(document.querySelectorAll("button"))
+        .find((item) => item.textContent?.includes("Continuar"));
+      if (!(continueButton instanceof HTMLButtonElement)) return false;
+      continueButton.click();
+      return true;
+    })()`
+  );
+  if (!quoteProductionStepOpened) throw new Error("Quote production step could not be opened.");
+  await delay(180);
+
+  const materialPreferenceOpened = await evaluate(
+    client,
+    `(() => {
+      const quantity = document.querySelector("#quantity");
+      const material = document.querySelector("#material");
+      if (!(quantity instanceof HTMLInputElement) || !(material instanceof HTMLSelectElement)) {
+        return false;
+      }
+
+      const inputSetter = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value"
+      )?.set;
+      inputSetter?.call(quantity, "2");
+      quantity.dispatchEvent(new Event("input", { bubbles: true }));
+
+      const selectSetter = Object.getOwnPropertyDescriptor(
+        HTMLSelectElement.prototype,
+        "value"
+      )?.set;
+      selectSetter?.call(material, "tenho-preferencia");
+      material.dispatchEvent(new Event("change", { bubbles: true }));
+      return true;
+    })()`
+  );
+  if (!materialPreferenceOpened) throw new Error("Quote material preference state could not be selected.");
+  await delay(180);
+
+  const preferenceFieldVisible = await evaluate(
+    client,
+    `document.querySelector("#material-preference") instanceof HTMLInputElement`
+  );
+  if (!preferenceFieldVisible) throw new Error("Material preference input did not render.");
+  await screenshot(client, "mobile-studio-quote-material-preference-390x844.png");
+
+  const quoteReviewReached = await evaluate(
+    client,
+    `(() => {
+      const setInput = (selector, value) => {
+        const input = document.querySelector(selector);
+        if (!(input instanceof HTMLInputElement)) return false;
+        const setter = Object.getOwnPropertyDescriptor(
+          HTMLInputElement.prototype,
+          "value"
+        )?.set;
+        setter?.call(input, value);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        return true;
+      };
+      if (!setInput("#material-preference", "PLA fosco")) return false;
+
+      let continueButton = Array.from(document.querySelectorAll("button"))
+        .find((item) => item.textContent?.includes("Continuar"));
+      if (!(continueButton instanceof HTMLButtonElement)) return false;
+      continueButton.click();
+
+      return true;
+    })()`
+  );
+  if (!quoteReviewReached) throw new Error("Quote material preference could not be filled.");
+  await delay(180);
+
+  const quoteContactFilled = await evaluate(
+    client,
+    `(() => {
+      const setInput = (selector, value) => {
+        const input = document.querySelector(selector);
+        if (!(input instanceof HTMLInputElement)) return false;
+        const setter = Object.getOwnPropertyDescriptor(
+          HTMLInputElement.prototype,
+          "value"
+        )?.set;
+        setter?.call(input, value);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        return true;
+      };
+      if (!setInput("#name", "Teste visual")) return false;
+      if (!setInput("#contact", "11999999999")) return false;
+
+      const continueButton = Array.from(document.querySelectorAll("button"))
+        .find((item) => item.textContent?.includes("Continuar"));
+      if (!(continueButton instanceof HTMLButtonElement)) return false;
+      continueButton.click();
+      return true;
+    })()`
+  );
+  if (!quoteContactFilled) throw new Error("Quote contact step could not be completed.");
+  await delay(220);
+
+  const quoteReviewState = await evaluate(
+    client,
+    `(() => {
+      const heading = document.querySelector("#quote-question")?.textContent ?? "";
+      const summary = document.querySelector("dl")?.textContent ?? "";
+      return {
+        ok: heading.includes("Revise o pedido") &&
+          summary.includes("PLA fosco") &&
+          summary.includes("Precisa encaixar em outra peça."),
+        heading,
+        summary
+      };
+    })()`
+  );
+  if (!quoteReviewState?.ok) {
+    throw new Error(
+      `Quote review did not preserve canonical payload fields: ${JSON.stringify(quoteReviewState)}`
+    );
+  }
+  await screenshot(client, "mobile-studio-quote-review-390x844.png");
+
   await navigate(client, 1440, 900, false, "/studio/impressao-3d-sob-demanda");
   const onDemandRouteReached = await evaluate(
     client,

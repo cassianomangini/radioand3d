@@ -1,25 +1,84 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { absoluteSiteUrl } from "@/lib/site-config";
 import styles from "./studio-content.module.css";
+
+function StudioBreadcrumbs({
+  currentLabel,
+  pathname
+}: {
+  currentLabel: string;
+  pathname: string;
+}) {
+  const items = [
+    { name: "Início", href: "/" },
+    { name: "Estúdio", href: "/studio" },
+    { name: currentLabel, href: pathname }
+  ];
+
+  const structuredItems = items.flatMap((item, index) => {
+    const absolute = absoluteSiteUrl(item.href);
+    return absolute
+      ? [{
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.name,
+          item: absolute
+        }]
+      : [];
+  });
+
+  return (
+    <>
+      <nav className={styles.breadcrumbs} aria-label="Caminho da página">
+        <ol>
+          {items.map((item, index) => (
+            <li key={item.href}>
+              {index === items.length - 1 ? (
+                <span aria-current="page">{item.name}</span>
+              ) : (
+                <Link href={item.href}>{item.name}</Link>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      {structuredItems.length === items.length ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: structuredItems
+            })
+          }}
+        />
+      ) : null}
+    </>
+  );
+}
 
 export function StudioPageShell({
   eyebrow,
   title,
   lead,
+  pathname,
+  breadcrumbLabel,
   children
 }: {
   eyebrow: string;
   title: string;
   lead: string;
+  pathname: string;
+  breadcrumbLabel: string;
   children: ReactNode;
 }) {
   return (
     <article className={styles.page}>
       <header className={styles.pageHeader}>
-        <Link className={styles.backLink} href="/studio">
-          <span aria-hidden="true">←</span>
-          <span>Voltar ao Estúdio</span>
-        </Link>
+        <StudioBreadcrumbs currentLabel={breadcrumbLabel} pathname={pathname} />
         <p className={styles.eyebrow}>{eyebrow}</p>
         <h1>{title}</h1>
         <p className={styles.lead}>{lead}</p>

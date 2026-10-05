@@ -4,7 +4,8 @@ Status: **ready_for_implementation**
 Data da revisão: **05/10/2026**  
 Escopo: **ponte read-only de Produtos entre `artesopolis-admin` e `radioand3d`**  
 Runtime atual: **9 produtos materializados estaticamente em `src/features/studio/catalog.ts`**  
-Objetivo final: **produto novo/publicado no Artesopolis Admin não deve exigir alteração de código no CM 3D & Radio**
+Objetivo final: **produto novo/publicado no Artesopolis Admin não deve exigir alteração de código no CM 3D & Radio**  
+Infra Supabase relacionada: [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md)
 
 ## 1. Resultado final observável
 
@@ -490,11 +491,24 @@ Requisitos:
 - logs estruturados incluem `organization_id` e `request_id`;
 - nenhuma credencial/token/raw payload sai na resposta.
 
-### Autenticação da API pública
+### Autenticação server-to-server
 
-A V1 não precisa tratar os dados públicos como segredo.
+O conteúdo final é público, mas o endpoint não precisa ser aberto para qualquer caller.
 
-A segurança vem de:
+A Edge Function será consumida somente pelo servidor do CM 3D & Radio.
+
+Configuração:
+
+- JWT verification da plataforma desabilitada **somente** porque a function implementa autenticação própria;
+- header `X-CM-Catalog-Token`;
+- secret `CM_CATALOG_READ_TOKEN` no projeto Supabase do Artesopolis Admin;
+- o mesmo token fica somente no ambiente server-side da Vercel;
+- comparar o token antes de acessar dados;
+- não habilitar CORS amplo porque o browser não consome essa API.
+
+O token é específico desta leitura e **não é** Supabase secret/service-role key.
+
+A segurança continua apoiada por:
 
 - shape fechado;
 - organização fixa;
@@ -503,7 +517,7 @@ A segurança vem de:
 - ausência de raw provider payload;
 - ausência de filtros de tenant.
 
-Não criar segredo compartilhado só para esconder informação que já será renderizada publicamente, salvo necessidade operacional posterior.
+Mesmo com token válido, a function nunca amplia o shape público.
 
 ## 13. Contrato HTTP público
 
@@ -910,6 +924,8 @@ Somente depois do item 9 a ponte é considerada concluída.
 ### Sem blocker para começar código local
 
 É possível implementar A–D sem publicar nada em produção.
+
+O novo projeto Supabase do CM 3D & Radio **não é dependência da ponte de Produtos**. A projeção vive no Supabase do Artesopolis Admin; o projeto CM é reservado aos dados próprios do site, principalmente Orçamento.
 
 ### Operações remotas exigem alvo confirmado
 

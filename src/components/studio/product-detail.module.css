@@ -330,29 +330,6 @@
   }
 }
 
-@media (max-width: 86rem) and (min-width: 73.75rem) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.72fr);
-    gap: 1.35rem;
-  }
-
-  .gallery {
-    grid-template-columns: 4.2rem minmax(0, 1fr);
-  }
-
-  .mainMedia {
-    min-height: 24rem;
-  }
-
-  .decision h1 {
-    font-size: clamp(2rem, 3.4vw, 3.1rem);
-  }
-
-  .variantGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 73.74rem) {
   .hero {
     grid-template-columns: 1fr;

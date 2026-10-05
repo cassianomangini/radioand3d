@@ -8,8 +8,8 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 
 ## Próximos passos
 
-1. Fechar o contrato local seguro do Orçamento: arquivos reais no estado, formatos, limites e validação reutilizável no servidor.
-2. Backend remoto do Orçamento: storage privado, inspeção server-side, retenção, persistência, triagem e confirmação — bloqueado até a escolha explícita do alvo em E2.
+1. Fechar o contrato serializável do Orçamento: payload versionado, validação estrutural compartilhável e triagem inicial sem depender de provider remoto.
+2. Backend remoto do Orçamento: storage privado, inspeção de conteúdo server-side, retenção, persistência, execução da triagem e confirmação — bloqueado até a escolha explícita do alvo em E2.
 3. Conteúdo real de Impressões/Placas/Caixas e revisão visual final ficam para a etapa de mídia, conforme decisão de deixar imagens por último.
 4. Publicação continua bloqueada por E2; produção permanece `noindex` até o gate de lançamento.
 

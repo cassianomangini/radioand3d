@@ -181,7 +181,7 @@ Não aceitar ZIP, executáveis ou G-code na V1. Compactação dificulta inspeç�
 
 ### Segurança
 
-A validação no navegador existe apenas para feedback rápido. O backend futuro deve repetir os limites e validar o conteúdo antes de persistir.
+A validação no navegador existe apenas para feedback rápido. A política estrutural de arquivos e da solicitação deve ser reutilizada no runtime server, mas isso **não substitui a inspeção do conteúdo real** antes de qualquer persistência definitiva.
 
 Requisitos de engenharia:
 
@@ -304,11 +304,32 @@ Parece uma solicitação legítima, mas um dado essencial está ausente.
 
 Sem informação mínima para avaliação.
 
-### Não atendido
+### Revisão manual / fora de escopo
 
-Projeto claramente fora do escopo operacional definido.
+A classificação estrutural não recusa projeto automaticamente. Quando a solicitação parecer fora do escopo operacional, contraditória ou ambígua, ela segue para decisão humana.
 
 Não usar IA ou regras automáticas para recusar silenciosamente um cliente sem permitir revisão humana quando houver ambiguidade.
+
+### Contrato técnico da solicitação
+
+O payload interno usa `schemaVersion: 1` e não depende de URL pública de arquivo nem de um provider específico.
+
+A validação compartilhável cobre:
+
+- coerência entre tipo e detalhes do projeto;
+- presença e política estrutural dos anexos;
+- quantidade;
+- dados mínimos específicos de placa/caixa/outro;
+- nome e canal de contato;
+- formato básico do e-mail ou WhatsApp.
+
+A triagem inicial pode resultar em:
+
+- `ready-for-review`;
+- `needs-information`;
+- `incomplete`.
+
+Storage, inspeção binária, retenção, persistência e confirmação continuam responsabilidades do adapter/backend remoto escolhido depois.
 
 ## Continuidade por WhatsApp
 

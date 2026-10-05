@@ -1,6 +1,7 @@
 import {
   MediaPlaceholder,
   PrimaryLink,
+  StudioMaterialGuidance,
   StudioPageShell,
   StudioSection,
   TextList
@@ -65,6 +66,7 @@ export default function CustomSignsPage() {
           Pedir orçamento de placa
         </PrimaryLink>
       </StudioSection>
+      <StudioMaterialGuidance />
     </StudioPageShell>
   );
 }

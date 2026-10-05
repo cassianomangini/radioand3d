@@ -624,12 +624,13 @@ function RadioContent({
   );
 }
 
-export function StudioRadioShell() {
+export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const radio = useRadio();
   const pathname = usePathname();
   const router = useRouter();
   const studioRoute = pathname.startsWith("/studio") ? "detail" : "home";
-  const studioProducts = pathname === "/studio/produtos";
+  const studioHub = pathname === "/studio";
+  const studioNestedRoute = studioRoute === "detail" && !studioHub;
   const shellRef = useRef<HTMLDivElement>(null);
   const radioNavRef = useRef<HTMLAnchorElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
@@ -1708,10 +1709,10 @@ export function StudioRadioShell() {
 
           <div
             className={styles.studioCatalogHeader}
-            aria-hidden={studioRoute !== "detail" || studioProducts}
+            aria-hidden={!studioHub}
           >
-            <strong>ESTÚDIO</strong>
-            <span>IMPRESSÕES, MATERIAIS E PRODUTOS EM UM SÓ LUGAR.</span>
+            <strong>ESTÚDIO DE IMPRESSÃO 3D</strong>
+            <span>PROJETOS PERSONALIZADOS, PEÇAS PRODUZIDAS E PRODUTOS PRONTOS.</span>
           </div>
 
           <section className={styles.studioIdentity} aria-labelledby="studio-title">
@@ -1759,64 +1760,57 @@ export function StudioRadioShell() {
 
           <div
             className={styles.studioDetailRail}
-            aria-hidden={studioRoute !== "detail" || studioProducts}
+            aria-hidden={!studioHub}
           >
-            <article className={styles.studioDetailCard} data-studio-card="prints">
-              <span className={styles.studioCardLabel}>PEÇAS</span>
+            <Link
+              className={styles.studioDetailCard}
+              data-studio-card="prints"
+              href="/studio/impressoes"
+              aria-label="Ver impressões do estúdio"
+              tabIndex={studioHub ? 0 : -1}
+            >
+              <span className={styles.studioCardMediaPlaceholder} aria-hidden="true">
+                FOTO REAL PENDENTE · peça produzida
+              </span>
+              <span className={styles.studioCardLabel}>ESTÚDIO DE IMPRESSÃO 3D</span>
               <strong>Impressões</strong>
-              <p>Peças que já saíram do estúdio. Inspirações, modelos e ideias.</p>
-            </article>
-
-            <article className={styles.studioDetailCard} data-studio-card="materials">
-              <span className={styles.studioCardLabel}>MATERIAIS</span>
-              <strong>Materiais &amp; Cores</strong>
-              <p>Filamentos, cores e propriedades que usamos no estúdio.</p>
-            </article>
+              <p>Veja peças que já saíram das impressoras, com contexto real de produção.</p>
+              <span className={styles.studioCardAction}>Ver impressões →</span>
+            </Link>
 
             <Link
               className={styles.studioDetailCard}
-              data-studio-card="store"
-              href="/studio/produtos"
-              aria-label="Ver produtos do estúdio vendidos pela Shopee"
-              tabIndex={studioRoute === "detail" && !studioProducts ? 0 : -1}
-              onPointerEnter={() => router.prefetch("/studio/produtos")}
+              data-studio-card="quote"
+              href="/studio/orcamento"
+              aria-label="Pedir orçamento"
+              tabIndex={studioHub ? 0 : -1}
             >
-              <span className={styles.studioCardLabel}>LOJA</span>
-              <strong>Loja Shopee</strong>
-              <p>Conheça os produtos que vendemos e veja os detalhes de cada peça.</p>
-              <span className={styles.studioCardAction}>Ver produtos</span>
+              <span className={styles.studioCardLabel}>PROJETO PERSONALIZADO</span>
+              <strong>Peça um orçamento</strong>
+              <p>Conte o que você precisa. O fluxo pergunta somente o que faz sentido para o projeto.</p>
+              <span className={styles.studioCardAction}>Pedir orçamento →</span>
+            </Link>
+
+            <Link
+              className={styles.studioDetailCard}
+              data-studio-card="products"
+              href="/studio/produtos"
+              aria-label="Ver produtos do estúdio"
+              tabIndex={studioHub ? 0 : -1}
+            >
+              <span className={styles.studioCardMediaPlaceholder} aria-hidden="true">
+                FOTO REAL PENDENTE · produto
+              </span>
+              <span className={styles.studioCardLabel}>PRODUTOS</span>
+              <strong>Peças prontas para comprar</strong>
+              <p>Conheça cada produto aqui e finalize a compra na Shopee quando estiver disponível.</p>
+              <span className={styles.studioCardAction}>Ver produtos →</span>
             </Link>
           </div>
 
-          <section
-            className={styles.studioProducts}
-            aria-hidden={!studioProducts}
-            aria-labelledby="studio-products-title"
-          >
-            <div className={styles.studioProductsHeader}>
-              <Link
-                href="/studio"
-                className={styles.studioProductsBack}
-                aria-label="Voltar ao catálogo do estúdio"
-              >
-                <span aria-hidden="true">←</span>
-                <span>Voltar ao estúdio</span>
-              </Link>
-              <span className={styles.studioProductsKicker}>PRODUTOS</span>
-              <h2 id="studio-products-title">Produtos à venda</h2>
-              <p>
-                Aqui entram somente as peças que o estúdio realmente comercializa.
-                Cada produto terá fotos, medidas, materiais, opções e o caminho de compra na Shopee.
-              </p>
-            </div>
-
-            <div className={styles.studioProductsEmpty}>
-              <strong>Catálogo comercial em preparação</strong>
-              <p>
-                Os produtos serão publicados aqui com informações completas antes do link de compra.
-              </p>
-            </div>
-          </section>
+          {studioNestedRoute ? (
+            <div className={styles.studioRouteContent}>{children}</div>
+          ) : null}
         </main>
 
         <div

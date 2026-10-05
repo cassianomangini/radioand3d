@@ -80,17 +80,17 @@ Enquanto o gate estiver aberto:
 
 ## Bloco S1.1 — Fundação de rotas e Search
 
-- [ ] criar estrutura persistente para `/studio/*`;
-- [ ] preservar continuidade da Rádio em todas as rotas públicas do Estúdio;
-- [ ] separar comportamento de indexação por ambiente;
-- [ ] criar `robots.ts`;
-- [ ] criar `sitemap.ts`;
-- [ ] definir origem única para base URL/canonical;
-- [ ] metadata específica por rota;
-- [ ] Open Graph por superfície estratégica;
+- [x] criar estrutura persistente para `/studio/*`;
+- [x] preservar continuidade da Rádio em todas as rotas públicas do Estúdio;
+- [x] separar comportamento de indexação por ambiente;
+- [x] criar `robots.ts`;
+- [x] criar `sitemap.ts`;
+- [x] definir origem única para base URL/canonical;
+- [x] metadata específica por rota;
+- [x] Open Graph textual por superfície estratégica; imagem OG específica fica para a etapa final de mídia;
 - [ ] breadcrumbs quando fizer sentido;
-- [ ] validar links HTML rastreáveis;
-- [ ] garantir conteúdo principal renderizável sem interação;
+- [x] usar links HTML rastreáveis nas jornadas implementadas; validação renderizada ainda pendente;
+- [x] garantir conteúdo principal das páginas comerciais em Server Components;
 - [ ] revisar impacto de `connection()`/dinamismo da Rádio nas páginas comerciais.
 
 ### Aceite S1.1
@@ -106,19 +106,19 @@ Enquanto o gate estiver aberto:
 
 Dependência visual: **S1.0B aprovado**.
 
-- [ ] substituir entrada Materiais por Orçamento;
-- [ ] renomear Loja Shopee para Produtos na hierarquia principal;
+- [x] substituir entrada Materiais por Orçamento;
+- [x] renomear Loja Shopee para Produtos na hierarquia principal;
 - [ ] manter material/cores dentro do conteúdo de apoio;
 - [x] Estúdio + Impressões ocupam a superfície grande da esquerda;
 - [x] Orçamento e Produtos ficam empilhados à direita;
 - [x] exatamente três entradas visuais;
 - [x] não usar três cards idênticos;
 - [ ] prova visual real;
-- [ ] links para Impressões, Orçamento e Produtos;
+- [x] links para Impressões, Orçamento e Produtos;
 - [ ] links contextuais para Impressão 3D sob demanda, Placas e Caixas nas rotas apropriadas, não como cards extras na home;
 - [x] não criar segunda seção abaixo dos três blocos;
 - [x] não repetir hero gigante da Home;
-- [ ] usar fotografia/asset aprovado em vez de CSS decorativo quando mídia for a resposta correta.
+- [ ] substituir placeholders neutros pelas fotografias/assets aprovados na última etapa de mídia.
 
 ### Aceite S1.2
 
@@ -131,7 +131,7 @@ Visitante frio entende em poucos segundos:
 
 ## Bloco S1.3 — Impressões
 
-- [ ] rota própria;
+- [x] rota própria;
 - [ ] dataset editorial mínimo;
 - [ ] status: produzido / conceito / produto / cliente;
 - [ ] foto real como conteúdo;
@@ -270,3 +270,29 @@ S1 pode avançar em paralelo à Rádio apenas quando não muda:
 - contratos de visualizer.
 
 Se precisar tocar nessas áreas, pausar e coordenar com o gate atual da Rádio.
+
+
+## Atualização 05/10/2026 — implementação sem mídia final
+
+Implementado na branch `feat/studio-foundation-content`:
+
+- fundação de `/studio/*` mantendo a Rádio persistente;
+- indexação por ambiente, canonical, robots e sitemap;
+- metadata textual por rota;
+- hub aprovado com exatamente Impressões + Orçamento + Produtos;
+- rotas de Impressões, Impressão 3D sob demanda, Placas, Caixas, Orçamento e Produtos;
+- wizard de orçamento com branching e revisão local;
+- placeholders neutros classificados por origem da mídia;
+- inventário final em [STUDIO_MEDIA_LAST_MILE.md](../design/STUDIO_MEDIA_LAST_MILE.md).
+
+Continua pendente e **não deve ser marcado como pronto**:
+
+- fotos/prova real;
+- catálogo/dataset de Impressões;
+- produtos reais e páginas individuais;
+- armazenamento privado e validação de upload;
+- persistência/triagem do orçamento;
+- envio final do orçamento;
+- decisões operacionais de logística/cobertura/modelagem;
+- validação renderizada desktop/mobile;
+- retirada do `noindex` em produção.

@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import { buildPublicMetadata } from "@/lib/site-config";
 
-export const metadata: Metadata = {
+export const metadata = buildPublicMetadata({
   title: "Estúdio de Impressão 3D | CM 3D & Radio",
   description:
-    "Estúdio de Impressão 3D da CM: peças, materiais, cores e processo apresentados com conteúdo real."
-};
+    "Impressões reais, projetos personalizados e produtos do Estúdio de Impressão 3D da CM.",
+  pathname: "/studio"
+});
 
 export default function StudioPage() {
   return null;

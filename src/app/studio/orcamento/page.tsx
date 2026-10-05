@@ -34,6 +34,8 @@ export default async function StudioQuotePage({
       eyebrow="Orçamento"
       title="Conte o que você precisa."
       lead="O formulário começa pelo projeto, não pelo seu telefone. Você responde somente o que faz sentido para o tipo de peça e revisa tudo antes do envio."
+      pathname="/studio/orcamento"
+      breadcrumbLabel="Orçamento"
     >
       <QuoteWizard initialType={initialType} />
 

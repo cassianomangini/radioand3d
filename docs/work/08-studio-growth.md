@@ -195,8 +195,12 @@ Visitante frio entende em poucos segundos:
 - [x] sem filtros/ordenação enquanto o volume não justificar;
 - [x] preview preparado para mídia fotográfica real, sem item sintético quando catálogo está vazio;
 - [x] rota individual `/studio/produtos/[slug]` preparada;
+- [x] direção visual final da página individual aprovada em 05/10/2026 e documentada em `docs/design/STUDIO_PRODUCT_PAGE_VISUAL_V1.md`;
 - [ ] fotos/medidas/material/opções reais;
-- [x] CTA externo preparado no nível do produto como “Ver preço e disponibilidade na Shopee” quando houver URL real;
+- [ ] galeria real com suporte a vídeo quando o produto tiver mídia útil;
+- [ ] diagrama visual de dimensões para produtos em que medida externa/interna muda a decisão;
+- [x] CTA comercial definido como **Comprar na Shopee**;
+- [x] sem carrinho, sem checkout próprio e sem botão “Adicionar ao carrinho”;
 - [x] explicar que finalização/pagamento acontecem na Shopee;
 - [x] não duplicar preço/estoque sem sincronização confiável;
 - [x] contrato de disponibilidade: disponível / sob consulta / indisponível, com data e origem de verificação;

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { absoluteSiteUrl, siteIndexable } from "@/lib/site-config";
+import { studioProducts } from "@/features/studio/catalog";
 
 const publicRoutes = [
   "/",
@@ -15,7 +16,12 @@ const publicRoutes = [
 export default function sitemap(): MetadataRoute.Sitemap {
   if (!siteIndexable) return [];
 
-  return publicRoutes.flatMap((pathname) => {
+  const routes = [
+    ...publicRoutes,
+    ...studioProducts.map((product) => `/studio/produtos/${product.slug}`)
+  ];
+
+  return routes.flatMap((pathname) => {
     const url = absoluteSiteUrl(pathname);
     return url ? [{ url }] : [];
   });

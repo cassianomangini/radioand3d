@@ -245,6 +245,23 @@
   background: #090d12;
 }
 
+.fileList li > span {
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.fileList li strong {
+  color: #e8eef4;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.fileList li small {
+  color: #718493;
+  font-size: 0.72rem;
+}
+
 .fileList button {
   border: 0;
   background: transparent;

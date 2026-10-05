@@ -1,7 +1,7 @@
 import {
   type QuoteFileLike,
   validateQuoteFiles
-} from "./quote-contract";
+} from "./quote-contract.ts";
 
 export type QuoteProjectType = "impressao" | "placa" | "caixa" | "outro";
 export type QuoteContactMethod = "whatsapp" | "email";

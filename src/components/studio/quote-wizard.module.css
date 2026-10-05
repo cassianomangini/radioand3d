@@ -161,3 +161,145 @@
     gap: 0.25rem;
   }
 }
+
+
+.choiceFieldset {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choiceFieldset legend {
+  margin-bottom: 0.25rem;
+}
+
+.choiceGrid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.checkChoice {
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgb(151 171 190 / 16%);
+  border-radius: 0.28rem;
+  background: #090d12;
+  color: #e8eef4;
+  cursor: pointer;
+}
+
+.checkChoice input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #68dcff;
+}
+
+.filePicker {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.fileDrop {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1rem;
+  border: 1px dashed rgb(151 171 190 / 30%);
+  background: #080c11;
+}
+
+.fileDrop label {
+  color: #eaf1f7;
+  font-weight: 700;
+}
+
+.fileDrop input {
+  width: 100%;
+  color: #dbe5ee;
+}
+
+.fileDrop small {
+  color: #718493;
+  line-height: 1.5;
+}
+
+.fileList {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fileList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgb(151 171 190 / 14%);
+  background: #090d12;
+}
+
+.fileList button {
+  border: 0;
+  background: transparent;
+  color: #9fcfe0;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.error {
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  border-left: 2px solid #ff8b68;
+  background: rgb(255 139 104 / 6%);
+  color: #ffd4c7;
+  line-height: 1.5;
+}
+
+.summary div {
+  grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.summary button {
+  border: 0;
+  background: transparent;
+  color: #78dfff;
+  cursor: pointer;
+  font-size: 0.76rem;
+}
+
+.question:focus {
+  outline: none;
+}
+
+@media (min-width: 42.01rem) {
+  .choiceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 42rem) {
+  .summary div {
+    grid-template-columns: 1fr auto;
+  }
+
+  .summary dt {
+    grid-column: 1 / -1;
+  }
+
+  .summary dd {
+    grid-column: 1;
+  }
+
+  .summary button {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}

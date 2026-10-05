@@ -28,14 +28,22 @@ export default async function StudioQuotePage({
 }) {
   const params = await searchParams;
   const initialType = parseProjectType(params.tipo);
+  const initialReference = Array.isArray(params.referencia) ? params.referencia[0] : params.referencia;
+  const initialOrigin = Array.isArray(params.origem) ? params.origem[0] : params.origem;
 
   return (
     <StudioPageShell
       eyebrow="Orçamento"
       title="Conte o que você precisa."
       lead="O formulário começa pelo projeto, não pelo seu telefone. Você responde somente o que faz sentido para o tipo de peça e revisa tudo antes do envio."
+      pathname="/studio/orcamento"
+      breadcrumbLabel="Orçamento"
     >
-      <QuoteWizard initialType={initialType} />
+      <QuoteWizard
+        initialType={initialType}
+        initialReference={initialReference}
+        initialOrigin={initialOrigin}
+      />
 
       <StudioSection eyebrow="Como funciona" title="Análise antes de contato">
         <p>

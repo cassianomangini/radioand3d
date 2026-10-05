@@ -174,3 +174,45 @@
     min-height: 16rem;
   }
 }
+
+
+.breadcrumbs {
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+  color: #8798a7;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 0.72rem;
+}
+
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.breadcrumbs li:not(:last-child)::after {
+  content: "/";
+  color: #50606f;
+}
+
+.breadcrumbs a {
+  color: #9fb0c0;
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover,
+.breadcrumbs a:focus-visible {
+  color: #f7f9fb;
+}
+
+.breadcrumbs [aria-current="page"] {
+  color: #d8e1e9;
+}

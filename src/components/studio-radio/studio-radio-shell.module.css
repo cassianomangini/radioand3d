@@ -4233,3 +4233,12 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     font-size: 0.52rem;
   }
 }
+
+
+@media (max-width: 73.74rem) {
+  /* Nested Studio routes must not inherit the mobile hub's normal-flow height. */
+  .studio[data-studio-route="detail"] .studioCatalogHeader[aria-hidden="true"],
+  .studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="true"] {
+    display: none;
+  }
+}

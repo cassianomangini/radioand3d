@@ -10,10 +10,7 @@ import {
   studioProducts,
   type StudioMeasurementSet
 } from "@/features/studio/catalog";
-import {
-  absoluteSiteUrl,
-  buildPublicMetadata
-} from "@/lib/site-config";
+import { buildPublicMetadata } from "@/lib/site-config";
 import styles from "./product-page.module.css";
 
 export function generateStaticParams() {
@@ -115,22 +112,6 @@ export default async function StudioProductPage({
   if (!product) notFound();
 
   const pathname = `/studio/produtos/${product.slug}`;
-  const canonical = absoluteSiteUrl(pathname);
-  const productSchema = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.title,
-    description: product.summary,
-    image: product.images.map((image) => image.src),
-    material: product.materials.join(", "),
-    category: product.contextLabel,
-    ...(canonical ? { url: canonical } : {}),
-    additionalProperty: product.specs.map((spec) => ({
-      "@type": "PropertyValue",
-      name: spec.label,
-      value: spec.value
-    }))
-  };
 
   return (
     <article className={styles.page}>
@@ -199,10 +180,6 @@ export default async function StudioProductPage({
         </PrimaryLink>
       </section>
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
     </article>
   );
 }

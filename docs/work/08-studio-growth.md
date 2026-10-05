@@ -181,8 +181,11 @@ Visitante frio entende em poucos segundos:
 - [x] opção “não sei”/“preciso de ajuda” quando aplicável;
 - [x] contato somente no final;
 - [x] seletor nativo em mobile e drag-and-drop apenas como melhoria desktop;
-- [x] resumo editável antes do envio;
-- [ ] anexos privados;
+- [x] seleção mantém os objetos `File` reais no estado local, não apenas nomes;
+- [x] política V1 de arquivo: STL/3MF/OBJ/STEP/STP/PDF/PNG/JPG/JPEG/WebP; até 5 arquivos, 50 MB por arquivo e 100 MB no total;
+- [x] validação local de extensão/tamanho/quantidade com erro acessível;
+- [ ] anexos privados no backend remoto;
+- [ ] validação server-side por conteúdo antes da persistência;
 - [ ] persistência;
 - [x] estados de erro e validação local;
 - [ ] confirmação sem CTA forçado para WhatsApp;
@@ -227,7 +230,8 @@ Visitante frio entende em poucos segundos:
 - [ ] image sitemap de Produto após migrar mídia para host controlado/verificável pela CM;
 - [x] links internos das jornadas estruturais validados no CI;
 - [ ] analytics de orçamento e saída para Shopee;
-- [ ] revisão de privacidade de anexos;
+- [x] contrato de privacidade/limites dos anexos definido;
+- [ ] revisão final da implementação remota de anexos;
 - [x] copy evita prometer aceite, prazo, preço ou disponibilidade não confirmados.
 
 ## Bloco S1.9 — Crescimento
@@ -360,9 +364,9 @@ Decisão desta fase:
 - CTA comercial único: **Comprar na Shopee**;
 - sem carrinho, checkout, frete ou seletor de quantidade local;
 - metadata recebe imagem real do produto;
-- páginas individuais geram `Product` sem `Offer` inventado;
 - catálogo gera `ItemList` quando a URL pública está configurada;
-- QA renderizado e validação final de CI ficam como gate antes do merge.
+- markup `Product` incompleto foi removido no PR #28;
+- QA renderizado desktop/mobile e CI foram concluídos antes do merge do PR #27.
 
 
 ## SEO técnico pós-Produto — 05/10/2026
@@ -372,3 +376,13 @@ Decisão desta fase:
 - sitemap usa `lastVerifiedAt` real nas URLs de Produto;
 - image sitemap deliberadamente adiado enquanto os ativos estiverem apenas no CDN da Shopee;
 - nenhuma avaliação, oferta, preço, estoque ou presença local foi inventada para satisfazer schema.
+
+
+## Orçamento — contrato local de arquivos — 05/10/2026
+
+- o wizard mantém os objetos `File` reais em memória para um upload futuro;
+- formatos e limites V1 foram congelados em `src/features/studio/quote-contract.ts`;
+- seleção inválida é rejeitada antes de avançar no fluxo;
+- nenhuma mídia é enviada ou persistida nesta etapa;
+- a mesma política deverá rodar no servidor, somada à inspeção do conteúdo;
+- storage privado, retenção e persistência continuam bloqueados até a escolha explícita do projeto/backend remoto.

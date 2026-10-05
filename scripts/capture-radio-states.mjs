@@ -542,7 +542,7 @@ try {
     client,
     `(() => {
       const pathOk = window.location.pathname === "/studio/orcamento";
-      const heading = document.querySelector("h1")?.textContent ?? "";
+      const heading = document.querySelector('[data-studio-route-content="true"] h1')?.textContent ?? "";
       const headingOk = heading.includes("Conte o que você precisa");
       const audioPreserved = document.querySelector("audio") === window.__cmMobileStudioAudioNode;
       return {

@@ -195,6 +195,13 @@ export function QuoteWizard({
     headingRef.current?.focus();
   }, [step]);
 
+  useEffect(() => {
+    if (!initialType || analyticsStartedRef.current) return;
+    analyticsStartedRef.current = true;
+    trackPublicEvent("quote_start", { projectType: initialType });
+    trackPublicEvent("quote_type_selected", { projectType: initialType });
+  }, [initialType]);
+
   function validateStep() {
     if (step === 1 && !type) return "Escolha o tipo de projeto para continuar.";
 
@@ -266,9 +273,7 @@ export function QuoteWizard({
     if (type) {
       trackPublicEvent("quote_step_completed", {
         projectType: type,
-        step,
-        origin: initialOrigin,
-        reference: initialReference
+        step
       });
     }
 
@@ -460,16 +465,12 @@ export function QuoteWizard({
                   if (!analyticsStartedRef.current) {
                     analyticsStartedRef.current = true;
                     trackPublicEvent("quote_start", {
-                      projectType: option,
-                      origin: initialOrigin,
-                      reference: initialReference
+                      projectType: option
                     });
                   }
                   setType(option);
                   trackPublicEvent("quote_type_selected", {
-                    projectType: option,
-                    origin: initialOrigin,
-                    reference: initialReference
+                    projectType: option
                   });
                 }}
               >
@@ -493,9 +494,7 @@ export function QuoteWizard({
               if (nextFiles.length > files.length) {
                 trackPublicEvent("quote_file_added", {
                   projectType: "impressao",
-                  step,
-                  origin: initialOrigin,
-                  reference: initialReference
+                  step
                 });
               }
               setFiles(nextFiles);
@@ -596,9 +595,7 @@ export function QuoteWizard({
               if (nextFiles.length > files.length && type) {
                 trackPublicEvent("quote_file_added", {
                   projectType: type,
-                  step,
-                  origin: initialOrigin,
-                  reference: initialReference
+                  step
                 });
               }
               setFiles(nextFiles);

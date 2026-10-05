@@ -126,7 +126,15 @@ function FilePicker({
   );
 }
 
-export function QuoteWizard({ initialType }: { initialType?: ProjectType }) {
+export function QuoteWizard({
+  initialType,
+  initialReference,
+  initialOrigin
+}: {
+  initialType?: ProjectType;
+  initialReference?: string;
+  initialOrigin?: string;
+}) {
   const [step, setStep] = useState(initialType ? 2 : 1);
   const [type, setType] = useState<ProjectType | null>(initialType ?? null);
   const [startingPoints, setStartingPoints] = useState<string[]>([]);
@@ -413,6 +421,13 @@ export function QuoteWizard({ initialType }: { initialType?: ProjectType }) {
         {stepTitle}
       </h2>
 
+      {initialReference || initialOrigin ? (
+        <p className={styles.contextNote}>
+          Contexto preservado deste acesso: {initialReference ? `referência ${initialReference}` : "sem referência específica"}
+          {initialOrigin ? ` · origem ${initialOrigin}` : ""}.
+        </p>
+      ) : null}
+
       {error ? (
         <p className={styles.error} role="alert">{error}</p>
       ) : null}
@@ -684,6 +699,14 @@ export function QuoteWizard({ initialType }: { initialType?: ProjectType }) {
                 <button type="button" onClick={() => edit(4)}>Editar</button>
               </div>
             )}
+
+            {initialReference || initialOrigin ? (
+              <div>
+                <dt>Origem</dt>
+                <dd>{initialReference ? `Referência: ${initialReference}` : "Sem referência específica"}{initialOrigin ? ` · ${initialOrigin}` : ""}</dd>
+                <span aria-hidden="true" />
+              </div>
+            ) : null}
 
             <div>
               <dt>Contato</dt>

@@ -14,10 +14,13 @@ import {
   quoteFilePolicyLabel,
   validateQuoteFiles
 } from "@/features/studio/quote-contract";
-import type {
-  QuoteContactMethod as ContactMethod,
-  QuoteMaterialChoice as MaterialChoice,
-  QuoteProjectType as ProjectType
+import {
+  toQuoteAttachmentMetadata,
+  validateQuoteRequestDraft,
+  type QuoteContactMethod as ContactMethod,
+  type QuoteMaterialChoice as MaterialChoice,
+  type QuoteProjectType as ProjectType,
+  type QuoteRequestDraft
 } from "@/features/studio/quote-request-contract";
 import { trackPublicEvent } from "@/lib/public-analytics";
 import styles from "./quote-wizard.module.css";
@@ -190,6 +193,7 @@ export function QuoteWizard({
   const [quantity, setQuantity] = useState("");
   const [sizeScale, setSizeScale] = useState("");
   const [material, setMaterial] = useState<MaterialChoice>("");
+  const [materialPreference, setMaterialPreference] = useState("");
   const [color, setColor] = useState("");
   const [deadline, setDeadline] = useState("");
 
@@ -235,6 +239,91 @@ export function QuoteWizard({
     return "Revise o pedido.";
   }, [step, type]);
 
+  const requestDraft = useMemo<QuoteRequestDraft | null>(() => {
+    if (!type) return null;
+
+    let project: QuoteRequestDraft["project"];
+
+    if (type === "impressao") {
+      project = {
+        kind: "impressao",
+        notes: details
+      };
+    } else if (type === "placa") {
+      project = {
+        kind: "placa",
+        use: plateUse,
+        contents: plateContent,
+        size: plateSize,
+        lighting: plateLighting
+      };
+    } else if (type === "caixa") {
+      project = {
+        kind: "caixa",
+        contents: boxContents,
+        dimensions: boxDimensions,
+        measurementBasis: boxMeasurementBasis,
+        features: boxSelectedFeatures
+      };
+    } else {
+      project = {
+        kind: "outro",
+        details
+      };
+    }
+
+    return {
+      schemaVersion: 1,
+      projectType: type,
+      source: {
+        ...(initialOrigin ? { origin: initialOrigin } : {}),
+        ...(initialReference ? { reference: initialReference } : {})
+      },
+      startingPoints,
+      noFile,
+      attachments: files.map(toQuoteAttachmentMetadata),
+      production: {
+        quantity,
+        sizeScale,
+        material,
+        materialPreference,
+        color,
+        deadline
+      },
+      project,
+      contact: {
+        method: contactMethod,
+        name,
+        value: contact
+      }
+    };
+  }, [
+    boxContents,
+    boxDimensions,
+    boxMeasurementBasis,
+    boxSelectedFeatures,
+    color,
+    contact,
+    contactMethod,
+    deadline,
+    details,
+    files,
+    initialOrigin,
+    initialReference,
+    material,
+    materialPreference,
+    name,
+    noFile,
+    plateContent,
+    plateLighting,
+    plateSize,
+    plateUse,
+    quantity,
+    sizeScale,
+    startingPoints,
+    type
+  ]);
+
   useEffect(() => {
     headingRef.current?.focus();
   }, [step]);
@@ -255,6 +344,13 @@ export function QuoteWizard({
       }
       if (step === 3 && !quantity.trim()) {
         return "Informe a quantidade ou escreva uma estimativa.";
+      }
+      if (
+        step === 3 &&
+        material === "tenho-preferencia" &&
+        !materialPreference.trim()
+      ) {
+        return "Descreva a preferência de material ou acabamento.";
       }
       if (step === 4) {
         if (!name.trim()) return "Informe seu nome.";
@@ -291,6 +387,9 @@ export function QuoteWizard({
       if (!files.length && !noFile) {
         return "Selecione uma referência ou marque que ainda não tem arquivo.";
       }
+      if (material === "tenho-preferencia" && !materialPreference.trim()) {
+        return "Descreva a preferência de material ou acabamento.";
+      }
     }
 
     if (step === 5) {
@@ -312,6 +411,19 @@ export function QuoteWizard({
     if (validationError) {
       setError(validationError);
       return;
+    }
+
+    if (step === totalSteps - 1) {
+      if (!requestDraft) {
+        setError("Não foi possível preparar a revisão deste pedido.");
+        return;
+      }
+
+      const requestValidation = validateQuoteRequestDraft(requestDraft);
+      if (!requestValidation.ok) {
+        setError(requestValidation.message);
+        return;
+      }
     }
 
     if (type) {
@@ -603,12 +715,33 @@ export function QuoteWizard({
           </div>
           <div className={styles.fieldGroup}>
             <label htmlFor="material">Material</label>
-            <select id="material" value={material} onChange={(event) => setMaterial(event.target.value as MaterialChoice)}>
+            <select
+              id="material"
+              value={material}
+              onChange={(event) => {
+                const nextMaterial = event.target.value as MaterialChoice;
+                setMaterial(nextMaterial);
+                if (nextMaterial !== "tenho-preferencia") {
+                  setMaterialPreference("");
+                }
+              }}
+            >
               <option value="">Não informado</option>
               <option value="nao-sei">Não sei, preciso de orientação</option>
               <option value="tenho-preferencia">Tenho uma preferência</option>
             </select>
           </div>
+          {material === "tenho-preferencia" ? (
+            <div className={styles.fieldGroup}>
+              <label htmlFor="material-preference">Qual é a sua preferência?</label>
+              <input
+                id="material-preference"
+                value={materialPreference}
+                onChange={(event) => setMaterialPreference(event.target.value)}
+                placeholder="Descreva o material, acabamento ou requisito."
+              />
+            </div>
+          ) : null}
           <div className={styles.fieldGroup}>
             <label htmlFor="color">Cor ou acabamento desejado</label>
             <input
@@ -658,12 +791,33 @@ export function QuoteWizard({
           </div>
           <div className={styles.fieldGroup}>
             <label htmlFor="material">Material ou cor</label>
-            <select id="material" value={material} onChange={(event) => setMaterial(event.target.value as MaterialChoice)}>
+            <select
+              id="material"
+              value={material}
+              onChange={(event) => {
+                const nextMaterial = event.target.value as MaterialChoice;
+                setMaterial(nextMaterial);
+                if (nextMaterial !== "tenho-preferencia") {
+                  setMaterialPreference("");
+                }
+              }}
+            >
               <option value="">Não informado</option>
               <option value="nao-sei">Não sei, preciso de orientação</option>
-              <option value="tenho-preferencia">Tenho uma preferência e explico no pedido</option>
+              <option value="tenho-preferencia">Tenho uma preferência</option>
             </select>
           </div>
+          {material === "tenho-preferencia" ? (
+            <div className={styles.fieldGroup}>
+              <label htmlFor="material-preference">Qual é a sua preferência?</label>
+              <input
+                id="material-preference"
+                value={materialPreference}
+                onChange={(event) => setMaterialPreference(event.target.value)}
+                placeholder="Descreva o material, acabamento ou requisito."
+              />
+            </div>
+          ) : null}
         </>
       ) : null}
 
@@ -763,13 +917,22 @@ export function QuoteWizard({
                   <dd>{files.length ? files.map((file) => file.name).join(", ") : "Nenhum arquivo selecionado"}</dd>
                   <button type="button" onClick={() => edit(2)}>Editar</button>
                 </div>
+                {details ? (
+                  <div>
+                    <dt>Observação da peça</dt>
+                    <dd>{details}</dd>
+                    <button type="button" onClick={() => edit(2)}>Editar</button>
+                  </div>
+                ) : null}
                 <div>
                   <dt>Produção</dt>
                   <dd>
                     {quantity || "quantidade não informada"}
                     {sizeScale ? ` · ${sizeScale}` : ""}
                     {material === "nao-sei" ? " · precisa de orientação de material" : ""}
-                    {material === "tenho-preferencia" ? " · tem preferência de material" : ""}
+                    {material === "tenho-preferencia" && materialPreference
+                      ? ` · preferência: ${materialPreference}`
+                      : ""}
                     {color ? ` · ${color}` : ""}
                     {deadline ? ` · prazo desejado: ${deadline}` : ""}
                   </dd>
@@ -782,7 +945,9 @@ export function QuoteWizard({
                 <dd>
                   {files.length ? files.map((file) => file.name).join(", ") : "sem arquivo agora"} · {quantity || "quantidade não informada"}
                   {material === "nao-sei" ? " · precisa de orientação" : ""}
-                  {material === "tenho-preferencia" ? " · tem preferência de material/cor" : ""}
+                  {material === "tenho-preferencia" && materialPreference
+                    ? ` · preferência: ${materialPreference}`
+                    : ""}
                 </dd>
                 <button type="button" onClick={() => edit(4)}>Editar</button>
               </div>

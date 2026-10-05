@@ -185,7 +185,10 @@ Visitante frio entende em poucos segundos:
 - [x] política V1 de arquivo: STL/3MF/OBJ/STEP/STP/PDF/PNG/JPG/JPEG/WebP; até 5 arquivos, 50 MB por arquivo e 100 MB no total;
 - [x] validação local de extensão/tamanho/quantidade com erro acessível;
 - [x] contrato serializável `schemaVersion: 1` para a solicitação, sem dependência de provider;
+- [x] parser seguro de `unknown` para o payload versionado antes da validação de negócio;
 - [x] validação estrutural do payload reutilizável no runtime server;
+- [x] wizard monta o payload canônico e o valida antes de entrar na etapa de revisão;
+- [x] observação da peça e preferência declarada de material/acabamento são preservadas no payload e na revisão;
 - [x] classificação inicial determinística: pronto para revisão / faltam informações / incompleto, sem recusa automática;
 - [ ] anexos privados no backend remoto;
 - [ ] inspeção server-side do conteúdo real do arquivo antes da persistência;
@@ -401,3 +404,14 @@ Decisão desta fase:
 - nenhuma regra automática marca projeto como “não atendido”; casos fora de escopo continuam decisão humana;
 - nenhum arquivo, contato ou solicitação é enviado nesta etapa;
 - inspeção binária, storage privado, retenção, persistência, confirmação e fila operacional continuam bloqueados por E2.
+
+
+## Revisão pós-PRs #29/#30 — contrato do Orçamento — 05/10/2026
+
+- validação server-side não depende mais de um objeto já tipado por TypeScript: existe parser de entrada `unknown`;
+- `schemaVersion` é verificado em runtime antes de aceitar o payload;
+- estados contraditórios de referência/anexo são rejeitados;
+- a observação do branch de arquivo pronto não se perde mais entre UI, revisão e payload;
+- “tenho preferência” exige registrar qual preferência de material/acabamento;
+- o wizard valida o mesmo contrato canônico antes da tela final de revisão;
+- `manual-review` não é um status automático: revisão humana de escopo permanece decisão operacional posterior.

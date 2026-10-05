@@ -19,6 +19,8 @@ export default function StudioProductsPage() {
       eyebrow="Produtos"
       title="Conheça aqui. Compre na Shopee."
       lead="O nosso domínio explica cada peça. Quando o produto estiver publicado, a Shopee entra somente no passo de finalizar a compra, pagamento e disponibilidade."
+      pathname="/studio/produtos"
+      breadcrumbLabel="Produtos"
     >
       <StudioSection title="Catálogo sem produto fictício">
         <MediaPlaceholder

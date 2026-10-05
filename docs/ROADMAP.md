@@ -9,7 +9,7 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 ## Próximos passos
 
 1. **Concluído nos PRs #29 e #30:** contrato local/serializável do Orçamento, arquivos reais em memória, política de formatos/limites, payload versionado, validação estrutural compartilhável e triagem inicial backend-neutral.
-2. **Próximo bloco técnico depende de E2:** backend remoto do Orçamento — storage privado, inspeção de conteúdo server-side, retenção, persistência, execução da triagem e confirmação.
+2. **Backend do Orçamento definido:** Supabase CM próprio em `sa-east-1`, PostgreSQL + Storage privado, upload TUS assinado, retenção e boundaries server-side conforme [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md). Implementação local pode avançar; validação/apply remoto depende de E2.
 3. **Próximo bloco de conteúdo depende de E3:** dataset/fotos reais de Impressões, Placas e Caixas e revisão visual final das superfícies restantes.
 4. **Gate de lançamento:** domínio/alvo público, retirada controlada do `noindex`, Search Console e validações finais continuam depois de E2/E3.
 
@@ -34,16 +34,16 @@ Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio
 
 ## Frente do Estúdio
 
-Contratos: [Search](STUDIO_SEARCH_DISCOVERY_V1.md), [Orçamento](STUDIO_QUOTE_FLOW_V1.md), [Catálogo 3D](CATALOG_3D.md), [wireframes](design/STUDIO_COMMERCE_WIREFRAMES_V1.md) e [mídia](design/STUDIO_MEDIA_INVENTORY_V1.md).
+Contratos: [Search](STUDIO_SEARCH_DISCOVERY_V1.md), [Orçamento](STUDIO_QUOTE_FLOW_V1.md), [Supabase](SUPABASE_INFRASTRUCTURE_V1.md), [Catálogo 3D](CATALOG_3D.md), [ponte de Produtos](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md), [wireframes](design/STUDIO_COMMERCE_WIREFRAMES_V1.md) e [mídia](design/STUDIO_MEDIA_INVENTORY_V1.md).
 
-Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hub, Impressões, impressão sob demanda, Placas, Caixas, Orçamento, Produtos, gate de lançamento e crescimento por dados. A origem pública inicial de Produtos está resolvida como projeção editorial controlada do Artesópolis Admin/Shopee; sincronização dinâmica não é requisito desta etapa. Infraestrutura de Search que não cristalize layout pode avançar com o gate visual ainda aberto.
+Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hub, Impressões, impressão sob demanda, Placas, Caixas, Orçamento, Produtos, gate de lançamento e crescimento por dados. A origem de Produtos está resolvida como projeção editorial controlada do Artesópolis Admin/Shopee; o snapshot estático atual é estado transitório até o cutover definido em [PRODUCT_CATALOG_BRIDGE_PLAN_V1.md](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md). Infraestrutura de Search e Supabase que não cristalize layout pode avançar com o gate visual ainda aberto.
 
 ## Bloqueios externos
 
 | Código | Pendência | Quem resolve | O que bloqueia |
 | --- | --- | --- | --- |
 | E1 | Confirmar repositório privado | Cassiano | Cópia de conteúdo privado |
-| E2 | Definir o projeto/backend remoto do CM e o alvo de publicação | Cassiano | Storage/persistência do Orçamento e publicação |
+| E2 | Criar a conta/projeto Supabase CM definido em `sa-east-1` e confirmar o alvo remoto antes de apply/deploy | Cassiano | Apply remoto, bucket real, secrets, validação live do Orçamento e publicação |
 | E3 | Selecionar peça, fotos e permissões | Cassiano | Conteúdo real do Estúdio no lançamento |
 | E5 | Definir contato comercial de continuidade | Cassiano | Chamadas comerciais e continuidade após triagem |
 

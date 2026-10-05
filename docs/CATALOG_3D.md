@@ -37,6 +37,10 @@ Fluxo:
 
 O link externo de compra entra no nível do produto. A página própria precisa ter valor mesmo quando o checkout acontece na Shopee.
 
+A página individual segue o contrato visual [STUDIO_PRODUCT_PAGE_VISUAL_V1.md](design/STUDIO_PRODUCT_PAGE_VISUAL_V1.md): galeria com foto/vídeo útil, variações reais, dimensões legíveis e ficha técnica. O CTA comercial é **Comprar na Shopee**.
+
+O CM **não possui carrinho, “Adicionar ao carrinho”, checkout próprio ou seletor de quantidade para compra local**. Preço e estoque só aparecem quando houver origem sincronizada e confiável; caso contrário, a Shopee é a fonte final dessas informações.
+
 ## Serviços
 
 Existe uma separação importante:
@@ -64,7 +68,7 @@ Não são um pilar de primeiro nível do Estúdio nesta fase.
 | Entidade | Informação necessária |
 | --- | --- |
 | Impressão/projeto | ID, slug opcional, estado editorial, título, descrição curta, fotos, categoria e permissão de exposição |
-| Produto | ID, slug, nome, descrição, categoria, dimensões com unidade, fotos, estado de publicação e link comercial quando aplicável |
+| Produto | ID, slug, nome, descrição, categoria, dimensões com unidade, fotos, vídeos quando úteis, variações reais, estado de publicação e link Shopee quando aplicável |
 | Material/cor | ID, nome legível, acabamento, amostra/foto e situação de disponibilidade conhecida |
 | Variante | Produto, combinações válidas e condição: pronta, sob consulta ou indisponível |
 | Caso de cliente | Pedido resumido, resultado, fotos autorizadas, possibilidades de personalização e nenhuma informação pessoal desnecessária |

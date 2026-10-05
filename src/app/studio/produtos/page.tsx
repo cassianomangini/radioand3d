@@ -1,9 +1,13 @@
+import Image from "next/image";
+import Link from "next/link";
 import {
   MediaPlaceholder,
   PrimaryLink,
   StudioPageShell,
   StudioSection
 } from "@/components/studio/studio-content";
+import catalogStyles from "@/components/studio/studio-catalog.module.css";
+import { studioProducts } from "@/features/studio/catalog";
 import { buildPublicMetadata } from "@/lib/site-config";
 
 export const metadata = buildPublicMetadata({
@@ -23,10 +27,37 @@ export default function StudioProductsPage() {
       breadcrumbLabel="Produtos"
     >
       <StudioSection title="Catálogo sem produto fictício">
-        <MediaPlaceholder
-          kind="user-photo"
-          note="Fotografia real do primeiro produto publicado no site. Não criaremos cards vazios para simular variedade."
-        />
+        {studioProducts.length ? (
+          <div className={catalogStyles.grid}>
+            {studioProducts.map((product) => {
+              const image = product.images[0];
+              return (
+                <Link className={catalogStyles.item} href={`/studio/produtos/${product.slug}`} key={product.slug}>
+                  {image ? (
+                    <div className={catalogStyles.media}>
+                      <Image
+                        src={image.src}
+                        alt={image.alt}
+                        width={image.width}
+                        height={image.height}
+                        sizes="(max-width: 1180px) 100vw, 33vw"
+                      />
+                    </div>
+                  ) : null}
+                  <div className={catalogStyles.meta}>
+                    <strong>{product.title}</strong>
+                    <p>{product.summary}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <MediaPlaceholder
+            kind="user-photo"
+            note="Fotografia real do primeiro produto publicado no site. Não criaremos cards vazios para simular variedade."
+          />
+        )}
         <p>
           Cada produto real terá página própria com fotos, medidas, material, opções e
           contexto suficiente para a pessoa decidir se faz sentido antes de sair do site.

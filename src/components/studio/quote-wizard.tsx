@@ -8,9 +8,10 @@ import {
   type ChangeEvent,
   type DragEvent
 } from "react";
+import { emitStudioAnalytics, type StudioProjectType } from "@/features/studio/analytics";
 import styles from "./quote-wizard.module.css";
 
-type ProjectType = "impressao" | "placa" | "caixa" | "outro";
+type ProjectType = StudioProjectType;
 type ContactMethod = "whatsapp" | "email";
 type MaterialChoice = "" | "nao-sei" | "tenho-preferencia";
 
@@ -48,16 +49,20 @@ function FilePicker({
   noFile,
   onFilesChange,
   onNoFileChange,
+  onFilesAdded,
   required
 }: {
   files: string[];
   noFile: boolean;
   onFilesChange: (files: string[]) => void;
   onNoFileChange: (value: boolean) => void;
+  onFilesAdded?: (count: number) => void;
   required?: boolean;
 }) {
   function addFiles(nextFiles: string[]) {
+    const addedFiles = nextFiles.filter((file) => !files.includes(file));
     onFilesChange(Array.from(new Set([...files, ...nextFiles])));
+    if (addedFiles.length) onFilesAdded?.(addedFiles.length);
     if (nextFiles.length) onNoFileChange(false);
   }
 
@@ -164,6 +169,7 @@ export function QuoteWizard({
   const [error, setError] = useState("");
 
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const analyticsStartedRef = useRef(false);
   const totalSteps = type === "impressao" ? 5 : 6;
 
   const stepTitle = useMemo(() => {
@@ -192,6 +198,15 @@ export function QuoteWizard({
   useEffect(() => {
     headingRef.current?.focus();
   }, [step]);
+
+  useEffect(() => {
+    if (analyticsStartedRef.current) return;
+    analyticsStartedRef.current = true;
+    emitStudioAnalytics({
+      name: "quote_start",
+      projectType: initialType
+    });
+  }, [initialType]);
 
   function validateStep() {
     if (step === 1 && !type) return "Escolha o tipo de projeto para continuar.";
@@ -261,6 +276,11 @@ export function QuoteWizard({
       return;
     }
     setError("");
+    emitStudioAnalytics({
+      name: "quote_step_completed",
+      projectType: type ?? undefined,
+      step
+    });
     setStep((current) => Math.min(totalSteps, current + 1));
   }
 
@@ -444,7 +464,13 @@ export function QuoteWizard({
                 key={option}
                 type="button"
                 aria-pressed={type === option}
-                onClick={() => setType(option)}
+                onClick={() => {
+                  setType(option);
+                  emitStudioAnalytics({
+                    name: "quote_type_selected",
+                    projectType: option
+                  });
+                }}
               >
                 <span>{labels[option]}</span>
                 <span aria-hidden="true">→</span>
@@ -464,6 +490,13 @@ export function QuoteWizard({
             noFile={false}
             onFilesChange={setFiles}
             onNoFileChange={() => undefined}
+            onFilesAdded={(count) =>
+              emitStudioAnalytics({
+                name: "quote_file_added",
+                projectType: type ?? undefined,
+                count
+              })
+            }
             required
           />
           <div className={styles.fieldGroup}>
@@ -557,6 +590,13 @@ export function QuoteWizard({
             noFile={noFile}
             onFilesChange={setFiles}
             onNoFileChange={setNoFile}
+            onFilesAdded={(count) =>
+              emitStudioAnalytics({
+                name: "quote_file_added",
+                projectType: type ?? undefined,
+                count
+              })
+            }
           />
           <div className={styles.fieldGroup}>
             <label htmlFor="quantity">Quantidade</label>

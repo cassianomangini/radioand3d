@@ -2,7 +2,7 @@
 
 ## Situação das decisões
 
-Este documento orienta a entrega 01. A stack abaixo é proposta, ainda não instalada. Registre aqui a escolha, justificativa e versão efetiva antes de criar dependências.
+Este documento mantém as decisões arquiteturais do projeto. Nem toda infraestrutura remota está provisionada; quando uma escolha estiver fechada mas ainda não criada, isso deve ser indicado explicitamente.
 
 | Camada | Proposta inicial | Validação necessária |
 | --- | --- | --- |
@@ -10,11 +10,13 @@ Este documento orienta a entrega 01. A stack abaixo é proposta, ainda não inst
 | Estilo e movimento | Tokens próprios, CSS/Tailwind e Motion quando necessário | Aprovação visual e orçamento de desempenho |
 | 3D em tempo real | Three.js/React Three Fiber apenas para interação aprovada | Modelo publicável, fallback e custo no mobile |
 | Pacotes | pnpm, Node suportado e lockfile versionado | Fixar versões no setup e CI |
-| Metadados | Banco relacional com migrations | Fornecedor, autenticação e operação local a decidir |
-| Mídia | Object storage; R2 é candidato por existir no legado | Alvos CM, acesso privado, CORS e entrega pública |
+| Dados próprios do site | **Supabase PostgreSQL** para Orçamento e futuros dados CM explicitamente contratados | Projeto remoto ainda não criado; contrato em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md) |
+| Mídia | **R2** permanece no acervo da Rádio; **Supabase Storage privado** recebe somente anexos temporários do Orçamento; mídia de Produtos vem da fonte Shopee/Admin na V1 | Provisionamento remoto do Supabase e gates de produção ainda pendentes |
 | Aplicação hospedada | Vercel é candidata | Conta, plano, domínio e permissões a confirmar |
 
-Não criar microserviços, monorepo ou infraestrutura de processamento distribuído antes de uma necessidade medida. O detalhamento do upload pode exigir processamento fora da requisição; decidir o menor mecanismo que respeite os limites reais do ambiente.
+Não criar microserviços, monorepo ou infraestrutura de processamento distribuído antes de uma necessidade medida.
+
+A infraestrutura Supabase está fechada em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md): projeto CM separado do Supabase do Artesopolis Admin, região `sa-east-1`, PostgreSQL + Storage privado para Orçamento, upload TUS assinado e nenhuma Data API de negócio exposta ao browser.
 
 ## Módulos propostos
 
@@ -133,7 +135,7 @@ Acesso público somente a itens publicados. Gestão restrita ao proprietário, c
 
 Escritas, uploads e publicação exigem validação, limites, trilha de resultado e tratamento de repetição. URLs fornecidas por importadores não autorizam fetch arbitrário no servidor. Segredos de banco/storage nunca entram no bundle público.
 
-A integração com Artesopolis Admin é opcional. Exige contrato de leitura com lista explícita de campos, alvo autorizado e política de atualização. Não copiar banco, estoque ou clientes para acelerar a demonstração.
+A integração de **Produtos** com o Artesopolis Admin está definida em [PRODUCT_CATALOG_BRIDGE_PLAN_V1.md](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md). O site consome uma projeção pública server-side com lista explícita de campos; não copia banco, estoque, custos, pedidos ou clientes. O novo Supabase do CM não espelha o catálogo do Admin.
 
 ## Infraestrutura a preparar
 

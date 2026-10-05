@@ -4,12 +4,14 @@
 
 O site ainda não foi lançado. Em 05/10/2026 Cassiano aceitou a passagem da Rádio, as barras e a entrada do Estúdio que já estava na Home. A fila da Rádio está fechada. C1–C8 não voltam como implementação.
 
-A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com Impressão 3D sob demanda, Placas e Caixas. O plano está em [STUDIO_GROWTH_PLAN_V1.md](STUDIO_GROWTH_PLAN_V1.md) e a execução em [08](work/08-studio-growth.md). O hub visual foi aprovado. O frontend comercial continua bloqueado enquanto o handoff [STUDIO_COMMERCE_EXPERIENCE_V1.md](design/STUDIO_COMMERCE_EXPERIENCE_V1.md) estiver com `ready_for_frontend: no`.
+A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com Impressão 3D sob demanda, Placas e Caixas. O plano está em [STUDIO_GROWTH_PLAN_V1.md](STUDIO_GROWTH_PLAN_V1.md) e a execução em [08](work/08-studio-growth.md). O hub visual foi aprovado. Em 05/10/2026, Cassiano autorizou explicitamente avançar toda a **estrutura, copy, rotas, estados e SEO que não dependam da mídia final**, usando placeholders neutros. O `ready_for_frontend: no` do handoff agora bloqueia apenas a cristalização visual final/mídia das superfícies ainda pendentes, não o trabalho estrutural já autorizado.
 
 ## Próximos passos
 
-1. Fechar o gate de experiência do Estúdio: revisão visual das próximas superfícies e uma etapa do Orçamento com direção visual final. Só então `ready_for_frontend` passa a `yes`.
-2. Publicar espera Cassiano definir o alvo (E2). Fotos e peças reais seguem o [inventário de mídia](design/STUDIO_MEDIA_INVENTORY_V1.md).
+1. Fechar o que ainda depende de conteúdo real: fotos/provas, primeiros itens de Impressões, primeiros Produtos e permissões de publicação.
+2. Fechar backend seguro do Orçamento: storage privado, validação, retenção, persistência, triagem e confirmação.
+3. Fazer a revisão visual final das superfícies e substituir placeholders somente na última etapa.
+4. Publicar espera Cassiano definir o alvo (E2); produção permanece `noindex` até o gate de lançamento.
 
 Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio não altera o motion spine da Rádio.
 

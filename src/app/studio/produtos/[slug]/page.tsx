@@ -7,9 +7,23 @@ import {
   StudioSection,
   TextList
 } from "@/components/studio/studio-content";
+import { TrackedShopeeLink } from "@/components/studio/tracked-shopee-link";
 import { buildPublicMetadata } from "@/lib/site-config";
 import { findStudioProduct, studioProducts } from "@/features/studio/catalog";
 import styles from "./product-page.module.css";
+
+const availabilityLabels = {
+  disponivel: "Disponível",
+  "sob-consulta": "Sob consulta",
+  indisponivel: "Indisponível"
+} as const;
+
+function formatVerificationDate(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(date);
+}
 
 export function generateStaticParams() {
   return studioProducts.map((product) => ({ slug: product.slug }));
@@ -53,6 +67,7 @@ export default async function StudioProductPage({
       lead={product.summary}
       pathname={`/studio/produtos/${product.slug}`}
       breadcrumbLabel={product.title}
+      breadcrumbParents={[{ name: "Produtos", href: "/studio/produtos" }]}
     >
       <StudioSection title="Fotos do produto">
         <div className={styles.gallery}>
@@ -72,6 +87,10 @@ export default async function StudioProductPage({
       <StudioSection title="O que você precisa saber">
         <p>{product.description}</p>
         {product.dimensions ? <p><strong>Medidas:</strong> {product.dimensions}</p> : null}
+        <p>
+          <strong>Disponibilidade:</strong> {availabilityLabels[product.availability]} ·
+          {" "}verificada em {formatVerificationDate(product.lastVerifiedAt)}.
+        </p>
         {product.materials.length ? (
           <TextList>
             {product.materials.map((material) => <li key={material}>{material}</li>)}
@@ -85,10 +104,18 @@ export default async function StudioProductPage({
       </StudioSection>
 
       <StudioSection eyebrow="Compra" title="Finalização na Shopee">
-        {product.shopeeUrl ? (
-          <PrimaryLink href={product.shopeeUrl}>Ver preço e disponibilidade na Shopee</PrimaryLink>
+        <p>
+          O site apresenta a peça. Preço, disponibilidade e pagamento são confirmados
+          no canal de compra quando houver link publicado.
+        </p>
+        {product.availability === "indisponivel" ? (
+          <p>Este produto está indisponível no momento.</p>
+        ) : product.shopeeUrl ? (
+          <TrackedShopeeLink href={product.shopeeUrl} productSlug={product.slug}>
+            Ver preço e disponibilidade na Shopee
+          </TrackedShopeeLink>
         ) : (
-          <p>Este produto ainda não tem checkout externo publicado.</p>
+          <p>Disponibilidade sob consulta; o checkout externo ainda não está publicado.</p>
         )}
       </StudioSection>
 

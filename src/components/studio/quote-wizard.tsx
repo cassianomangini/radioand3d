@@ -8,6 +8,7 @@ import {
   type ChangeEvent,
   type DragEvent
 } from "react";
+import { trackPublicEvent } from "@/lib/public-analytics";
 import styles from "./quote-wizard.module.css";
 
 type ProjectType = "impressao" | "placa" | "caixa" | "outro";
@@ -164,6 +165,7 @@ export function QuoteWizard({
   const [error, setError] = useState("");
 
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const analyticsStartedRef = useRef(false);
   const totalSteps = type === "impressao" ? 5 : 6;
 
   const stepTitle = useMemo(() => {
@@ -192,6 +194,13 @@ export function QuoteWizard({
   useEffect(() => {
     headingRef.current?.focus();
   }, [step]);
+
+  useEffect(() => {
+    if (!initialType || analyticsStartedRef.current) return;
+    analyticsStartedRef.current = true;
+    trackPublicEvent("quote_start", { projectType: initialType });
+    trackPublicEvent("quote_type_selected", { projectType: initialType });
+  }, [initialType]);
 
   function validateStep() {
     if (step === 1 && !type) return "Escolha o tipo de projeto para continuar.";
@@ -260,6 +269,14 @@ export function QuoteWizard({
       setError(validationError);
       return;
     }
+
+    if (type) {
+      trackPublicEvent("quote_step_completed", {
+        projectType: type,
+        step
+      });
+    }
+
     setError("");
     setStep((current) => Math.min(totalSteps, current + 1));
   }
@@ -444,7 +461,18 @@ export function QuoteWizard({
                 key={option}
                 type="button"
                 aria-pressed={type === option}
-                onClick={() => setType(option)}
+                onClick={() => {
+                  if (!analyticsStartedRef.current) {
+                    analyticsStartedRef.current = true;
+                    trackPublicEvent("quote_start", {
+                      projectType: option
+                    });
+                  }
+                  setType(option);
+                  trackPublicEvent("quote_type_selected", {
+                    projectType: option
+                  });
+                }}
               >
                 <span>{labels[option]}</span>
                 <span aria-hidden="true">→</span>
@@ -462,7 +490,15 @@ export function QuoteWizard({
           <FilePicker
             files={files}
             noFile={false}
-            onFilesChange={setFiles}
+            onFilesChange={(nextFiles) => {
+              if (nextFiles.length > files.length) {
+                trackPublicEvent("quote_file_added", {
+                  projectType: "impressao",
+                  step
+                });
+              }
+              setFiles(nextFiles);
+            }}
             onNoFileChange={() => undefined}
             required
           />
@@ -555,7 +591,15 @@ export function QuoteWizard({
           <FilePicker
             files={files}
             noFile={noFile}
-            onFilesChange={setFiles}
+            onFilesChange={(nextFiles) => {
+              if (nextFiles.length > files.length && type) {
+                trackPublicEvent("quote_file_added", {
+                  projectType: type,
+                  step
+                });
+              }
+              setFiles(nextFiles);
+            }}
             onNoFileChange={setNoFile}
           />
           <div className={styles.fieldGroup}>

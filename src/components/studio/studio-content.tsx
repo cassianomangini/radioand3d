@@ -3,16 +3,24 @@ import type { ReactNode } from "react";
 import { absoluteSiteUrl } from "@/lib/site-config";
 import styles from "./studio-content.module.css";
 
+type StudioBreadcrumbItem = {
+  name: string;
+  href: string;
+};
+
 function StudioBreadcrumbs({
   currentLabel,
-  pathname
+  pathname,
+  parents = []
 }: {
   currentLabel: string;
   pathname: string;
+  parents?: StudioBreadcrumbItem[];
 }) {
   const items = [
     { name: "Início", href: "/" },
     { name: "Estúdio", href: "/studio" },
+    ...parents,
     { name: currentLabel, href: pathname }
   ];
 
@@ -66,6 +74,7 @@ export function StudioPageShell({
   lead,
   pathname,
   breadcrumbLabel,
+  breadcrumbParents,
   children
 }: {
   eyebrow: string;
@@ -73,12 +82,17 @@ export function StudioPageShell({
   lead: string;
   pathname: string;
   breadcrumbLabel: string;
+  breadcrumbParents?: StudioBreadcrumbItem[];
   children: ReactNode;
 }) {
   return (
     <article className={styles.page}>
       <header className={styles.pageHeader}>
-        <StudioBreadcrumbs currentLabel={breadcrumbLabel} pathname={pathname} />
+        <StudioBreadcrumbs
+          currentLabel={breadcrumbLabel}
+          pathname={pathname}
+          parents={breadcrumbParents}
+        />
         <p className={styles.eyebrow}>{eyebrow}</p>
         <h1>{title}</h1>
         <p className={styles.lead}>{lead}</p>
@@ -138,6 +152,24 @@ export function MediaPlaceholder({
         <small>{source}</small>
       </figcaption>
     </figure>
+  );
+}
+
+
+export function StudioMaterialGuidance() {
+  return (
+    <StudioSection eyebrow="Materiais & cores" title="A escolha vem depois da função.">
+      <p>
+        Material, cor e acabamento dependem do uso da peça, das dimensões e das condições
+        de produção. Não exibimos uma grade genérica de materiais como se toda combinação
+        estivesse automaticamente disponível.
+      </p>
+      <TextList>
+        <li>Se você já tem preferência de material, cor ou acabamento, informe no orçamento.</li>
+        <li>Se não souber, marque que precisa de orientação e avaliamos junto com o projeto.</li>
+        <li>Disponibilidade e combinação final só são confirmadas durante a análise.</li>
+      </TextList>
+    </StudioSection>
   );
 }
 

@@ -1,8 +1,9 @@
 # STUDIO_COMMERCE_EXPERIENCE_V1 — Handoff de experiência do Estúdio
 
-Status: **hub `/studio` aprovado; demais superfícies ainda em direção visual**  
-ready_for_frontend: **no**  
-approved_by: **estrutura-base: Cassiano — 04/10/2026; revisão atual: pending**  
+Status: **estrutura comercial em implementação; mídia e aprovação visual final continuam pendentes**  
+structural_frontend_authorized: **yes — Cassiano, 05/10/2026; placeholders neutros permitidos e mídia final deixada para a última etapa**  
+ready_for_frontend: **no — vale para cristalização visual final/mídia, não bloqueia estrutura, copy, rotas e estados autorizados**  
+approved_by: **hub/estrutura-base: Cassiano — 04/10/2026; avanço estrutural sem mídia final: Cassiano — 05/10/2026**  
 artifact_ref: **docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md**  
 Versão: **V1 — 04/10/2026**
 
@@ -783,7 +784,10 @@ Mudar para `ready_for_frontend: yes` somente quando:
 - itens proibidos estiverem explícitos;
 - Cassiano aprovar a direção.
 
-Até lá:
+Em 05/10/2026, Cassiano autorizou explicitamente continuar **toda a implementação estrutural que não dependa da mídia final**, usando placeholders neutros quando necessário. Portanto, este gate não volta a bloquear rotas, copy, SEO, estados, orçamento, contratos de catálogo ou responsividade estrutural já autorizados.
 
-ready_for_frontend: **no**  
-approved_by: **estrutura-base aprovada por Cassiano em 04/10/2026; revisão do hub/serviço sob demanda e mock visual final pendentes**
+O que continua bloqueado por `ready_for_frontend: no` é a **cristalização visual final das superfícies ainda não aprovadas e a substituição dos placeholders por mídia definitiva**.
+
+ready_for_frontend: **no — visual final/mídia**  
+structural_frontend_authorized: **yes**  
+approved_by: **hub/estrutura-base aprovada por Cassiano em 04/10/2026; implementação estrutural sem mídia final autorizada em 05/10/2026**

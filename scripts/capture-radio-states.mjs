@@ -106,7 +106,7 @@ class CdpClient {
   }
 }
 
-async function navigate(client, width, height, mobile = false) {
+async function navigate(client, width, height, mobile = false, routePath = "/") {
   await client.send("Emulation.setDeviceMetricsOverride", {
     width,
     height,
@@ -114,7 +114,7 @@ async function navigate(client, width, height, mobile = false) {
     mobile
   });
   const loaded = client.waitFor("Page.loadEventFired");
-  await client.send("Page.navigate", { url: baseUrl });
+  await client.send("Page.navigate", { url: new URL(routePath, baseUrl).toString() });
   await loaded;
   await delay(1700);
 }
@@ -400,6 +400,59 @@ try {
   if (!studioRouteReached) throw new Error("Studio route did not reach the detail world.");
   await screenshot(client, "desktop-studio-route-detail-1760x824.png");
 
+  const studioNestedAudioStored = await evaluate(
+    client,
+    `(() => {
+      const audio = document.querySelector("audio");
+      if (!(audio instanceof HTMLAudioElement)) return false;
+      window.__cmStudioNestedAudioNode = audio;
+      return true;
+    })()`
+  );
+  if (!studioNestedAudioStored) throw new Error("Studio nested-route audio element was not found.");
+
+  const printsRouteClicked = await evaluate(
+    client,
+    `(() => {
+      const link = document.querySelector('a[href="/studio/impressoes"]');
+      if (!(link instanceof HTMLElement)) return false;
+      link.click();
+      return true;
+    })()`
+  );
+  if (!printsRouteClicked) throw new Error("Studio Prints route link was not found.");
+  await delay(950);
+
+  const printsRouteReached = await evaluate(
+    client,
+    `window.location.pathname === "/studio/impressoes" &&
+      document.querySelector("h1")?.textContent?.includes("O que já saiu") === true &&
+      document.querySelector("audio") === window.__cmStudioNestedAudioNode`
+  );
+  if (!printsRouteReached) {
+    throw new Error("Studio nested route did not preserve the Radio audio element.");
+  }
+  await screenshot(client, "desktop-studio-prints-1760x824.png");
+
+  const nestedBackClicked = await evaluate(
+    client,
+    `(() => {
+      const link = document.querySelector('nav[aria-label="Caminho da página"] a[href="/studio"]');
+      if (!(link instanceof HTMLElement)) return false;
+      link.click();
+      return true;
+    })()`
+  );
+  if (!nestedBackClicked) throw new Error("Studio breadcrumb back link was not found.");
+  await delay(900);
+
+  const studioHubRestored = await evaluate(
+    client,
+    `window.location.pathname === "/studio" &&
+      document.querySelector("audio") === window.__cmStudioNestedAudioNode`
+  );
+  if (!studioHubRestored) throw new Error("Studio breadcrumb navigation replaced the Radio audio element.");
+
   const studioBackClicked = await evaluate(
     client,
     `(() => {
@@ -441,6 +494,47 @@ try {
   );
   if (!mobileStudioReached) throw new Error("Mobile Studio route did not open.");
   await screenshot(client, "mobile-studio-detail-390x844.png");
+
+  const mobileNestedAudioStored = await evaluate(
+    client,
+    `(() => {
+      const audio = document.querySelector("audio");
+      if (!(audio instanceof HTMLAudioElement)) return false;
+      window.__cmMobileStudioAudioNode = audio;
+      return true;
+    })()`
+  );
+  if (!mobileNestedAudioStored) throw new Error("Mobile Studio audio element was not found.");
+
+  const mobileQuoteClicked = await evaluate(
+    client,
+    `(() => {
+      const link = document.querySelector('a[href="/studio/orcamento"]');
+      if (!(link instanceof HTMLElement)) return false;
+      link.click();
+      return true;
+    })()`
+  );
+  if (!mobileQuoteClicked) throw new Error("Mobile quote route link was not found.");
+  await delay(950);
+
+  const mobileQuoteReached = await evaluate(
+    client,
+    `window.location.pathname === "/studio/orcamento" &&
+      document.querySelector("h1")?.textContent?.includes("Conte o que você precisa") === true &&
+      document.querySelector("audio") === window.__cmMobileStudioAudioNode`
+  );
+  if (!mobileQuoteReached) throw new Error("Mobile quote route did not preserve the Radio audio element.");
+  await screenshot(client, "mobile-studio-quote-390x844.png");
+
+  await navigate(client, 1440, 900, false, "/studio/impressao-3d-sob-demanda");
+  const onDemandRouteReached = await evaluate(
+    client,
+    `window.location.pathname === "/studio/impressao-3d-sob-demanda" &&
+      document.querySelector("h1")?.textContent?.includes("Já tem o arquivo 3D") === true`
+  );
+  if (!onDemandRouteReached) throw new Error("On-demand Studio route did not render its main content.");
+  await screenshot(client, "desktop-studio-on-demand-1440x900.png");
 
   await navigate(client, 390, 844, true);
   const mobileClicked = await evaluate(

@@ -219,11 +219,12 @@ O formulário deve funcionar como conversa guiada:
 Nosso domínio apresenta e explica; a Shopee finaliza a compra.
 
 - preview de produto é principalmente fotografia;
-- página individual concentra detalhes;
-- CTA chama **Comprar na Shopee**;
+- página individual funciona como **ficha técnica visual**: galeria, vídeo quando útil, variações, dimensões externas/internas e ficha técnica legível;
+- CTA comercial chama **Comprar na Shopee**;
+- não existe carrinho, checkout próprio, quantity picker de compra ou “Adicionar ao carrinho”;
 - deixar claro que pagamento/finalização acontecem externamente;
 - não duplicar preço/estoque sem sincronização confiável;
-- sem sincronização, usar “Ver preço e disponibilidade na Shopee”.
+- sem sincronização, não exibir preço/estoque possivelmente desatualizado; a Shopee continua sendo a fonte final.
 
 ### Regra de mídia versus CSS
 
@@ -437,7 +438,12 @@ Enquanto esse artefato estiver com `ready_for_frontend: no`, trabalho técnico i
 
 - catálogo interno;
 - páginas individuais;
+- direção visual individual aprovada em `docs/design/STUDIO_PRODUCT_PAGE_VISUAL_V1.md`;
+- galeria real com foto/vídeo;
+- variações reais e dimensões legíveis;
 - link externo no nível do produto;
+- CTA único **Comprar na Shopee**;
+- sem carrinho/checkout interno;
 - schema aplicável sem inventar checkout próprio.
 
 ### S1.8 — Gate de lançamento SEO

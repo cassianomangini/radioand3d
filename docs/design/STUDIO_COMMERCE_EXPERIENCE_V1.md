@@ -498,35 +498,24 @@ Evitar no card:
 
 ## 17. Página individual do produto
 
-A página individual é a principal superfície de decisão antes da Shopee.
+A direção visual final da página individual foi aprovada em 05/10/2026 e está congelada em:
 
-### Primeira área
+[STUDIO_PRODUCT_PAGE_VISUAL_V1.md](STUDIO_PRODUCT_PAGE_VISUAL_V1.md)
 
-- galeria de imagens;
-- nome;
-- uso;
-- medidas;
-- material;
-- opções reais;
-- CTA **Comprar na Shopee**;
-- aviso curto de que compra/pagamento serão finalizados na Shopee.
+A página funciona como uma **ficha técnica visual premium antes da Shopee**, e não como uma cópia do marketplace.
 
-### Depois
+Contrato resumido:
 
-- mais fotos;
-- detalhes;
-- dimensões;
-- acabamento;
-- variações permitidas;
-- cuidados/uso quando relevante.
-
-### Ponte para serviço
-
-No final:
-
-**Precisa de algo parecido, mas com outra medida?**
-
-→ **Pedir orçamento**
+- galeria forte com foto/vídeo e miniaturas;
+- nome + descrição curta de uso;
+- variações reais e legíveis;
+- dimensões visuais, incluindo internas/externas quando aplicável;
+- ficha técnica próxima da mídia;
+- CTA comercial único **Comprar na Shopee**;
+- nenhum carrinho, checkout, quantity picker de compra ou botão “Adicionar ao carrinho”;
+- preço/estoque somente com origem confiável;
+- descrição e mídia adicional abaixo sem virar outra landing page;
+- ponte secundária para orçamento quando fizer sentido.
 
 Referência de usabilidade para product detail page:  
 https://baymard.com/research/product-page
@@ -538,6 +527,8 @@ Shopee é checkout, não identidade principal.
 Regras:
 
 - botão chama **Comprar na Shopee**;
+- esse é o único CTA comercial principal da página;
+- não existe carrinho nem checkout próprio;
 - não usar “Comprar” e surpreender com redirecionamento;
 - informar que a finalização acontece na Shopee;
 - não deixar logo Shopee dominar a composição;
@@ -713,7 +704,7 @@ Antes de implementar superfícies visíveis, fechar nesta ordem:
 1. **Hub `/studio` desktop + mobile** — wireframe criado
 2. **Página Placas desktop + mobile** — wireframe criado
 3. **Fluxo completo de Orçamento em wireframe** — criado; etapa visual final ainda pendente
-5. **Página individual de Produto desktop + mobile** — wireframe criado
+5. **Página individual de Produto desktop + mobile** — direção visual final aprovada em 05/10/2026
 6. **Impressões** — estrutura funcional definida; visual final posterior
 7. **Caixas** — estrutura funcional definida; visual final posterior
 

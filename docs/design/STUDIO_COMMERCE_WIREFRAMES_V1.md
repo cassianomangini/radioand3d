@@ -422,34 +422,59 @@ Sem CTA obrigatório para WhatsApp.
 
 URL: `/studio/produtos/[slug]`
 
-## Primeira dobra
+**Direção visual final aprovada em 05/10/2026.**  
+Contrato completo: [STUDIO_PRODUCT_PAGE_VISUAL_V1.md](STUDIO_PRODUCT_PAGE_VISUAL_V1.md)
+
+A composição deixa de ser apenas um wireframe abstrato. A referência aprovada concentra, na primeira área útil:
+
+- galeria vertical de mídia;
+- foto/vídeo principal;
+- nome e descrição curta;
+- variações reais;
+- CTA único **Comprar na Shopee**;
+- dimensões visuais;
+- ficha técnica.
+
+Estrutura:
 
 ```text
-┌──────────────────────────────────┬──────────────────────────────────┐
-│                                  │ NOME DO PRODUTO                  │
-│ [FOTO PRINCIPAL]                 │ descrição curta de uso          │
-│                                  │                                  │
-│ [mini] [mini] [mini]             │ Medidas                          │
-│                                  │ Material                         │
-│                                  │ Opções reais                     │
-│                                  │                                  │
-│                                  │ [Comprar na Shopee]              │
-│                                  │ Finalização e pagamento          │
-│                                  │ acontecem na Shopee.             │
-└──────────────────────────────────┴──────────────────────────────────┘
+BREADCRUMB
+
+┌──────────┬──────────────────────────────┬──────────────────────────────────┐
+│ mídia    │ FOTO / VÍDEO PRINCIPAL      │ NOME + USO                       │
+│ vertical │                              │ variações reais                  │
+│          │                              │                                  │
+│          │                              │ [ COMPRAR NA SHOPEE ]            │
+└──────────┴──────────────────────────────┴──────────────────────────────────┘
+
+┌────────────────────────────────────────┬──────────────────────────────────┐
+│ DIMENSÕES VISUAIS                      │ DETALHES DA PEÇA                 │
+│ externas + internas                    │ material / medidas / acabamento  │
+└────────────────────────────────────────┴──────────────────────────────────┘
+
+DESCRIÇÃO / CONTEXTO / MÍDIA ADICIONAL
 ```
 
-Se preço e estoque não forem sincronizados:
+Regras obrigatórias:
 
-> Ver preço e disponibilidade na Shopee.
+- **não existe Adicionar ao carrinho**;
+- **não existe carrinho**;
+- **não existe checkout local**;
+- **não existe seletor de quantidade associado a compra local**;
+- a Shopee é o único destino comercial;
+- preço/estoque no CM somente com sincronização confiável;
+- sem dados confiáveis, não exibir valores possivelmente desatualizados;
+- vídeo, quando existir, entra na mesma galeria e deve ajudar a explicar uso/encaixe/acabamento;
+- dimensões relevantes não ficam enterradas em parágrafo.
 
 ## Segunda área
 
-- detalhes de uso;
-- dimensões;
+- descrição;
+- uso;
 - acabamento;
-- fotos adicionais;
-- combinações reais.
+- limitações;
+- fotos/vídeos adicionais somente quando acrescentarem compreensão;
+- ponte para orçamento quando houver demanda de outra medida ou adaptação.
 
 ## Final
 
@@ -465,16 +490,18 @@ PRECISA DE ALGO PARECIDO, MAS COM OUTRA MEDIDA?
 
 Ordem:
 
-1. galeria;
-2. nome;
-3. descrição curta;
-4. medidas/material/opções;
-5. CTA Shopee;
-6. aviso de redirecionamento;
-7. detalhes;
-8. CTA de orçamento relacionado.
+1. mini player;
+2. galeria com trilho horizontal de miniaturas;
+3. nome e descrição curta;
+4. variações;
+5. CTA **Comprar na Shopee**;
+6. dimensões;
+7. ficha técnica;
+8. descrição/mídia adicional;
+9. CTA de orçamento relacionado.
 
-Não usar botão Shopee sticky na primeira versão.
+Não usar CTA Shopee sticky na primeira versão.  
+Não adicionar carrinho, checkout ou botão duplicado de compra.
 
 ---
 
@@ -533,7 +560,8 @@ Para avançar:
 - [x] Cassiano aprova fluxo do Orçamento;
 - [x] Cassiano aprova hierarquia Produto → Shopee;
 - [ ] assets mínimos são selecionados;
-- [ ] criar e aprovar mock visual final das quatro superfícies.
+- [ ] criar e aprovar mock visual final das superfícies restantes;
+- [x] direção visual final da página individual de Produto aprovada em 05/10/2026.
 
-ready_for_frontend: **no**
-approved_by: **pending**
+ready_for_frontend: **parcial — produto individual: yes; demais superfícies: no**
+approved_by: **Produto individual: Cassiano — 05/10/2026**

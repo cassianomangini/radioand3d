@@ -8,7 +8,7 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 
 ## Evolução da qualidade visual — subfrente 08V
 
-O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já existente, laboratório e piloto isolado fica em [08V — Evolução visual](work/08-visual-quality-evolution.md). A auditoria está marcada como feita; V1–V6 permanecem pendentes de execução. Este documento não reabre a Rádio aceita e não substitui a fila funcional do Estúdio.
+O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já existente, laboratório e piloto isolado fica em [08V — Evolução visual](work/08-visual-quality-evolution.md). A auditoria foi concluída; V1 teve contratos/agentes/sources atualizados, o ZIP da skill está preparado (ativação pessoal pendente), V2 já executa 25 testes Playwright em cinco viewports no CI e V3 dispõe de catálogo e receitas. V2 ainda não possui baselines aprovadas nem gate visual integral; V4–V6 continuam pendentes. Este documento não reabre a Rádio aceita e não substitui a fila funcional do Estúdio.
 
 ## Próximos passos
 

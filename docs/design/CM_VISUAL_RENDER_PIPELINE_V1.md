@@ -60,6 +60,8 @@ Versões concretas de packages instalados são as de `package.json` + `pnpm-lock
 
 Documentação oficial: [Motion](https://motion.dev/docs/react-installation), [Playwright](https://playwright.dev/docs/intro), [Playwright a11y](https://playwright.dev/docs/accessibility-testing), [React Bits license](https://github.com/DavidHDev/react-bits/blob/main/LICENSE.md), [R3F](https://r3f.docs.pmnd.rs), [GSAP](https://gsap.com/standard-license/).
 
+**Licenças efetivamente verificadas (versões escolhidas):** Motion MIT; Playwright Apache-2.0; `@axe-core/playwright` MPL-2.0. A revisão de redistribuição se aplica sobretudo a código copiado, não apenas ao uso de pacotes padrão. React Bits adota MIT + Commons Clause, com restrições sobre vender/redistribuir componentes. A nota vale para a avaliação de 09/10/2026 e deve ser renovada ao copiar novos componentes.
+
 ## 5 — QA renderizado e controle de baseline
 
 **Infra que já existe:** `.github/workflows/ci.yml` captura visual em PRs e pushes com `[visual]`; `scripts/capture-radio-states.mjs` faz captura e validações de transição com CDP. **Não excluir/recriar** esse sistema até provar paridade.
@@ -71,6 +73,8 @@ Viewports mínimos por superfície: 1440×900, 1024×768, desktop curto 1760×82
 Casos centrais: horizontal overflow; scroll indevido da Rádio em desktop e barras comprimidas no mobile; imagem croppada; controles/foco/touch; `prefers-reduced-motion`; navegação Estúdio preserva áudio; sem 2 `audio` nodes; contagem de 3 entradas no hub; CTA Shopee sem carrinho na página individual; contraste legível; estabilidade/performance no mobile.
 
 Aprovação `done` exige **código + testes aplicáveis + revisão visual renderizada + aprovação humana quando o desenho mudou**. Revisão estática e build ficam explicitamente separados.
+
+**Primeira execução técnica:** [CI 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995), 25 Playwright/5 viewports aprovados tecnicamente. Ainda houve 1–2 violações Axe moderadas por viewport no hub e falta de prova de conteúdo R2 real. Registrar no [relatório](../work/evidence/08v-visual-qa-audit-2026-10-09.md). Não mascarar problemas de UX apenas porque o workflow ficou verde.
 
 ## 6 — Instruções para futuras implementações
 

@@ -825,9 +825,9 @@ A ponte de Produtos **não depende** da base CM. No ambiente operacional da orig
 
 ## 29. O que pode avançar sem Supabase remoto
 
-**Desbloqueado em código local:** migrations, schema, grants/RLS, parsers, contrato de sessão anônima, handlers, validação de conteúdo, quota, rate limit, idempotência, scheduler, fixtures e testes. Esse código local **não** significa que upload, submit ou cron estejam funcionando na produção.
+**Implementado em código e banco:** migrations, schema, grants/RLS, parser 3MF com testes sintéticos, sessão anônima, quatro handlers, reserva/quota, rate limit, recibo idempotente e 27h de proteção de TUS. **Ainda NÃO implementado:** scheduler/retention via Storage API e Cron Vercel. O CI verde não significa que upload TUS ou submit estejam operacionais na produção.
 
-**Já verificado:** projeto CM definitivo em São Paulo e organização independente; migrations de schema e quota aplicadas e versionadas; bucket privado; read-back SQL/RLS/grants e testes transacionais sintéticos de reserva/negação. Banco sem dados reais; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, suite/CI da aplicação, secrets Vercel, signed TUS real, validação de Range/arquivos reais, limpeza de uploads via Storage API, smoke E2E e release. O backup do legado segue sem comprovação.
+**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **nove migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `e4f352e`: lint + typecheck + 103 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, secrets Vercel, TUS e Range reais, validação de arquivos Bambu reais, limpeza via Storage API, smoke E2E e release. O backup do legado segue sem comprovação.
 
 ## 30. Gate de infraestrutura pronta
 
@@ -878,4 +878,4 @@ Só marcar `infra_ready` quando todas as provas relevantes existirem:
 - Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 - Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
 - O Performance Advisor apontou FK de `quote_events` sem índice, corrigida na migration `index_quote_events_request_fk`; o novo read-back eliminou esse aviso. Sete avisos `INFO` de índices não utilizados são esperados enquanto não existe workload real.
-- Próximo gate: handlers com autenticação de sessão, emissão de token TUS por path, verificação do objeto/tipo real, rate limit e limpeza Storage API. A quota SQL funciona de maneira conservadora, mas **não equivale à validação E2E de concorrência ou upload real**. CLI/Docker locais indisponíveis neste ambiente; manter o intake público desativado.
+- Próximo gate: ensaio E2E com sessão real e autorização cruzada, signed TUS/Range com arquivo sintético e 3MF exportado da impressora, concorrência e limpeza Storage API/Cron. A reserva conservadora de 27h e CI verde **não equivalem à prova remota de upload**. Manter intake público desativado.

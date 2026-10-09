@@ -44,6 +44,15 @@ begin
   if first_path is distinct from repeat_path then
     raise exception 'idempotency_broken';
   end if;
+  if (select grant_expires_at from public.quote_attachments where id=first_id)
+      < transaction_timestamp()+interval '26 hours 59 minutes' then
+    raise exception 'tus_reservation_does_not_cover_24h_resumable_url';
+  end if;
+  if (select expires_at from public.quote_requests where id=q1)
+      < transaction_timestamp()+interval '23 hours 59 minutes' then
+    raise exception 'draft_sliding_expiry_not_refreshed';
+  end if;
+
 
   denied:=false;
   begin

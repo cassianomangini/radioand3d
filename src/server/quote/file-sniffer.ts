@@ -2,8 +2,8 @@
  * Lightweight fail-closed signature validation for quote previews.
  *
  * A signature is not a malware scan or full CAD parser. Files remain private
- * and are never rendered/executed by the public site. 3MF additionally checks
- * the ZIP central directory for the mandatory OPC manifest and a 3D model.
+ * and are never rendered/executed by the public site. 3MF uses the separate
+ * bounded ZIP/OPC parser in zip-3mf.ts, not a filename-search heuristic.
  */
 export type DetectedQuoteFile =
   | 'stl-binary' | 'stl-ascii' | '3mf-zip' | 'obj-text'
@@ -60,15 +60,6 @@ export function detectQuoteFile(
   if (extension === '.step' || extension === '.stp') {
     return mostlyText(head) && /^\s*ISO-10303-21\s*;/i.test(prefix)
       ? 'step-text' : null;
-  }
-  if (extension === '.3mf') {
-    if (!starts(head, [80,75,3,4]) || !tail || tail.length < 22) return null;
-    const index = ascii(tail);
-    // 3MF is an OPC ZIP container: require both the content types manifest
-    // and at least one model part, not merely a generic ZIP magic prefix.
-    return index.includes('PK\x05\x06') &&
-      index.includes('[Content_Types].xml') &&
-      /3D\/[^\x00-\x1f]{1,100}\.model/i.test(index) ? '3mf-zip' : null;
   }
   return null;
 }

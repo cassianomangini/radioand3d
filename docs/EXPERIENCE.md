@@ -110,6 +110,10 @@ Separar valores-base, papéis semânticos e poucas variáveis específicas de co
 
 Mostrar pares reais de fundo/texto e estados, não só bolinhas de paleta. Seleção combina forma/texto e cor. Filamentos e capas são conteúdo: suas cores não são alteradas para caber na paleta da interface.
 
+## Auditoria transversal da identidade do site
+
+O diagnóstico do visual **efetivamente existente** (Home, Rádio em foco, CMANGINI 3D/X1, foto/projeto real, paleta de tokens e gradientes aplicados) está em [CM Site Visual Identity Audit V1](design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md). Esse estudo **complementa** as decisões aprovadas acima; não as substitui nem altera o escopo dos componentes aceitos. Em 09/10/2026, as três variantes iniciais do laboratório foram rejeitadas como direção artística por não terem sido construídas a partir desse contexto, apesar da CI verde.
+
 ## Processo render-first para novas evoluções
 
 O processo de investigação gráfica, decomposição por camadas, escolha de CSS/SVG/asset/Canvas/WebGL/Motion e QA renderizado está centralizado em [CM Visual Render Pipeline V1](design/CM_VISUAL_RENDER_PIPELINE_V1.md). **A aprovação dos desenhos existentes permanece válida**; esse processo não autoriza redesenhar a Home, o hub ou a página individual de Produto nem reabrir a Rádio aceita sem novo pedido.

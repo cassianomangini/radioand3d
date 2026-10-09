@@ -27,6 +27,17 @@ This skill is an experience/design reviewer, not an unapproved permission to alt
 
 Consider React Bits, Magic UI and Codrops as catalogs of reference examples, not default installed dependencies. Confirm actual license *of the selected component*, including redistribution. Do not copy an entire theme or overwrite studio identity.
 
+## Gate: identity before renderer
+
+The first decision is **not** CSS versus a library: it is which existing **CM product surface** this belongs to. Before sketching anything, consult `docs/design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md`, `docs/EXPERIENCE.md`, relevant brand assets, live tokens and approved compositions.
+
+- Parent `CM 3D and Radio`: site shell/header; preserve nav/logo and split/player persistence.
+- `CMANGINI 3D` + X1: specific studio brand artwork, never fake proof of a printed part.
+- `CM Radio`: audio-activated blue/cyan/violet/pink artwork and dense controls, not a template for every Studio page.
+- Physical 3D pieces/cases: content photography may have warm or distinct project-owned colors; never recast those as global brand tokens.
+
+Use actual site palette (`#020305`, `#03050A`, `#4E9DFF`, `#52D6FF`, `#8B6DFF`, white text) and the current hero gradient only in its intended accent roles; exact values reside in code. `/studio` is the accepted 3-entry hub, whereas `/studio/impressoes` is an editorial gallery inside the existing shell. The three previously rendered lab variants are **invalid as creative candidates** despite passing tests. No art proposal is eligible without a site-context comparison.
+
 ## Render-first QA checklist
 
 1. Capture BEFORE, reference, and AFTER for the same viewport/state. If approved screenshots are missing, comparison is descriptive and cannot be called exact reference parity.

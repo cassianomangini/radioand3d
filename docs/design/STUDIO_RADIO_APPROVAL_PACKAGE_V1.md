@@ -2,6 +2,9 @@
 
 Este é o ponto de decisão antes de liberar frontend visual final.
 
+> **Aditivo prospectivo, 09/10/2026:** a aprovação abaixo descreve a Rádio **visível em modo lateral/fullscreen**, sem segundo player desktop. Cassiano solicitou uma evolução posterior, distinta: **recolher a lateral para cima na navbar** por arraste à direita, mostrando **somente nesse estado** um player compacto; retorno por botão da navbar ou novo arraste. Ver [03c — contrato](CM_RADIO_NAVBAR_DOCK_V1.md) e [checklist](../work/03c-radio-navbar-dock.md). O addendum não revoga o aceite histórico nem aprova antecipadamente o acabamento visual do dock.
+
+
 ## Artefatos canônicos
 
 1. [STUDIO_RADIO_HANDOFF_V1.md](STUDIO_RADIO_HANDOFF_V1.md)

@@ -30,7 +30,14 @@ O ambiente é protegido pelo `NODE_ENV=development`; não aparece na navegação
 - Troca de estudo por mouse/toque e teclado; exatamente um estado ativo; foco visível; ausência de overflow horizontal; nenhuma foto/medida inventada.
 - Capturas fullPage geradas por Playwright, armazenadas como artefatos de CI; não cometer thumbnails como baselines finais sem aprovação.
 - A CI monta `test-results/visual-lab/comparativo.html` reunindo os 3 estudos lado a lado em desktop/mobile. Esse contato visual é uma **proposta para revisão**, não prova automática de superioridade.
-- Inspeção visual sobre hierarquia, espaço de mídia, CTA, comprimento de texto, proporção e linguagem material. Após a primeira renderização, foi observado texto do Mostruário sobrepondo descrição em desktop; o CSS foi corrigido e foi adicionado teste de colisão de caixas de glifos. A correção só pode ser marcada validada após a nova renderização CI.
+- Inspeção visual sobre hierarquia, espaço de mídia, CTA, comprimento de texto, proporção e linguagem material. Após a primeira renderização, foi observado texto do Mostruário sobrepondo descrição em desktop; o CSS foi corrigido e foi adicionado teste de colisão de caixas de glifos. A correção foi validada na [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229), sem retries, após reequilibrar colunas e sincronizar testes com hidratação.
+
+## Evidência do experimento, não aprovação artística
+
+- **30/30** testes Playwright de páginas públicas/404 e **16/16** do laboratório, mais 84 testes unitários, lint, typecheck e build verdes na [execução final 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229).
+- Estudo em quatro tamanhos (1440, 1024, 390, 360), troca com mouse/teclado, sem colisões/overflow detectados e rota inacessível em `NODE_ENV=production`.
+- Capturas reais no [artefato do laboratório](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229/artifacts/11622475963), dentro do arquivo `comparativo.html`, com material também disponível como imagens individuais. [Registro de testes e inventário de desempenho dev](../work/evidence/08v-lab-performance-2026-10-09.md).
+- **Nenhuma composição escolhida.** V4.4/V4.5 exigem manifestação de Cassiano; V5/implementação pública não iniciados.
 
 ## Critérios para decisão
 

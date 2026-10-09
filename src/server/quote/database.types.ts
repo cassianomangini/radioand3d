@@ -253,6 +253,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      quote_consume_rate_limit: {
+        Args: { p_action: string; p_key_hash: string }
+        Returns: boolean
+      }
+      quote_owned_attachment: {
+        Args: {
+          p_attachment_id: string
+          p_owner_session_hash: string
+          p_request_id: string
+        }
+        Returns: {
+          attachment_id: string
+          extension: string
+          original_name: string
+          reported_size_bytes: number
+          storage_path: string
+          validated_size_bytes: number
+          validation_status: string
+        }[]
+      }
       quote_release_attachment: {
         Args: {
           p_attachment_id: string
@@ -276,6 +296,39 @@ export type Database = {
           object_path: string
           reservation_expires_at: string
         }[]
+      }
+      quote_submit: {
+        Args: {
+          p_attachment_ids: string[]
+          p_contact_method: string
+          p_contact_name: string
+          p_contact_value: string
+          p_no_file: boolean
+          p_owner_session_hash: string
+          p_production: Json
+          p_project: Json
+          p_project_type: string
+          p_request_id: string
+          p_source_origin: string
+          p_source_reference: string
+          p_starting_points: string[]
+          p_submission_key: string
+          p_triage_status: string
+        }
+        Returns: {
+          request_id: string
+          submission_time: string
+        }[]
+      }
+      quote_validate_attachment: {
+        Args: {
+          p_actual_size_bytes: number
+          p_attachment_id: string
+          p_detected_type: string
+          p_owner_session_hash: string
+          p_request_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

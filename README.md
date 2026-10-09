@@ -32,7 +32,7 @@ A CI `[visual]` valida a proteção da rota e renderiza os três casos de teste 
 
 ### Nova evolução planejada da Rádio: dock na navbar
 
-Em 09/10/2026, foi pedido um modo desktop no qual **empurrar a Rádio lateral para a direita** a faz **subir para a navbar como player pequeno**, liberando o Estúdio; ela retorna por botão no header ou novo arraste da borda direita para a esquerda. Contrato: [CM Radio Navbar Dock V1](docs/design/CM_RADIO_NAVBAR_DOCK_V1.md) · [checklist 03c](docs/work/03c-radio-navbar-dock.md). **Somente a análise e a especificação estão feitas**; o visual do movimento depende de prévia/aprovação. O site público ainda não implementa esse estado.
+Em 09/10/2026, foi pedido um modo desktop no qual **empurrar a Rádio lateral para a direita** a faz **subir para a navbar como player pequeno imediatamente antes dos botões de redes sociais**, liberando o Estúdio e mantendo o menu principal centralizado; ela retorna por botão no header ou novo arraste da borda direita para a esquerda. Contrato: [CM Radio Navbar Dock V1](docs/design/CM_RADIO_NAVBAR_DOCK_V1.md) · [checklist 03c](docs/work/03c-radio-navbar-dock.md). **Somente a análise e a especificação estão feitas**; o visual do movimento depende de prévia/aprovação. O site público ainda não implementa esse estado.
 
 ### QA visual renderizado (ferramentas de desenvolvimento)
 

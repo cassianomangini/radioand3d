@@ -9,9 +9,10 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 ## Próximos passos
 
 1. **Concluído nos PRs #29 e #30:** contrato local/serializável do Orçamento, arquivos reais em memória, política de formatos/limites, payload versionado, validação estrutural compartilhável e triagem inicial backend-neutral.
-2. **Backend do Orçamento definido; E2 em execução:** reaproveitar o projeto Supabase `auiovzmxvhqlvhtmkavt` (antigo Artesopolis Staging) em `sa-east-1`, separadamente do Admin produção. O alvo foi identificado, mas mantém schema/jobs/functions legados, e a conexão SQL administrativa falha (`28P01`). O checklist operacional com gates/backup está em [E2 — Reaproveitamento Supabase](work/08-supabase-staging-reuse.md). Aplicação remota continua bloqueada até recuperação administrativa e saneamento.
-3. **Próximo bloco de conteúdo depende de E3:** dataset/fotos reais de Impressões, Placas e Caixas e revisão visual final das superfícies restantes.
-4. **Gate de lançamento:** domínio/alvo público, retirada controlada do `noindex`, Search Console e validações finais continuam depois de E2/E3.
+2. **E2 — documentação do Orçamento corrigida; provisionamento remoto pendente:** criar um **novo Supabase CM limpo** em `sa-east-1`, preferencialmente em organização própria. O ambiente legado deve ser inventariado e preservado privadamente antes de eventual pausa para liberar vaga Free. Sessão anônima, quota global e retenção por Vercel Cron GET estão contratadas, **não implementadas**. [Checklist E2](work/08-supabase-provisioning.md).
+3. **E4 — ponte de Produtos independente e pendente:** o catálogo atual é uma curadoria estática; o consumidor read-only do Admin e o cutover live ainda devem ser executados conforme [Product Catalog Bridge V1](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md).
+4. **Próximo bloco de conteúdo depende de E3:** dataset/fotos reais de Impressões, Placas e Caixas e revisão visual final das superfícies restantes.
+5. **Gate de lançamento:** domínio/alvo público, retirada controlada do `noindex`, Search Console e validações finais continuam depois de E2/E3.
 
 Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio não altera o motion spine da Rádio.
 
@@ -43,7 +44,8 @@ Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hu
 | Código | Pendência | Quem resolve | O que bloqueia |
 | --- | --- | --- | --- |
 | E1 | Confirmar repositório privado | Cassiano | Cópia de conteúdo privado |
-| E2 | **Em andamento:** reutilizar `auiovzmxvhqlvhtmkavt`; acesso SQL `28P01`, backup, corte do legado e provisionamento CM pendentes. [Checklist](work/08-supabase-staging-reuse.md) | CM Infra / CM Data | Apply remoto, bucket real, secrets, validação live do Orçamento e publicação |
+| E2 | **Em andamento (contratos fechados; remoto não provisionado):** projeto CM novo e limpo, liberação segura de vaga Free, backend de Orçamento com sessão, quota e retenção. [Checklist](work/08-supabase-provisioning.md) | CM Infra / CM Data | Migration/bucket/segredos, smoke live e publicação de envio |
+| E4 | **Pendente, separado de E2:** integração de Produtos/Shopee Admin → catálogo público CM; 9 registros estáticos em uso até paridade/cutover | CM Products / Integração | Atualização automática e décimo produto sem mudança no `radioand3d` |
 | E3 | Selecionar peça, fotos e permissões | Cassiano | Conteúdo real do Estúdio no lançamento |
 | E5 | Definir contato comercial de continuidade | Cassiano | Chamadas comerciais e continuidade após triagem |
 

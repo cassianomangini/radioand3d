@@ -1,11 +1,11 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **projeto definitivo confirmado; migration inicial de Orçamento aplicada e validada; Storage/handlers/produção pendentes**  
+Status: **nove migrations aplicadas · 4 handlers versionados · reparos de revisão aplicados · TUS E2E/retencão/deploy pendentes**  
 Revisão: **09/10/2026**  
 Região contratada e confirmada: **sa-east-1 (São Paulo)**  
 Responsável: **CM Infra / CM Data**
 
-Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário criou o projeto Supabase definitivo** na organização independente Cmangini3d (Free), em `sa-east-1`. O projeto está `ACTIVE_HEALTHY`; foram aplicadas **oito migrations** versionadas: schema privado, quota, bucket, guards de limpeza, índice de FK, rate limit atômico, confirmação/envio idempotente e validação de tipo de arquivo. São cinco tabelas com RLS, bucket `quote-intake` privado e nenhum dado de clientes. **As quatro rotas HTTP de sessão, init, complete e submit existem no Git, mas continuam DESATIVADAS por flag**; somente as RPCs foram testadas transacionalmente. Upload TUS real, limpeza Storage API, secrets, Cron, E2E e deploy seguem pendentes.
+Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário criou o projeto Supabase definitivo** na organização independente Cmangini3d (Free), em `sa-east-1`. O projeto está `ACTIVE_HEALTHY`; foram aplicadas **nove migrations** versionadas: schema privado, quota, bucket, guards de limpeza, índice de FK, rate limit atômico, confirmação/envio idempotente e validação de tipo de arquivo. São cinco tabelas com RLS, bucket `quote-intake` privado e nenhum dado de clientes. **As quatro rotas HTTP de sessão, init, complete e submit existem no Git, mas continuam DESATIVADAS por flag**; somente as RPCs foram testadas transacionalmente. Upload TUS real, limpeza Storage API, secrets, Cron, E2E e deploy seguem pendentes.
 
 A execução e os checkpoints verificáveis estão em [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md). Detalhes operacionais sobre a infraestrutura de outro sistema ficam fora deste repositório público. **Não** usar este documento como autorização para pausar, limpar, migrar ou modificar um banco existente.
 
@@ -77,7 +77,7 @@ Migrations versionadas no Git, dados de seed exclusivamente fictícios e CLI ver
 
 ### Produção
 
-**Projeto CM definitivo criado na organização Cmangini3d em `sa-east-1`.** PostgreSQL 17.11 saudável e SQL funcional. Oito migrations de Orçamento/infra foram aplicadas e registradas no Git, desde [`create_quote_core`](../supabase/migrations/20261009143743_create_quote_core.sql) até [`quote_detected_type_guard`](../supabase/migrations/20261009154035_quote_detected_type_guard.sql). Verificadas cinco tabelas privadas, zero pedidos/objetos/janelas de teste persistidos e ACL/RLS negando acesso anônimo. Security Advisor: cinco observações `INFO` de RLS ativado **sem policies**, negação intencional nesta etapa. A Vercel ainda não tem variáveis CM Supabase. Identificadores/credenciais concretos ficam fora da documentação pública.
+**Projeto CM definitivo criado na organização Cmangini3d em `sa-east-1`.** PostgreSQL 17.11 saudável e SQL funcional. Nove migrations de Orçamento/infra foram aplicadas e registradas no Git, desde [`create_quote_core`](../supabase/migrations/20261009143743_create_quote_core.sql) até [`quote_tus_ttl_touch_and_replay`](../supabase/migrations/20261009185555_quote_tus_ttl_touch_and_replay.sql). Verificadas cinco tabelas privadas, zero pedidos/objetos/janelas de teste persistidos e ACL/RLS negando acesso anônimo. Security Advisor: cinco observações `INFO` de RLS ativado **sem policies**, negação intencional nesta etapa. A Vercel ainda não tem variáveis CM Supabase. Identificadores/credenciais concretos ficam fora da documentação pública.
 
 A organização CM separada **foi criada e confirmada**: Cmangini3d está no plano Free. O isolamento administrativo/de faturamento por organização está estabelecido, sem alterar a assinatura da organização do Artesopolis Admin. Criar outra organização não aumenta o limite de projetos Free ativos da mesma conta.
 
@@ -214,7 +214,7 @@ server verifica objeto + conteúdo
 
 Usar **Supabase Storage Resumable Uploads (TUS)**.
 
-O servidor usa `createSignedUploadUrl` para o **path já reservado**, com upsert desabilitado. No TUS, o browser envia **somente o token temporário retornado** no header `x-signature`; não recebe chave de serviço, token de usuário do Admin ou permissão ampla. Validar em integração real o endpoint TUS de Storage, a validade do token, o comportamento de retomada e o bloqueio de path diferente/sobrescrita. A assinatura é autorização de upload para o objeto específico, **não** autorização para ler/alterar a solicitação de Orçamento.
+O servidor usa `createSignedUploadUrl` para o **path já reservado**, com upsert desabilitado. A API foi corrigida para reconhecer paths UUID canônicos (expressão regular válida e comparação exata entre IDs/extensão), evitando o erro de sintaxe da versão anterior. No TUS, o browser envia **somente o token temporário retornado** no header `x-signature`; não recebe chave de serviço, token de usuário do Admin ou permissão ampla. Validar em integração real o endpoint TUS de Storage, a validade do token, o comportamento de retomada e o bloqueio de path diferente/sobrescrita. A assinatura é autorização de upload para o objeto específico, **não** autorização para ler/alterar a solicitação de Orçamento.
 
 Motivo:
 
@@ -275,6 +275,9 @@ Não chamar slicer.
 Não extrair macros/scripts de PDF.
 
 ### Validação mínima por formato
+
+**Correção de revisão (09/10/2026):** 3MF deixou de ser aceito por busca textual de nomes em bytes ZIP. O novo `zip-3mf.ts` inspeciona EOCD, diretório central, cabeçalhos locais, contagens, limites de tamanho/descompressão, ausência de caminhos suspeitos, manifestos OPC com CRC e prefixo XML do modelo. Foram executados testes locais com ZIP/OPC armazenado/deflate válido e adversariais (ZIP falso, manifesto corrompido, relacionamentos ausentes, diretório adulterado, path traversal). **Não é parser geométrico CAD nem antivírus**; 3MF real da Bambu e Storage Range HTTP ainda requerem smoke E2E.
+
 
 A implementação deve usar parser/sniffer seguro e limitado.
 
@@ -458,7 +461,7 @@ Usar IDs internos. A FK opcional de `quote_events` para `quote_requests` usa com
 
 ## 12. Rate limiting e capacidade de Storage
 
-**Implementado no banco:** `quote_consume_rate_limit` consome janelas atômicas em `quote_rate_limit_windows`, persistindo somente **HMAC(secret, IP normalizado)**, jamais IP bruto. Limites atuais: criar request **5/h**, iniciar upload **25/h**, submit **5/h** por hash; registros expiram em 24h. Teste SQL remoto sintético (rollback) comprovou 5 permitidas/6ª negada e separação por ação/hash. As quatro rotas Next implementadas chamam a RPC quando aplicável, incluindo submit (5/h). O intake continua desativado por feature flag; sem end-to-end público. Na Vercel, ler IP de cabeçalho normalizado pelo proxy; fora da Vercel, produção não pode confiar cegamente em `X-Forwarded-For` fornecido pelo visitante.
+**Implementado no banco:** `quote_consume_rate_limit` consome janelas atômicas em `quote_rate_limit_windows`, persistindo somente **HMAC(secret, IP normalizado)**, jamais IP bruto. Limites atuais: criar request **5/h**, iniciar upload **25/h**, submit **5/h** por hash; registros expiram em 24h. Teste SQL remoto sintético (rollback) comprovou 5 permitidas/6ª negada e separação por ação/hash. Os handlers de criação e upload consomem a RPC, e submit também (5/h), **mas um envio já gravado com mesmo draft, posse e `submission_key` recupera o recibo por `quote_submission_receipt` antes de consumir outro crédito**. Isso preserva a idempotência em retries após esgotar a janela. O intake continua desativado por feature flag; sem end-to-end público. Na Vercel, ler IP de cabeçalho normalizado pelo proxy; fora da Vercel, produção não pode confiar cegamente em `X-Forwarded-For` fornecido pelo visitante.
 
 ### Capacidade global
 
@@ -466,11 +469,11 @@ O bucket **privado** `quote-intake` existe desde 09/10/2026, com limite de **50.
 
 O orçamento global está persistido no singleton `quote_upload_limits.max_bytes = 600000000`, não na palavra de um cliente. `CM_QUOTE_STORAGE_BUDGET_BYTES`, na configuração do servidor, **deve coincidir** com esse limite e nunca sobrescrevê-lo silenciosamente. Capacidade geral do Supabase Free não deve ser interpretada como limite exclusivo deste bucket.
 
-**Regra conservadora indispensável:** antes de emitir uma URL TUS, a RPC `quote_reserve_attachment` reserva **50.000.000 bytes inteiros por arquivo ainda não verificado**, e não o tamanho declarado pelo browser, pois um token de upload não está restrito ao número informado no `init`. Isso restringe o número de uploads pendentes simultâneos (em geral dois por pedido); arquivos pequenos devem ser enviados e verificados em sequência para liberar capacidade.
+**Regra conservadora indispensável:** antes de emitir uma URL TUS, a RPC `quote_reserve_attachment` reserva **50.000.000 bytes inteiros por arquivo ainda não verificado**, e não o tamanho declarado pelo browser, pois um token de upload não está restrito ao número informado no `init`. Isso restringe o número de uploads pendentes simultâneos (em geral dois por pedido); arquivos pequenos devem ser enviados e verificados em sequência para liberar capacidade. O token assinado dura **até 2h**, mas a **URL resumível TUS pode sobreviver por até 24h após sua criação**. Por isso, desde a nona migration, a reserva persistente dura **27 horas** (2h+24h+1h de margem). O backend impede reemitir uma assinatura quando faltar menos que **26h05min** para liberar essa reserva. Expirar um token assinado **não** significa que a URL de upload parcial expirou. O processo de limpeza deve respeitar a janela de 27h.
 
 O trigger `quote_attachment_capacity_guard` serializa inserts/updates pelo lock da linha de limite global, compara a soma de reservas com 600 MB e também aplica 5 anexos/100 MB contabilizados por solicitação, inclusive sob concorrência. Somente depois de verificar que um objeto existe, seu tamanho real no Storage e seu conteúdo permitido, o backend poderá reduzir `accounted_bytes` ao tamanho efetivo. O banco confere metadados `storage.objects`; inspeção de tipo/conteúdo permanece responsabilidade da camada server-side.
 
-Reserva pendente, upload rejeitado ou upload órfão **continuam ocupando orçamento** até expiração do grant e remoção/ausência confirmada pela Storage API. O processo de limpeza é idempotente e protegido por `quote_release_attachment`; **a execução real da limpeza ainda não está implementada**. As validações SQL com dados sintéticos foram executadas dentro de transações desfeitas por `ROLLBACK`; testes end-to-end de TUS e concorrência em conexões simultâneas seguem pendentes.
+Reserva pendente, upload rejeitado ou upload órfão **continuam ocupando orçamento** até expiração da janela TUS conservadora e remoção/ausência confirmada pela Storage API. `quote_touch_draft` renova `last_activity_at`, o prazo de 24h do draft e de seus anexos nas operações autorizadas de reserva e confirmação; o cookie de sessão também é renovado nesses handlers. O processo de limpeza é idempotente e protegido por `quote_release_attachment`; **a execução real da limpeza ainda não está implementada**. As validações SQL com dados sintéticos foram executadas dentro de transações desfeitas por `ROLLBACK`; testes end-to-end de TUS e concorrência em conexões simultâneas seguem pendentes.
 
 Quando teto/quota acabar, devolver erro acionável de capacidade sem emitir novos tokens; alertar operação. Não depender de uma única quota por visitante, de `Content-Length` informado pelo browser ou de remoção manual.
 
@@ -592,7 +595,7 @@ Depois de implementar a rota, configurar em `vercel.json` **preservando `git.dep
 - Logs: timestamp, duração, número de candidatos/processados, bytes liberados, erros e atraso do último sucesso, sempre sem contato/nome de arquivo/token.
 - Criar monitoramento/alerta para ausência de execução, falha recorrente e risco de quota esgotada. Testar falha/duplicidade/invocação manual autenticada e URL não autorizada.
 
-O objetivo continua o contrato de 24h para draft/órfão, 90 dias para arquivos submetidos, 180 dias para contato/conteúdo e 365 dias para eventos técnicos sem PII. A rotina é diária e, portanto, a exclusão deve ter **tolerância operacional até a próxima execução**; não prometer remoção no segundo exato do prazo.
+O objetivo continua 24h **após última atividade** para draft, respeitando porém a **reserva TUS de 27h** antes de liberar quota de upload órfão; 90 dias para arquivos submetidos, 180 dias para contato/conteúdo e 365 dias para eventos técnicos sem PII. A rotina é diária e, portanto, a exclusão deve ter **tolerância operacional até a próxima execução**; não prometer remoção no segundo exato do prazo.
 
 Se mudar de hospedagem, preservar o comportamento e trocar somente o scheduler.
 
@@ -871,7 +874,7 @@ Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
 - **Projeto CM definitivo validado** na organização Free independente Cmangini3d e região São Paulo. Migration inicial `create_quote_core` aplicada e versionada, quatro tabelas verificadas e vazias, com RLS/grants restritos.
 - O ambiente de testes legado permanece **inalterado**; pausa depende de inventário, backup e gate próprio.
-- **Oito migrations aplicadas e versionadas**: schema base, bucket/reserva de quota, proteção de limpeza, validade TUS, índice de FK, rate limit atômico, RPCs de complete/submit e verificação de tipo/extensão. Bucket privado confirmado; dados de clientes: zero. SQL sintético testado com rollback. **Quatro rotas HTTP em código com flag `CM_QUOTE_INTAKE_ENABLED=false`**; testes JS de complete/submit versionados, mas suite CI completa não confirmada. Sem TUS real, segredos Vercel, Cron, limpeza Storage API ou deploy.
+- **Nove migrations aplicadas e versionadas**: schema base, bucket/reserva de quota, proteção de limpeza, validade TUS, índice de FK, rate limit atômico, RPCs de complete/submit verificação de tipo/extensão, prazo TUS seguro e replay de envio. Bucket privado confirmado; dados de clientes: zero. SQL sintético testado com rollback. **Quatro rotas HTTP em código com flag `CM_QUOTE_INTAKE_ENABLED=false`**; testes JS de complete/submit versionados, mas suite CI completa não confirmada. Sem TUS real, segredos Vercel, Cron, limpeza Storage API ou deploy.
 - Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 - Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
 - O Performance Advisor apontou FK de `quote_events` sem índice, corrigida na migration `index_quote_events_request_fk`; o novo read-back eliminou esse aviso. Sete avisos `INFO` de índices não utilizados são esperados enquanto não existe workload real.

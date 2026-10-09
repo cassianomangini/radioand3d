@@ -12,15 +12,19 @@
     "check": "pnpm lint && pnpm typecheck && pnpm build",
     "lyrics:sync": "node scripts/sync-radio-lyrics.mjs",
     "visualizer:sync": "node scripts/sync-radio-visualizer.mjs",
-    "visualizer:inspect": "node --experimental-strip-types scripts/inspect-radio-visualizer.mjs"
+    "visualizer:inspect": "node --experimental-strip-types scripts/inspect-radio-visualizer.mjs",
+    "visual:qa": "playwright test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1143.0",
+    "motion": "^12.43.0",
     "next": "16.3.7",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

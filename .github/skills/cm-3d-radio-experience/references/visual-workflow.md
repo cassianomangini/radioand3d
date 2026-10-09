@@ -36,4 +36,4 @@ Consider React Bits, Magic UI and Codrops as catalogs of reference examples, not
 5. Visual score is advisory; pixel differences are regression evidence, never aesthetic truth. Do not automatically approve with numeric thresholds alone.
 6. Report: files/commit, reference, screenshots, conditions, checks actually run, failed checks, and whether Cassiano approved. If browser is unavailable, record a block instead of marking reviewed.
 
-The repository's tracked delivery is `docs/work/08-visual-quality-evolution.md`. Follow `docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md` when it exists in the checkout; the library register and QA entrypoints may evolve after the skill is packaged.
+The repository's tracked delivery is `docs/work/08-visual-quality-evolution.md`. Follow `docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md`, `docs/design/CM_VISUAL_RECIPES_V1.md` and available evidence in `docs/work/evidence/`. For browser QA, use the installed `pnpm visual:qa` (Playwright, screenshots and Axe inventory) alongside the existing CDP Radio suite. No current baseline grants aesthetic approval automatically.

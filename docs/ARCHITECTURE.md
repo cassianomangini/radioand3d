@@ -10,13 +10,13 @@ Este documento mantém as decisões arquiteturais do projeto. Nem toda infraestr
 | Estilo e movimento | Tokens próprios, CSS/Tailwind e Motion quando necessário | Aprovação visual e orçamento de desempenho |
 | 3D em tempo real | Three.js/React Three Fiber apenas para interação aprovada | Modelo publicável, fallback e custo no mobile |
 | Pacotes | pnpm, Node suportado e lockfile versionado | Fixar versões no setup e CI |
-| Dados próprios do site | **Supabase PostgreSQL separado** para Orçamento | Projeto `radioand3d` **criado pelo usuário** e sem migrations/tabelas; região **US East** diverge de São Paulo e organização é compartilhada com o Admin. **Apply remoto bloqueado até decidir o alvo definitivo**. [Infra](SUPABASE_INFRASTRUCTURE_V1.md) · [E2](work/08-supabase-provisioning.md) |
+| Dados próprios do site | **Supabase PostgreSQL separado**, para Orçamento | Projeto definitivo criado e confirmado em **São Paulo**, na organização Free independente **Cmangini3d**; SQL acessível, banco ainda sem migrations/schema de domínio. [Infra](SUPABASE_INFRASTRUCTURE_V1.md) · [E2](work/08-supabase-provisioning.md) |
 | Mídia | **R2** permanece no acervo da Rádio; **Supabase Storage privado** recebe somente anexos temporários do Orçamento; mídia de Produtos vem da fonte Shopee/Admin na V1 | Provisionamento remoto do Supabase e gates de produção ainda pendentes |
 | Aplicação hospedada | **Vercel já configurada** para `radioand3d`; integração Git com `deploymentEnabled: false` | Deploy explícito necessário; domínio e plano de lançamento ainda precisam de gate |
 
 Não criar microserviços, monorepo ou infraestrutura de processamento distribuído antes de uma necessidade medida.
 
-A arquitetura está definida em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md): projeto de Orçamento próprio e limpo, **já criado**, sem reutilização de banco antigo ou acesso ao banco do Admin. O contrato previa `sa-east-1`, mas o projeto verificado foi criado em `us-east-1` e na organização compartilhada; essa diferença **não está aprovada**. PostgreSQL + Storage privado, TUS assinado e sessão anônima vinculada ao draft são o destino; ainda **não existe schema de negócio aplicado, bucket ou integração ao site**.
+A arquitetura está definida em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md): projeto de Orçamento próprio e limpo, **criado e confirmado em `sa-east-1` e organização CM independente**, sem reutilizar o staging antigo nem acessar o banco do Admin. PostgreSQL, Storage privado, TUS assinado e sessão anônima vinculada ao draft são o destino; **ainda faltam migrations, bucket e integração com o site**.
 
 ## Módulos propostos
 
@@ -145,7 +145,7 @@ A integração de **Produtos** com o Artesopolis Admin está **planejada**, não
 
 ## Infraestrutura a preparar
 
-O staging antigo já foi pausado pelo usuário para liberar a vaga Free; o Supabase CM novo já existe. O [checklist E2](work/08-supabase-provisioning.md) mantém como **não comprovados** o backup do ambiente antigo e a ausência de consumidores remanescentes, além da escolha de região/organização do novo projeto. Essas decisões precedem migrations remotas.
+O staging antigo já foi pausado pelo usuário; o Supabase CM novo já existe na região e organização corretas. O [checklist E2](work/08-supabase-provisioning.md) mantém **não comprovados** o backup do ambiente antigo e a ausência de consumidores remanescentes. Para o CM, o próximo gate é schema/migrations versionados e segurança verificada antes do apply remoto.
 
 Vercel Cron só entra em `vercel.json` quando a rota autenticada `GET /api/internal/quote-retention` e `CRON_SECRET` tiverem sido implementados e verificados. Manter `git.deploymentEnabled: false` e usar deploy explícito. Os limites, segurança, retry e política de retenção estão no contrato de infraestrutura.
 

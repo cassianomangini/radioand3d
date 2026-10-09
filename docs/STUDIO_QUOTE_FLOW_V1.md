@@ -345,7 +345,7 @@ Storage, sessão/posse anônima, persistência, retenção (Vercel Cron GET), li
 
 Resumo vigente:
 
-- **projeto Supabase CM novo e limpo criado** na organização independente Cmangini3d, ainda sem schema de negócio/Storage do Orçamento;
+- **projeto Supabase CM na organização independente Cmangini3d**, com schema privado, bucket `quote-intake` e quota conservadora de 600 MB já aplicados; rotas reais e uploads ainda não;
 - região contratada e confirmada `sa-east-1` (São Paulo);
 - bucket privado `quote-intake`;
 - upload direto por signed resumable upload/TUS;
@@ -418,7 +418,7 @@ A landing de serviço deve apontar para orçamento. O formulário não precisa c
 
 ## Decisões abertas
 
-O **contrato técnico** de sessão, segurança, infra e retenção está definido em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md); **o projeto remoto já existe na região/organização planejadas**, mas schema/Storage/handlers/smoke ainda estão pendentes. Estado e evidências: [checklist E2](work/08-supabase-provisioning.md).
+O **contrato técnico** está definido em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md); **o projeto remoto, schema de Orçamento, bucket privado e reserva SQL já existem**. Ainda faltam handlers, upload TUS real, inspeção, retenção, secrets e smoke. Estado e evidências: [checklist E2](work/08-supabase-provisioning.md).
 
 Continuam abertas apenas decisões de operação/comercial:
 

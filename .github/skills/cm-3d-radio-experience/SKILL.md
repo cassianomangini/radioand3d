@@ -9,6 +9,12 @@ Own the visual and interaction decision for CM 3D & Radio. Do not implement appl
 
 Read `references/product-contract.md` first for the current product model and `references/visual-workflow.md` before planning or reviewing substantial visual implementation. Read `references/taste-controls.md` for new composition, redesign, player/equalizer work, visual-reference interpretation, or when the user says the result is generic, chaotic, polluted, weak, cramped, empty, too neon, or unlike the intended Winamp/studio character.
 
+## Required site-identity audit before any visual proposal
+
+Before creating or approving compositions, **read the live CM site and its implemented design system**: `docs/design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md`, `src/styles/tokens.css`, the relevant JSX/CSS shell, recent actual screenshots, and approved page contracts. The site uses a CM 3D & Radio parent brand, CMANGINI 3D/X1 studio artwork, a dense CM Radio interface and separate physical-project photography; these are related but not interchangeable.
+
+**Do not accept a standalone experimental page with its own colors, buttons and hierarchy as evidence it belongs to this site.** The October 9 visual lab's Editorial/Mostruário/Detalhe compositions were technically validated but rejected as CM art direction. Keep them as QA fixtures only. For a new study, include `visual_identity_audit_ref`, target route, inherited header/player geometry, real token values and assets, and differences from Home/Studio; test the result in the actual shell context before asking Cassiano to approve it.
+
 Legacy Artesopolis visual docs are context, not automatic authority. Current rendered product, latest approved user direction, and active product contracts win when they conflict with older branding or layout assumptions.
 
 ## Product character

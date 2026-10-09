@@ -417,16 +417,18 @@ Decisão desta fase:
 - `manual-review` não é um status automático: revisão humana de escopo permanece decisão operacional posterior.
 
 
-## Infra Supabase do Estúdio — decisão 05/10/2026
+## Infra Supabase do Estúdio — contrato revisado em 09/10/2026
 
-- projeto Supabase próprio do CM 3D & Radio definido para Orçamento;
+- projeto Supabase **novo e limpo** próprio do CM 3D & Radio, separado do ambiente operacional e **ainda não provisionado**;
 - região: `sa-east-1`;
 - Supabase do Artesopolis Admin continua owner da ponte Produtos/Shopee;
 - novo projeto CM não espelha catálogo, estoque ou ERP;
 - Orçamento: PostgreSQL + bucket privado `quote-intake`;
 - upload: signed resumable/TUS direto para Storage;
 - nenhum secret Supabase no browser;
-- Route Handlers Next server-side fazem sessão, init/complete de attachment e submit;
-- retenção: draft/órfão 24 h, arquivos submetidos 90 d, conteúdo/contato 180 d, eventos técnicos 365 d;
+- Route Handlers Next server-side **deverão** fazer sessão anônima protegida por cookie e posse do draft, init/complete de attachment e submit; UUID não concede autorização;
+- limites globais de Storage e reservas concorrentes, além dos limites por request;
+- retenção: draft/órfão 24 h, arquivos submetidos 90 d, conteúdo/contato 180 d, eventos técnicos 365 d; Cron `GET` + `CRON_SECRET` e idempotência na Vercel (somente depois de implementado);
 - produção real exige projeto remoto + secrets + migration/bucket + validação live;
-- documento canônico de infra: [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md).
+- documento canônico de infra: [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md);
+- checklist de provisionamento/validação remota: [E2](08-supabase-provisioning.md). Nenhum banco, bucket ou Cron foi criado/alterado por esta revisão.

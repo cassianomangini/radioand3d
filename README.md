@@ -24,6 +24,12 @@ pnpm typecheck
 pnpm build
 ```
 
+### Laboratório de composição (apenas desenvolvimento)
+
+Abra `/dev/visual-lab` com `pnpm dev` para comparar três estudos de **Impressões** (Editorial, Mostruário e Detalhe), sem alterar as páginas públicas. A rota deve responder **404** em `pnpm start`/produção e no preview Vercel. O protótipo usa `motion/react` apenas para troca entre variantes, incluindo movimento reduzido; os espaços de fotografia são honestamente sinalizados como pendentes.
+
+A CI `[visual]` valida a proteção da rota e renderiza separadamente as três composições em desktop/mobile. Imagens geradas no teste são **candidatas para avaliação**, nunca referências aprovadas. [Brief do laboratório](docs/design/CM_VISUAL_LAB_V1.md) · [Registro de referências/baselines](docs/design/CM_VISUAL_REFERENCE_REGISTER_V1.md).
+
 ### QA visual renderizado (ferramentas de desenvolvimento)
 
 O projeto mantém `scripts/capture-radio-states.mjs`/CDP para a Rádio e adiciona diagnósticos com Playwright Test. As bibliotecas `motion`, `@playwright/test` e `@axe-core/playwright` estão versionadas no lockfile; instalar ferramentas **não** modifica a aparência das páginas.

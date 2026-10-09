@@ -33,7 +33,7 @@ function CopyBlock({ eyebrow, compact = false }: { eyebrow: string; compact?: bo
     <div className={compact ? styles.copyCompact : styles.copy}>
       <p className={styles.eyebrow}>{eyebrow}</p>
       <h2>Impressões<span className={styles.punctuation}>.</span></h2>
-      <p className={styles.description}>
+      <p className={styles.description} data-study-description="true">
         O encontro entre projeto, material e acabamento. Um espaço para
         apresentar peças produzidas de verdade, com contexto e atenção aos detalhes.
       </p>

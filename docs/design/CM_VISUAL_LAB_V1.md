@@ -29,6 +29,7 @@ O ambiente é protegido pelo `NODE_ENV=development`; não aparece na navegação
 - No mínimo desktop 1440×900 e mobile 390×844 com capturas das três opções. Mobile estreito e laptop podem ser adicionados quando necessários após o primeiro gate.
 - Troca de estudo por mouse/toque e teclado; exatamente um estado ativo; foco visível; ausência de overflow horizontal; nenhuma foto/medida inventada.
 - Capturas fullPage geradas por Playwright, armazenadas como artefatos de CI; não cometer thumbnails como baselines finais sem aprovação.
+- A CI monta `test-results/visual-lab/comparativo.html` reunindo os 3 estudos lado a lado em desktop/mobile. Esse contato visual é uma **proposta para revisão**, não prova automática de superioridade.
 - Inspeção visual sobre hierarquia, espaço de mídia, CTA, comprimento de texto, proporção e linguagem material; reportar defeitos observados e corrigir o protótipo antes de pedir aprovação.
 
 ## Critérios para decisão

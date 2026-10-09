@@ -67,4 +67,5 @@ test("quote file size formatting stays readable", () => {
   assert.equal(formatQuoteFileSize(512), "512 B");
   assert.equal(formatQuoteFileSize(1024), "1.0 KB");
   assert.equal(formatQuoteFileSize(10 * 1024 * 1024), "10 MB");
+  assert.equal(formatQuoteFileSize(50_000_000), "50 MB");
 });

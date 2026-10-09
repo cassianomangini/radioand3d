@@ -18,11 +18,44 @@ export type UploadInput = {
   sizeBytes: number;
 };
 
+export type OwnedQuoteAttachment = {
+  attachment_id: string;
+  storage_path: string;
+  original_name: string;
+  extension: string;
+  reported_size_bytes: number;
+  validation_status: string;
+  validated_size_bytes: number | null;
+};
+export type QuoteSubmitInput = {
+  requestId: string;
+  ownerHash: string;
+  submissionKey: string;
+  projectType: QuoteProjectType;
+  noFile: boolean;
+  startingPoints: string[];
+  sourceOrigin: string | null;
+  sourceReference: string | null;
+  production: Record<string, unknown>;
+  project: Record<string, unknown>;
+  contactMethod: 'whatsapp' | 'email';
+  contactName: string;
+  contactValue: string;
+  triageStatus: 'ready-for-review' | 'needs-information';
+  attachmentIds: string[];
+};
+
 export type QuoteGateway = {
   consumeRate(action: QuoteAction, keyHash: string): Promise<boolean>;
   createDraft(ownerSessionHash: string, projectType: QuoteProjectType): Promise<DraftCreated>;
   reserveAttachment(input: UploadInput): Promise<UploadReservation>;
   signUpload(path: string): Promise<{ token: string; endpoint: string }>;
+  ownedAttachment(requestId: string, ownerHash: string, attachmentId: string): Promise<OwnedQuoteAttachment>;
+  storageFileSize(path: string): Promise<number>;
+  readStorageRange(path: string, first: number, last: number): Promise<Uint8Array>;
+  validateAttachment(requestId: string, ownerHash: string, attachmentId: string,
+    sizeBytes: number, detectedType: string): Promise<void>;
+  submitQuote(input: QuoteSubmitInput): Promise<{ request_id: string; submission_time: string }>;
 };
 
 function config(): { url: string; key: string } {
@@ -65,12 +98,33 @@ function makeSupabaseRequest(fetcher: typeof fetch) {
     try { return await response.json() as T; }
     catch { throw new QuoteHttpError(503, 'quote_upstream_unavailable'); }
   }
-  return { api, url };
+  async function fileApi(path: string, headers: Record<string, string> = {}): Promise<Response> {
+    let response: Response;
+    try {
+      response = await fetcher(`${url}${path}`, {
+        method: 'GET',
+        headers: { apikey: key, accept: '*/*', ...headers },
+        cache: 'no-store',
+        redirect: 'error',
+        signal: AbortSignal.timeout(12_000),
+      });
+    } catch { throw new QuoteHttpError(503, 'quote_upstream_unavailable'); }
+    if (!response.ok) {
+      if (response.status === 404) throw new QuoteHttpError(409, 'quote_file_missing');
+      throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+    }
+    return response;
+  }
+  return { api, url, fileApi };
 }
 
 /** Server-only service transport: modern sb_secret key stays in apikey header. */
 export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway {
-  const { api, url } = makeSupabaseRequest(fetcher);
+  const { api, url, fileApi } = makeSupabaseRequest(fetcher);
+  const acceptedPath = /^[0-9a-f-]{36}\\/[0-9a-f-]{36}\\.(?:stl|3mf|obj|step|stp|pdf|png|jpg|jpeg|webp)$/i;
+  const assertPath = (path: string) => {
+    if (!acceptedPath.test(path)) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+  };
   return {
     async consumeRate(action, keyHash) {
       const result = await api<boolean>('/rest/v1/rpc/quote_consume_rate_limit',
@@ -108,9 +162,7 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
       return row;
     },
     async signUpload(path) {
-      if (!/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(?:stl|3mf|obj|step|stp|pdf|png|jpg|jpeg|webp)$/i.test(path)) {
-        throw new QuoteHttpError(503, 'quote_upstream_unavailable');
-      }
+      assertPath(path);
       // storage-js createSignedUploadUrl uses this same Storage API endpoint.
       const data = await api<{url: string}>(`/storage/v1/object/upload/sign/quote-intake/${path}`, {});
       if (!data || typeof data.url !== 'string' ||

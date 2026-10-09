@@ -1,6 +1,6 @@
 # E2 — Provisionamento seguro do Supabase CM
 
-Estado: **in_progress** (schema inicial aplicado e auditado no projeto CM definitivo; Storage/handlers/deploy pendentes)  
+Estado: **in_progress** (quatro migrations aplicadas, bucket privado e quotas SQL validadas; handlers/TUS/limpeza/deploy pendentes)  
 Atualização: **09/10/2026**  
 Owner: **CM Infra / CM Data**  
 Contrato: [Supabase Infrastructure V1](../SUPABASE_INFRASTRUCTURE_V1.md)  
@@ -58,7 +58,7 @@ Gate: contratos sincronizados com o estado real de implementação; detalhes de 
 - [x] Conferir alvo definitivo, executar SQL integral em transação com `ROLLBACK`, comprovar ausência de objetos após dry-run e aplicar migration **não destrutiva** `create_quote_core` no projeto CM de São Paulo; versionamento Git com timestamp **retornado pelo histórico remoto**, não inventado. Commit `aa7450f5`; quatro tabelas conferidas.
 - [ ] Validar Data API, políticas de backup e quotas após o provisionamento de schema/Storage.
 
-**Gate P2 parcial:** projeto/região/organização e migration inicial remota **comprovados**. CLI/local stack, configuração Data API, bucket e validação integrada **não concluídos**; sem segredos no Git/browser.
+**Gate P2 parcial:** projeto/região/organização, schema e **bucket remoto privado comprovados**. CLI/local stack, configuração Data API, fluxos reais de upload/Storage API e validação integrada **não concluídos**; sem segredos no Git/browser.
 
 ## P3 — Orçamento privado com posse de sessão
 
@@ -69,22 +69,25 @@ Gate: contratos sincronizados com o estado real de implementação; detalhes de 
 - [ ] Implementar sessão anônima opaca por cookie `Secure`, `HttpOnly`, `SameSite=Strict`, com segredo aleatório forte e vínculo persistido **apenas por digest/HMAC** no banco.
 - [ ] Em toda operação sobre request ou anexo, conferir a **posse por sessão + ID** no servidor antes de usar credencial privilegiada. UUID não é autorização.
 - [ ] Impor Origin/CSRF, allowlist de métodos e `Content-Type`, expiração de sessão e fluxo previsível após expiração.
-- [x] Habilitar RLS e negar privilégios diretos `anon`/`authenticated` **nas quatro tabelas**; SQL live confirmou `relrowsecurity=true`, `anon_select=false`, `authenticated_select=false`, `service_select=true`. **Storage permanece pendente**. Security Advisor informa 4 avisos `INFO` esperados de RLS sem policies (negação intencional); não promover como ZERO avisos.
+- [x] Habilitar RLS e negar privilégios diretos `anon`/`authenticated` **nas cinco tabelas** de Orçamento/limites; SQL live confirmou leitura anônima negada e EXECUTE anônimo negado nas RPCs. **Bucket `quote-intake` privado**, sem policies para `storage.objects`; Security Advisor mantém 5 avisos `INFO` intencionais de RLS sem policies. Ainda falta prova HTTP real de negação anônima.
 - [ ] Verificar isolamento entre duas sessões, tentativas cruzadas, retries, concorrência e submit idempotente.
 
 Gate: não há acesso horizontal por adivinhar/obter ID de orçamento.
 
 ## P4 — Anexos, limite global e retenção
 
-- [ ] Criar `quote-intake` privado e limites por arquivo/pedido conforme contrato.
-- [ ] Emitir token de upload **somente** após validar posse da sessão, quota, caminho imutável e reserva de capacidade.
-- [ ] Validar upload TUS/resume e assinatura do conteúdo; impedir upsert e submissão com objeto inválido.
-- [ ] Definir/medir teto **agregado** de bytes reservados + objetos existentes, com reserva transacional e compensação de falhas/expiração.
-- [ ] Implementar rota autenticada `GET /api/internal/quote-retention` com `CRON_SECRET`; agendar **diariamente**, quando a rota e os segredos estiverem operacionais.
-- [ ] Implementar varredura idempotente: Storage API exclui objetos antes de confirmar eliminação de metadados; falhas parciais permanecem recuperáveis.
-- [ ] Provar exclusão de uploads órfãos, drafts, anexos submetidos e contatos nos prazos contratados; observar falhas do job e execução manual autenticada.
+- [x] Criar e verificar o bucket **privado** `quote-intake`, `public=false`, limite real de **50.000.000 bytes/objeto** e ausência de policies públicas no Storage. Browser alinhado a **50 MB por arquivo, 100 MB por pedido**, com teste de fronteira versionado. **Não afirmar que upload TUS foi exercitado.**
+- [x] Aplicar migration de limites globais: `quote_upload_limits=600000000` e reserva conservadora **50 MB/arquivo pendente**, serialização por lock de linha, no máximo 5 anexos/100 MB contabilizados por pedido; `quote_reserve_attachment` idempotente exige hash de posse do draft. [Migration](../../supabase/migrations/20261009144734_quote_private_bucket_and_capacity.sql) · [Teste SQL](../../tests/sql/quote-private-storage.sql).
+- [x] Proteger integridade do descarte: impedir `DELETE` de anexo ainda reservado/armazenado; `quote_release_attachment` exige hash, grant expirado e ausência de `storage.objects`; bloquear redução prematura do prazo TUS. [Cleanup](../../supabase/migrations/20261009145055_quote_attachment_safe_release.sql) · [Expiração](../../supabase/migrations/20261009145125_guard_quote_upload_grant_expiry.sql) · [Teste SQL](../../tests/sql/quote-safe-release.sql).
+- [x] Executar testes sintéticos SQL com `BEGIN/ROLLBACK`: idempotência, sessão incorreta, conflito de chave, cota por pedido/global, impedimento de manipulação, impedimento de liberar grant ativo e limpeza repetível; **read-back de zero requests/anexos/objetos**. Não foram realizados uploads reais nem teste de corrida com duas conexões.
+- [ ] Emitir token TUS server-only **somente** após validar cookie + posse + quota; path aleatório, sem upsert. Testar resposta 409/429/503 conforme erro.
+- [ ] Validar TUS/resume, tipos/conteúdo e **tamanho físico no Storage** antes de reduzir `accounted_bytes`; executar upload real e prova de isolamento.
+- [ ] Testar corrida real em duas conexões/duas sessões e recuperação de falha parcial; os locks estão implementados, mas essa prova ainda não foi executada.
+- [ ] Implementar limpeza pela **Storage API**: confirmar exclusão do objeto, aguardar expiração do grant, chamar release idempotente e só então apagar metadados. Não tratar ausência de `storage.objects` como prova isolada de remoção física.
+- [ ] Implementar e autenticar `GET /api/internal/quote-retention` com `CRON_SECRET`, agendar diariamente **após** rotas/segredos testados.
+- [ ] Provar retenção de uploads órfãos, drafts, anexos submetidos, contatos e eventos, alertas de falha/ausência do cron e execução manual protegida.
 
-Gate: retenção e consumo medidos, testados e recuperáveis diante de interrupção/duplicidade.
+**Gate P4 ainda aberto:** quota e bucket configurados, mas a ponta a ponta (Storage API, TUS e limpeza real) continua bloqueante para produção.
 
 ## P5 — Integrar ao site sem antecipar publicação
 
@@ -117,6 +120,6 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 - **P1:** staging legado pausado pelo usuário e `INACTIVE`; backup restaurável e inexistência de consumidores **não comprovados**; Admin produção segue `ACTIVE_HEALTHY`, sem testes operacionais completos de regressão.
 - **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo, banco acessível, vazio e sem migrations. Security Advisor inicial sem achados. A referência antiga nos EUA não é o alvo.
 - **P3 local:** token opaco, HMAC de posse e testes focais já versionados. Isso não é fluxo persistente funcionando.
-- **Supabase CM remoto:** projeto validado e **primeira migration aplicada** (`create_quote_core`, versão `20261009143743`); quatro tabelas vazias, RLS ativado e sem grants anônimos; **bucket, secrets, rotas e cron ainda não aplicados**.
+- **Supabase CM remoto:** quatro migrations aplicadas e versionadas; cinco tabelas privadas (incluindo orçamento global), bucket `quote-intake` privado e limite de 50 MB, RPCs restritas ao servidor. SQL transacional e read-back concluídos, zero pedidos/objetos criados. **Secrets, handlers, TUS real e cron ainda não aplicados**.
 - **Vercel:** projeto Radio mantém somente variáveis R2; não foi alterado.
-- **Próximo passo:** concluir quota global/reservas com concorrência, bucket privado, handlers autenticados e testes de expiração; confirmar configuração de Data API e requisitos de Storage. Não ativar formulário/cron sem testes completos e segredos server-side.
+- **Próximo passo:** integrar backend server-only (sessão, `init` → token TUS, `complete` → inspeção real, submit idempotente e rate limit), implementar limpeza Storage API e executar testes concorrentes e E2E antes de configurar Vercel/Cron. O site não recebe dados de clientes nesta fase.

@@ -656,36 +656,26 @@ A API pública de Produtos e o backend do Orçamento são independentes.
 
 Falha em um não pode derrubar o outro.
 
-## 21. Secrets
+## 21. Variáveis, chaves e secrets
 
-### Git
+Não commitar credenciais nem números/IDs internos de outros sistemas em documentos públicos. Usar `.env.example` com campos vazios e validação de variáveis obrigatórias no servidor.
 
-Nunca commitados.
+### Vercel — apenas server-side, quando o projeto CM existir
 
-Criar somente arquivos example sem valores:
+- `CM_SUPABASE_URL` — URL do **projeto novo**;
+- `CM_SUPABASE_SECRET_KEY` — chave privilegiada do projeto CM, nunca em frontend;
+- `CM_QUOTE_BUCKET=quote-intake`;
+- `CM_QUOTE_RATE_LIMIT_SECRET` — HMAC de IP;
+- `CM_QUOTE_SESSION_SECRET` — derivação/associação da sessão opaca;
+- `CM_QUOTE_STORAGE_BUDGET_BYTES` — configuração não secreta para teto global;
+- `CRON_SECRET` — segredo reconhecido e enviado automaticamente pelo Vercel Cron;
+- `ARTESOPOLIS_CATALOG_URL` / `ARTESOPOLIS_CATALOG_TOKEN` — somente para o consumidor da ponte pública server-to-server, **separados** do projeto Supabase CM.
 
-`.env.example`
+`CRON_SECRET` substitui a antiga proposta de variável dedicada ao Cron; não manter nomes concorrentes.
 
-### Vercel — Production
+### Sistema operacional de origem
 
-Server-only:
-
-- `CM_SUPABASE_URL`;
-- `CM_SUPABASE_SECRET_KEY`;
-- `CM_QUOTE_BUCKET`;
-- `CM_QUOTE_RATE_LIMIT_SECRET`;
-- `QUOTE_RETENTION_CRON_SECRET`;
-- `ARTESOPOLIS_CATALOG_URL`;
-- `ARTESOPOLIS_CATALOG_TOKEN`.
-
-### Supabase Admin project
-
-Edge Function secret:
-
-- `CM_PUBLIC_ORGANIZATION_ID`;
-- `CM_CATALOG_READ_TOKEN`.
-
-Não usar prefixo `SUPABASE_` para secrets custom da Edge Function.
+A função de catálogo mantém identidade/configuração e autenticação **próprias**, administradas no ambiente privado correspondente. Jamais reutilizar a secret key do Supabase CM para autorizar leitura do Admin, nem transportar credenciais de um projeto para outro.
 
 ## 22. CORS
 
@@ -800,86 +790,56 @@ Quando Supabase remoto existir, não fazer CI depender da produção.
 
 Preview branch/staging é o alvo apropriado para E2E de schema.
 
-## 28. Provisionamento — reutilização autorizada em 09/10/2026
+## 28. Provisionamento remoto — novo projeto CM
 
-O projeto CM **não será criado do zero**: reutilizar `auiovzmxvhqlvhtmkavt` na organização gratuita já conectada. Sequência completa, com checklist verificável e gates para evitar perda de dados, no [trabalho E2](work/08-supabase-staging-reuse.md).
+Plano detalhado e checklist: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 
-1. Inventariar consumidores legados (Vercel, branch, crons, functions, Storage, Auth, segredos) e proteger a produção do Admin `ueasdbjuelqwfobcdlww`.
-2. Recuperar conexão SQL administrativa do projeto de staging (erro `28P01`), produzir e validar backup externo recuperável.
-3. Desativar/aposentar integrações, automações e dados de demonstração somente depois de provar que ninguém depende desse staging.
-4. Conservar a project ref e alterar apenas o nome de exibição para CM, quando o ambiente estiver isolado.
-5. Aplicar migrations do Orçamento; criar bucket privado `quote-intake`, ACL/RLS, handlers, uploads, rate limit e retenção.
-6. Configurar secrets server-side no Vercel do Radio e validar casos de segurança/falha.
-7. Habilitar intake público real somente após o gate de backup/plano de produção previsto aqui; upgrade pago não está autorizado implicitamente.
+1. Conferir em ambiente **privado** dependências do ambiente de teste legado, gerar backup externo recuperável e somente depois autorizar/realizar a pausa, sem excluir.
+2. Confirmar cota Free e criar organização CM separada, se disponível sem cobrança; criar **projeto limpo** em `sa-east-1`. Identificador, secrets e acesso administrativo ficam fora do repo público.
+3. Vincular CLI ao projeto novo apenas com ref previamente conferida, manter migrations versionadas e fazer dry-run antes de push remoto.
+4. Aplicar schema de Orçamento com sessão/posse, RLS/grants, constraints e quota global.
+5. Criar `quote-intake` privado; implementar signed TUS, validação de arquivo, idempotência e limpeza.
+6. Configurar variáveis server-side na Vercel e implementar handlers; validar que a Rádio permanece no R2.
+7. **Só após a rota protegida estar operacional:** ativar o GET diário do Vercel Cron, fazer read-back e observar falha/duplicidade.
+8. Executar testes negativos de acesso cruzado, quota, Storage, retenção, advisors e backup; cumprir o gate de plano/produção antes do intake real.
 
-**Em 09/10/2026:** alvo identificado, mas P0/P1 ainda não passaram; nenhum apply/cleanup remoto executado.
+A ponte de Produtos **não depende** da base CM. No ambiente operacional da origem, seu plano independente prevê persistência/publicação editorial, uma projeção allowlisted server-to-server, migração dos produtos curados e remoção do catálogo estático somente após provas. Contrato: [Product Catalog Bridge V1](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md). Não inferir que a ponte esteja implantada pelo provisionamento do CM.
 
-### Produto bridge
+## 29. O que pode avançar sem Supabase remoto
 
-Separadamente, no Supabase já usado pelo Artesopolis Admin:
+**Desbloqueado em código local:** migrations, schema, grants/RLS, parsers, contrato de sessão anônima, handlers, validação de conteúdo, quota, rate limit, idempotência, scheduler, fixtures e testes. Esse código local **não** significa que upload, submit ou cron estejam funcionando na produção.
 
-1. aplicar migration da publicação CM;
-2. deploy `cm-public-catalog`;
-3. configurar `CM_PUBLIC_ORGANIZATION_ID`;
-4. configurar `CM_CATALOG_READ_TOKEN`;
-5. configurar URL/token no Vercel;
-6. migrar os 9 produtos;
-7. cortar o catálogo estático.
-
-## 29. O que não depende da conta ainda
-
-Pode ser implementado antes do projeto remoto existir:
-
-- migrations;
-- schema;
-- RLS/grants;
-- adapters;
-- signed-upload contract;
-- Route Handlers;
-- content sniffing;
-- rate-limit RPC/table;
-- retention logic;
-- tests;
-- fixture;
-- product bridge no código;
-- documentação.
-
-Fica bloqueado até a conta/projeto existir:
-
-- link remoto;
-- criação real do bucket;
-- secret keys;
-- apply migration remoto;
-- upload real;
-- advisors remotos;
-- deploy production;
-- validação live.
+**Depende de novo projeto e de configuração remota:** acesso/vínculo, aplicação de migrations, criação real do bucket, secrets Vercel, uploads TUS reais, advisors remotos, smoke E2E e release. Pausa do legado exige seu próprio gate privado e não deve ser apresentada como etapa já feita.
 
 ## 30. Gate de infraestrutura pronta
 
-Só marcar `infra_ready` quando:
+Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
-- [ ] projeto CM existe em `sa-east-1`;
-- [ ] plano de produção adequado está ativo antes do intake real;
-- [ ] migrations aplicadas no alvo correto;
-- [ ] bucket privado existe;
-- [ ] direct anon table access falha;
-- [ ] upload assinado funciona;
-- [ ] TUS resume funciona;
-- [ ] content validation funciona;
-- [ ] submit idempotente funciona;
-- [ ] rate limit funciona;
-- [ ] retention funciona;
-- [ ] delete remove Storage + row;
-- [ ] DB backup policy conferida;
-- [ ] nenhum arquivo do intake é tratado como backup de produção;
-- [ ] secrets estão fora do Git/browser;
-- [ ] Security Advisor revisado;
-- [ ] Performance Advisor revisado;
-- [ ] produto bridge está no Supabase do Admin, não duplicado no CM;
-- [ ] nenhuma pendência material está escondida como “depois”.
+- [ ] Supabase **novo** CM em `sa-east-1`, projeto e organização adequados; legado não foi migrado.
+- [ ] Migrations versionadas aplicadas e validadas **na ref nova correta**.
+- [ ] `quote-intake` privado, limites 50MB/objeto e 5/100MB por request e quota **global** confirmados.
+- [ ] RLS/grants/Storage negam acesso direto `anon`/`authenticated`; nenhum privilégio no browser.
+- [ ] Cookie de sessão anônima, vínculo por HMAC/digest, Origin/CSRF e expiração funcionam.
+- [ ] Duas sessões não conseguem ler, completar upload ou enviar orçamento uma da outra.
+- [ ] Signed TUS, retomada, content sniffing e falha parcial validados sem upsert.
+- [ ] Submit idempotente e reservas de bytes concorrentes respeitam invariantes.
+- [ ] Rate limiting, respostas de quota esgotada e limpeza de órfãos funcionam.
+- [ ] Vercel Cron **GET** autenticado por `CRON_SECRET` foi agendado **após** rota pronta e verificado em execução real.
+- [ ] Falha/duplicidade/ausência de Cron têm reconciliação e alerta; Storage excluído antes do row/PII.
+- [ ] Duração de retenção e rotinas de expurgo de dados pessoais testadas.
+- [ ] Segredos Vercel só server-side; deploy é **explícito** enquanto `git.deploymentEnabled: false`.
+- [ ] Política de backup e de plano da organização CM avaliadas; upgrade pago somente com autorização.
+- [ ] Security Advisor, Performance Advisor, logs e observabilidade sem riscos introduzidos.
+- [ ] Ponte de Produtos continua **fora** do Supabase CM e seu status não foi promovido artificialmente.
+- [ ] Documentação pública não inclui identificadores operacionais privados; ausência de pendências materiais escondidas.
 
 ## 31. Referências oficiais consultadas
+
+- [Free projects e organização](https://supabase.com/docs/guides/platform/billing-faq)
+- [Pausa e restauração de projeto](https://supabase.com/docs/guides/platform/free-project-pausing)
+- [Vercel Cron GET](https://vercel.com/docs/cron-jobs)
+- [Vercel Cron Auth e retries](https://vercel.com/docs/cron-jobs/manage-cron-jobs)
+- [Limites Cron por plano](https://vercel.com/docs/cron-jobs/usage-and-pricing)
 
 - Supabase Deployment & Branching: https://supabase.com/docs/guides/deployment
 - Supabase Branching: https://supabase.com/docs/guides/deployment/branching
@@ -892,20 +852,11 @@ Só marcar `infra_ready` quando:
 - Storage resumable uploads: https://supabase.com/docs/guides/storage/uploads/resumable-uploads
 - Cron: https://supabase.com/docs/guides/cron/quickstart
 
-## 32. Retomada
+## 32. Retomada — 09/10/2026
 
-Estado em 05/10/2026:
-
-- arquitetura Supabase: **definida**;
-- conta existente Artesopolis Free: **conectada**;
-- projeto CM: **ref de staging existente identificada para reaproveitamento, não saneada**;
-- project ref: **`auiovzmxvhqlvhtmkavt`**;
-- migration quote: **não implementada**;
-- bucket: **não criado**;
-- Vercel secrets: **não configurados**;
-- Produto bridge Admin Supabase: **planejado, não implementado**;
-- Orçamento Supabase CM: **planejado, não implementado**.
-
-Próxima ação técnica sem depender de conta:
-
-> implementar localmente o schema/migrations do Orçamento e os adapters server-side seguindo este contrato.
+- Arquitetura do **projeto CM novo e limpo**: definida, **não provisionada**.
+- O ambiente de testes legado permanece **inalterado**; pausa depende de inventário, backup e gate próprio.
+- Migrations, bucket, segredo de sessão, quota, Route Handlers e Cron: **não implementados/deployados**.
+- Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
+- Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
+- Próxima ação técnica independente do provisionamento: implementar e revisar schema e handlers localmente sem aceitar dados pessoais reais.

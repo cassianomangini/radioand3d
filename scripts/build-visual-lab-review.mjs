@@ -9,7 +9,9 @@ const studies = [
 ];
 const viewports = [
   { id: "desktop-1440", name: "Desktop · 1440 × 900" },
-  { id: "mobile-390", name: "Mobile · 390 × 844" }
+  { id: "desktop-1024", name: "Notebook · 1024 × 768" },
+  { id: "mobile-390", name: "Mobile · 390 × 844" },
+  { id: "mobile-360", name: "Mobile estreito · 360 × 800" }
 ];
 
 async function filesBelow(directory) {

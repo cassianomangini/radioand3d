@@ -2,14 +2,14 @@
 
 **Pedido funcional:** Cassiano, 09/10/2026. **Contexto:** nova evolução pontual da Rádio após a passagem aceita em 05/10, **não** reabertura automática de C1–C8.  
 **Comportamento solicitado:** ao empurrar/arrastar a Rádio lateral **para a direita**, ela deve **subir e se transformar em um player compacto dentro da navbar**, liberando o Estúdio. O usuário consegue **restaurar a Rádio lateral** por um botão na navegação ou arrastando novamente a partir da borda direita.  
-**Gate:** comportamento indicado pelo usuário; **composição exata do dock ainda não aprovada em mock/render**. `ready_for_frontend: no` até revisão da prévia do movimento. `visual_approved_by: null`. `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`.  
+**Gate:** comportamento indicado pelo usuário; **posição do dock no cabeçalho confirmada por Cassiano: imediatamente ANTES do grupo de ícones sociais, à direita da navegação principal; acabamento e animação ainda não aprovados em mock/render**. `ready_for_frontend: no` até revisão da prévia do movimento. `visual_approved_by: null`. `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`.  
 **Checklist:** [03c — Dock da Rádio](../work/03c-radio-navbar-dock.md).
 
 ## 1. Princípio de interação
 
 O produto passa a ter um novo estado de apresentação da Rádio no desktop: **`docked`**. Ele é mutuamente exclusivo com `split`, `custom`, `focus` e `fullscreen`, sem interferir na reprodução.
 
-A Rádio **não desaparece abruptamente**. Ela parece fisicamente ser recolhida da lateral direita, subir e encaixar-se na área direita do cabeçalho, onde só permanece um **player pequeno**. Enquanto isso, o Estúdio ganha a largura liberada. O conteúdo da Rádio e o motor de áudio não são reinicializados.
+A Rádio **não desaparece abruptamente**. Ela parece fisicamente ser recolhida da lateral direita, subir e encaixar-se **à esquerda e imediatamente antes dos botões de redes sociais no cabeçalho** (no mesmo agrupamento de ações à direita), onde só permanece um **player pequeno**. Enquanto isso, o Estúdio ganha a largura liberada. O conteúdo da Rádio e o motor de áudio não são reinicializados.
 
 ### Estado A — Rádio lateral (existente)
 
@@ -28,19 +28,28 @@ A Rádio **não desaparece abruptamente**. Ela parece fisicamente ser recolhida 
 ### Estado B — Rádio acoplada à navbar (novo)
 
 ```text
-╔═════════════════════════════════════════════════════════════════╗
-║ CM 3D & Radio     Início   Estúdio   Rádio     [♪ faixa  ▶  Abrir] ║
-╠═════════════════════════════════════════════════════════════════╣
-║                                                                 ║
-║                                                                 ║
-║              ESTÚDIO OCUPANDO A LARGURA LIVRE                     ║
-║                                                                 ║
-║                                                              ▏  ║
-╚═════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ LOGO CM       Início   Estúdio   Rádio       [♪ Faixa  ▶  Abrir]  [redes sociais] ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                              ║
+║                     ESTÚDIO OCUPANDO A LARGURA LIBERADA                       ║
+║                                                                              ║
+║                                                                           ▏  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
                                              ↑ borda direita arrastável
 ```
 
-Esquema funcional, **não mock final**. O header deve permanecer equilibrado; não cortar a marca nem empurrar a navegação para fora da tela.
+Esquema funcional, **não mock final**. A ordem da navbar em dock é **logo à esquerda | navegação centrada | player compacto | grupo de redes sociais à extrema direita**. **As redes sociais não desaparecem para abrir espaço para o mini player.** O header deve permanecer equilibrado; não cortar a marca nem empurrar a navegação para fora da tela.
+
+### Referência verificada: Artesópolis Landing (legado, somente comportamento/composição)
+
+Cassiano esclareceu em 09/10/2026 que o mini player deve ficar **antes dos botões sociais**, como na experiência de navbar da antiga Landing Artesópolis. O repositório legado foi conferido:
+
+- `cassianomangini/artesopolis-landing/src/components/navbar.tsx` (`master`): no desktop, a navbar organizava **marca/menu | MiniPlayer | SocialIcons** em três áreas do grid, com o player no centro e os ícones na última área à direita.
+- `cassianomangini/artesopolis-landing/src/components/mini-player.tsx`: o player mostrava arte, faixa, controles e um visualizador ativo por um contexto único de áudio.
+- **Distinção deliberada:** no novo CM, a navegação principal `Início / Estúdio / Rádio` **permanece centralizada** e o player passa a integrar o **grupo de ações à direita**, imediatamente **antes dos ícones sociais**, não na coluna central. Não importar o estilo neon, o astronauta, os arquivos do player ou sua antiga arquitetura; apenas usar a relação espacial/comportamental como referência.
+
+**Decisão confirmada:** posição relativa `dock → redes sociais` aprovada pela indicação direta de Cassiano. **Pendente:** dimensões, conteúdo de controle e percepção visual da transformação, que continuam sujeitos a preview.
 
 ## 2. Gatilhos e reversão
 
@@ -54,7 +63,7 @@ Esquema funcional, **não mock final**. O header deve permanecer equilibrado; n�
 
 ## 3. Conteúdo do player no cabeçalho
 
-O player compacto aparece **apenas no estado `docked` do desktop**; não aparece ao lado da Rádio lateral completa nem da fullscreen. A composição proposta para o lado direito da navbar contém:
+O player compacto aparece **apenas no estado `docked` do desktop**; não aparece ao lado da Rádio lateral completa nem da fullscreen. A composição do lado direito da navbar é um **grupo horizontal na ordem player compacto → botões sociais**. Os ícones de redes sociais existentes preservam sua posição final à direita, visibilidade e espaçamento próprio. O grupo do player contém:
 
 - pequena imagem/identidade da faixa real atual (quando disponível, fallback existente se não houver capa);
 - **título** e, quando couber, artista, truncados sem corte de controles;
@@ -82,7 +91,7 @@ Inspecionado em 09/10/2026:
 - `src/components/studio-radio/radio-motion-spine.ts`: `RadioLayoutMode` só conhece `split | custom | focus | fullscreen`; será necessária extensão explícita para `docked` sem quebrar callers e contratos já testados.
 - `studio-radio-shell.tsx`: resize usa `clampRadioWidth`, `handlePointerDown`, `handlePointerMove`, `stopDragging`; o valor é calculado por `rect.right - event.clientX - dragOffsetRef.current`. O limite mínimo atual impede dock por simples resize. Detectar **overshoot para a direita antes do clamp** e aplicar gatilho/histerese independente do fullscreen, que usa overshoot na direção oposta.
 - `radio-panel-drag.ts`: snap points existentes são `compact, balanced, focus` (todos com sidebar). O dock é **estado terminal diferente de `compact`**: não transformar o snap `compact` em `docked` automaticamente.
-- `studio-radio-shell.module.css`: o header desktop termina em `right: calc(var(--radio-width) + var(--rail-width))`, a Rádio é fixa à direita e o divisor permanece à esquerda dela. Em dock, o header precisa **ocupar todo o viewport** sem alterar a navegação global; o Estúdio ocupa a área liberada. O antigo `resizeHandle` deixa de estar na fronteira do painel e vira uma zona de retorno na borda da tela.
+- `studio-radio-shell.module.css`: o header desktop termina em `right: calc(var(--radio-width) + var(--rail-width))`, a Rádio é fixa à direita e o divisor permanece à esquerda dela. Em dock, o header precisa **ocupar todo o viewport** sem alterar a navegação global; o Estúdio ocupa a área liberada. O bloco direito atual contém `SocialIcons` e tem espaço limitado: será preciso compor um grupo **[dock player][SocialIcons]**, mantendo o menu principal geometricamente centrado. Atualmente o CSS oculta os ícones sociais em expansão/focus; **essa regra não pode esconder redes sociais em dock**. O antigo `resizeHandle` deixa de estar na fronteira do painel e vira uma zona de retorno na borda da tela.
 - `studio-radio-shell.tsx` `navigateStudioRoute`/`restoreInitialRadioLayout` restauram o split durante navegação: deve haver uma exceção deliberada para preservar `docked` ao visitar Home/Estúdio/Produtos. Não redefinir áudio nem forçar a sidebar a reaparecer a cada link.
 - `RadioContent` permanece montado ou isolado de modo que não perca dados/estado; com dock estável, conteúdo completo deve ficar **inert/fora da ordem de foco** e o custo de desenhar o visualizador oculto deve ser suspenso quando possível. **Não montar um segundo `<audio>`.**
 - Mobile usa sua própria mini no topo; **não** criar um segundo dock mobile. Ao cruzar o breakpoint desktop/mobile, resolver a apresentação sem manter dois compactos visíveis.
@@ -98,7 +107,7 @@ Preservar o padrão do mini mobile como referência de **informações** e contr
 - Demonstrar com vídeo/capturas do browser os estados **lateral → puxando à direita → dock no topo → botão de retorno → lateral** e **dock → puxar da borda à esquerda → lateral**.
 - Cobrir início/cancelamento/reversão no meio da animação; drag pequeno não aciona modo sem intenção; overshoot à esquerda para fullscreen continua funcionando.
 - Verificar que playback, tempo, faixa, playlist, shuffle/repeat e seek não reiniciam; **um único áudio** persiste enquanto o dock, header, rota e fullscreen mudam.
-- Confirmar que a nav continua legível e centrada em 1440, 1180, 1024 (sem dock abaixo do breakpoint real), desktop baixo; text overflow e zoom 200%; foco de teclado nunca vai para o painel oculto.
+- Confirmar que a nav continua legível e centrada em 1440, 1180, 1024 (sem dock abaixo do breakpoint real), desktop baixo; text overflow e zoom 200%; foco de teclado nunca vai para o painel oculto. No dock, conferir explicitamente a ordem **logo | nav central | mini player | ícones sociais**, nenhum ícone escondido, nenhuma sobreposição e player truncando título antes de roubar espaço do menu.
 - Contrastar modo desktop `docked` com mobile 390/360, reduced motion e entrada/saída em resize. Sem layout shift ou scroll horizontal por reaparecimento do painel.
 - Não declarar o efeito pronto só porque CSS animou a largura; a percepção espacial de **subir para navbar** e sua reversão precisam ser revisadas com Cassiano.
 

@@ -19,7 +19,7 @@ test.describe("Visual Lab development preview", () => {
     test("renders isolated study " + study, async ({ page }, testInfo) => {
       const response = await page.goto("/dev/visual-lab", { waitUntil: "domcontentloaded" });
       expect(response?.status()).toBe(200);
-      await expect(page.locator('[data-visual-lab="true"]')).toBeVisible();
+      await expect(page.locator('[data-visual-lab="true"][data-lab-ready="true"]')).toBeVisible();
       const button = page.locator('[data-study-button="' + study + '"]');
       await button.click();
       await expect(button).toHaveAttribute("aria-pressed", "true");
@@ -67,6 +67,7 @@ test.describe("Visual Lab development preview", () => {
 
   test("study switching works with keyboard and maintains one active choice", async ({ page }) => {
     await page.goto("/dev/visual-lab", { waitUntil: "domcontentloaded" });
+    await expect(page.locator('[data-visual-lab="true"][data-lab-ready="true"]')).toBeVisible();
     const controls = page.locator("[data-study-button]");
     await expect(controls).toHaveCount(3);
     const second = page.locator('[data-study-button="mostruario"]');

@@ -1,6 +1,6 @@
 # E2 — Provisionamento seguro do Supabase CM
 
-Estado: **in_progress** (contratos revisados; **projeto remoto CM não provisionado**)  
+Estado: **in_progress** (projeto remoto criado e inspecionado; **região/organização divergem do plano**)  
 Atualização: **09/10/2026**  
 Owner: **CM Infra / CM Data**  
 Contrato: [Supabase Infrastructure V1](../SUPABASE_INFRASTRUCTURE_V1.md)  
@@ -8,7 +8,7 @@ Contexto: [Estúdio público](08-studio-growth.md) e [Roadmap](../ROADMAP.md)
 
 ## Decisão vigente
 
-Criar **um projeto Supabase novo e limpo** para os dados próprios do CM 3D & Radio, em `sa-east-1`, em vez de apagar e reaproveitar o banco de testes de outro sistema.
+O usuário pausou o ambiente de testes legado e criou um **projeto Supabase novo e limpo** para CM 3D & Radio em 09/10/2026. O projeto real foi localizado, está saudável e sem tabelas de domínio/migrations, mas **foi criado em `us-east-1`, não em `sa-east-1` como previsto**, e dentro da **mesma organização do Admin**, não em organização CM separada. Essa divergência impede tratar o gate de arquitetura como aprovado; **nenhuma migration remota deve ser aplicada antes de decidir a região e o isolamento de faturamento**.
 
 - Preferir uma **organização CM separada** para isolar faturamento e administração. A cota Free de dois projetos ativos considera os projetos do proprietário/administrador entre organizações; criar uma nova organização **não cria outra vaga grátis**.
 - Antes de criar o projeto, inventariar e preservar o ambiente legado em documentação e acesso **privados**. Pausá-lo **somente depois** de comprovar que não existem consumidores necessários, registrar backup externo e validar a capacidade de recuperação.
@@ -36,7 +36,7 @@ Gate: contratos sincronizados com o estado real de implementação; detalhes de 
 
 ## P1 — Pré-requisitos para liberar vaga Free (inventário inicial read-only)
 
-- [x] Confirmar via Supabase Management a organização Free existente e os **dois projetos ativos**; **nenhuma organização CM separada existe ainda**. Consulta read-only de 09/10/2026.
+- [x] Conferir Supabase Management após a ação do usuário: **dois projetos ativos** (Admin e CM) e **staging INACTIVE**; todos na mesma organização. Nenhuma organização CM independente existe. Leitura em 09/10/2026.
 - [x] Confirmar as referências de ambiente de aplicação: os destinos Supabase dos ambientes Preview/Production do projeto Vercel de testes apontam ao **staging**, não ao banco operacional; ambos informam **Shopee sandbox**. Verificado por leitura individual das variáveis, sem expor valores no Git.
 - [x] Conferir histórico recente de deploy: projeto Vercel de testes sem deploy novo desde **01/09/2026**, enquanto a aplicação operacional segue recebendo deploys. Isso **não** prova que não existem consumidores automáticos.
 - [x] Levantar metadados estruturais das classes **banco, Auth, Storage, jobs e Edge Functions** via Management API; o inventário detalhado foi consultado fora do repositório público. Há recursos antigos e automações; o projeto **não está vazio**.
@@ -45,20 +45,24 @@ Gate: contratos sincronizados com o estado real de implementação; detalhes de 
 - [ ] Confirmar que a pausa não interromperá rotinas, testes necessários ou consumidores ainda utilizados. Existe evidência recente de automação executando, mas não de tráfego humano.
 - [ ] Exportar backup completo de banco e objetos realmente necessários **fora do Git**, com restauração/recuperabilidade demonstrada. No plano Free, usar dump lógico independente; não confundir metadata da API com backup.
 - [ ] Confirmar permissões reais de pausa no Dashboard.
-- [ ] Pausar o ambiente legado **somente após** o gate anterior, verificar seu estado e confirmar funcionamento da operação principal.
+- [x] **Pausa do staging efetuada pelo usuário e confirmada** por Supabase Management (`INACTIVE`), sem exclusão realizada pelo assistente.
+- [ ] Confirmar por prova separada que a produção do Admin permaneceu íntegra após a pausa (status do banco ativo, sozinho, não prova fluxos críticos).
 
-**Gate P1 bloqueado:** falta comprovar consumidores/backup e recuperar um caminho SQL administrativo do staging. **Nenhuma pausa, exclusão, revogação ou alteração do Admin foi executada.**
+**Gate P1 parcialmente atendido:** a vaga Free foi efetivamente liberada e já existe projeto CM. **Permanece não comprovado** se houve backup recuperável antes da pausa e se todos os consumidores antigos estavam independentes. Não reativar o legado apenas para exploração sem motivo; registrar essa dívida operacional e confirmar que o Admin de produção não depende dele. O assistente **não executou** pausa, exclusão, revogação nem alteração do Admin.
 
 ## P2 — Criar o projeto CM limpo
 
-- [ ] Preparar a organização CM separada, quando permitido pela cota e sem gerar contratação automática.
-- [ ] Criar um projeto novo em `sa-east-1`; manter o identificador real apenas no inventário de infraestrutura privado.
+- [x] Projeto CM criado pelo usuário e verificado no Supabase Management: nome `radioand3d`, estado `ACTIVE_HEALTHY`; sem tabelas `public`, sem migrations e com acesso SQL read-only funcional.
+- [x] Confirmar região/organização **reais** do projeto: `us-east-1` / mesma organização Artesopolis; conferido em 09/10/2026. **É evidência de desvio, não aprovação de arquitetura.**
+- [ ] Resolver o desvio **antes de aplicar schema**: contrato prevê São Paulo (`sa-east-1`), e a região de projeto Supabase não pode ser alterada in-place; se a decisão continuar São Paulo, será necessário criar outro projeto nessa região e aposentar o vazio atual, com revisão de custo/vaga e autorização operacional específica.
+- [ ] Decidir se a organização CM separada continua necessária para isolar faturamento; a organização atual abriga também o Admin. Nenhuma transferência/criação de organização foi efetuada pelo assistente.
 - [ ] Habilitar MFA e restrições de acesso adequadas.
 - [ ] Configurar desenvolvimento local (Supabase CLI, `config.toml`, migrations e seed sintético) no repo `radioand3d`.
 - [ ] Conferir vínculo CLI/projeto e fazer **dry-run** antes de aplicar qualquer migration remota.
-- [ ] Verificar as configurações de Data API, logs, plano/quotas e backups do projeto novo.
+- [x] Verificar acesso SQL read-only, ausência de tabelas públicas, histórico de migrations vazio e Security Advisor sem alertas iniciais no projeto CM novo.
+- [ ] Revisar configurações Data API, backups, região final, plano/quotas e restrições de acesso no alvo definitivo.
 
-Gate: projeto independente, vazio de legado operacional, com acesso e alvo comprovados.
+**Gate P2 bloqueado por decisão de arquitetura:** novo projeto está limpo e acessível, mas sua região e sua organização não correspondem ao contrato vigente. Sem migrações, Storage, secrets ou deploy até conciliar esse desvio.
 
 ## P3 — Orçamento privado com posse de sessão
 
@@ -114,9 +118,10 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 ## Retomada verificada em 09/10/2026
 
 - **P0:** contratos alinhados, histórico inicial auditado; há identificadores técnicos em commits antigos, mas nenhum segredo detectado na inspeção focal. HEAD atual sanitizado.
-- **P1:** cota Free, projetos e ambientes Vercel conferidos; classes de recursos de staging inventariadas por metadata. **Gate bloqueado** por falta de prova de ausência de consumidores, backup recuperável e leitura SQL via conexão atual (`28P01`).
+- **P1:** staging **pausado pelo usuário** e confirmado INACTIVE; nova vaga utilizada pelo projeto CM. Não há prova registrada de backup/restauração e de independência de todos os consumidores antigos; acesso SQL do staging já não é pré-requisito para desenvolver o CM.
+- **P2:** projeto `radioand3d` ativo e vazio, leitura SQL funcional, **criado em `us-east-1` na mesma organização do Admin**. O contrato previa `sa-east-1` e organização CM independente preferencial. **Bloquear apply remoto até resolver esse desvio.**
 - **P3 local (paralelo permitido):** token opaco e HMAC de sessão criados em código; teste focal **5/5 PASS** com hashes locais iguais aos blobs do GitHub. Não há Route Handler nem persistência.
-- **Supabase CM remoto:** **não criado**; migrations, bucket, segredos, rotas e cron **não aplicados**.
-- **Ambiente legado:** não pausado, não apagado e não reconfigurado por esta entrega.
+- **Supabase CM remoto:** **criado pelo usuário**, sem tabelas de domínio/migrations; bucket, segredos, rotas e cron **não aplicados**.
+- **Ambiente legado:** **pausado pelo usuário** (verificado INACTIVE); não apagado ou reconfigurado pelo assistente.
 - **Vercel:** nenhum cron habilitado nem mudança de deploy aplicada nesta entrega.
-- **Próxima ação segura:** verificar acesso pelo SQL Editor do staging ou restabelecer a conexão administrativa **sem compartilhar senha em chat**; inventariar jobs/consumidores e exportar backup externo com prova de recuperação antes de qualquer pausa. Em paralelo, construir schema e handlers localmente com validação focal.
+- **Próxima ação segura:** decidir se o projeto de Orçamento deve ficar na região dos EUA ou em São Paulo e se será preciso organização CM separada. **Não publicar ref/secrets no Git.** Em paralelo, avançar na implementação local (schema/handlers/testes) sem aplicação remota, e documentar o estado do backup do staging quando houver evidência.

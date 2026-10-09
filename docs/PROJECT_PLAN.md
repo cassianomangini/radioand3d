@@ -11,8 +11,8 @@ Este é o contrato de escopo. A sequência e o estado das entregas ficam apenas 
 - Identidade CM própria, sem astronauta ou reaproveitamento automático da estética Artesopolis.
 - Experiência viva, com muitas animações e boa apresentação em computador e celular.
 - Rádio inspirada no Winamp, com tecnologia atual.
-- No mobile, mini player persistente; no desktop, a Rádio completa/acoplada é a interface de reprodução visível. Ambos usam o mesmo motor e a mesma fila.
-- No desktop, o 3D e a rádio formam uma composição integrada; a rádio pode ganhar largura por arraste e por ação explícita de expandir/recolher.
+- No mobile, mini player persistente; no desktop, a Rádio completa/acoplada é a interface de reprodução visível **enquanto estiver lateral ou em tela inteira**. Se recolhida por gesto deliberado, um player compacto assume seu lugar na navbar e a lateral sai de vista. Todos compartilham o mesmo motor e a mesma fila; **nunca dois players desktop simultaneamente visíveis**.
+- No desktop, o 3D e a rádio formam uma composição integrada; a rádio pode ganhar largura por arraste e por ação explícita de expandir/recolher. **Nova evolução pedida em 09/10/2026:** empurrar a divisória para a direita além da largura mínima faz a Rádio subir e encaixar-se como player compacto na navbar, liberando a largura do Estúdio; botão na navbar ou novo arraste da borda direita para a esquerda restauram a Rádio lateral, sem interromper o áudio. Direção visual final condicionada à prévia aprovada.
 - No mobile, o mini player aparece logo abaixo do header e a experiência de Estúdio de Impressão 3D começa imediatamente abaixo dele.
 - O Estúdio público se organiza em três pilares: **Impressões, Orçamento e Produtos**.
 - **Impressões** prova capacidade e inspira; **Orçamento** qualifica projeto personalizado sem abrir WhatsApp para qualquer visitante; **Produtos** apresenta itens próprios antes do checkout externo.
@@ -49,7 +49,7 @@ O primeiro marco visível entrega duas frentes bem acabadas:
 1. **CM Rádio funcional e visualmente pronta**, com Rádio completa no desktop e mini player no mobile compartilhando a mesma reprodução, seleção manual de músicas, shuffle e visualizador.
 2. **Estúdio público funcional**, com hero, três pilares, páginas comerciais prioritárias, caminho de orçamento e catálogo de produtos construídos apenas com conteúdo real.
 
-Desktop: o Estúdio ocupa a área principal e a Rádio completa aparece acoplada à direita, com ação de expandir/recolher e redimensionamento quando suportado pela interação aprovada. **Não existe mini player adicional no desktop.**
+Desktop: o Estúdio ocupa a área principal e a Rádio completa aparece acoplada à direita, com ação de expandir/recolher e redimensionamento. **Não existe mini player adicional enquanto a Rádio completa estiver visível.** O modo novo **docked** é mutuamente exclusivo: somente com a Rádio lateral recolhida, uma vista compacta pode ocupar a navbar e o Estúdio usa a largura recuperada. [Contrato e gate de desenho](design/CM_RADIO_NAVBAR_DOCK_V1.md).
 
 Mobile: header, mini player compacto e, logo abaixo, a entrada do Estúdio. A rádio completa abre sob demanda.
 

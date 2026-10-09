@@ -21,7 +21,11 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 - [x] **D2** Inspecionar o shell/handle/state/FLIP existentes, nav desktop, invariantes de áudio e breakpoints; identificar conflitos com o limite mínimo da Rádio e com `restoreInitialRadioLayout`.
 - [x] **D3** Documentar a proposta inicial de estados, posição no header, ações acessíveis, conteúdo mínimo, direção do movimento, reversibilidade e regressões de layout/áudio.
 - [x] **D3.1** Conferir referência `cassianomangini/artesopolis-landing` (`master`, `src/components/navbar.tsx` e `mini-player.tsx`) e registrar correção de Cassiano: dock **imediatamente antes dos ícones sociais**, preservando a nav CM centralizada. A landing usava mini na coluna central e sociais na última coluna; reaproveitar a relação e o comportamento, não sua paleta/código.
-- [x] **D4** Criar e renderizar prévia interativa **com o StudioRadioShell real**, em `/dev/radio-dock`, contendo transição lateral → navbar antes dos sociais → lateral. Capturas/vídeo desktop, teste de gesto/botão, reduced motion e contraste mobile no [relatório de evidência](evidence/03c-radio-dock-preview-2026-10-09.md). **Aprovação estética ainda não concedida**.
+- [x] **D3.2** Reestudar **integralmente a referência Artesópolis Landing**: navbar, mini-player completo, botões, barras reativas/engine, camadas de acabamento e padrões documentados; confrontar com a prévia CM atual. [Contrato de direção atualizado](../design/CM_RADIO_NAVBAR_DOCK_V1.md). Resultado: o primeiro mini CM perdeu controles e identidade sonora; referência não foi bem traduzida.
+- [x] **D4 (prova técnica apenas)** Criar e renderizar prévia com `StudioRadioShell` real em `/dev/radio-dock`, demonstrando gesto/posição/transição; [vídeo e teste browser](evidence/03c-radio-dock-preview-2026-10-09.md). **Os 6 testes não demonstram fidelidade visual à Landing**; não apresentar esse mock como direção de arte.
+- [ ] **D4.1 (correção obrigatória)** Refazer o **mini-player da prévia** respeitando densidade e funções verificadas na Landing: capa, CM RÁDIO/faixa, **anterior + play/pause + próxima**, visualizer compacto **alimentado pela análise real** e controle de restaurar; adaptação CM, sem copiar astronauta ou tema antigo; manter redes visíveis/nav centrada.
+- [ ] **D4.2** Comparar **render real em 1180, 1440 e 1760** com a referência de composição e CM, inclusive faixa longa, paused/playing, reduced-motion, teclado, vídeo de ida/volta; corrigir colisões e registrar mídia/capturas antes de solicitar escolha.
+
 - [ ] **D5** Cassiano aprovar a direção da transição e as dimensões do player do topo. Somente então mudar `ready_for_frontend` para `yes` com referência de aprovação verdadeira.
 
 ### B — Implementação restrita à capacidade nova
@@ -65,9 +69,11 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 
 - **09/10/2026 — D4 renderizado:** [execução Playwright 37976670382](https://github.com/cassianomangini/radioand3d/actions/runs/37976670382), 6 testes browser passados (14 casos ignorados propositalmente), screenshots e vídeo do lado/voo/mini/retorno. O mini usa o mesmo `RadioProvider` do shell real e aparece **antes dos ícones sociais** mantendo menu centralizado. [Detalhes dos defeitos corrigidos e limites](evidence/03c-radio-dock-preview-2026-10-09.md). Nenhuma alteração de layout/estado na Rádio pública. `D5` permanece pendente.
 
+- **09/10/2026 — auditoria complementar da referência:** primeiro estudo inspecionou os arquivos mas não traduziu a **densidade funcional** e **expressão sonora** da Landing. Leitura adicional de `control-button.tsx`, `social-icons.tsx`, `globals.css`, `player-context.tsx` e `docs/frontend-patterns.md` demonstrou a omissão de botões anterior/próxima e barras reais no protótipo. Novas etapas D4.1/D4.2 abertas; **D5 não pode seguir com o mock anterior**.
+
 ## Retomada
 
-**Último ponto comprovado:** D1–D4 (contrato, comparação com Landing e prévia renderizada/gravada em navegador), [relatório](evidence/03c-radio-dock-preview-2026-10-09.md).  
-**Próxima atividade:** D5, apresentação e aprovação/ajuste estético da animação e das dimensões do mini na navbar. **Implementação pública bloqueada até esse aceite.**  
+**Último ponto comprovado:** D1–D3.2 e D4 **somente como mecanismo técnico**; ao revisar o mini real da Landing ficou comprovado que a prévia omitiu **anterior/próxima e o visualizer**, além de reduzir excessivamente presença e acabamento. [Diagnóstico corrigido no contrato](../design/CM_RADIO_NAVBAR_DOCK_V1.md).  
+**Próxima atividade:** **D4.1 e D4.2** — nova prévia fiel às características relevantes da Landing dentro do CM e comparação em navegador. **Não solicitar D5 ainda**; implementação pública bloqueada até aceite explícito.  
 **Deploy:** nenhum. **QA da prévia:** 6 casos Playwright passaram; testes reais de áudio e CI completo de produção continuam não executados/com falhas externas ao escopo. **Aprovação visual:** não obtida.  
 **Não fazer:** não reabrir Rádio inteira, não instalar outro engine de animação por reflexo, não criar dois áudio players, não trocar o comportamento do link Rádio existente.

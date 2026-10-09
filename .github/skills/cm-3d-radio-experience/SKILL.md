@@ -1,3 +1,7 @@
+---
+name: cm-3d-radio-experience
+description: "Direct and review CM 3D & Radio visual and interaction design: desktop Studio-left/Radio-right split, mobile persistent mini-player, studio portfolio/products, responsive composition, motion libraries, browser screenshots and render-first visual QA. Use for creating/reviewing/fixing CM 3D & Radio screens, reference mismatch, over-neon, generic design, cramped mobile, radio motion and visual polish."
+---
 
 # CM 3D & Radio Experience
 

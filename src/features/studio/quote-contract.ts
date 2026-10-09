@@ -47,13 +47,13 @@ function fileExtension(name: string) {
 
 export function formatQuoteFileSize(bytes: number) {
   if (!Number.isFinite(bytes) || bytes < 0) return "tamanho desconhecido";
-  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1000) return `${bytes} B`;
 
-  const kib = bytes / 1024;
-  if (kib < 1024) return `${kib.toFixed(kib >= 10 ? 0 : 1)} KB`;
+  const kilobytes = bytes / 1000;
+  if (kilobytes < 1000) return `${kilobytes.toFixed(kilobytes >= 10 ? 0 : 1)} KB`;
 
-  const mib = kib / 1024;
-  return `${mib.toFixed(mib >= 10 ? 0 : 1)} MB`;
+  const megabytes = kilobytes / 1000;
+  return `${megabytes.toFixed(megabytes >= 10 ? 0 : 1)} MB`;
 }
 
 export function validateQuoteFiles(

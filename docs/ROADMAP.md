@@ -6,6 +6,10 @@ O site ainda não foi lançado. Em 05/10/2026 Cassiano aceitou a passagem da Rá
 
 A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com Impressão 3D sob demanda, Placas e Caixas. O plano está em [STUDIO_GROWTH_PLAN_V1.md](STUDIO_GROWTH_PLAN_V1.md) e a execução em [08](work/08-studio-growth.md). O hub visual foi aprovado. Em 05/10/2026, Cassiano autorizou explicitamente avançar toda a **estrutura, copy, rotas, estados e SEO que não dependam da mídia final**, usando placeholders neutros. O `ready_for_frontend: no` do handoff agora bloqueia apenas a cristalização visual final/mídia das superfícies ainda pendentes, não o trabalho estrutural já autorizado.
 
+## Evolução da qualidade visual — subfrente 08V
+
+O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já existente, laboratório e piloto isolado fica em [08V — Evolução visual](work/08-visual-quality-evolution.md). A auditoria está marcada como feita; V1–V6 permanecem pendentes de execução. Este documento não reabre a Rádio aceita e não substitui a fila funcional do Estúdio.
+
 ## Próximos passos
 
 1. **Concluído nos PRs #29 e #30:** contrato local/serializável do Orçamento, arquivos reais em memória, política de formatos/limites, payload versionado, validação estrutural compartilhável e triagem inicial backend-neutral.

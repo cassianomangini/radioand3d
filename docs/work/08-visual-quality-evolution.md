@@ -47,6 +47,8 @@ Em 09/10/2026, Cassiano identificou que a primeira rodada do laboratório **não
 - [ ] **A1.5** Inspecionar capturas reais da rota-alvo Impressões e fluxo mobile completo nas condições representativas; adquirir versão verificável de referência visual aprovada para comparação de precisão quando disponível.
 - [ ] **A1.6** Produzir nova proposta de Impressões **inserida no shell CM** e submeter direção/identidade visual a Cassiano antes de experimentar implementação de página pública.
 
+**Conferência renderizada adicional:** foram inspecionados os screenshots do próprio CI [37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229) para Home/hub/Produto/Orçamento, desktop 1440 e mobile 390. A foto de Produto, as miniaturas, o CTA Shopee sólido, o mini-player e a hierarquia colorida ciano/violeta/coral dos três pilares reforçam a diferença em relação ao lab genérico. **A1.5 permanece aberta** especificamente porque falta QA da galeria `/studio/impressoes` com mídia apropriada, não porque nenhum mobile tenha sido visto.
+
 **Artefato de estudo:** [CM — Auditoria da identidade visual aplicada ao site](../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md). **Gate:** V4.4/V4.5 e V5 estão bloqueados até A1.5/A1.6, conforme pertinência da tela. Não pedir que o usuário escolha entre três propostas que compartilham um erro de identidade. **A implementação pública continua intocada.**
 
 ## Sequência de execução — marcar somente com evidência

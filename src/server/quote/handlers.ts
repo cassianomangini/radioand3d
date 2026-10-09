@@ -66,6 +66,12 @@ export async function handleQuoteAttachmentInit(
       reportedMime: typeof body.type === 'string' ? body.type : null,
       sizeBytes: body.size as number,
     });
+    // Supabase upload signatures live for 2 hours. A retry must not mint a
+    // signature that outlives the database reservation (3 hours from init).
+    const remainingMs = Date.parse(reserved.reservation_expires_at) - Date.now();
+    if (!Number.isFinite(remainingMs) || remainingMs < 2 * 60 * 60 * 1000 + 5 * 60 * 1000) {
+      throw new QuoteHttpError(409, 'upload_reservation_expiring');
+    }
     const signed = await db.signUpload(reserved.object_path);
     return responseJson({
       attachmentId: reserved.attachment_id,
@@ -74,7 +80,8 @@ export async function handleQuoteAttachmentInit(
       uploadToken: signed.token,
       // Signed TUS uploads send x-signature and MUST NOT send a service key.
       tokenHeader: 'x-signature',
-      expiresAt: reserved.reservation_expires_at,
+      uploadTokenExpiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+      reservationExpiresAt: reserved.reservation_expires_at,
     }, 200);
   } catch (error) { return responseError(error); }
 }

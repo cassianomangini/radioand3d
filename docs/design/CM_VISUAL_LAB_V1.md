@@ -1,11 +1,13 @@
 # Visual Lab 08V — três composições de Impressões (V1)
 
 **Artefato:** `CM3D-08V-visual-lab-v1`  
-**Estado:** experimentos isolados em `/dev/visual-lab`. **Não são layout público final.**  
+**Estado:** experimentos isolados em `/dev/visual-lab` **rejeitados como direção de arte** em 09/10/2026 por falta de estudo do site real. Permanecem SOMENTE como casos técnicos para Motion, screenshot, responsividade e acessibilidade. **Não são alternativas para aprovação visual.**  
 **Aprovação visual:** `approved_by: null`; `ready_for_frontend: no`.  
 **Relação:** [08V checklist](../work/08-visual-quality-evolution.md) · [receita R1](CM_VISUAL_RECIPES_V1.md) · [registro de referências](CM_VISUAL_REFERENCE_REGISTER_V1.md).
 
-## Escopo
+**Correção de referência:** ver [auditoria do site CM real](CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md). As três variantes têm identidade própria excessivamente neutra/teal, não mostram o header CM, a relação com o split/Rádio nem as direções de marca e fotografia já aceitas. A aprovação técnica 46/46 não valida esses estudos como design. **Não pedir seleção de 01, 02 ou 03.**
+
+## Escopo histórico (harness técnico V1)
 
 Explorar qual composição consegue transformar **Impressões** em uma vitrine premium, legível e visualmente memorável sem inventar fotos de peças, substituir assets por CSS ornamental ou espalhar o brilho da Rádio pelo Estúdio. Cada estudo contém exatamente o mesmo assunto e intenção de CTA, sem novas categorias, carrinho, pricing, filtros ou outras funcionalidades não aprovadas.
 
@@ -49,4 +51,4 @@ Avaliar cada estudo por:
 4. **Personalidade:** não é Shopee genérica nem landing SaaS, mas também não usa ornamentação vazia.
 5. **Custo:** DOM/CSS predominam; Motion só coordena a troca; não exigir WebGL para um layout editorial.
 
-**Próximo gate:** mostrar capturas desktop/mobile dos três estudos e obter seleção/direção de Cassiano. A aprovação de uma composição não supre o conteúdo E3 (fotografias reais) nem autoriza reescrever automaticamente `/studio` ou a Rádio.
+**Próximo gate:** A1.5/A1.6 do [plano 08V](../work/08-visual-quality-evolution.md): auditar `/studio/impressoes` e o mobile real, criar um conceito contextual integrado ao CM e só então buscar aprovação de nova art direction. As três variantes V1 **não seguem para seleção**. Conteúdo E3 continua pendente.

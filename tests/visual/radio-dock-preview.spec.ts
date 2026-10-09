@@ -21,6 +21,7 @@ test.describe("03c visual dock preview", () => {
   test("real CM header: dock then restore using explicit player control", async ({ page }, testInfo) => {
     test.skip(!wideProjects.has(testInfo.project.name), "Desktop sidebar is available only on wide layouts");
 
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     const response = await page.goto(previewRoute, { waitUntil: "domcontentloaded" });
     expect(response?.status()).toBe(200);
     const root = page.locator('[data-radio-dock-preview="true"][data-preview-ready="true"]');
@@ -76,6 +77,7 @@ test.describe("03c visual dock preview", () => {
 
   test("overshoot right docks; pulling right edge left restores", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop-1440", "Gesture proof on representative wide desktop");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto(previewRoute, { waitUntil: "domcontentloaded" });
     const root = page.locator('[data-radio-dock-preview="true"][data-preview-ready="true"]');
     await expect(root).toBeVisible();

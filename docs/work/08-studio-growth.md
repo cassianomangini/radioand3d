@@ -419,8 +419,9 @@ Decisão desta fase:
 
 ## Infra Supabase do Estúdio — contrato revisado em 09/10/2026
 
-- projeto Supabase **novo e limpo** próprio do CM 3D & Radio, separado do ambiente operacional e **ainda não provisionado**;
-- região: `sa-east-1`;
+- projeto Supabase **novo e limpo** criado pelo usuário; o banco próprio está separado do banco operacional e sem migrations ou bucket;
+- região contratada: `sa-east-1`; **região real do projeto criado: `us-east-1` — pendente decisão antes de aplicar**;
+- projeto permanece na organização do Admin (sem isolamento de faturamento); staging antigo pausado pelo usuário;
 - Supabase do Artesopolis Admin continua owner da ponte Produtos/Shopee;
 - novo projeto CM não espelha catálogo, estoque ou ERP;
 - Orçamento: PostgreSQL + bucket privado `quote-intake`;
@@ -429,6 +430,6 @@ Decisão desta fase:
 - Route Handlers Next server-side **deverão** fazer sessão anônima protegida por cookie e posse do draft, init/complete de attachment e submit; UUID não concede autorização;
 - limites globais de Storage e reservas concorrentes, além dos limites por request;
 - retenção: draft/órfão 24 h, arquivos submetidos 90 d, conteúdo/contato 180 d, eventos técnicos 365 d; Cron `GET` + `CRON_SECRET` e idempotência na Vercel (somente depois de implementado);
-- produção real exige projeto remoto + secrets + migration/bucket + validação live;
+- produção real exige decisão de região/organização, secrets + migration/bucket + validação live;
 - documento canônico de infra: [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md);
-- checklist de provisionamento/validação remota: [E2](08-supabase-provisioning.md). Nenhum banco, bucket ou Cron foi criado/alterado por esta revisão.
+- checklist de provisionamento/validação remota: [E2](08-supabase-provisioning.md). O banco foi criado e staging pausado pelo usuário, **não** por este agente; nenhuma migration/bucket/Cron aplicada.

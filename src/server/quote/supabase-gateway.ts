@@ -60,7 +60,7 @@ export type QuoteGateway = {
   submitQuote(input: QuoteSubmitInput): Promise<{ request_id: string; submission_time: string }>;
 };
 
-function config(): { url: string; key: string } {
+export function quoteServiceConfig(): { url: string; key: string } {
   const url = process.env.CM_SUPABASE_URL?.trim() || '';
   const key = process.env.CM_SUPABASE_SECRET_KEY?.trim() || '';
   let parsed: URL;
@@ -74,7 +74,7 @@ function config(): { url: string; key: string } {
 }
 
 function makeSupabaseRequest(fetcher: typeof fetch) {
-  const { url, key } = config();
+  const { url, key } = quoteServiceConfig();
   async function api<T>(path: string, body: unknown, headers: Record<string, string> = {}): Promise<T> {
     // Only callers in this module supply paths. Never let user content choose a URL.
     let response: Response;

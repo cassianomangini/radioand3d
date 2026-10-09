@@ -13,7 +13,7 @@ test.describe("03c production protection", () => {
   });
 });
 
-test.use({ video: "on" });
+test.use({ video: previewRun ? "on" : "off" });
 
 test.describe("03c visual dock preview", () => {
   test.skip(!previewRun, "Run the isolated animation preview against pnpm dev");

@@ -2,13 +2,19 @@
 
 ## Agora
 
-O site ainda não foi lançado. Em 05/10/2026 Cassiano aceitou a passagem da Rádio, as barras e a entrada do Estúdio que já estava na Home. A fila da Rádio está fechada. C1–C8 não voltam como implementação.
+O site ainda não foi lançado. Em 05/10/2026 Cassiano aceitou a passagem da Rádio, as barras e a entrada do Estúdio que já estava na Home. A fila da Rádio aceita permanece fechada e C1–C8 não voltam como implementação **exceto a evolução pontual 03c — Dock na navbar, pedida em 09/10/2026, sem substituir os movimentos aceitos**.
 
 A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com Impressão 3D sob demanda, Placas e Caixas. O plano está em [STUDIO_GROWTH_PLAN_V1.md](STUDIO_GROWTH_PLAN_V1.md) e a execução em [08](work/08-studio-growth.md). O hub visual foi aprovado. Em 05/10/2026, Cassiano autorizou explicitamente avançar toda a **estrutura, copy, rotas, estados e SEO que não dependam da mídia final**, usando placeholders neutros. O `ready_for_frontend: no` do handoff agora bloqueia apenas a cristalização visual final/mídia das superfícies ainda pendentes, não o trabalho estrutural já autorizado.
 
 ## Evolução da qualidade visual — subfrente 08V
 
 O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já existente, laboratório e piloto isolado fica em [08V — Evolução visual](work/08-visual-quality-evolution.md). A auditoria foi concluída; V1 teve contratos/agentes atualizados (importação pessoal da skill pendente), V2 opera capturas e Playwright em cinco perfis, V3 tem catálogo/receitas. **V4.1–V4.3 concluídos tecnicamente:** laboratório isolado em `/dev/visual-lab` com três fixtures de Impressões, quatro viewports comparados, 30 testes públicos e 16 do laboratório no CI (sem retries), ver [evidência](work/evidence/08v-lab-performance-2026-10-09.md). **Em 09/10 Cassiano constatou que os três protótipos não partiam do visual real do site; foram rejeitados como direção de arte.** [Auditoria CM](design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md) concluída documentalmente, mas inspeção da rota-alvo/mobile e nova composição contextual ainda pendentes. **V4.4/V4.5 não podem selecionar nenhuma das três variantes antigas.** V2 ainda não tem baselines visuais aprovadas, V5/V6 não começaram. Este documento não reabre a Rádio aceita e não substitui a fila funcional do Estúdio.
+
+## Nova evolução pontual — 03c Rádio para navbar
+
+Em 09/10/2026, Cassiano pediu que arrastar a Rádio lateral **para a direita** faça a superfície **subir para a navbar** e virar um **player compacto**, liberando o Estúdio. A Rádio lateral volta por botão no header ou arrastando da borda direita para a esquerda. Esse estado será exclusivamente desktop e não duplica o áudio nem o player móvel. [Contrato de direção e movimento](design/CM_RADIO_NAVBAR_DOCK_V1.md) · [Checklist 03c](work/03c-radio-navbar-dock.md).
+
+**Estado:** `in_progress` apenas em documentação e revisão de comportamento. D1–D3 concluídos por inspeção; D4 (prévia contextual de interação), D5 (aprovação visual) e código/testes ainda pendentes. Isso **não** revoga o aceite anterior da Rádio nem altera a prioridade funcional do Estúdio.
 
 ## Próximos passos
 
@@ -29,6 +35,7 @@ Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio
 | 02 | Aplicação e verificações mínimas | done | App, lockfile, lint, tipos, build e CI na `main` |
 | 03 | Contrato visual Estúdio + Rádio | done | Aprovado por Cassiano; pacote em [STUDIO_RADIO_APPROVAL_PACKAGE_V1.md](design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md) |
 | 03b | Base visual compartilhada | done | Cassiano aceitou a passagem da Rádio em 05/10/2026; [checklist](work/03b-frontend-foundation.md) |
+| 03c | Rádio — dock reversível no header desktop | in_progress | **Somente especificação D1–D3 concluída**; novo gesto à direita e mini na navbar, retorno por botão/arraste. Prévia e aprovação estética pendentes, nenhuma implementação. [Checklist](work/03c-radio-navbar-dock.md) |
 | 04 | Biblioteca e ingestão | blocked | Fora do caminho atual |
 | 05 | Music Inbox | blocked | Fora do caminho atual |
 | 06 | Motor de rádio e visualizador | done | Cassiano aceitou as barras em 05/10/2026; [checklist](work/06-radio-engine.md) |

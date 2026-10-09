@@ -32,6 +32,14 @@ Em 01/10, Cassiano mostrou que o mini player mobile estava pequeno demais e pedi
 
 Cassiano pediu também que, no desktop, arrastar a divisória para a esquerda além da largura máxima da barra lateral faça a Rádio avançar visualmente sobre o Estúdio. Ao chegar ao limite esquerdo e soltar, a Rádio ocupa a tela inteira, no mesmo estado acessível pelo link Rádio. Um arraste incompleto retorna à largura lateral. O efeito e o limite de ativação dependem de sua revisão visual e de interação.
 
+## Nova experiência solicitada — Rádio sobe para a navbar (09/10/2026)
+
+Cassiano pediu expressamente **um novo caminho reversível para a Rádio desktop**: arrastar a lateral **para a direita**, ultrapassando intencionalmente o tamanho mínimo, deve fazer a Rádio **subir e encaixar como player compacto no lado direito da navbar**; o Estúdio passa a ocupar a largura liberada. O retorno à Rádio **lateral** ocorre por botão no próprio header ou por novo arraste da borda direita em direção à esquerda, com transformação inversa. Este **dock** difere de expandir para foco/fullscreen, que continuam existindo. **A música, fila e tempo de reprodução permanecem contínuos.**
+
+O mini-player desktop existe **somente nesse estado recolhido**, nunca lado a lado com a Rádio completa. O mini mobile não muda. O item atual **Rádio** da navegação continua abrindo fullscreen; o retorno lateral terá controle distinto, claramente identificado.
+
+O comportamento solicitado está em [CM Rádio — Navbar Dock V1](design/CM_RADIO_NAVBAR_DOCK_V1.md), com [checklist 03c](work/03c-radio-navbar-dock.md). **Ainda requer render/mock do movimento para aprovação estética**; não se considera implementado por estar documentado. É uma nova capacidade expressa, não uma reabertura dos movimentos C1–C8 que já receberam aceite.
+
 **Desktop**
 
 - Header CM enxuto.
@@ -80,7 +88,7 @@ O frontend deve rejeitar automaticamente o padrão visual de "quatro cards de be
 
 Navegação e ações ficam legíveis antes do hover. Explorar o site não exige dar play. Botões usam verbos claros; filtros, seleções e causas de indisponibilidade ficam visíveis. Ações ambíguas recebem rótulo, além de nome acessível.
 
-Definir desktop e mobile separadamente: ordem, densidade, área segura, foco e teclado aberto. No desktop existe somente a Rádio completa/acoplada, sem mini player duplicado. No mobile existe mini player logo abaixo do header e a Rádio completa abre sob demanda. O player não cobre controles.
+Definir desktop e mobile separadamente: ordem, densidade, área segura, foco e teclado aberto. No desktop existe a Rádio completa quando lateral/foco/fullscreen; **no novo estado docked, a lateral sai de vista e SOMENTE uma vista compacta ocupa a navbar, sem duplicação**. No mobile existe mini player logo abaixo do header e a Rádio completa abre sob demanda. O player não cobre controles.
 
 ## Escalas iniciais para avaliação
 

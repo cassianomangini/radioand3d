@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 
 const labEnabled = process.env.VISUAL_LAB_QA === "1";
@@ -86,6 +87,11 @@ test.describe("Visual Lab development preview", () => {
           caveat: "Lab costs only; development server overhead and CI runner load distort real production performance."
         };
       });
+      await writeFile(
+        testInfo.outputPath("visual-lab-performance-inventory.json"),
+        JSON.stringify(performanceInventory, null, 2),
+        "utf8"
+      );
       await testInfo.attach("visual-lab-performance-inventory.json", {
         body: Buffer.from(JSON.stringify(performanceInventory, null, 2), "utf8"),
         contentType: "application/json"

@@ -19,7 +19,7 @@ Em 09/10/2026, Cassiano pediu que arrastar a Rádio lateral **para a direita** f
 ## Próximos passos
 
 1. **Concluído nos PRs #29 e #30:** contrato local/serializável do Orçamento, arquivos reais em memória, política de formatos/limites, payload versionado, validação estrutural compartilhável e triagem inicial backend-neutral.
-2. **E2 — infraestrutura de Storage e quota aplicada:** projeto Supabase CM na organização Free Cmangini3d, São Paulo. Cinco migrations versionadas; cinco tabelas privadas com RLS, bucket `quote-intake` privado de 50 MB e reserva global de 600 MB com proteção de concorrência e testes sintéticos em `ROLLBACK`. **Pendente:** TUS real, handlers server-only, verificação de conteúdo, Storage API cleanup, secrets/Cron e E2E. Intake público desativado. [Checklist E2](work/08-supabase-provisioning.md).
+2. **E2 — infraestrutura de Storage e quota aplicada:** projeto Supabase CM na organização Free Cmangini3d, São Paulo. Seis migrations versionadas; cinco tabelas privadas com RLS, bucket `quote-intake` privado e reserva global de 600 MB. **Novos handlers em código:** `/api/quote/session` e `/api/quote/attachments/init`, com cookie seguro, CSRF/origin, rate limit SQL e assinatura TUS por objeto, **flag desligada por padrão**. **Pendente:** complete/submit, inspeção de conteúdo, TUS real, Storage API cleanup, secrets/Cron e E2E. Intake público desativado. [Checklist E2](work/08-supabase-provisioning.md).
 3. **E4 — ponte de Produtos independente e pendente:** o catálogo atual é uma curadoria estática; o consumidor read-only do Admin e o cutover live ainda devem ser executados conforme [Product Catalog Bridge V1](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md).
 4. **Próximo bloco de conteúdo depende de E3:** dataset/fotos reais de Impressões, Placas e Caixas e revisão visual final das superfícies restantes.
 5. **Gate de lançamento:** domínio/alvo público, retirada controlada do `noindex`, Search Console e validações finais continuam depois de E2/E3.
@@ -55,7 +55,7 @@ Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hu
 | Código | Pendência | Quem resolve | O que bloqueia |
 | --- | --- | --- | --- |
 | E1 | Confirmar repositório privado | Cassiano | Cópia de conteúdo privado |
-| E2 | **Em andamento:** bucket privado e quotas com travas no banco, testes transacionais SQL; ainda sem upload/submit real nem secretos no servidor. [Checklist](work/08-supabase-provisioning.md) | CM Infra / CM Data | Handlers autenticados, signed TUS, inspeção, limpeza Storage API, E2E, smoke e publicação |
+| E2 | **Em andamento:** bucket privado, quotas com locks e rate limit SQL testados; `session` + `init` implementados em código com feature flag OFF; ainda sem upload/submit real nem secrets na Vercel. [Checklist](work/08-supabase-provisioning.md) | CM Infra / CM Data | Handlers autenticados, signed TUS, inspeção, limpeza Storage API, E2E, smoke e publicação |
 | E4 | **Pendente, separado de E2:** integração de Produtos/Shopee Admin → catálogo público CM; 9 registros estáticos em uso até paridade/cutover | CM Products / Integração | Atualização automática e décimo produto sem mudança no `radioand3d` |
 | E3 | Selecionar peça, fotos e permissões | Cassiano | Conteúdo real do Estúdio no lançamento |
 | E5 | Definir contato comercial de continuidade | Cassiano | Chamadas comerciais e continuidade após triagem |

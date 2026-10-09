@@ -1,17 +1,17 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **contrato definido · projeto CM remoto não provisionado**  
+Status: **projeto remoto criado, vazio e acessível · região/organização divergentes do contrato · nenhuma migration aplicada**  
 Revisão: **09/10/2026**  
-Região planejada: **sa-east-1 (São Paulo)**  
+Região do contrato: **sa-east-1 (São Paulo)** · projeto real: **us-east-1 (EUA)** · **pendência de decisão antes do apply**  
 Responsável: **CM Infra / CM Data**
 
-Esta é a arquitetura canônica do backend próprio do site. A decisão vigente é **criar um projeto Supabase novo e limpo**, preferencialmente em organização CM separada, após liberar uma vaga Free de forma segura. Nenhum novo projeto, migration, bucket, segredo, cron ou deploy do Orçamento foi provisionado.
+Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário pausou o staging legado e criou o projeto limpo `radioand3d`**. O Management API confirmou o staging inativo e o projeto CM ativo, sem tabelas de domínio ou migrations, com leitura SQL funcional. **A região real é `us-east-1`, não `sa-east-1` prevista; a organização é compartilhada com o Admin, não CM separada.** Esses dois desvios exigem decisão antes de qualquer apply remoto. Nenhuma migration, bucket, secret, cron ou deploy do Orçamento foi realizado.
 
 A execução e os checkpoints verificáveis estão em [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md). Detalhes operacionais sobre a infraestrutura de outro sistema ficam fora deste repositório público. **Não** usar este documento como autorização para pausar, limpar, migrar ou modificar um banco existente.
 
 ## 1. Decisão principal
 
-O CM 3D & Radio terá **um projeto Supabase novo e independente**, na região `sa-east-1`, para os dados próprios do site.
+O CM 3D & Radio terá **um banco próprio, independente do banco do Admin**. O contrato continua exigindo região `sa-east-1` até decisão explícita de mudança; o projeto já criado em `us-east-1` é candidato **sem aprovação de região para produção**. A região não é alterável diretamente no Supabase — mudar exige criar projeto na região desejada. Não aplicar migrations no alvo divergente por conveniência.
 
 O banco do Artesopolis Admin continua sendo o responsável pelo domínio operacional de Produtos e Shopee. O CM **não** copia o ERP, custos, estoque, pedidos ou Ads. Seu catálogo público será uma projeção read-only, consumida no servidor; o backend próprio armazena somente os pedidos de Orçamento.
 
@@ -77,9 +77,9 @@ Migrations versionadas no Git, dados de seed exclusivamente fictícios e CLI ver
 
 ### Produção
 
-**Um novo projeto Supabase CM em `sa-east-1`, ainda não criado.** Seu identificador concreto, segredos, URL e inventário de administração serão guardados em local privado, nunca neste documento.
+**Projeto CM `radioand3d` criado e vazio em `us-east-1` pelo usuário.** A região permanece **divergente da arquitetura planejada** (`sa-east-1`), e o projeto está na mesma organização do Admin. O acesso SQL read-only funciona, não há tabelas de domínio nem migrations e o Security Advisor não apontou lints iniciais. Nenhuma configuração server-side do CM foi adicionada à Vercel. Não publicar o project ref ou as credenciais aqui.
 
-A organização CM separada é a preferência de governança para que um eventual plano pago do CM não mude o plano de faturamento do Admin. Isso **não** aumenta o limite gratuito de projetos ativos da conta.
+A organização CM separada continua sendo a **preferência de governança**, mas **não foi criada**: o novo projeto está na organização do Admin. Se a operação contratar Pro nessa organização, o faturamento é compartilhado; **não afirmar isolamento de cobrança**. Uma organização separada **não** aumenta o limite gratuito de projetos ativos da conta.
 
 ### Preview / staging
 
@@ -87,7 +87,7 @@ Usar stack local e fixtures sintéticas enquanto estiver no Free; sem segundo pr
 
 ### Ambiente legado
 
-O ambiente de testes do sistema anterior não será convertido em produção CM. Antes de **pausá-lo** para liberar uma vaga Free: conferir consumidores/dependências, criar backup externo recuperável e obter autorização específica. Pausa preserva a necessidade de backup. Nenhuma desativação foi executada nesta entrega.
+O ambiente de testes do sistema anterior **foi pausado pelo usuário** e está `INACTIVE`, como confirmado via Management API. **Não há evidência fornecida de backup externo recuperável nem de reconciliação de todos os consumidores**, portanto o gate de aposentadoria segue parcialmente não verificado. O assistente não executou essa pausa e não deve inferir que as verificações faltantes aconteceram.
 
 ## 4. Plano, disponibilidade e faturamento
 
@@ -662,7 +662,7 @@ Falha em um não pode derrubar o outro.
 
 Não commitar credenciais nem números/IDs internos de outros sistemas em documentos públicos. Usar `.env.example` com campos vazios e validação de variáveis obrigatórias no servidor.
 
-### Vercel — apenas server-side, quando o projeto CM existir
+### Vercel — apenas server-side, quando o projeto CM definitivo e sua região estiverem aprovados
 
 - `CM_SUPABASE_URL` — URL do **projeto novo**;
 - `CM_SUPABASE_SECRET_KEY` — chave privilegiada do projeto CM, nunca em frontend;
@@ -797,7 +797,7 @@ Preview branch/staging é o alvo apropriado para E2E de schema.
 Plano detalhado e checklist: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 
 1. Conferir em ambiente **privado** dependências do ambiente de teste legado, gerar backup externo recuperável e somente depois autorizar/realizar a pausa, sem excluir.
-2. Confirmar cota Free e criar organização CM separada, se disponível sem cobrança; criar **projeto limpo** em `sa-east-1`. Identificador, secrets e acesso administrativo ficam fora do repo público.
+2. **Parcial executado pelo usuário:** projeto limpo já criado e inspecionado, mas em `us-east-1` e na organização do Admin. **Resolver o desvio antes do apply remoto**, conferindo região pretendida e isolamento de faturamento; se optar por São Paulo, criar o projeto definitivo em `sa-east-1` pela interface apropriada após revisar cota/custo. Identificadores e secrets ficam fora do repo público.
 3. Vincular CLI ao projeto novo apenas com ref previamente conferida, manter migrations versionadas e fazer dry-run antes de push remoto.
 4. Aplicar schema de Orçamento com sessão/posse, RLS/grants, constraints e quota global.
 5. Criar `quote-intake` privado; implementar signed TUS, validação de arquivo, idempotência e limpeza.
@@ -811,7 +811,7 @@ A ponte de Produtos **não depende** da base CM. No ambiente operacional da orig
 
 **Desbloqueado em código local:** migrations, schema, grants/RLS, parsers, contrato de sessão anônima, handlers, validação de conteúdo, quota, rate limit, idempotência, scheduler, fixtures e testes. Esse código local **não** significa que upload, submit ou cron estejam funcionando na produção.
 
-**Depende de novo projeto e de configuração remota:** acesso/vínculo, aplicação de migrations, criação real do bucket, secrets Vercel, uploads TUS reais, advisors remotos, smoke E2E e release. Pausa do legado exige seu próprio gate privado e não deve ser apresentada como etapa já feita.
+**Já verificado:** projeto CM novo e sem schema de domínio/migrations, leitura SQL read-only e Security Advisor inicial; staging pausado pelo usuário. **Depende de decisão de região/organização e configuração remota:** link ao alvo definitivo, migrations, bucket, secrets Vercel, uploads TUS reais, advisors pós-DDL, smoke E2E e release. O estado de backup do legado segue sem comprovação.
 
 ## 30. Gate de infraestrutura pronta
 
@@ -856,9 +856,9 @@ Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
 ## 32. Retomada — 09/10/2026
 
-- Arquitetura do **projeto CM novo e limpo**: definida, **não provisionada**.
+- **Projeto CM novo e limpo criado** pelo usuário: ativo, sem tabelas de domínio ou migrations; **região US East conflita com o contrato São Paulo**. O plano de organização CM separada também não foi seguido.
 - O ambiente de testes legado permanece **inalterado**; pausa depende de inventário, backup e gate próprio.
-- Migrations, bucket, segredo de sessão, quota, Route Handlers e Cron: **não implementados/deployados**.
+- Migrations, bucket, segredo de sessão remoto, quota persistente, Route Handlers e Cron: **não aplicados/deployados**. Apenas a primitiva criptográfica de sessão existe no código.
 - Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 - Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
-- Próxima ação técnica independente do provisionamento: implementar e revisar schema e handlers localmente sem aceitar dados pessoais reais.
+- Próximo gate: decidir a **região definitiva** e se há necessidade de isolamento de cobrança por organização antes de qualquer alteração remota; o desenvolvimento e os testes locais podem continuar sem dados pessoais reais.

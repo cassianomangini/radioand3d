@@ -1,0 +1,68 @@
+name: 03c radio dock preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/app/dev/radio-dock/**"
+      - "tests/visual/radio-dock-preview.spec.ts"
+      - "playwright.config.ts"
+      - ".github/workflows/radio-dock-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Launch development-only preview and exercise motion in Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm dev --hostname 127.0.0.1 --port 3100 > /tmp/cm-03c-preview.log 2>&1 &
+          APP_PID=$!
+          trap 'kill "$APP_PID" 2>/dev/null || true' EXIT
+
+          for attempt in {1..85}; do
+            STATUS="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/dev/radio-dock || true)"
+            if [ "$STATUS" = "200" ]; then
+              break
+            fi
+            if [ "$attempt" -eq 85 ]; then
+              cat /tmp/cm-03c-preview.log
+              echo "Development-only preview did not return 200"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          VISUAL_LAB_QA=1 VISUAL_REVIEW_URL=http://127.0.0.1:3100 \
+            pnpm exec playwright test tests/visual/radio-dock-preview.spec.ts \
+            --project=desktop-1440 --project=desktop-short \
+            --project=desktop-1024 --project=mobile-390
+
+      - name: Upload screenshots, video and Playwright evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cm-03c-radio-navbar-dock-preview
+          path: |
+            test-results/visual-lab/**
+            playwright-report/visual-lab/**
+            /tmp/cm-03c-preview.log
+          if-no-files-found: warn
+          retention-days: 7

@@ -4,12 +4,9 @@ import {
   requireQuoteEnabled, requireSameOriginJson, responseError, responseJson, uuid,
 } from './http.ts';
 import { createQuoteGateway, type QuoteGateway, type QuoteProjectType } from './supabase-gateway.ts';
+import { validateQuoteFiles } from '../../features/studio/quote-contract.ts';
 
 const TYPES: readonly string[] = ['impressao', 'placa', 'caixa', 'outro'];
-const EXTENSIONS: readonly string[] = [
-  '.stl', '.3mf', '.obj', '.step', '.stp', '.pdf', '.png', '.jpg', '.jpeg', '.webp',
-];
-
 /** Starts a new draft; a cookie never grants access to another draft ID. */
 export async function handleQuoteSession(request: Request, gateway?: QuoteGateway): Promise<Response> {
   try {
@@ -57,7 +54,8 @@ export async function handleQuoteAttachmentInit(
     }
     const name = body.name as string;
     const extension = name.slice(name.lastIndexOf('.')).toLowerCase();
-    if (!EXTENSIONS.includes(extension)) throw new QuoteHttpError(400, 'unsupported_file_type');
+    const policy = validateQuoteFiles([{ name, size: body.size as number }]);
+    if (!policy.ok) throw new QuoteHttpError(400, 'invalid_quote_upload');
     const db = gateway ?? createQuoteGateway();
     if (!await db.consumeRate('upload', rateLimitHash(request))) {
       throw new QuoteHttpError(429, 'quote_rate_limited');

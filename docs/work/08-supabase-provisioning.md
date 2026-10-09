@@ -1,6 +1,6 @@
 # E2 — Provisionamento seguro do Supabase CM
 
-Estado: **in_progress** (projeto CM definitivo validado em São Paulo e organização Free própria; schema/deploy pendentes)  
+Estado: **in_progress** (schema inicial aplicado e auditado no projeto CM definitivo; Storage/handlers/deploy pendentes)  
 Atualização: **09/10/2026**  
 Owner: **CM Infra / CM Data**  
 Contrato: [Supabase Infrastructure V1](../SUPABASE_INFRASTRUCTURE_V1.md)  
@@ -53,23 +53,23 @@ Gate: contratos sincronizados com o estado real de implementação; detalhes de 
 - [x] Security Advisor inicial sem lints no banco novo (reexecutar **depois** de migrations).
 - [x] Confirmar plano **Free** e que a Vercel do Radio ainda não recebeu variáveis CM Supabase (apenas configuração R2).
 - [ ] Confirmar MFA e permissões mínimas da conta/organização no Dashboard; ferramenta conectada não comprova esse estado.
-- [ ] Configurar e versionar ambiente local do Supabase CLI, `config.toml`, migrations e seed sintético sem dados pessoais.
-- [ ] Executar testes de schema e regras/RLS/grants localmente com CLI/Postgres; se ambiente local indisponível, registrar `BLOCKED`, não `PASS`.
-- [ ] Conferir alvo definitivo e dry-run antes de **apply remoto** de migrations, com histórico versionado e revisão SQL.
+- [ ] Instalar/configurar Supabase CLI e ambiente local com `config.toml` e seed sintético. **Bloqueio do runner:** CLI, Docker/Postgres não disponíveis; tentativa `npx --offline supabase --version` retornou `ENOTCACHED`.
+- [ ] Testes locais com CLI/Postgres permanecem **BLOCKED** por falta de runtime; **substituição parcial verificada**: migration executada em transação com `ROLLBACK` no projeto vazio, verificação de tabelas ausentes após rollback e read-back SQL após apply.
+- [x] Conferir alvo definitivo, executar SQL integral em transação com `ROLLBACK`, comprovar ausência de objetos após dry-run e aplicar migration **não destrutiva** `create_quote_core` no projeto CM de São Paulo; versionamento Git com timestamp **retornado pelo histórico remoto**, não inventado. Commit `aa7450f5`; quatro tabelas conferidas.
 - [ ] Validar Data API, políticas de backup e quotas após o provisionamento de schema/Storage.
 
-**Gate P2:** identidade, região, organização e banco limpo **confirmados**. Preparação CLI, migrations, segurança pós-DDL e integração remota **ainda não concluídas**; nenhum segredo deve aparecer no Git ou no browser.
+**Gate P2 parcial:** projeto/região/organização e migration inicial remota **comprovados**. CLI/local stack, configuração Data API, bucket e validação integrada **não concluídos**; sem segredos no Git/browser.
 
 ## P3 — Orçamento privado com posse de sessão
 
 **Preparação local independente de P1/P2:** é permitido desenvolver/validar primitivas sem criar banco ou habilitar acesso público. Isso **não** avança o gate remoto fora de ordem.
 
 - [x] Adicionar a primitiva criptográfica server-only de sessão opaca, HMAC de posse e política de cookie em [`session-token.ts`](../../src/server/quote/session-token.ts); teste focal em [`studio-quote-session.test.mjs`](../../tests/studio-quote-session.test.mjs). Em 09/10/2026, **5/5 testes passaram** com Node 22 e os arquivos foram comparados aos blobs da `main` pelo SHA Git. **Somente primitiva**, não houve escrita no banco.
-- [ ] Versionar migrations de `quote_requests`, `quote_attachments`, `quote_events` e `quote_rate_limit_windows`, incluindo vínculo de posse de sessão e índices/constraints.
+- [x] Versionar e aplicar a primeira migration de `quote_requests`, `quote_attachments`, `quote_events`, `quote_rate_limit_windows`, com hash de posse, FKs, índices, estados e constraints: [`20261009143743_create_quote_core.sql`](../../supabase/migrations/20261009143743_create_quote_core.sql). Verificada no projeto correto; sem dados pessoais inseridos.
 - [ ] Implementar sessão anônima opaca por cookie `Secure`, `HttpOnly`, `SameSite=Strict`, com segredo aleatório forte e vínculo persistido **apenas por digest/HMAC** no banco.
 - [ ] Em toda operação sobre request ou anexo, conferir a **posse por sessão + ID** no servidor antes de usar credencial privilegiada. UUID não é autorização.
 - [ ] Impor Origin/CSRF, allowlist de métodos e `Content-Type`, expiração de sessão e fluxo previsível após expiração.
-- [ ] Habilitar RLS e grants restritos; `anon` e `authenticated` sem acesso direto a tabelas ou bucket.
+- [x] Habilitar RLS e negar privilégios diretos `anon`/`authenticated` **nas quatro tabelas**; SQL live confirmou `relrowsecurity=true`, `anon_select=false`, `authenticated_select=false`, `service_select=true`. **Storage permanece pendente**. Security Advisor informa 4 avisos `INFO` esperados de RLS sem policies (negação intencional); não promover como ZERO avisos.
 - [ ] Verificar isolamento entre duas sessões, tentativas cruzadas, retries, concorrência e submit idempotente.
 
 Gate: não há acesso horizontal por adivinhar/obter ID de orçamento.
@@ -117,6 +117,6 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 - **P1:** staging legado pausado pelo usuário e `INACTIVE`; backup restaurável e inexistência de consumidores **não comprovados**; Admin produção segue `ACTIVE_HEALTHY`, sem testes operacionais completos de regressão.
 - **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo, banco acessível, vazio e sem migrations. Security Advisor inicial sem achados. A referência antiga nos EUA não é o alvo.
 - **P3 local:** token opaco, HMAC de posse e testes focais já versionados. Isso não é fluxo persistente funcionando.
-- **Supabase CM remoto:** **criado pelo usuário**; sem schema de negócio, bucket `quote-intake` validado, secrets, rotas ou cron aplicados.
+- **Supabase CM remoto:** projeto validado e **primeira migration aplicada** (`create_quote_core`, versão `20261009143743`); quatro tabelas vazias, RLS ativado e sem grants anônimos; **bucket, secrets, rotas e cron ainda não aplicados**.
 - **Vercel:** projeto Radio mantém somente variáveis R2; não foi alterado.
-- **Próximo passo:** preparar migrations e testes de dados **versionados**, conferir Data API e RLS/grants, executar dry-run e somente então aplicar no projeto CM definitivo. O formulário público permanece desabilitado até o gate de privacidade/lançamento.
+- **Próximo passo:** concluir quota global/reservas com concorrência, bucket privado, handlers autenticados e testes de expiração; confirmar configuração de Data API e requisitos de Storage. Não ativar formulário/cron sem testes completos e segredos server-side.

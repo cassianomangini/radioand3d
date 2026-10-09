@@ -46,9 +46,16 @@ jobs:
           git add package.json pnpm-lock.yaml
           if ! git diff --cached --quiet; then
             git commit -m "chore: install Motion Playwright and axe with pnpm lock"
-            git fetch origin main
-            git rebase origin/main
-            git push origin HEAD:main
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "Dependency install push lost multiple races; refusing force push"
+            exit 1
           fi
       - name: Show actual installed versions
         run: |

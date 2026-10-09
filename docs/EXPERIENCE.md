@@ -110,6 +110,14 @@ Separar valores-base, papéis semânticos e poucas variáveis específicas de co
 
 Mostrar pares reais de fundo/texto e estados, não só bolinhas de paleta. Seleção combina forma/texto e cor. Filamentos e capas são conteúdo: suas cores não são alteradas para caber na paleta da interface.
 
+## Processo render-first para novas evoluções
+
+O processo de investigação gráfica, decomposição por camadas, escolha de CSS/SVG/asset/Canvas/WebGL/Motion e QA renderizado está centralizado em [CM Visual Render Pipeline V1](design/CM_VISUAL_RENDER_PIPELINE_V1.md). **A aprovação dos desenhos existentes permanece válida**; esse processo não autoriza redesenhar a Home, o hub ou a página individual de Produto nem reabrir a Rádio aceita sem novo pedido.
+
+Em frontend visual substancial já autorizado, o agente deve produzir capturas do próprio navegador em desktop/mobile, comparar com a referência aprovada, descrever discrepâncias observáveis, corrigir e repetir. Build e screenshot isolado não são aceitação visual, e a palavra final sobre novos desenhos continua com Cassiano. Se não houver browser disponível, registrar QA renderizado pendente e não declarar pronto.
+
+**Orientação do split vigente:** Estúdio à esquerda, Rádio à direita no desktop. A seta contextual da divisória existe apenas quando prevista no comportamento aprovado; não adicionar seta permanente.
+
 ## Movimento como linguagem
 
 Movimento entra na primeira entrega. Projetar resposta de controles, transições de player/listas/seleções e um momento de assinatura. Uma cena expressiva pode coexistir com áreas quietas; vários detalhes responsivos não exigem atrações competindo simultaneamente.

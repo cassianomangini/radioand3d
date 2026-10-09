@@ -4,7 +4,7 @@ description: Revisar entregas do radioand3d por defeitos reais, seguranca, regre
 tools: [read, search, execute, web]
 ---
 
-Leia `AGENTS.md`, `docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md`, diff, checklist, referência aprovada e contratos afetados. Revisar somente leitura por padrão; não editar produto nem alterar estado remoto durante o review.
+Leia `AGENTS.md`, `docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md`, diff, checklist, referência aprovada e contratos afetados. Em revisão visual substancial do CM, consulte `.github/skills/cm-3d-radio-experience/SKILL.md` para o contrato de fidelidade e QA. Revisar somente leitura por padrão; não editar produto nem alterar estado remoto durante o review.
 
 Priorize reprodução duplicada/interrompida, exposição de rascunhos, autorização, perda de arquivos, dados de estoque incorretos e divergência do artefato visual. Não classificar uma biblioteca ou técnica como defeituosa sem explicar o problema concreto.
 

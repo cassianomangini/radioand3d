@@ -93,6 +93,21 @@ jobs:
 
           BROWSER="$BROWSER" node scripts/capture-radio-states.mjs "$GITHUB_WORKSPACE/visual-review"
 
+      - name: Playwright visual diagnostics
+        if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
+        run: pnpm visual:qa
+
+      - name: Upload Playwright diagnostics
+        if: always() && (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]'))
+        uses: actions/upload-artifact@v4
+        with:
+          name: cm-visual-diagnostics
+          path: |
+            test-results/visual/**
+            playwright-report/**
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Upload visual review
         if: (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')) && success()
         uses: actions/upload-artifact@v4

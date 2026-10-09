@@ -12,7 +12,7 @@ O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já ex
 
 ## Nova evolução pontual — 03c Rádio para navbar
 
-Em 09/10/2026, Cassiano pediu que arrastar a Rádio lateral **para a direita** faça a superfície **subir para a navbar** e virar um **player compacto**, liberando o Estúdio. A Rádio lateral volta por botão no header ou arrastando da borda direita para a esquerda. Esse estado será exclusivamente desktop e não duplica o áudio nem o player móvel. [Contrato de direção e movimento](design/CM_RADIO_NAVBAR_DOCK_V1.md) · [Checklist 03c](work/03c-radio-navbar-dock.md).
+Em 09/10/2026, Cassiano pediu que arrastar a Rádio lateral **para a direita** faça a superfície **subir para a navbar** e virar um **player compacto**, liberando o Estúdio. A Rádio lateral volta por botão no header ou arrastando da borda direita para a esquerda. **Localização fixada por Cassiano em seguida:** mini imediatamente antes dos ícones sociais existentes, no conjunto de ações da direita, preservando a navegação principal centralizada. Referência verificada: `cassianomangini/artesopolis-landing/src/components/navbar.tsx`. Esse estado será exclusivamente desktop e não duplica o áudio nem o player móvel. [Contrato de direção e movimento](design/CM_RADIO_NAVBAR_DOCK_V1.md) · [Checklist 03c](work/03c-radio-navbar-dock.md).
 
 **Estado:** `in_progress` apenas em documentação e revisão de comportamento. D1–D3 concluídos por inspeção; D4 (prévia contextual de interação), D5 (aprovação visual) e código/testes ainda pendentes. Isso **não** revoga o aceite anterior da Rádio nem altera a prioridade funcional do Estúdio.
 

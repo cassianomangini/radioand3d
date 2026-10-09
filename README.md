@@ -83,7 +83,7 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 | [Inventário de mídia](docs/design/STUDIO_MEDIA_INVENTORY_V1.md) | Assets existentes, referências, mídia faltante e bloqueios de fotografia/diagramas |
 | [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md) | Contrato técnico de SEO/Search baseado em documentação oficial |
 | [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md) | Wizard, anexos, triagem, analytics e continuidade por contato |
-| [Infra Supabase CM](docs/SUPABASE_INFRASTRUCTURE_V1.md) | Projeto Supabase CM em São Paulo, schema/bucket/limites aplicados; rotas de sessão e init em código, desativadas por flag; complete/submit, retenção e Cron ainda pendentes |
+| [Infra Supabase CM](docs/SUPABASE_INFRASTRUCTURE_V1.md) | Projeto Supabase CM em São Paulo, schema/bucket/limites aplicados; quatro rotas de Orçamento em código, desativadas por flag; TUS real, retenção, smoke, secrets e Cron pendentes |
 | [Checklist E2](docs/work/08-supabase-provisioning.md) | Execução verificável de provisionamento e segurança sem detalhes privados do ambiente legado |
 | [Checklist 08](docs/work/08-studio-growth.md) | Execução do Estúdio sem interferir no motion spine da Rádio |
 | [Biblioteca musical](docs/MUSIC_PIPELINE.md) | Importação, versões, publicação, permissões e acervo antigo |

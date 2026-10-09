@@ -78,7 +78,7 @@ Checkout próprio, gestão financeira ou de produção, contas de ouvintes, app 
 
 Essas possibilidades entram no roadmap somente quando houver necessidade e decisão explícita.
 
-## Decisões ainda abertas
+## Pendências para lançamento e decisões em aberto
 
 - cobertura geográfica de projetos personalizados;
 - até onde o Estúdio modela a partir de ideia, foto, logo ou desenho;

@@ -30,6 +30,10 @@ Abra `/dev/visual-lab` com `pnpm dev` para reproduzir três **fixtures técnicos
 
 A CI `[visual]` valida a proteção da rota e renderiza os três casos de teste em desktop/mobile. Imagens geradas nesse lab **não são candidatas atuais ao design do site**; servem somente para QA até termos novo conceito fiel à identidade CM. [Brief do laboratório](docs/design/CM_VISUAL_LAB_V1.md) · [Registro de referências/baselines](docs/design/CM_VISUAL_REFERENCE_REGISTER_V1.md).
 
+### Nova evolução planejada da Rádio: dock na navbar
+
+Em 09/10/2026, foi pedido um modo desktop no qual **empurrar a Rádio lateral para a direita** a faz **subir para a navbar como player pequeno**, liberando o Estúdio; ela retorna por botão no header ou novo arraste da borda direita para a esquerda. Contrato: [CM Radio Navbar Dock V1](docs/design/CM_RADIO_NAVBAR_DOCK_V1.md) · [checklist 03c](docs/work/03c-radio-navbar-dock.md). **Somente a análise e a especificação estão feitas**; o visual do movimento depende de prévia/aprovação. O site público ainda não implementa esse estado.
+
 ### QA visual renderizado (ferramentas de desenvolvimento)
 
 O projeto mantém `scripts/capture-radio-states.mjs`/CDP para a Rádio e adiciona diagnósticos com Playwright Test. As bibliotecas `motion`, `@playwright/test` e `@axe-core/playwright` estão versionadas no lockfile; instalar ferramentas **não** modifica a aparência das páginas.

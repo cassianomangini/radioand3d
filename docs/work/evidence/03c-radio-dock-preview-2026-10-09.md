@@ -6,6 +6,8 @@
 **Código do experimento:** `src/app/dev/radio-dock/page.tsx`, `radio-dock-preview.tsx`, `radio-dock-preview.module.css`.  
 **Teste:** `tests/visual/radio-dock-preview.spec.ts`; [workflow isolado](../../../.github/workflows/radio-dock-preview.yml).
 
+**Reexecução adicional após validação de código:** [CI 37977126467](https://github.com/cassianomangini/radioand3d/actions/runs/37977126467) — lint **dos arquivos deste protótipo** passou; **6/6 casos aplicáveis** de browser passaram, 14 skips planejados por viewport, sem retries. [Capturas e vídeos da reexecução](https://github.com/cassianomangini/radioand3d/actions/runs/37977126467/artifacts/11639167693). A CI global continua falhando em código de orçamento não alterado por 03c, conforme ressalva abaixo.
+
 ## Evidência de navegador
 
 - **[CI de referência: 37976670382](https://github.com/cassianomangini/radioand3d/actions/runs/37976670382)** — sucesso, **6 cenários efetivamente executados**, 14 skips deliberados por viewport/ambiente, sem retry. [Artefato de screenshots/vídeos/traces](https://github.com/cassianomangini/radioand3d/actions/runs/37976670382/artifacts/11638314730).

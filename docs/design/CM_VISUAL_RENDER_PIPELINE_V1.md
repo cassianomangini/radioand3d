@@ -4,6 +4,16 @@
 **Relação:** `EXPERIENCE.md` é a fonte da direção de arte; `ARCHITECTURE.md` governa a stack; `docs/work/08-visual-quality-evolution.md` é o checklist e o registro de evidência; `ROADMAP.md` é a única sequência macro.  
 **Base:** pesquisa entregue em 09/10/2026, *Como fazer agentes de código entregarem interfaces com acabamento visual de 2040*. A pesquisa propõe render-first, escolha do renderer, receitas reutilizáveis e feedback por screenshots; não estabelece uma nota estética objetiva universal.
 
+## Gate zero — estudar o site real antes de propor um renderer
+
+**Referência obrigatória:** [CM — auditoria da identidade visual aplicada ao site](CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md).
+
+A iteração V4 V1 de 09/10/2026 revelou um erro de processo: foram comparados protótipos standalone coerentes entre si, mas **desconectados da marca, cores, hierarquia, header e shell do site CM**. Três opções tecnicamente válidas podem ser três opções criativamente inválidas.
+
+Para um novo estudo, registrar `visual_identity_audit_ref`, tokens reais, screenshots existentes da Home/Rádio/hub, presença de marca CM 3D and Radio e CMANGINI 3D, função da mídia (artwork, capa musical ou foto de peça física), rota-alvo e uso do shell compartilhado. `Manrope`/`IBM Plex Mono`, fundo `#020305`, acentos e gradientes de destaque precisam partir da implementação, não de uma paleta inventada para o laboratório. **O hub de três entradas não é uma galeria inteira.**
+
+O lab `Editorial / Mostruário / Detalhe` V1 permanece como **harness técnico** (Motion/QA), mas foi rejeitado como proposta estética. Os novos candidatos não serão produzidos até revisar o contexto real e definir como mostrar a composição com header/player, mesmo em ambiente isolado.
+
 ## 1 — Contrato de entrega visual
 
 A composição aprovada **não** vira autorização para o agente trocar texto, ordem, funcionalidade, imagem ou navegação. Antes de implementar, levantar:

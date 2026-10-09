@@ -51,7 +51,7 @@ const gateway = {
     return {
       attachment_id: attachmentId,
       object_path: storagePath,
-      reservation_expires_at: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString()
+      reservation_expires_at: new Date(Date.now() + 27 * 60 * 60 * 1000).toISOString()
     };
   },
   async signUpload(objectPath) {
@@ -143,6 +143,8 @@ test("attachment init validates file and ownership, then signs only the reserved
   assert.equal(result.uploadPath, storagePath);
   assert.equal(result.tokenHeader, "x-signature");
   assert.equal(result.uploadToken, "signed-token-for-tests-only");
+  assert.match(valid.headers.get('set-cookie') || '', /HttpOnly/);
+  assert.ok(Date.parse(result.reservationExpiresAt) >= Date.now() + 26 * 60 * 60 * 1000);
   assert.ok(Date.parse(result.uploadTokenExpiresAt) > Date.now());
   assert.ok(Date.parse(result.uploadTokenExpiresAt) <= Date.parse(result.reservationExpiresAt));
   assert.equal(calls[0].action, "upload");
@@ -200,7 +202,7 @@ test("native gateway sends sb_secret only as apikey, with no auth Bearer header"
     if (url.includes("quote_reserve_attachment")) {
       return Response.json([{
         attachment_id: attachmentId, object_path: storagePath,
-        reservation_expires_at: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString()
+        reservation_expires_at: new Date(Date.now() + 27 * 60 * 60 * 1000).toISOString()
       }]);
     }
     if (url.includes("/storage/v1/object/upload/sign/")) {

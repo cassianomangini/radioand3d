@@ -1,12 +1,12 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **infra_defined_not_provisioned**  
+Status: **reuse_target_identified_not_provisioned**  
 Data: **05/10/2026**  
-Projeto Supabase remoto: **ainda não criado**  
+Projeto Supabase remoto: **reaproveitamento autorizado do existente `auiovzmxvhqlvhtmkavt` (`Artesopolis Staging`); ainda não saneado ou provisionado para CM**  
 Região definida: **`sa-east-1` (São Paulo)**  
-Owner do provisionamento: **Cassiano**
+Owner do provisionamento: **CM Infra / CM Data; autorização para reaproveitar dada por Cassiano em 09/10/2026**
 
-Este documento fecha as decisões de infraestrutura Supabase do CM 3D & Radio antes da criação da conta/projeto remoto.
+Este documento define a infraestrutura Supabase do CM 3D & Radio. Em 09/10/2026, Cassiano autorizou **reaproveitar o projeto existente** `auiovzmxvhqlvhtmkavt`, sem criar projeto novo. O procedimento seguro, status e provas estão em [E2 — Reaproveitamento do staging](work/08-supabase-staging-reuse.md). Referências abaixo a criar conta/projeto são histórico da proposta inicial, substituídas por esta decisão.
 
 Nada descrito aqui significa que projeto, migration, bucket, secret, função ou deploy remoto já exista.
 
@@ -14,9 +14,11 @@ Nada descrito aqui significa que projeto, migration, bucket, secret, função ou
 
 O CM 3D & Radio terá **um projeto Supabase próprio** para dados próprios do site.
 
-Nome recomendado:
+Nome de exibição pretendido, após retirement do staging:
 
-`cm-radioand3d-prod`
+`CM 3D & Radio`
+
+Project ref existente e permanente: `auiovzmxvhqlvhtmkavt`. O nome antigo é `Artesopolis Staging`. **Não criar novo projeto nem alterar a ref.**
 
 Região:
 
@@ -106,15 +108,15 @@ Regras:
 
 ### Production
 
-Projeto remoto único inicial:
+Projeto remoto existente a reaproveitar:
 
-`cm-radioand3d-prod`
+`auiovzmxvhqlvhtmkavt` (nome atual `Artesopolis Staging`, nome futuro `CM 3D & Radio`)
 
 Região:
 
 `sa-east-1`
 
-O project ref só será registrado depois que Cassiano criar a conta/projeto.
+O project ref foi identificado em 09/10/2026. Ainda há 186 tabelas e 17 Edge Functions legadas; SQL administrativo falha com `28P01`. Não tratar como base limpa. O gate de backup/limpeza/retirement está no checklist E2.
 
 ### Staging / Preview
 
@@ -940,28 +942,19 @@ Quando Supabase remoto existir, não fazer CI depender da produção.
 
 Preview branch/staging é o alvo apropriado para E2E de schema.
 
-## 28. Provisionamento — quando Cassiano criar a conta
+## 28. Provisionamento — reutilização autorizada em 09/10/2026
 
-Sequência exata:
+O projeto CM **não será criado do zero**: reutilizar `auiovzmxvhqlvhtmkavt` na organização gratuita já conectada. Sequência completa, com checklist verificável e gates para evitar perda de dados, no [trabalho E2](work/08-supabase-staging-reuse.md).
 
-1. criar conta Supabase;
-2. habilitar MFA;
-3. criar Organization CM;
-4. criar projeto `cm-radioand3d-prod`;
-5. escolher `sa-east-1`;
-6. registrar project ref no inventário privado/config;
-7. conectar repo `radioand3d` conforme workflow escolhido;
-8. configurar local project link;
-9. criar/aplicar migrations do Orçamento;
-10. criar bucket private `quote-intake`;
-11. revisar grants/RLS;
-12. obter Supabase URL;
-13. criar secret key server-side;
-14. configurar secrets Vercel;
-15. ativar retention scheduler;
-16. rodar advisors;
-17. executar smoke de upload/submit/delete;
-18. somente depois habilitar o CTA final de envio.
+1. Inventariar consumidores legados (Vercel, branch, crons, functions, Storage, Auth, segredos) e proteger a produção do Admin `ueasdbjuelqwfobcdlww`.
+2. Recuperar conexão SQL administrativa do projeto de staging (erro `28P01`), produzir e validar backup externo recuperável.
+3. Desativar/aposentar integrações, automações e dados de demonstração somente depois de provar que ninguém depende desse staging.
+4. Conservar a project ref e alterar apenas o nome de exibição para CM, quando o ambiente estiver isolado.
+5. Aplicar migrations do Orçamento; criar bucket privado `quote-intake`, ACL/RLS, handlers, uploads, rate limit e retenção.
+6. Configurar secrets server-side no Vercel do Radio e validar casos de segurança/falha.
+7. Habilitar intake público real somente após o gate de backup/plano de produção previsto aqui; upgrade pago não está autorizado implicitamente.
+
+**Em 09/10/2026:** alvo identificado, mas P0/P1 ainda não passaram; nenhum apply/cleanup remoto executado.
 
 ### Produto bridge
 
@@ -1046,9 +1039,9 @@ Só marcar `infra_ready` quando:
 Estado em 05/10/2026:
 
 - arquitetura Supabase: **definida**;
-- conta CM: **não criada**;
-- projeto CM: **não criado**;
-- project ref: **pendente**;
+- conta existente Artesopolis Free: **conectada**;
+- projeto CM: **ref de staging existente identificada para reaproveitamento, não saneada**;
+- project ref: **`auiovzmxvhqlvhtmkavt`**;
 - migration quote: **não implementada**;
 - bucket: **não criado**;
 - Vercel secrets: **não configurados**;

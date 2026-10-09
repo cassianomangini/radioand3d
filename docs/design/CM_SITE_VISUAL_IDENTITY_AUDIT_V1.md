@@ -28,6 +28,18 @@ A primeira rodada de `/dev/visual-lab` comparou três arranjos **genéricos** pa
 
 As seis imagens são **referências fornecidas**, não comparações pixel-a-pixel homologadas. A imagem 6 é referência para apresentação de portfólio e peça real *quando comprovada*; a fotografia/ativo original autorizado ainda é dependência E3.
 
+## 2.1. Conferência complementar: renders atuais do próprio site no CI
+
+Além das imagens do usuário, foram inspecionados os screenshots do navegador da execução [37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229), [artefato Playwright](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229/artifacts/11622475963). Esses renders mostram o **shell implementado** em Home, hub, Produto e Orçamento, em desktop e mobile. A execução tem mídia/playlist de teste sem reprodução real de R2; **não** tratá-la como substituta de visitação real e nem como mock final aprovado.
+
+- **Hub desktop (1440×900):** logo pequeno e nav central continuam acima da área Estúdio; um trilho de marca fino separa Estúdio e Rádio, que permanece visível à direita. A zona dominante à esquerda de Impressões ocupa 2 linhas; Orçamento e Produtos ficam na coluna direita. Com mídia E3 ausente, grandes áreas negras são placeholders; o texto aparece no rodapé de cada bloco, com kicker em **ciano para Impressões**, **violeta para Orçamento**, **laranja/coral para Produtos**. Isso é um vocabulário de diferenciação por **função comercial**, não uma página monotemática teal.
+- **Hub mobile (390×844):** header compacto → mini-player com capa e controles → eyebrow de Estúdio → 3 entradas empilhadas, nesta ordem; mesmo universo negro/ciano/violeta/coral. O contexto da Rádio permanece presente, embora a tela seja de comércio 3D.
+- **Produto desktop (1440×900):** foto real de produto grande e clara contra fundo quase preto, rail vertical de miniaturas, decisão/variações à direita, CTA **Comprar na Shopee** como botão azul-violeta sólido/retangular, linha divisória sutil. **Não se reutiliza o botão-pill da Home nesse CTA**. Prova de que páginas comerciais têm uma gramática visual própria **dentro do mesmo shell** e conseguem usar fotografia com fundo branco sem “quebrar a marca”.
+- **Orçamento desktop (1440×900):** predominam texto branco, título de grande escala, kicker ciano e opções funcionais com contorno discreto; sem foto fictícia nem ícones de benefícios. A Rádio permanece à direita. Densidade de formulário é deliberadamente diferente da galeria.
+- **Home mobile (390×844):** header, mini-player e grande imagem X1; o texto da Home começa perto da borda inferior do primeiro viewport no screenshot. Registrar isso como **observação para futura QA**, não copiar mecanicamente a relação arte/título na rota Impressões, nem alterar Home aprovada por conta desta auditoria.
+
+**Atualização do gate A1.5:** screenshots existentes da Home/hub/Produto/Orçamento desktop e mobile foram conferidos. Ainda não há, nesta execução de CI, captura comparável **da rota `/studio/impressoes` com conteúdo real e mobile**; ela continua pendente para validar a próxima composição específica.
+
 ## 3. Arquitetura de marcas e linguagem visual
 
 **Marca guarda-chuva:** `CM 3D and Radio` no header global. Assinatura com monograma CM, 3D e Rádio juntos, cromaticidade mais alta em cyan/azul/violeta; preservar o PNG original `public/images/cm-3d-radio-logo.png` e a proporção do header.
@@ -135,4 +147,4 @@ O mobile **não empilha** Estúdio e Rádio completa como duas colunas comprimid
 - **Terceiro:** avaliar uma composição integrada em desktop/mobile e comparar com Home, hub e exemplos comerciais. Só criar três opções novamente se elas testarem **hipóteses realmente diferentes e coerentes com CM**; não há obrigação de produzir três por rodada.
 - **Quarto:** congelar escolha **após avaliação de Cassiano**, planejar assets E3 e só então começar V5 na rota pública.
 
-**Não executado nesta auditoria:** nenhuma alteração de `tsx`, `.module.css`, tokens, marketing/page, Rádio, imagens públicas, testes ou deploy; leitura visual/estática e contrato documental, apenas. **O lab anterior não foi removido nem aprovado.**
+**Não executado nesta auditoria:** nenhuma alteração de `tsx`, `.module.css`, tokens, marketing/page, Rádio, imagens públicas, testes ou deploy; somente leitura visual de referências do usuário, renders Playwright existentes, código/contratos e atualização de documentação/agentes. **O lab anterior não foi removido nem aprovado.** **O lab anterior não foi removido nem aprovado.**

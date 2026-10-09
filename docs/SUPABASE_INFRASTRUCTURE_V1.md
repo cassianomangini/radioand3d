@@ -385,6 +385,11 @@ extension text not null
 reported_mime text null
 detected_type text null
 size_bytes bigint not null
+validated_size_bytes bigint null
+upload_key uuid not null
+accounted_bytes bigint not null
+quota_released_at timestamptz null
+grant_expires_at timestamptz not null
 
 validation_status text not null
 validation_code text null
@@ -407,7 +412,9 @@ rejected
 expired
 ```
 
-Não persistir URL pública. A FK do anexo para a solicitação impede exclusão do request enquanto existir objeto a remover; o processo de retenção primeiro exclui via Storage API e depois reconcilia/exclui attachment e request.
+Não persistir URL pública. A FK do anexo para a solicitação impede exclusão do request enquanto existir objeto a remover. O servidor usa `upload_key` idempotente por request; `accounted_bytes` reserva capacidade conservadora e `quota_released_at` só pode ser gravado depois que o grant TUS expirou e não houver metadado do objeto no Storage. Triggers negam exclusão de linha reservada e redução prematura de `grant_expires_at`.
+
+As funções server-only `quote_reserve_attachment` e `quote_release_attachment` operam com `service_role`, sem `EXECUTE` para `anon`/`authenticated`. Mesmo no servidor, a sessão e o ID precisam ser validados. **Ausência da linha em `storage.objects` não prova, por si, que o conteúdo binário foi removido**: antes de liberar quota, a rotina deve confirmar a exclusão pela Storage API e só então chamar a função idempotente.
 
 ## 11. `quote_events`
 
@@ -455,9 +462,15 @@ Persistir `quote_rate_limit_windows` com **HMAC(server_secret, normalized_ip)**,
 
 ### Capacidade global
 
-Além dos limites de **5 arquivos**, **50 MB/arquivo** e **100 MB/request**, impor um teto agregado de Storage reservado + ocupado, configurado em `CM_QUOTE_STORAGE_BUDGET_BYTES`. Valor inicial recomendado no Free: **600 MB** (ajustável conforme capacidade efetiva; deixar margem para uso e metadados da conta).
+O bucket **privado** `quote-intake` existe desde 09/10/2026, com limite de **50.000.000 bytes/objeto** no Supabase Free. A aplicação aceita **5 arquivos por pedido**, até **50.000.000 bytes por arquivo** e **100.000.000 bytes por pedido**. Isso corrige a antiga divergência de `50 * 1024 * 1024` (52,4 milhões de bytes) na validação do browser.
 
-No init, transação reserva bytes declarados e slot de anexo (inclusive uploads em andamento). Somar **reservas ainda válidas + objetos validados** com sincronização transacional (ex.: lock/advisory no projeto) para impedir dois uploads simultâneos de furar a quota. Falhas/expiração de token liberam reserva somente após verificar/remover eventual objeto no Storage. No complete, conferir bytes reais: divergência que exceda reserva ou limite implica rejeitar/excluir o objeto e reconciliar saldo.
+O orçamento global está persistido no singleton `quote_upload_limits.max_bytes = 600000000`, não na palavra de um cliente. `CM_QUOTE_STORAGE_BUDGET_BYTES`, na configuração do servidor, **deve coincidir** com esse limite e nunca sobrescrevê-lo silenciosamente. Capacidade geral do Supabase Free não deve ser interpretada como limite exclusivo deste bucket.
+
+**Regra conservadora indispensável:** antes de emitir uma URL TUS, a RPC `quote_reserve_attachment` reserva **50.000.000 bytes inteiros por arquivo ainda não verificado**, e não o tamanho declarado pelo browser, pois um token de upload não está restrito ao número informado no `init`. Isso restringe o número de uploads pendentes simultâneos (em geral dois por pedido); arquivos pequenos devem ser enviados e verificados em sequência para liberar capacidade.
+
+O trigger `quote_attachment_capacity_guard` serializa inserts/updates pelo lock da linha de limite global, compara a soma de reservas com 600 MB e também aplica 5 anexos/100 MB contabilizados por solicitação, inclusive sob concorrência. Somente depois de verificar que um objeto existe, seu tamanho real no Storage e seu conteúdo permitido, o backend poderá reduzir `accounted_bytes` ao tamanho efetivo. O banco confere metadados `storage.objects`; inspeção de tipo/conteúdo permanece responsabilidade da camada server-side.
+
+Reserva pendente, upload rejeitado ou upload órfão **continuam ocupando orçamento** até expiração do grant e remoção/ausência confirmada pela Storage API. O processo de limpeza é idempotente e protegido por `quote_release_attachment`; **a execução real da limpeza ainda não está implementada**. As validações SQL com dados sintéticos foram executadas dentro de transações desfeitas por `ROLLBACK`; testes end-to-end de TUS e concorrência em conexões simultâneas seguem pendentes.
 
 Quando teto/quota acabar, devolver erro acionável de capacidade sem emitir novos tokens; alertar operação. Não depender de uma única quota por visitante, de `Content-Length` informado pelo browser ou de remoção manual.
 
@@ -799,8 +812,8 @@ Plano detalhado e checklist: [E2 — Provisionamento Supabase](work/08-supabase-
 1. Conferir em ambiente **privado** dependências do ambiente de teste legado, gerar backup externo recuperável e somente depois autorizar/realizar a pausa, sem excluir.
 2. **Concluído pelo usuário e validado:** projeto CM novo, em organização independente, região São Paulo, acessível via SQL e sem migrations. Ver [checklist E2](work/08-supabase-provisioning.md). Identificadores e secrets ficam fora do Git público.
 3. Vincular CLI ao projeto novo apenas com ref previamente conferida, manter migrations versionadas e fazer dry-run antes de push remoto.
-4. Aplicar schema de Orçamento com sessão/posse, RLS/grants, constraints e quota global.
-5. Criar `quote-intake` privado; implementar signed TUS, validação de arquivo, idempotência e limpeza.
+4. **Aplicado e verificado:** schema base, índices, RLS/grants e reserva global transacional com triggers de integridade; ainda falta a integração de backend que realizará as transições.
+5. **Bucket privado criado:** `quote-intake` com limite de 50 milhões de bytes, sem políticas anônimas. **Pendente:** signed TUS, inspeção de conteúdo, limpeza Storage API e testes de upload efetivo.
 6. Configurar variáveis server-side na Vercel e implementar handlers; validar que a Rádio permanece no R2.
 7. **Só após a rota protegida estar operacional:** ativar o GET diário do Vercel Cron, fazer read-back e observar falha/duplicidade.
 8. Executar testes negativos de acesso cruzado, quota, Storage, retenção, advisors e backup; cumprir o gate de plano/produção antes do intake real.
@@ -811,14 +824,14 @@ A ponte de Produtos **não depende** da base CM. No ambiente operacional da orig
 
 **Desbloqueado em código local:** migrations, schema, grants/RLS, parsers, contrato de sessão anônima, handlers, validação de conteúdo, quota, rate limit, idempotência, scheduler, fixtures e testes. Esse código local **não** significa que upload, submit ou cron estejam funcionando na produção.
 
-**Já verificado:** projeto CM definitivo (São Paulo, organização Cmangini3d), banco vazio, SQL read-only e Security Advisor inicial; staging pausado pelo usuário. **Ainda depende de implementação/validação:** migrations versionadas, schema, bucket, secrets Vercel, uploads TUS reais, advisors pós-DDL, smoke E2E e release. O backup do legado segue sem comprovação.
+**Já verificado:** projeto CM definitivo em São Paulo e organização independente; migrations de schema e quota aplicadas e versionadas; bucket privado; read-back SQL/RLS/grants e testes transacionais sintéticos de reserva/negação. Banco sem dados reais; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local, secrets Vercel, signed TUS real, handlers de Orçamento, finalização e limpeza de uploads, smoke E2E e release. O backup do legado segue sem comprovação.
 
 ## 30. Gate de infraestrutura pronta
 
 Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
-- [ ] Supabase **novo** CM em `sa-east-1`, projeto e organização adequados; legado não foi migrado.
-- [ ] Migrations versionadas aplicadas e validadas **na ref nova correta**.
+- [x] Supabase **novo** CM em `sa-east-1`, organização independente; nenhum dado legado foi migrado.
+- [x] Migrations de schema inicial, bucket privado e quota aplicadas, versionadas e verificadas **na ref correta**. Próximas migrations continuarão sujeitas ao mesmo gate.
 - [ ] `quote-intake` privado, limites 50MB/objeto e 5/100MB por request e quota **global** confirmados.
 - [ ] RLS/grants/Storage negam acesso direto `anon`/`authenticated`; nenhum privilégio no browser.
 - [ ] Cookie de sessão anônima, vínculo por HMAC/digest, Origin/CSRF e expiração funcionam.
@@ -858,7 +871,7 @@ Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
 - **Projeto CM definitivo validado** na organização Free independente Cmangini3d e região São Paulo. Migration inicial `create_quote_core` aplicada e versionada, quatro tabelas verificadas e vazias, com RLS/grants restritos.
 - O ambiente de testes legado permanece **inalterado**; pausa depende de inventário, backup e gate próprio.
-- **Migration inicial aplicada** (schema base, índices, FKs, constraints, RLS/grants). Bucket, segredo de sessão remoto, quota transacional completa, Route Handlers e Cron: **não aplicados/deployados**. Primitiva de sessão existe apenas no código.
+- **Quatro migrations aplicadas e versionadas**: schema base, bucket + reserva de quota com trigger, proteção de exclusão/limpeza, imutabilidade da validade TUS. Bucket privado confirmado; dados de clientes: zero; testes SQL sintéticos de limites e liberação executados com `ROLLBACK`. **Rotas, uploads reais, segredos na Vercel e Cron não aplicados/deployados**.
 - Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 - Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
-- Próximo gate: completar limite global de bytes e transições seguras, bucket privado, autorização nos handlers e testes de falha. O teste de SQL com `BEGIN`/`ROLLBACK`, read-back das quatro tabelas e ACL já passou; CLI/Docker locais indisponíveis neste ambiente. Não aceitar dados pessoais reais até o gate de lançamento.
+- Próximo gate: handlers com autenticação de sessão, emissão de token TUS por path, verificação do objeto/tipo real, rate limit e limpeza Storage API. A quota SQL funciona de maneira conservadora, mas **não equivale à validação E2E de concorrência ou upload real**. CLI/Docker locais indisponíveis neste ambiente; manter o intake público desativado.

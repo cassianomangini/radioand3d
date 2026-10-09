@@ -1,57 +1,36 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **reuse_target_identified_not_provisioned**  
-Data: **05/10/2026**  
-Projeto Supabase remoto: **reaproveitamento autorizado do existente `auiovzmxvhqlvhtmkavt` (`Artesopolis Staging`); ainda não saneado ou provisionado para CM**  
-Região definida: **`sa-east-1` (São Paulo)**  
-Owner do provisionamento: **CM Infra / CM Data; autorização para reaproveitar dada por Cassiano em 09/10/2026**
+Status: **contrato definido · projeto CM remoto não provisionado**  
+Revisão: **09/10/2026**  
+Região planejada: **sa-east-1 (São Paulo)**  
+Responsável: **CM Infra / CM Data**
 
-Este documento define a infraestrutura Supabase do CM 3D & Radio. Em 09/10/2026, Cassiano autorizou **reaproveitar o projeto existente** `auiovzmxvhqlvhtmkavt`, sem criar projeto novo. O procedimento seguro, status e provas estão em [E2 — Reaproveitamento do staging](work/08-supabase-staging-reuse.md). Referências abaixo a criar conta/projeto são histórico da proposta inicial, substituídas por esta decisão.
+Esta é a arquitetura canônica do backend próprio do site. A decisão vigente é **criar um projeto Supabase novo e limpo**, preferencialmente em organização CM separada, após liberar uma vaga Free de forma segura. Nenhum novo projeto, migration, bucket, segredo, cron ou deploy do Orçamento foi provisionado.
 
-Nada descrito aqui significa que projeto, migration, bucket, secret, função ou deploy remoto já exista.
+A execução e os checkpoints verificáveis estão em [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md). Detalhes operacionais sobre a infraestrutura de outro sistema ficam fora deste repositório público. **Não** usar este documento como autorização para pausar, limpar, migrar ou modificar um banco existente.
 
 ## 1. Decisão principal
 
-O CM 3D & Radio terá **um projeto Supabase próprio** para dados próprios do site.
+O CM 3D & Radio terá **um projeto Supabase novo e independente**, na região `sa-east-1`, para os dados próprios do site.
 
-Nome de exibição pretendido, após retirement do staging:
-
-`CM 3D & Radio`
-
-Project ref existente e permanente: `auiovzmxvhqlvhtmkavt`. O nome antigo é `Artesopolis Staging`. **Não criar novo projeto nem alterar a ref.**
-
-Região:
-
-`sa-east-1`
-
-O projeto novo **não substitui** o Supabase do Artesopolis Admin.
-
-A separação é:
+O banco do Artesopolis Admin continua sendo o responsável pelo domínio operacional de Produtos e Shopee. O CM **não** copia o ERP, custos, estoque, pedidos ou Ads. Seu catálogo público será uma projeção read-only, consumida no servidor; o backend próprio armazena somente os pedidos de Orçamento.
 
 ```text
-SUPABASE ARTESOPOLIS ADMIN
-├─ Products
-├─ Shopee Channel
-├─ product_cm_publications
-└─ cm-public-catalog Edge Function
-        ↓ read-only
-CM 3D & Radio
+Admin / Shopee (dados operacionais)
+  └─ projeção editorial pública allowlisted, somente leitura
+       └─ servidor CM -> páginas Produtos e SEO
 
-SUPABASE CM 3D & RADIO
-├─ quote_requests
-├─ quote_attachments
-├─ quote_events
-├─ quote_rate_limit_windows
-└─ Storage privado quote-intake
+CM Supabase (projeto novo e limpo)
+  ├─ quote_requests
+  ├─ quote_attachments
+  ├─ quote_events
+  ├─ quote_rate_limit_windows
+  └─ Storage privado quote-intake
+
+Cloudflare R2 -> catálogo e streaming da Rádio
 ```
 
-### Motivo
-
-Produtos/Shopee são domínio operacional do Artesopolis Admin.
-
-Orçamentos enviados pelo site público são dados próprios da superfície CM e têm lifecycle, retenção e risco diferentes.
-
-Não copiar ERP, estoque, custos, pedidos, Ads ou catálogo Shopee bruto para o novo projeto.
+Não usar a mesma credencial ou o mesmo banco para os dois domínios. O visitante não escolhe organização nem recebe segredos privilegiados.
 
 ## 2. Produtos Supabase usados na V1
 
@@ -83,11 +62,9 @@ A ausência desses produtos é intencional, não dívida.
 
 ## 3. Ambientes
 
-### Local
+### Desenvolvimento local
 
-Fonte de desenvolvimento para schema e comportamento do backend do Orçamento.
-
-Estrutura versionada:
+O schema e os handlers do Orçamento são desenvolvidos sem depender de banco remoto. A estrutura versionada prevista é:
 
 ```text
 supabase/
@@ -96,74 +73,35 @@ supabase/
 └─ seed.sql
 ```
 
-Regras:
+Migrations versionadas no Git, dados de seed exclusivamente fictícios e CLI versionada. Nenhum cliente, arquivo ou segredo real em fixtures, logs ou commits.
 
-- migrations versionadas no Git;
-- seed somente com dados sintéticos;
-- nenhum contato real;
-- nenhum arquivo real de cliente;
-- nenhum secret commitado;
-- CLI com versão conhecida/pinada no ambiente de desenvolvimento/CI;
-- descobrir comandos por `supabase --help` no momento da implementação.
+### Produção
 
-### Production
+**Um novo projeto Supabase CM em `sa-east-1`, ainda não criado.** Seu identificador concreto, segredos, URL e inventário de administração serão guardados em local privado, nunca neste documento.
 
-Projeto remoto existente a reaproveitar:
+A organização CM separada é a preferência de governança para que um eventual plano pago do CM não mude o plano de faturamento do Admin. Isso **não** aumenta o limite gratuito de projetos ativos da conta.
 
-`auiovzmxvhqlvhtmkavt` (nome atual `Artesopolis Staging`, nome futuro `CM 3D & Radio`)
+### Preview / staging
 
-Região:
+Usar stack local e fixtures sintéticas enquanto estiver no Free; sem segundo projeto pago por padrão. Se no futuro a assinatura e o fluxo justificarem Supabase Branching, cada branch deve usar credenciais próprias e nunca dados pessoais copiados de produção.
 
-`sa-east-1`
+### Ambiente legado
 
-O project ref foi identificado em 09/10/2026. Ainda há 186 tabelas e 17 Edge Functions legadas; SQL administrativo falha com `28P01`. Não tratar como base limpa. O gate de backup/limpeza/retirement está no checklist E2.
+O ambiente de testes do sistema anterior não será convertido em produção CM. Antes de **pausá-lo** para liberar uma vaga Free: conferir consumidores/dependências, criar backup externo recuperável e obter autorização específica. Pausa preserva a necessidade de backup. Nenhuma desativação foi executada nesta entrega.
 
-### Staging / Preview
+## 4. Plano, disponibilidade e faturamento
 
-Não criar um segundo projeto pago por padrão.
+### Desenvolvimento
 
-Quando o projeto estiver em plano com Supabase Branching:
+Usar Free para schema, integração inicial, fixtures e validação sem coleta pública significativa. A cota atual de projetos Free ativos é **compartilhada entre as organizações das quais o usuário é owner/admin**; projeto pausado não ocupa vaga. A documentação da plataforma prevê uma janela de recuperação por Dashboard de até **um ano** para projetos pausados, mas isso não dispensa backup independente.
 
-- criar uma persistent branch `staging`;
-- usar preview branches apenas em mudanças de schema/Edge Function que justifiquem ambiente isolado;
-- nunca copiar dados pessoais de produção para branch;
-- branch recebe somente seed sintético.
+### Gate para receber orçamentos reais
 
-Supabase Branches são data-less por padrão e têm credenciais próprias.
+O produto adota como **critério de lançamento** revisar backup gerenciado, disponibilidade e contratar Pro para a **organização CM** antes do intake público real. Isso é uma **decisão de operação**, não uma exigência técnica automática do Supabase. Nenhuma assinatura, upgrade ou alteração de cobrança está autorizada por este documento.
 
-## 4. Plano recomendado de conta
+O plano é atribuído à **organização**: fazer upgrade da organização onde também vive o Admin poderia alterar seu faturamento. Por isso a organização CM separada é preferida. Reavaliar custo/benefício antes do gate, considerando tráfego, pausa no Free, política de backup e disponibilidade pretendida.
 
-### Antes do lançamento
-
-Free pode ser usado para:
-
-- criação inicial;
-- desenvolvimento;
-- schema;
-- testes;
-- integração com Vercel;
-- validação sem tráfego real significativo.
-
-### Gate de produção com Orçamento real
-
-Antes de habilitar envio público real de projetos:
-
-**migrar o projeto para Pro**.
-
-Motivos operacionais:
-
-- evitar pausa por inatividade do Free;
-- ter backup gerenciado diário do banco;
-- suporte melhor ao uso contínuo;
-- habilitar Branching quando necessário.
-
-PITR não é obrigatório na V1.
-
-Reavaliar PITR quando:
-
-- volume de leads aumentar;
-- dados passarem a ter impacto operacional alto;
-- RPO de até 24 horas deixar de ser aceitável.
+PITR não é obrigatório na V1; reconsiderar quando o RPO diário ou a criticidade do fluxo justificar.
 
 ## 5. Backup e recuperação
 

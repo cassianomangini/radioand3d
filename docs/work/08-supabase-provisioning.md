@@ -29,19 +29,25 @@ Uma caixa `[x]` significa que o artefato e a prova foram verificados, não apena
 - [x] Alinhar contrato de Orçamento anônimo com posse de sessão e quotas.
 - [x] Especificar Vercel Cron com GET, `CRON_SECRET`, reconciliação e retenção.
 - [x] Conciliar roadmap, arquitetura e checklist.
-- [ ] Eventual auditoria do **histórico público do Git** concluída por procedimento separado, sem force push automático.
+- [x] Auditoria **focal** dos três commits públicos que introduziram o inventário legado: identificadores e detalhes técnicos ainda aparecem no histórico, mas não foram encontrados padrões evidentes de credenciais nos diffs inspecionados. **Não** houve reescrita de histórico. Evidência: comparação dos commits de 09/10/2026 com o HEAD sanitizado.
+- [ ] Avaliar posteriormente necessidade real de mitigação adicional do histórico; não reescrever `main`/force-push nem invalidar clones só por identificadores que não são segredos. Esse residual **não autoriza publicar segredos nem bloqueia o inventário read-only**.
 
 Gate: contratos sincronizados com o estado real de implementação; detalhes de desativação legada mantidos fora da documentação pública.
 
-## P1 — Pré-requisitos para liberar vaga Free
+## P1 — Pré-requisitos para liberar vaga Free (inventário inicial read-only)
 
-- [ ] Inventariar, em área **privada**, consumidores, scripts, credenciais, endpoints, usuários e agendamentos do ambiente antigo.
-- [ ] Confirmar que sua pausa não interrompe rotinas, testes necessários ou algum consumidor ainda utilizado.
-- [ ] Exportar backup completo de banco e objetos necessários, com local de guarda privado, e comprovar possibilidade de recuperação.
-- [ ] Conferir a cota real do proprietário/organização e a opção de pausar disponível no Dashboard.
-- [ ] Pausar o ambiente legado **somente após** o gate anterior, verificar seu estado e verificar que a aplicação operacional continua funcionando.
+- [x] Confirmar via Supabase Management a organização Free existente e os **dois projetos ativos**; **nenhuma organização CM separada existe ainda**. Consulta read-only de 09/10/2026.
+- [x] Confirmar as referências de ambiente de aplicação: os destinos Supabase dos ambientes Preview/Production do projeto Vercel de testes apontam ao **staging**, não ao banco operacional; ambos informam **Shopee sandbox**. Verificado por leitura individual das variáveis, sem expor valores no Git.
+- [x] Conferir histórico recente de deploy: projeto Vercel de testes sem deploy novo desde **01/09/2026**, enquanto a aplicação operacional segue recebendo deploys. Isso **não** prova que não existem consumidores automáticos.
+- [x] Levantar metadados estruturais das classes **banco, Auth, Storage, jobs e Edge Functions** via Management API; o inventário detalhado foi consultado fora do repositório público. Há recursos antigos e automações; o projeto **não está vazio**.
+- [ ] **Completar** inventário privado de consumidores, scripts, credenciais (apenas nomes/destinos), buckets/conteúdo, identidades e jobs efetivamente ativos; metadata isolada não comprova ausência de dependências.
+- [ ] Inspecionar `cron.job`, funções e registros necessários à desativação. O acesso SQL/migrations da conexão atual retorna **falha de autenticação `28P01`**, enquanto a API de gerenciamento consegue listar metadados. **Não** presumir que o SQL Editor do Dashboard também esteja indisponível.
+- [ ] Confirmar que a pausa não interromperá rotinas, testes necessários ou consumidores ainda utilizados. Existe evidência recente de automação executando, mas não de tráfego humano.
+- [ ] Exportar backup completo de banco e objetos realmente necessários **fora do Git**, com restauração/recuperabilidade demonstrada. No plano Free, usar dump lógico independente; não confundir metadata da API com backup.
+- [ ] Confirmar permissões reais de pausa no Dashboard.
+- [ ] Pausar o ambiente legado **somente após** o gate anterior, verificar seu estado e confirmar funcionamento da operação principal.
 
-Gate: vaga livre e backup recuperável; **não deletar** o projeto legado. Sem prova, P1 continua bloqueado.
+**Gate P1 bloqueado:** falta comprovar consumidores/backup e recuperar um caminho SQL administrativo do staging. **Nenhuma pausa, exclusão, revogação ou alteração do Admin foi executada.**
 
 ## P2 — Criar o projeto CM limpo
 
@@ -56,6 +62,9 @@ Gate: projeto independente, vazio de legado operacional, com acesso e alvo compr
 
 ## P3 — Orçamento privado com posse de sessão
 
+**Preparação local independente de P1/P2:** é permitido desenvolver/validar primitivas sem criar banco ou habilitar acesso público. Isso **não** avança o gate remoto fora de ordem.
+
+- [x] Adicionar a primitiva criptográfica server-only de sessão opaca, HMAC de posse e política de cookie em [`session-token.ts`](../../src/server/quote/session-token.ts); teste focal em [`studio-quote-session.test.mjs`](../../tests/studio-quote-session.test.mjs). Em 09/10/2026, **5/5 testes passaram** com Node 22 e os arquivos foram comparados aos blobs da `main` pelo SHA Git. **Somente primitiva**, não houve escrita no banco.
 - [ ] Versionar migrations de `quote_requests`, `quote_attachments`, `quote_events` e `quote_rate_limit_windows`, incluindo vínculo de posse de sessão e índices/constraints.
 - [ ] Implementar sessão anônima opaca por cookie `Secure`, `HttpOnly`, `SameSite=Strict`, com segredo aleatório forte e vínculo persistido **apenas por digest/HMAC** no banco.
 - [ ] Em toda operação sobre request ou anexo, conferir a **posse por sessão + ID** no servidor antes de usar credencial privilegiada. UUID não é autorização.
@@ -104,8 +113,10 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 
 ## Retomada verificada em 09/10/2026
 
-- **Documentação:** alternativa de projeto novo, cron, sessão anônima, arquitetura e roadmap reconciliados na `main`.
+- **P0:** contratos alinhados, histórico inicial auditado; há identificadores técnicos em commits antigos, mas nenhum segredo detectado na inspeção focal. HEAD atual sanitizado.
+- **P1:** cota Free, projetos e ambientes Vercel conferidos; classes de recursos de staging inventariadas por metadata. **Gate bloqueado** por falta de prova de ausência de consumidores, backup recuperável e leitura SQL via conexão atual (`28P01`).
+- **P3 local (paralelo permitido):** token opaco e HMAC de sessão criados em código; teste focal **5/5 PASS** com hashes locais iguais aos blobs do GitHub. Não há Route Handler nem persistência.
 - **Supabase CM remoto:** **não criado**; migrations, bucket, segredos, rotas e cron **não aplicados**.
 - **Ambiente legado:** não pausado, não apagado e não reconfigurado por esta entrega.
 - **Vercel:** nenhum cron habilitado nem mudança de deploy aplicada nesta entrega.
-- **Próxima execução:** inventário e backup do legado por meios privados; implementação local pode avançar sem aguardar o projeto remoto.
+- **Próxima ação segura:** verificar acesso pelo SQL Editor do staging ou restabelecer a conexão administrativa **sem compartilhar senha em chat**; inventariar jobs/consumidores e exportar backup externo com prova de recuperação antes de qualquer pausa. Em paralelo, construir schema e handlers localmente com validação focal.

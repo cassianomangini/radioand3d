@@ -1,6 +1,6 @@
 # E2 — Provisionamento seguro do Supabase CM
 
-Estado: **in_progress** (projeto remoto criado e inspecionado; **região/organização divergem do plano**)  
+Estado: **in_progress** (projeto CM definitivo validado em São Paulo e organização Free própria; schema/deploy pendentes)  
 Atualização: **09/10/2026**  
 Owner: **CM Infra / CM Data**  
 Contrato: [Supabase Infrastructure V1](../SUPABASE_INFRASTRUCTURE_V1.md)  
@@ -8,15 +8,15 @@ Contexto: [Estúdio público](08-studio-growth.md) e [Roadmap](../ROADMAP.md)
 
 ## Decisão vigente
 
-O usuário pausou o ambiente de testes legado e criou um **projeto Supabase novo e limpo** para CM 3D & Radio em 09/10/2026. O projeto real foi localizado, está saudável e sem tabelas de domínio/migrations, mas **foi criado em `us-east-1`, não em `sa-east-1` como previsto**, e dentro da **mesma organização do Admin**, não em organização CM separada. Essa divergência impede tratar o gate de arquitetura como aprovado; **nenhuma migration remota deve ser aplicada antes de decidir a região e o isolamento de faturamento**.
+Em **09/10/2026**, o usuário criou um projeto Supabase **novo e limpo**, na organização independente **Cmangini3d** (plano Free), na região contratada **`sa-east-1` (São Paulo)**. O nome de exibição atual é `cassianomangini's Project`. Identificadores de projeto, URLs administrativas e segredos ficam fora deste Git público.
 
-- Preferir uma **organização CM separada** para isolar faturamento e administração. A cota Free de dois projetos ativos considera os projetos do proprietário/administrador entre organizações; criar uma nova organização **não cria outra vaga grátis**.
-- Antes de criar o projeto, inventariar e preservar o ambiente legado em documentação e acesso **privados**. Pausá-lo **somente depois** de comprovar que não existem consumidores necessários, registrar backup externo e validar a capacidade de recuperação.
-- Projeto pausado não conta para a cota de dois projetos Free ativos; a documentação atual do Supabase prevê até **um ano** para restaurar pelo Dashboard. **Não** usar a pausa como único backup nem como justificativa para desligar dependências não investigadas.
-- O Supabase operacional do Artesopolis Admin **não** é alvo de qualquer migração ou limpeza deste trabalho.
-- Nenhuma alteração de plano, custo, exclusão, pausa, mudança de organização ou deploy remoto é implícita nesta documentação.
+**Conferência live (Supabase Management + SQL, 09/10/2026):** projeto `ACTIVE_HEALTHY`, banco PostgreSQL 17.11, `public` sem tabelas, histórico de migrations vazio, consulta SQL funcional, Security Advisor inicial sem achados. O projeto anterior criado em região dos EUA **não é mais o alvo**; a ferramenta devolveu erro de permissão ao consultar aquela referência antiga, logo a exclusão é informada pelo usuário, mas não auditada de forma independente.
 
-A V1 do projeto CM contém apenas dados de **Orçamento**. Produtos/Shopee permanecem sob o sistema operacional de origem, por uma ponte read-only server-to-server independente. A Rádio e seus sidecars continuam no R2.
+O projeto CM agora corresponde à decisão arquitetural: **banco separado, organização separada, região São Paulo**. A V1 armazena somente dados privados de Orçamento; os produtos e a Shopee continuam no Artesopolis Admin, com ponte editorial read-only independente; músicas e sidecars continuam no R2.
+
+O ambiente antigo de testes do Admin segue `INACTIVE`, pausa efetuada pelo usuário. A existência de backup recuperável e a ausência de consumidores do staging **continuam não verificadas**. Não reativar, limpar nem tocar o Supabase de produção do Admin sem necessidade e autorização específicas.
+
+Nenhum gasto, plano Pro, migração de dados antigos, configuração Vercel, ativação do formulário público ou deploy está autorizado implicitamente pelo simples provisionamento.
 
 ## Como registrar evidência
 
@@ -34,35 +34,31 @@ Uma caixa `[x]` significa que o artefato e a prova foram verificados, não apena
 
 Gate: contratos sincronizados com o estado real de implementação; detalhes de desativação legada mantidos fora da documentação pública.
 
-## P1 — Pré-requisitos para liberar vaga Free (inventário inicial read-only)
+## P1 — Liberar vaga Free sem afetar o Admin
 
-- [x] Conferir Supabase Management após a ação do usuário: **dois projetos ativos** (Admin e CM) e **staging INACTIVE**; todos na mesma organização. Nenhuma organização CM independente existe. Leitura em 09/10/2026.
-- [x] Confirmar as referências de ambiente de aplicação: os destinos Supabase dos ambientes Preview/Production do projeto Vercel de testes apontam ao **staging**, não ao banco operacional; ambos informam **Shopee sandbox**. Verificado por leitura individual das variáveis, sem expor valores no Git.
-- [x] Conferir histórico recente de deploy: projeto Vercel de testes sem deploy novo desde **01/09/2026**, enquanto a aplicação operacional segue recebendo deploys. Isso **não** prova que não existem consumidores automáticos.
-- [x] Levantar metadados estruturais das classes **banco, Auth, Storage, jobs e Edge Functions** via Management API; o inventário detalhado foi consultado fora do repositório público. Há recursos antigos e automações; o projeto **não está vazio**.
-- [ ] **Completar** inventário privado de consumidores, scripts, credenciais (apenas nomes/destinos), buckets/conteúdo, identidades e jobs efetivamente ativos; metadata isolada não comprova ausência de dependências.
-- [ ] Inspecionar `cron.job`, funções e registros necessários à desativação. O acesso SQL/migrations da conexão atual retorna **falha de autenticação `28P01`**, enquanto a API de gerenciamento consegue listar metadados. **Não** presumir que o SQL Editor do Dashboard também esteja indisponível.
-- [ ] Confirmar que a pausa não interromperá rotinas, testes necessários ou consumidores ainda utilizados. Existe evidência recente de automação executando, mas não de tráfego humano.
-- [ ] Exportar backup completo de banco e objetos realmente necessários **fora do Git**, com restauração/recuperabilidade demonstrada. No plano Free, usar dump lógico independente; não confundir metadata da API com backup.
-- [ ] Confirmar permissões reais de pausa no Dashboard.
-- [x] **Pausa do staging efetuada pelo usuário e confirmada** por Supabase Management (`INACTIVE`), sem exclusão realizada pelo assistente.
-- [ ] Confirmar por prova separada que a produção do Admin permaneceu íntegra após a pausa (status do banco ativo, sozinho, não prova fluxos críticos).
+- [x] Registrar inspeção inicial read-only do staging e de seus consumidores declarados (Vercel de testes, sandbox, funções e cron); detalhes internos permaneceram fora do Git.
+- [x] Confirmar via Management API que o projeto antigo de testes foi pausado pelo usuário (`INACTIVE`) e que o Admin de produção permaneceu ativo.
+- [x] Confirmar existência da organização independente **Cmangini3d / Free** para o projeto CM.
+- [ ] Arquivar comprovação de backup externo recuperável do staging (DB + Storage relevante) em local privado; não tratar a pausa como backup.
+- [ ] Comprovar que não há consumidores legados necessários; não alterar scripts/credenciais do Admin sem avaliação explícita.
+- [ ] Executar verificação de fluxo operacional do Admin após pausa, com evidência separada.
 
-**Gate P1 parcialmente atendido:** a vaga Free foi efetivamente liberada e já existe projeto CM. **Permanece não comprovado** se houve backup recuperável antes da pausa e se todos os consumidores antigos estavam independentes. Não reativar o legado apenas para exploração sem motivo; registrar essa dívida operacional e confirmar que o Admin de produção não depende dele. O assistente **não executou** pausa, exclusão, revogação nem alteração do Admin.
+**Gate P1:** vaga liberada e projeto CM criado; **pendências residuais de backup/consumidores do staging não foram artificialmente marcadas como concluídas**. Não são motivo para operar no banco do Admin; registrar riscos sem misturá-los ao CM.
 
-## P2 — Criar o projeto CM limpo
+## P2 — Criar e validar projeto CM limpo
 
-- [x] Projeto CM criado pelo usuário e verificado no Supabase Management: nome `radioand3d`, estado `ACTIVE_HEALTHY`; sem tabelas `public`, sem migrations e com acesso SQL read-only funcional.
-- [x] Confirmar região/organização **reais** do projeto: `us-east-1` / mesma organização Artesopolis; conferido em 09/10/2026. **É evidência de desvio, não aprovação de arquitetura.**
-- [ ] Resolver o desvio **antes de aplicar schema**: contrato prevê São Paulo (`sa-east-1`), e a região de projeto Supabase não pode ser alterada in-place; se a decisão continuar São Paulo, será necessário criar outro projeto nessa região e aposentar o vazio atual, com revisão de custo/vaga e autorização operacional específica.
-- [ ] Decidir se a organização CM separada continua necessária para isolar faturamento; a organização atual abriga também o Admin. Nenhuma transferência/criação de organização foi efetuada pelo assistente.
-- [ ] Habilitar MFA e restrições de acesso adequadas.
-- [ ] Configurar desenvolvimento local (Supabase CLI, `config.toml`, migrations e seed sintético) no repo `radioand3d`.
-- [ ] Conferir vínculo CLI/projeto e fazer **dry-run** antes de aplicar qualquer migration remota.
-- [x] Verificar acesso SQL read-only, ausência de tabelas públicas, histórico de migrations vazio e Security Advisor sem alertas iniciais no projeto CM novo.
-- [ ] Revisar configurações Data API, backups, região final, plano/quotas e restrições de acesso no alvo definitivo.
+- [x] **Projeto definitivo criado pelo usuário** na organização **Cmangini3d**, separado da organização Artesopolis.
+- [x] **Região correta `sa-east-1`** verificada via Management API; a divergência US East anterior foi encerrada por substituição do projeto, não por migração.
+- [x] Verificar banco PostgreSQL acessível por SQL read-only, sem tabelas de negócio ou migrations remotas existentes (base inicial limpa).
+- [x] Security Advisor inicial sem lints no banco novo (reexecutar **depois** de migrations).
+- [x] Confirmar plano **Free** e que a Vercel do Radio ainda não recebeu variáveis CM Supabase (apenas configuração R2).
+- [ ] Confirmar MFA e permissões mínimas da conta/organização no Dashboard; ferramenta conectada não comprova esse estado.
+- [ ] Configurar e versionar ambiente local do Supabase CLI, `config.toml`, migrations e seed sintético sem dados pessoais.
+- [ ] Executar testes de schema e regras/RLS/grants localmente com CLI/Postgres; se ambiente local indisponível, registrar `BLOCKED`, não `PASS`.
+- [ ] Conferir alvo definitivo e dry-run antes de **apply remoto** de migrations, com histórico versionado e revisão SQL.
+- [ ] Validar Data API, políticas de backup e quotas após o provisionamento de schema/Storage.
 
-**Gate P2 bloqueado por decisão de arquitetura:** novo projeto está limpo e acessível, mas sua região e sua organização não correspondem ao contrato vigente. Sem migrações, Storage, secrets ou deploy até conciliar esse desvio.
+**Gate P2:** identidade, região, organização e banco limpo **confirmados**. Preparação CLI, migrations, segurança pós-DDL e integração remota **ainda não concluídas**; nenhum segredo deve aparecer no Git ou no browser.
 
 ## P3 — Orçamento privado com posse de sessão
 
@@ -117,11 +113,10 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 
 ## Retomada verificada em 09/10/2026
 
-- **P0:** contratos alinhados, histórico inicial auditado; há identificadores técnicos em commits antigos, mas nenhum segredo detectado na inspeção focal. HEAD atual sanitizado.
-- **P1:** staging **pausado pelo usuário** e confirmado INACTIVE; nova vaga utilizada pelo projeto CM. Não há prova registrada de backup/restauração e de independência de todos os consumidores antigos; acesso SQL do staging já não é pré-requisito para desenvolver o CM.
-- **P2:** projeto `radioand3d` ativo e vazio, leitura SQL funcional, **criado em `us-east-1` na mesma organização do Admin**. O contrato previa `sa-east-1` e organização CM independente preferencial. **Bloquear apply remoto até resolver esse desvio.**
-- **P3 local (paralelo permitido):** token opaco e HMAC de sessão criados em código; teste focal **5/5 PASS** com hashes locais iguais aos blobs do GitHub. Não há Route Handler nem persistência.
-- **Supabase CM remoto:** **criado pelo usuário**, sem tabelas de domínio/migrations; bucket, segredos, rotas e cron **não aplicados**.
-- **Ambiente legado:** **pausado pelo usuário** (verificado INACTIVE); não apagado ou reconfigurado pelo assistente.
-- **Vercel:** nenhum cron habilitado nem mudança de deploy aplicada nesta entrega.
-- **Próxima ação segura:** decidir se o projeto de Orçamento deve ficar na região dos EUA ou em São Paulo e se será preciso organização CM separada. **Não publicar ref/secrets no Git.** Em paralelo, avançar na implementação local (schema/handlers/testes) sem aplicação remota, e documentar o estado do backup do staging quando houver evidência.
+- **P0:** contratos documentados e HEAD público sanitizado; histórico antigo tem material técnico residual sem credenciais detectadas na auditoria focal.
+- **P1:** staging legado pausado pelo usuário e `INACTIVE`; backup restaurável e inexistência de consumidores **não comprovados**; Admin produção segue `ACTIVE_HEALTHY`, sem testes operacionais completos de regressão.
+- **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo, banco acessível, vazio e sem migrations. Security Advisor inicial sem achados. A referência antiga nos EUA não é o alvo.
+- **P3 local:** token opaco, HMAC de posse e testes focais já versionados. Isso não é fluxo persistente funcionando.
+- **Supabase CM remoto:** **criado pelo usuário**; sem schema de negócio, bucket `quote-intake` validado, secrets, rotas ou cron aplicados.
+- **Vercel:** projeto Radio mantém somente variáveis R2; não foi alterado.
+- **Próximo passo:** preparar migrations e testes de dados **versionados**, conferir Data API e RLS/grants, executar dry-run e somente então aplicar no projeto CM definitivo. O formulário público permanece desabilitado até o gate de privacidade/lançamento.

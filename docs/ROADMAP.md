@@ -9,7 +9,7 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 ## Próximos passos
 
 1. **Concluído nos PRs #29 e #30:** contrato local/serializável do Orçamento, arquivos reais em memória, política de formatos/limites, payload versionado, validação estrutural compartilhável e triagem inicial backend-neutral.
-2. **Backend do Orçamento definido:** Supabase CM próprio em `sa-east-1`, PostgreSQL + Storage privado, upload TUS assinado, retenção e boundaries server-side conforme [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md). Implementação local pode avançar; validação/apply remoto depende de E2.
+2. **Backend do Orçamento definido; E2 em execução:** reaproveitar o projeto Supabase `auiovzmxvhqlvhtmkavt` (antigo Artesopolis Staging) em `sa-east-1`, separadamente do Admin produção. O alvo foi identificado, mas mantém schema/jobs/functions legados, e a conexão SQL administrativa falha (`28P01`). O checklist operacional com gates/backup está em [E2 — Reaproveitamento Supabase](work/08-supabase-staging-reuse.md). Aplicação remota continua bloqueada até recuperação administrativa e saneamento.
 3. **Próximo bloco de conteúdo depende de E3:** dataset/fotos reais de Impressões, Placas e Caixas e revisão visual final das superfícies restantes.
 4. **Gate de lançamento:** domínio/alvo público, retirada controlada do `noindex`, Search Console e validações finais continuam depois de E2/E3.
 
@@ -43,7 +43,7 @@ Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hu
 | Código | Pendência | Quem resolve | O que bloqueia |
 | --- | --- | --- | --- |
 | E1 | Confirmar repositório privado | Cassiano | Cópia de conteúdo privado |
-| E2 | Criar a conta/projeto Supabase CM definido em `sa-east-1` e confirmar o alvo remoto antes de apply/deploy | Cassiano | Apply remoto, bucket real, secrets, validação live do Orçamento e publicação |
+| E2 | **Em andamento:** reutilizar `auiovzmxvhqlvhtmkavt`; acesso SQL `28P01`, backup, corte do legado e provisionamento CM pendentes. [Checklist](work/08-supabase-staging-reuse.md) | CM Infra / CM Data | Apply remoto, bucket real, secrets, validação live do Orçamento e publicação |
 | E3 | Selecionar peça, fotos e permissões | Cassiano | Conteúdo real do Estúdio no lançamento |
 | E5 | Definir contato comercial de continuidade | Cassiano | Chamadas comerciais e continuidade após triagem |
 

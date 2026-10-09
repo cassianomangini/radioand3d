@@ -301,13 +301,7 @@ Nunca inferir que extensão correta significa arquivo seguro.
 
 ### `quote_requests`
 
-Responsabilidade:
-
-- lifecycle da solicitação;
-- payload canônico;
-- contato;
-- triagem;
-- retenção.
+Responsabilidade: lifecycle da solicitação, conteúdo canônico, contato, triagem, **posse da sessão anônima** e retenção.
 
 Campos mínimos:
 
@@ -318,6 +312,7 @@ lifecycle_status text not null
 triage_status text null
 project_type text not null
 
+owner_session_hash text not null
 source_origin text null
 source_reference text null
 starting_points text[] not null default '{}'
@@ -334,14 +329,13 @@ submission_key uuid unique
 submitted_at timestamptz null
 last_activity_at timestamptz not null
 expires_at timestamptz not null
-
 created_at timestamptz not null
 updated_at timestamptz not null
 ```
 
-### Lifecycle
+`owner_session_hash` é calculado no servidor a partir de um segredo de sessão aleatório; **nunca** persistir cookie/token em texto puro. A mesma sessão pode possuir mais de um draft (abas diferentes). Consultas e writes sempre verificam **ID do draft E digest da sessão** no servidor, antes de realizar qualquer operação com chave privilegiada.
 
-Valores V1:
+### Lifecycle
 
 ```text
 draft
@@ -353,8 +347,6 @@ expired
 
 ### Triage
 
-Valores V1:
-
 ```text
 ready-for-review
 needs-information
@@ -365,14 +357,16 @@ Triagem não é lifecycle.
 
 ### JSON fechado
 
-`production` e `project` continuam representando o contrato versionado do frontend, mas:
+`production` e `project` representam o contrato versionado do frontend: validar `schemaVersion` antes de persistir; closed shape; chaves inesperadas falham; tamanho máximo; sem HTML; strings normalizadas. Contato deve ser gravado apenas com o mínimo necessário e protegido de logs/analytics.
 
-- schemaVersion precisa ser validado antes da persistência final;
-- formato é closed shape;
-- chaves inesperadas falham;
-- tamanho do JSON tem teto;
-- nenhum HTML é necessário;
-- strings são normalizadas.
+### Invariantes de posse
+
+- A criação do primeiro draft estabelece uma sessão anônima emitida pelo servidor, com **256 bits aleatórios**, associada por digest/HMAC aos drafts.
+- Cookie host-only `__Host-cm-quote-session`: `Secure`, `HttpOnly`, `SameSite=Strict`, `Path=/`, expiração alinhada à retenção de drafts (24h). Em localhost HTTP usar convenção de desenvolvimento separada, sem enfraquecer produção.
+- Idempotência e posse devem ser protegidas no banco/serviço: não existe caminho de write baseado **somente** em UUID, slug ou sessão fornecida no body.
+- Validar `Origin` da aplicação e rejeitar métodos/`Content-Type` inesperados nas rotas que mutam estado, além do cookie. Revisar CSRF nos fluxos de upload assinado.
+- Depois que o cookie expirar/perder-se, não oferecer recuperação por ID isolado: o draft entra em expiração; solicitar novo preenchimento sem divulgar dados antigos.
+- A sessão anônima não cria usuário Supabase Auth nem permite leitura direta da Data API.
 
 ## 10. `quote_attachments`
 
@@ -453,135 +447,60 @@ Pode registrar:
 
 Usar IDs internos.
 
-## 12. Rate limiting
+## 12. Rate limiting e capacidade de Storage
 
-Tabela:
+Persistir `quote_rate_limit_windows` com **HMAC(server_secret, normalized_ip)**, jamais IP bruto. Política inicial configurável: criar request **5/h**, iniciar upload **25/h**, submit **5/h** por hash; expiração do hash em 24h. Aplicar contagem atomicamente; limitações por IP não substituem quota global nem autenticação da sessão.
 
-`quote_rate_limit_windows`
+### Capacidade global
 
-Não armazenar IP bruto.
+Além dos limites de **5 arquivos**, **50 MB/arquivo** e **100 MB/request**, impor um teto agregado de Storage reservado + ocupado, configurado em `CM_QUOTE_STORAGE_BUDGET_BYTES`. Valor inicial recomendado no Free: **600 MB** (ajustável conforme capacidade efetiva; deixar margem para uso e metadados da conta).
 
-O servidor calcula:
+No init, transação reserva bytes declarados e slot de anexo (inclusive uploads em andamento). Somar **reservas ainda válidas + objetos validados** com sincronização transacional (ex.: lock/advisory no projeto) para impedir dois uploads simultâneos de furar a quota. Falhas/expiração de token liberam reserva somente após verificar/remover eventual objeto no Storage. No complete, conferir bytes reais: divergência que exceda reserva ou limite implica rejeitar/excluir o objeto e reconciliar saldo.
 
-```text
-HMAC(server_secret, normalized_ip)
-```
+Quando teto/quota acabar, devolver erro acionável de capacidade sem emitir novos tokens; alertar operação. Não depender de uma única quota por visitante, de `Content-Length` informado pelo browser ou de remoção manual.
 
-e persiste apenas o hash temporário.
+## 13. Persistência, autorização e idempotência
 
-Threshold inicial configurável:
+1. `POST /api/quote/session`: servidor emite/reutiliza cookie opaco de sessão, cria draft e vincula `owner_session_hash`. IDs são gerados no servidor.
+2. `POST /api/quote/attachments/init`: valida cookie, Origin, draft `id`, posse, lifecycle, quantidade, tamanho e **reserva de quota** antes de emitir um token temporário para path único; token não autoriza listar o bucket nem substituir objeto.
+3. `POST /api/quote/attachments/complete`: valida a mesma posse, inspeciona objeto real, conteúdo e bytes, confirma/rejeita e atualiza reservas sem write parcial perdido.
+4. `POST /api/quote/submit`: valida posse, payload, contato, anexos e status; persiste uma única transição terminal vinculada a `submission_key` única.
+5. Repetição da mesma submissão retorna resultado consistente e **não cria dois leads**. Repetição de init/complete deve ter semântica explícita de retry, com idempotency key/attachment ID e reconciliação.
+6. Requests de outra sessão, cookies expirados e anexos de outro request recebem rejeição **sem retornar dados privados**. Não conceder poderes extras pela presença de uma Supabase secret key no servidor.
 
-- criar request: **5 por hora** por hash;
-- iniciar upload: **25 tokens por hora** por hash;
-- submit: **5 por hora** por hash.
-
-Esses valores ficam em configuração, não espalhados no código.
-
-Retenção do rate-limit hash:
-
-**24 horas**.
-
-Se tráfego real provar falso positivo/abuso, ajustar por evidência.
-
-## 13. Persistência e idempotência
-
-### Request
-
-ID criado no servidor.
-
-### Attachment
-
-ID criado no servidor antes do signed upload token.
-
-### Submit
-
-`submission_key` idempotente.
-
-Retry do submit com a mesma key:
-
-- não duplica lead;
-- retorna o mesmo resultado terminal quando seguro.
-
-### Regra
-
-O registro `submitted` só existe quando:
-
-- payload canônico válido;
-- contato válido;
-- anexos exigidos presentes;
-- attachments referenciados pertencem ao request;
-- attachments concluídos estão `validated`;
-- contagem/tamanho obedecem à política.
+`submitted` somente quando payload/contato válidos, anexos pertencentes ao draft e `validated`, quantidade e capacidade dentro da política. Garantir transação/locking nas alterações que disputem estado do draft.
 
 ## 14. RLS, grants e Data API
 
-Todas as tabelas acima ficam com:
+Todas as tabelas de Orçamento ficam com **RLS habilitado** e sem SELECT/INSERT/UPDATE/DELETE para `anon` e `authenticated`, sem policy pública. O browser **nunca** chama Data API/RPC de negócio; o servidor é o único consumidor privilegiado.
 
-- RLS habilitado;
-- sem SELECT/INSERT/UPDATE/DELETE para `anon`;
-- sem SELECT/INSERT/UPDATE/DELETE para `authenticated`;
-- sem policy pública;
-- acesso da aplicação somente por backend server-side autorizado.
-
-Não usar browser → table.
-
-Não usar browser → RPC de negócio.
-
-A secret key Supabase fica somente no servidor.
-
-O frontend não precisa de `NEXT_PUBLIC_SUPABASE_*` na V1.
+A chave Supabase do servidor **não substitui autorização**: antes de executar leitura, upload, complete, submit ou emissão de URL assinada, verificar sessão e posse do draft. `owner_session_hash` não é fornecido pelo cliente. Limitar campos retornados: contato, filenames e dados de projetos não aparecem em resposta para IDs alheios, em logs nem em analytics. Auditoria e testes negativos cobrem grants, views, RPCs e políticas do Storage.
 
 ### Storage
 
-Bucket privado.
-
-Nenhuma policy de list/read pública.
-
-Upload direto ocorre por signed upload token específico.
-
-Download para análise/review futura ocorre por signed URL curto gerado no servidor.
+O bucket `quote-intake` é privado. Não permitir list/read públicos nem upsert. O servidor emite token de upload restrito a um path físico novo **somente** após autorizar o request e reservar capacidade. A URL ou token assinado não é persistido; expira. Downloads futuros usam URL temporária curta criada pelo backend depois de autorizar acesso interno.
 
 ## 15. Supabase Auth
 
-**Não usado na V1 pública.**
-
-Visitante não cria conta.
-
-Não usar anonymous sign-in apenas para permitir upload.
-
-Isso criaria sessão/identidade sem necessidade.
-
-Se uma área privada de gestão do CM surgir futuramente, Auth será decidido como capacidade separada.
+**Não usado para visitantes na V1.** Não criar anonymous sign-in como atalho para acesso ao bucket. Sessão do Orçamento é um vínculo de posse específico e não uma conta de usuário. Área privada de gestão, se existir no futuro, terá contrato Auth/autorização separado.
 
 ## 16. Server boundary do Next.js
 
-O site usa Route Handlers server-side.
-
-Rotas propostas:
+Routes server-side previstas:
 
 ```text
 POST /api/quote/session
 POST /api/quote/attachments/init
 POST /api/quote/attachments/complete
 POST /api/quote/submit
-GET  /api/quote/<public-result-id>   (somente se futuramente necessário)
+GET  /api/internal/quote-retention   (cron autenticado; nunca navegador público)
 ```
 
-Na V1 a confirmação pode vir diretamente do submit; não é obrigatório criar GET público.
+Confirmação da V1 vem do submit; não criar GET público por ID de solicitação. Se futuramente necessário, GET também deve exigir posse de sessão e não expor contato por ID.
 
-### Secret key
+Cookie de sessão: criado somente por servidor; HttpOnly, host-only, Secure em produção, SameSite Strict, Path=/, TTL até 24h. Para cada mutação, checar Origin same-origin e método/`Content-Type`, além de posse, rate-limit e estado. Separar a lógica de autorização do cliente Supabase `service_role`.
 
-Vercel Production:
-
-`CM_SUPABASE_URL`
-
-`CM_SUPABASE_SECRET_KEY`
-
-`CM_QUOTE_BUCKET=quote-intake`
-
-`CM_QUOTE_RATE_LIMIT_SECRET`
-
-Nenhuma dessas variáveis usa prefixo `NEXT_PUBLIC_`.
+Config server-only: `CM_SUPABASE_URL`, `CM_SUPABASE_SECRET_KEY`, `CM_QUOTE_BUCKET`, `CM_QUOTE_RATE_LIMIT_SECRET`, `CM_QUOTE_SESSION_SECRET`, `CM_QUOTE_STORAGE_BUDGET_BYTES`. Não usar prefixo `NEXT_PUBLIC_` para credenciais, nem publicar cookies/tokens/assinaturas.
 
 ## 17. Retenção
 
@@ -629,39 +548,40 @@ Desde que metadata não contenha PII.
 
 **24 horas**.
 
-## 18. Job de retenção
+## 18. Retenção automatizada e Vercel Cron
 
-Cleanup não deve deletar diretamente metadados internos de `storage.objects` por SQL.
+Não excluir registros de `storage.objects` diretamente por SQL. Usar a **Storage API** para apagar os objetos reais e somente depois concluir a exclusão dos registros de Orçamento correspondentes.
 
-Exclusão de objeto deve usar Storage API.
+**Contrato HTTP vigente: `GET /api/internal/quote-retention`**. Vercel Cron faz GET para a URL de **produção**. A rota verifica `Authorization: Bearer <CRON_SECRET>` contra a variável server-only `CRON_SECRET`, rejeita segredo ausente/incorreto (`401`) e não expõe métricas ou PII a chamadas não autorizadas. User-Agent e `x-vercel-cron-schedule` não são autenticação.
 
-Estratégia V1:
+Depois de implementar a rota, configurar em `vercel.json` **preservando `git.deploymentEnabled: false`**:
 
-```text
-Vercel Cron / server scheduled route
-        ↓
-server secret
-        ↓
-lista requests/attachments expirados
-        ↓
-Storage API delete
-        ↓
-delete/expire rows
-        ↓
-quote_events
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": { "deploymentEnabled": false },
+  "crons": [
+    { "path": "/api/internal/quote-retention", "schedule": "0 3 * * *" }
+  ]
+}
 ```
 
-Rota interna proposta:
+`0 3 * * *` = diariamente, **03:00 UTC**, com possível variação conforme plano. No Hobby, Vercel permite no máximo uma execução diária por cron; o deploy falha ao tentar cadência superior. **Não adicionar `crons` enquanto a rota não existir, não estiver autenticada/testada e o secret não estiver provisionado**: caso contrário haverá invocações 404.
 
-`POST /api/internal/quote-retention`
+### Semântica de execução
 
-Protegida por secret próprio de cron.
+- Vercel **não retenta automaticamente** invocações com erro. Entrega pode falhar, repetir ou sobrepor runs: reconciliar **todos os pendentes** em toda execução, não apenas a data corrente.
+- Usar lock/lease no banco + paginação/lotes para evitar duas execuções deletando a mesma solicitação simultaneamente.
+- Estados idempotentes e reconciliáveis, por anexo e solicitação: `pending_delete` / `storage_deleted` / `row_deleted`; erro de Storage mantém metadata e entra na próxima varredura.
+- Depois de apagar objetos via Storage API, remover/anonimizar metadados e contato conforme os períodos de retenção; registrar evento **sem PII**. Se o processo morrer entre as operações, próximo run recomeça com segurança.
+- Logs: timestamp, duração, número de candidatos/processados, bytes liberados, erros e atraso do último sucesso, sempre sem contato/nome de arquivo/token.
+- Criar monitoramento/alerta para ausência de execução, falha recorrente e risco de quota esgotada. Testar falha/duplicidade/invocação manual autenticada e URL não autorizada.
 
-Executar diariamente.
+O objetivo continua o contrato de 24h para draft/órfão, 90 dias para arquivos submetidos, 180 dias para contato/conteúdo e 365 dias para eventos técnicos sem PII. A rotina é diária e, portanto, a exclusão deve ter **tolerância operacional até a próxima execução**; não prometer remoção no segundo exato do prazo.
 
-Não usar Edge Function adicional no CM apenas para duplicar uma função que o runtime Next/Vercel já consegue executar.
+Se mudar de hospedagem, preservar o comportamento e trocar somente o scheduler.
 
-Se no futuro o site sair da Vercel, mover o scheduler sem alterar o contrato de dados.
+Fontes: [Vercel Cron](https://vercel.com/docs/cron-jobs), [segurança e entrega](https://vercel.com/docs/cron-jobs/manage-cron-jobs) e [limites de agendamento](https://vercel.com/docs/cron-jobs/usage-and-pricing).
 
 ## 19. Produtos/Shopee — Supabase do Artesopolis Admin
 

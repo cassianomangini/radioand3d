@@ -18,7 +18,7 @@ The two halves share one brand and one page, but they do not need identical visu
 - central draggable split when active in the approved design;
 - full desktop radio player;
 - no persistent desktop mini-player when the full player is present;
-- user-requested new desktop mode `docked` (09 Oct 2026): dragging the right sidebar **toward the right** beyond its minimum width makes it **rise into the navbar** as one compact audio-control view and gives Studio the released width; a button in the header or drag **from right edge to left** restores the previous sidebar width. This is mutually exclusive with the full sidebar, not a second audio engine. Latest design handoff: `docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`; visual approval is pending.
+- user-requested new desktop mode `docked` (09 Oct 2026): dragging the right sidebar **toward the right** beyond its minimum width makes it **rise into the navbar immediately BEFORE SocialIcons on the right-hand side** as one compact audio-control view, preserving the centered navigation and leaving existing social buttons visible, and gives Studio the released width; a button in the header or drag **from right edge to left** restores the previous sidebar width. This is mutually exclusive with the full sidebar, not a second audio engine. Latest design handoff: `docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`; visual approval is pending.
 - essential radio operation should not depend on scrolling the page;
 - playlist/equalizer/full-player content may use the radio pane's internal composition;
 - 3D pane can grow with future content.

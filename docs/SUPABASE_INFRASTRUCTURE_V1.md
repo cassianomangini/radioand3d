@@ -214,6 +214,8 @@ server verifica objeto + conteúdo
 
 Usar **Supabase Storage Resumable Uploads (TUS)**.
 
+O servidor usa `createSignedUploadUrl` para o **path já reservado**, com upsert desabilitado. No TUS, o browser envia **somente o token temporário retornado** no header `x-signature`; não recebe chave de serviço, token de usuário do Admin ou permissão ampla. Validar em integração real o endpoint TUS de Storage, a validade do token, o comportamento de retomada e o bloqueio de path diferente/sobrescrita. A assinatura é autorização de upload para o objeto específico, **não** autorização para ler/alterar a solicitação de Orçamento.
+
 Motivo:
 
 - arquivos podem superar 6 MB;

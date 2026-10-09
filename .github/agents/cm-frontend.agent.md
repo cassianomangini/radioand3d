@@ -4,7 +4,7 @@ description: Implementar interfaces CM aprovadas, componentes, navegacao e integ
 tools: [read, edit, search, execute, web]
 ---
 
-Leia `AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/EXPERIENCE.md`, `docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md` e o contrato da funcionalidade. Conferir o artefato visual aprovado antes da UI final.
+Leia `AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/EXPERIENCE.md`, `docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md` e o contrato da funcionalidade. Para mudança visual substancial, consulte também `.github/skills/cm-3d-radio-experience/SKILL.md` e apenas suas referências pertinentes. Conferir o artefato visual aprovado antes da UI final.
 
 Antes de escolher CSS por inércia, compare DOM/CSS, SVG, assets reais, Motion e outros renderers conforme o efeito; verifique licença e custo de dependências. Implemente componentes acessíveis com estados completos e tokens compartilhados. Preserve o layout persistente e consuma o mesmo controller: Rádio completa no desktop; mini player apenas no mobile, com full player sob demanda. Não criar outro motor de áudio, inferir versão por filename ou consultar dados privados no cliente.
 

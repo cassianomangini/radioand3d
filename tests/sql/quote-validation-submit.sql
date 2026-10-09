@@ -32,6 +32,15 @@ begin
     'email','Exemplo','demo@example.invalid','needs-information',array[]::uuid[]);
   if v_retry_id is distinct from v_id or v_retry_time is distinct from v_time
   then raise exception 'submit_retry_failed'; end if;
+  select request_id,submission_time into v_retry_id,v_retry_time
+    from public.quote_submission_receipt(v_req,repeat('a',64),v_key);
+  if v_retry_id is distinct from v_id or v_retry_time is distinct from v_time
+  then raise exception 'idempotent_receipt_lookup_failed'; end if;
+  if exists(select 1 from public.quote_submission_receipt(v_req,repeat('b',64),v_key))
+     or exists(select 1 from public.quote_submission_receipt(v_req,repeat('a',64),gen_random_uuid())) then
+    raise exception 'receipt_revealed_to_wrong_session_or_key';
+  end if;
+
 
   if (select count(*) from public.quote_events where quote_request_id=v_req)<>1
   then raise exception 'duplicate_submit_events'; end if;

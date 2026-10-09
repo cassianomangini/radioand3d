@@ -9,6 +9,7 @@ import {
   classifyQuoteRequestDraft, parseQuoteRequestDraft, validateQuoteRequestDraft,
 } from '../../features/studio/quote-request-contract.ts';
 import { detectQuoteFile } from './file-sniffer.ts';
+import { validate3mfArchive } from './zip-3mf.ts';
 
 const TYPES: readonly string[] = ['impressao', 'placa', 'caixa', 'outro'];
 /** Starts a new draft; a cookie never grants access to another draft ID. */
@@ -123,15 +124,17 @@ export async function handleQuoteAttachmentComplete(
     if (actualSize !== owned.reported_size_bytes) {
       throw new QuoteHttpError(409, 'quote_file_size_mismatch');
     }
-    const head = await db.readStorageRange(owned.storage_path, 0,
-      Math.min(actualSize, 131_072) - 1);
-    // 3MF requires a bounded check of the ZIP central directory; a generic
-    // ZIP magic prefix must never be enough to approve a 3D manufacturing file.
-    const tail = owned.extension === '.3mf'
-      ? await db.readStorageRange(owned.storage_path,
-        Math.max(0, actualSize - 65_536), actualSize - 1)
-      : undefined;
-    const detected = detectQuoteFile(owned.extension, head, actualSize, tail);
+    const detected = owned.extension === '.3mf'
+      ? (await validate3mfArchive(
+          actualSize,
+          (first, last) => db.readStorageRange(owned.storage_path, first, last),
+        ) ? '3mf-zip' : null)
+      : detectQuoteFile(
+          owned.extension,
+          await db.readStorageRange(owned.storage_path, 0,
+            Math.min(actualSize, 131_072) - 1),
+          actualSize,
+        );
     if (!detected) throw new QuoteHttpError(409, 'unsupported_file_content');
 
     await db.validateAttachment(body.requestId, hash, body.attachmentId, actualSize, detected);

@@ -1,6 +1,6 @@
 # E2 — Provisionamento seguro do Supabase CM
 
-Estado: **in_progress** (quatro migrations aplicadas, bucket privado e quotas SQL validadas; handlers/TUS/limpeza/deploy pendentes)  
+Estado: **in_progress** (cinco migrations aplicadas; bucket e quotas SQL verificados; handlers/TUS/limpeza/deploy pendentes)  
 Atualização: **09/10/2026**  
 Owner: **CM Infra / CM Data**  
 Contrato: [Supabase Infrastructure V1](../SUPABASE_INFRASTRUCTURE_V1.md)  
@@ -79,6 +79,7 @@ Gate: não há acesso horizontal por adivinhar/obter ID de orçamento.
 - [x] Criar e verificar o bucket **privado** `quote-intake`, `public=false`, limite real de **50.000.000 bytes/objeto** e ausência de policies públicas no Storage. Browser alinhado a **50 MB por arquivo, 100 MB por pedido**, com teste de fronteira versionado. **Não afirmar que upload TUS foi exercitado.**
 - [x] Aplicar migration de limites globais: `quote_upload_limits=600000000` e reserva conservadora **50 MB/arquivo pendente**, serialização por lock de linha, no máximo 5 anexos/100 MB contabilizados por pedido; `quote_reserve_attachment` idempotente exige hash de posse do draft. [Migration](../../supabase/migrations/20261009144734_quote_private_bucket_and_capacity.sql) · [Teste SQL](../../tests/sql/quote-private-storage.sql).
 - [x] Proteger integridade do descarte: impedir `DELETE` de anexo ainda reservado/armazenado; `quote_release_attachment` exige hash, grant expirado e ausência de `storage.objects`; bloquear redução prematura do prazo TUS. [Cleanup](../../supabase/migrations/20261009145055_quote_attachment_safe_release.sql) · [Expiração](../../supabase/migrations/20261009145125_guard_quote_upload_grant_expiry.sql) · [Teste SQL](../../tests/sql/quote-safe-release.sql).
+- [x] Após o Performance Advisor identificar uma FK sem índice (`quote_events.quote_request_id`), aplicar [migration de índice](../../supabase/migrations/20261009145751_index_quote_events_request_fk.sql) e confirmar o desaparecimento do alerta. Permanecem avisos `INFO` de índices ainda não usados, esperados em banco sem dados de negócio; não removê-los sem workload.
 - [x] Executar testes sintéticos SQL com `BEGIN/ROLLBACK`: idempotência, sessão incorreta, conflito de chave, cota por pedido/global, impedimento de manipulação, impedimento de liberar grant ativo e limpeza repetível; **read-back de zero requests/anexos/objetos**. Não foram realizados uploads reais nem teste de corrida com duas conexões.
 - [ ] Emitir token TUS server-only **somente** após validar cookie + posse + quota; path aleatório, sem upsert. Testar resposta 409/429/503 conforme erro.
 - [ ] Validar TUS/resume, tipos/conteúdo e **tamanho físico no Storage** antes de reduzir `accounted_bytes`; executar upload real e prova de isolamento.
@@ -120,6 +121,6 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 - **P1:** staging legado pausado pelo usuário e `INACTIVE`; backup restaurável e inexistência de consumidores **não comprovados**; Admin produção segue `ACTIVE_HEALTHY`, sem testes operacionais completos de regressão.
 - **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo, banco acessível, vazio e sem migrations. Security Advisor inicial sem achados. A referência antiga nos EUA não é o alvo.
 - **P3 local:** token opaco, HMAC de posse e testes focais já versionados. Isso não é fluxo persistente funcionando.
-- **Supabase CM remoto:** quatro migrations aplicadas e versionadas; cinco tabelas privadas (incluindo orçamento global), bucket `quote-intake` privado e limite de 50 MB, RPCs restritas ao servidor. SQL transacional e read-back concluídos, zero pedidos/objetos criados. **Secrets, handlers, TUS real e cron ainda não aplicados**.
+- **Supabase CM remoto:** cinco migrations aplicadas e versionadas (incluindo correção de FK); cinco tabelas privadas (incluindo orçamento global), bucket `quote-intake` privado e limite de 50 MB, RPCs restritas ao servidor. SQL transacional e read-back concluídos, zero pedidos/objetos criados. **Secrets, handlers, TUS real e cron ainda não aplicados**.
 - **Vercel:** projeto Radio mantém somente variáveis R2; não foi alterado.
 - **Próximo passo:** integrar backend server-only (sessão, `init` → token TUS, `complete` → inspeção real, submit idempotente e rate limit), implementar limpeza Storage API e executar testes concorrentes e E2E antes de configurar Vercel/Cron. O site não recebe dados de clientes nesta fase.

@@ -35,6 +35,27 @@ test.describe("Visual Lab development preview", () => {
       expect(dimensions.document, "No horizontal scroll should be introduced").toBeLessThanOrEqual(
         dimensions.viewport + 1
       );
+      const collision = await page.evaluate(() => {
+        const heading = document.querySelector('[data-study] h2');
+        const paragraph = document.querySelector('[data-study-description="true"]');
+        if (!heading || !paragraph) return { missing: true, overlapping: true };
+        const range = document.createRange();
+        range.selectNodeContents(heading);
+        const title = range.getBoundingClientRect();
+        const copy = paragraph.getBoundingClientRect();
+        return {
+          missing: false,
+          overlapping: title.left < copy.right - 1 &&
+            title.right > copy.left + 1 &&
+            title.top < copy.bottom - 1 &&
+            title.bottom > copy.top + 1
+        };
+      });
+      expect(collision.missing, "Lab content must expose readable title and description").toBe(false);
+      expect(collision.overlapping, "Text glyphs must not collide with the description").toBe(false);
+
+      // Next dev badge is not part of the authored composition.
+      await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
       await page.screenshot({
         path: testInfo.outputPath("lab-" + study + ".png"),
         fullPage: true,

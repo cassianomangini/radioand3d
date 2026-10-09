@@ -391,7 +391,7 @@ Decisão desta fase:
 - seleção inválida é rejeitada antes de avançar no fluxo;
 - nenhuma mídia é enviada ou persistida nesta etapa;
 - a mesma política deverá rodar no servidor, somada à inspeção do conteúdo;
-- backend, storage, upload e retenção seguem o contrato [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md); schema, bucket e nove migrations já foram aplicados no Supabase CM, enquanto **TUS real, limpeza e E2E ainda bloqueiam ativação pública**.
+- backend, storage, upload e retenção seguem o contrato [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md); schema, bucket e dez migrations já foram aplicados no Supabase CM, enquanto **TUS real, limpeza e E2E ainda bloqueiam ativação pública**.
 
 
 ## Orçamento — contrato de solicitação backend-neutral — 05/10/2026
@@ -403,7 +403,7 @@ Decisão desta fase:
 - classificação inicial separa `ready-for-review`, `needs-information` e `incomplete`;
 - nenhuma regra automática marca projeto como “não atendido”; casos fora de escopo continuam decisão humana;
 - nenhum arquivo, contato ou solicitação é enviado nesta etapa;
-- persistência e Storage privado já existem no Supabase CM; verificação de 3MF foi reforçada e CI passou, mas secrets, TUS real, retenção automática e smoke live **ainda não foram validados**.
+- persistência e Storage privado já existem no Supabase CM; verificação 3MF e worker de retenção foram implementados e CI passou, mas secrets, TUS real, limpeza Storage física, Cron agendado e smoke live **ainda não foram validados**.
 
 
 ## Revisão pós-PRs #29/#30 — contrato do Orçamento — 05/10/2026
@@ -432,4 +432,4 @@ Decisão desta fase:
 - retenção: draft/órfão 24 h, arquivos submetidos 90 d, conteúdo/contato 180 d, eventos técnicos 365 d; Cron `GET` + `CRON_SECRET` e idempotência na Vercel (somente depois de implementado);
 - produção real exige migrations/bucket, secrets server-side, testes de segurança e validação live;
 - documento canônico de infra: [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md);
-- checklist de provisionamento/validação remota: [E2](08-supabase-provisioning.md). Banco CM criado e staging pausado pelo usuário; **nove migrations e bucket privado aplicados**, e handlers `session`/`init`/`complete`/`submit` existem na `main` **com flag OFF**; falta validar upload real, retenção, secrets e Cron. Nenhuma publicação.
+- checklist de provisionamento/validação remota: [E2](08-supabase-provisioning.md). Banco CM criado e staging pausado pelo usuário; **dez migrations e bucket privado aplicados**, e handlers `session`/`init`/`complete`/`submit` existem na `main` **com flag OFF**; worker de retenção já existe (não agendado); falta validar upload, remoção real, secrets e Cron. Nenhuma publicação.

@@ -67,11 +67,29 @@ export function RadioDockPreview() {
     if (!root) return;
     const social = root.querySelector(`.${shellStyles.socialIcons}`);
     if (!social) return;
+
+    // Attribute hooks point to REAL hashed CSS-module nodes. Targeting their
+    // source class names as :global(.siteHeader) would not match the DOM.
+    const targets = [
+      [shellStyles.siteHeader, "data-preview-header"],
+      [shellStyles.desktopShell, "data-preview-shell"],
+      [shellStyles.radioPanel, "data-preview-radio"],
+      [shellStyles.resizeHandle, "data-preview-divider"],
+      [shellStyles.socialIcons, "data-preview-socials"]
+    ] as const;
+    const marked = targets.flatMap(([className, attribute]) => {
+      const element = root.querySelector(`.${className}`);
+      if (!element) return [];
+      element.setAttribute(attribute, "true");
+      return [{ element, attribute }];
+    });
+
     setSocialTarget(social);
     setReady(true);
     root.dataset.previewReady = "true";
     return () => {
       delete root.dataset.previewReady;
+      for (const { element, attribute } of marked) element.removeAttribute(attribute);
     };
   }, []);
 

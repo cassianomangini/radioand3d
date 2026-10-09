@@ -79,4 +79,4 @@ ${sections}
 </main></body></html>`;
 
 await writeFile(path.join(outputDirectory, "comparativo.html"), html, "utf8");
-console.log("Visual comparison generated: " + path.join(outputDirectory, "comparativo.html"));
+process.stdout.write("Visual comparison generated: " + path.join(outputDirectory, "comparativo.html") + "\n");

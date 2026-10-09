@@ -55,10 +55,10 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 
 **Objetivo:** ampliar o sistema que já existe, sem descartar o CDP ou substituir todas as capturas de uma vez.
 
-- [ ] **V2.1** Rodar e inspecionar as capturas atuais em ambiente controlado; registrar quais telas, estados e viewports realmente passam ou falham.
+- [x] **V2.1** Rodar e inspecionar as capturas atuais em ambiente controlado; registrar quais telas, estados e viewports realmente passam ou falham.
 - [ ] **V2.2** Definir fixtures/dados determinísticos, esperas por fontes e mídia, controle de transições e tratamento de conteúdo dinâmico (faixa aleatória, tempo e arte), sem depender de credenciais privadas no navegador.
-- [ ] **V2.3** Introduzir Playwright Test onde trouxer ganho verificável para jornadas, emulação mobile e comparação visual; conservar o script CDP da Rádio até haver paridade, sem duas suítes duplicadas indefinidamente.
-- [ ] **V2.4** Capturar ao menos 1440×900, 1024×768, desktop curto 1760×824, mobile 390×844 e mobile estreito ~360 px conforme a superfície; testar mobile com emulação real, não apenas largura de screenshot desktop.
+- [x] **V2.3** Introduzir Playwright Test onde trouxer ganho verificável para jornadas, emulação mobile e comparação visual; conservar o script CDP da Rádio até haver paridade, sem duas suítes duplicadas indefinidamente.
+- [x] **V2.4** Capturar ao menos 1440×900, 1024×768, desktop curto 1760×824, mobile 390×844 e mobile estreito ~360 px conforme a superfície; testar mobile com emulação real, não apenas largura de screenshot desktop.
 - [ ] **V2.5** Criar comparação com baselines **curadas e aprovadas**, diffs/artifacts e triagem visual das cinco maiores diferenças. Pixel diff detecta regressão; não é nota automática de beleza nem aprovação de mock.
 - [ ] **V2.6** Cobrir overflow horizontal/scroll involuntário, hierarquia, foco/teclado, touch, títulos longos, loading/error, `prefers-reduced-motion`, áudio único/persistente e estados de entrada/saída/interrupção.
 - [ ] **V2.7** Registrar acessibilidade e performance em cenários representativos; orçamento de GPU/bundle é avaliado antes de 3D/Canvas/efeitos permanentes.
@@ -71,7 +71,7 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 **Objetivo:** explorar tecnologia avançada em vez de reconstruir efeitos por inércia.
 
 - [x] **V3.1** Criar registro enxuto de candidatos por problema: Motion (layout/gestos), GSAP (timeline/SVG), React Bits/Codrops (referências/experimentos), R3F + Drei (3D real), SVG/Canvas (iluminação/partículas), Rive (animação stateful).
-- [ ] **V3.2** Para cada opção usada: verificar licença de uso **e redistribuição**, manutenção, acessibilidade, Next/React/SSR, custo de bundle, desempenho mobile, fallback e complexidade de atualização. React Bits não é MIT irrestrito: possui condição Commons Clause.
+- [x] **V3.2** Para cada opção usada: verificar licença de uso **e redistribuição**, manutenção, acessibilidade, Next/React/SSR, custo de bundle, desempenho mobile, fallback e complexidade de atualização. React Bits não é MIT irrestrito: possui condição Commons Clause.
 - [x] **V3.3** Montar referências aprovadas e receitas **apenas para os efeitos que tenham consumidor real**; especificar camadas, iluminação, movimento, estados e antipatrones. Não criar dez componentes abstratos vazios.
 - [x] **V3.4** Formalizar regra de escolha: DOM/CSS para texto/controles, SVG para geometria/filtros, asset para cenário artístico estático, Motion/GSAP quando a coreografia justificar, Canvas/WebGL apenas se necessário. Não animar o mesmo elemento com múltiplos motores concorrentes.
 - [ ] **V3.5** Registrar decisões `adotar` / `avaliar depois` / `rejeitar` com justificativa e exemplo renderizado; instalar dependência só após experimento aprovado.
@@ -123,6 +123,12 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 
 **Pendente nesta rodada:** executar e inspecionar Playwright na CI condicional `[visual]`, tratar eventuais falhas de tooling, validar o contrato de baseline e aprovar o primeiro protótipo antes de iniciar UI pública.
 
+## QA renderizada realmente executada
+
+**CI [visual] validada:** [run 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995): lint, typecheck, 84 testes unitários e build passaram; **25/25** testes Playwright passaram, com cinco perfis de tela, 20 capturas e 5 auditorias Axe. O CDP existente capturou mais 23 imagens de estados e navegação. Foram inspecionados exemplos desktop/mobile da Home, do Estúdio e dos estados da Rádio. Detalhes e resultados não resolvidos estão no [relatório de evidência](evidence/08v-visual-qa-audit-2026-10-09.md).
+
+**A11y diagnosticou problemas moderados, não corrigidos:** `page-has-heading-one` no hub em todos os perfis e `region` para o divisor em desktops amplos. O cenário sem R2 real mostra playlist vazia. O CI verde comprova o harness técnico, **não** comprova design 2040, áudio verdadeiro em reprodução ou aceitação das páginas. V2.2, V2.5, V2.6, V2.7 e V2.8 continuam abertos na parte ainda não coberta.
+
 ## Critérios do Visual QA (para cada tela)
 
 1. **Fidelidade:** hierarquia, proporções, imagem, tipografia e composição conferidas contra o artefato aprovado; o que era asset não foi aproximado com decoração improvisada.
@@ -144,10 +150,11 @@ Um `[x]` exige um resultado **efetivamente observado** e localização da prova.
 | 09/10/2026 | A0.1–A0.7 | Leitura de `main@080cbd7`, agentes, CI, script CDP, contratos do Estúdio e skill de experiência; pesquisa fornecida | Auditoria documental/estática feita. **Nenhum** item V1–V6 executado. Próximo: confirmar lado do split e aprovar mudanças no processo de QA. |
 | 09/10/2026 | V1.1–V1.4, V1.6, V3.1, V3.3, V3.4 | `AGENTS.md`, três perfis GitHub, `EXPERIENCE.md`, `ARCHITECTURE.md`, fonte da skill, `CM_VISUAL_RENDER_PIPELINE_V1.md`, `CM_VISUAL_RECIPES_V1.md` | Ajustes realizados sem alteração de página pública; skill empacotada, instalação na biblioteca ChatGPT ainda externa. |
 | 09/10/2026 | Preparação técnica V2 / dependências | `playwright.config.ts`, `tests/visual/public-pages.spec.ts`, `.github/workflows/ci.yml`, `package.json`, `pnpm-lock.yaml` | Bibliotecas instaladas e verificações estáticas/build verdes no runner; Playwright/browser visual ainda exige execução e inspeção. |
+| 09/10/2026 | V2.1/V2.3/V2.4 e V3.2 | [run 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995), [evidência observada](evidence/08v-visual-qa-audit-2026-10-09.md) | 25/25 Playwright, 23 capturas CDP; 5 perfis e Axe com 1–2 violações moderadas por viewport. Baseline perceptual/aceite humano pendentes. |
 
 ## Retomada
 
-**Último ponto verificado:** V1.1–V1.4/V1.6 documentados; dependências travadas e build/testes de código verdes no runner; receipts/skill source versionados.  
+**Último ponto verificado:** V1.1–V1.4/V1.6; V2.1/V2.3/V2.4; V3.1/V3.2/V3.3/V3.4 com evidências. CI 37936816995 verde (25/25), resultados a11y registrados. Skill ZIP validada, ainda exige importação/ativação pessoal.  
 **Pendência:** V1.5 exige ativação humana da nova skill instalada; V2 ainda requer auditoria do browser e snapshots comparáveis; V3 requer prova visual de uso de biblioteca antes de declarar componente adotado.  
 **Próxima ação exata:** executar os cenários Playwright de V2 e inspecionar screenshots/erros reais; só então decidir V4 lab e V5 piloto de página.  
 **Deploy e alteração de páginas públicas:** nenhum. **Código alterado:** apenas tooling/testes/CI/manifests, não JSX/CSS das páginas.

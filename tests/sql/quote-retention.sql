@@ -6,7 +6,7 @@ do $$
 declare
   token uuid:=gen_random_uuid();
   other uuid:=gen_random_uuid();
-  draft uuid; submitted uuid; expired_file uuid; active_file uuid; submitted_file uuid;
+  draft uuid; orphan_draft uuid; submitted uuid; expired_file uuid; active_file uuid; submitted_file uuid;
   n integer; freed bigint;
   d integer; s integer; r integer; e integer;
   blocked boolean;
@@ -69,9 +69,17 @@ begin
   insert into public.quote_events(quote_request_id,event_type,event_status,metadata,created_at)
   values(null,'technical.test','ok','{}'::jsonb,now()-interval '400 days');
 
+  -- Regression: expiring a draft with no attachments must not leave its
+  -- event metadata behind when FK ON DELETE SET NULL preserves the event.
+  insert into public.quote_requests(project_type,owner_session_hash,created_at,expires_at)
+    values('placa',repeat('d',64),now()-interval '4 days',now()-interval '2 days')
+    returning id into orphan_draft;
+  insert into public.quote_events(quote_request_id,event_type,event_status,metadata)
+    values(orphan_draft,'technical.test','ok','{"contact":"synthetic@example.invalid"}'::jsonb);
+
   select drafts_deleted,submitted_deleted,rate_windows_deleted,events_deleted
   into d,s,r,e from public.quote_retention_sweep(token,100);
-  if d<>0 or s<>1 or r<>1 or e<>1 then
+  if d<>1 or s<>1 or r<>1 or e<>1 then
     raise exception 'wrong_counts_%_%_%_%',d,s,r,e; end if;
   if exists(select 1 from public.quote_events
     where quote_request_id is null and metadata<>'{}'::jsonb) then

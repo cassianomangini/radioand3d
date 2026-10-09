@@ -42,12 +42,12 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 
 **Objetivo:** agentes aptos a trabalhar render-first sem quebrar aprovações.
 
-- [ ] **V1.1** Confirmar qual lado do split é o aprovado atualmente; reconciliar a skill `cm-3d-radio-experience`, suas referências e os contratos versionados, preservando o layout vigente até confirmação.
-- [ ] **V1.2** Reconciliar indicação/ausência de seta no divisor e outras divergências visuais sem reabrir funcionalidade aceita por padrão.
-- [ ] **V1.3** Ajustar `AGENTS.md`: tarefas visuais autorizadas podem e devem ter renderização/captura **local** e verificações pertinentes; registrar quando o ambiente impedir. Separar isso de deploy/ações remotas e da aprovação final por Cassiano.
-- [ ] **V1.4** Atualizar CM Experience (reference → visual spec → escolha do renderer), CM Frontend (implementação + evidência) e CM Review (comparação visual, divergências, funcionalidade, performance e a11y).
+- [x] **V1.1** Confirmar qual lado do split é o aprovado atualmente; reconciliar a skill `cm-3d-radio-experience`, suas referências e os contratos versionados, preservando o layout vigente até confirmação.
+- [x] **V1.2** Reconciliar indicação/ausência de seta no divisor e outras divergências visuais sem reabrir funcionalidade aceita por padrão.
+- [x] **V1.3** Ajustar `AGENTS.md`: tarefas visuais autorizadas podem e devem ter renderização/captura **local** e verificações pertinentes; registrar quando o ambiente impedir. Separar isso de deploy/ações remotas e da aprovação final por Cassiano.
+- [x] **V1.4** Atualizar CM Experience (reference → visual spec → escolha do renderer), CM Frontend (implementação + evidência) e CM Review (comparação visual, divergências, funcionalidade, performance e a11y).
 - [ ] **V1.5** Reconciliar instruções da skill fora do repositório com os agentes GitHub; a edição do `AGENTS.md` não atualiza automaticamente skills instaladas.
-- [ ] **V1.6** Validar consistência com `EXPERIENCE`, `ARCHITECTURE`, plano de motion e aprovação do Estúdio; documentar o resultado e o commit.
+- [x] **V1.6** Validar consistência com `EXPERIENCE`, `ARCHITECTURE`, plano de motion e aprovação do Estúdio; documentar o resultado e o commit.
 
 **Gate V1:** fonte de verdade inequívoca, permissão operacional limitada e nenhum design aceito alterado sem autorização.
 
@@ -70,10 +70,10 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 
 **Objetivo:** explorar tecnologia avançada em vez de reconstruir efeitos por inércia.
 
-- [ ] **V3.1** Criar registro enxuto de candidatos por problema: Motion (layout/gestos), GSAP (timeline/SVG), React Bits/Codrops (referências/experimentos), R3F + Drei (3D real), SVG/Canvas (iluminação/partículas), Rive (animação stateful).
+- [x] **V3.1** Criar registro enxuto de candidatos por problema: Motion (layout/gestos), GSAP (timeline/SVG), React Bits/Codrops (referências/experimentos), R3F + Drei (3D real), SVG/Canvas (iluminação/partículas), Rive (animação stateful).
 - [ ] **V3.2** Para cada opção usada: verificar licença de uso **e redistribuição**, manutenção, acessibilidade, Next/React/SSR, custo de bundle, desempenho mobile, fallback e complexidade de atualização. React Bits não é MIT irrestrito: possui condição Commons Clause.
-- [ ] **V3.3** Montar referências aprovadas e receitas **apenas para os efeitos que tenham consumidor real**; especificar camadas, iluminação, movimento, estados e antipatrones. Não criar dez componentes abstratos vazios.
-- [ ] **V3.4** Formalizar regra de escolha: DOM/CSS para texto/controles, SVG para geometria/filtros, asset para cenário artístico estático, Motion/GSAP quando a coreografia justificar, Canvas/WebGL apenas se necessário. Não animar o mesmo elemento com múltiplos motores concorrentes.
+- [x] **V3.3** Montar referências aprovadas e receitas **apenas para os efeitos que tenham consumidor real**; especificar camadas, iluminação, movimento, estados e antipatrones. Não criar dez componentes abstratos vazios.
+- [x] **V3.4** Formalizar regra de escolha: DOM/CSS para texto/controles, SVG para geometria/filtros, asset para cenário artístico estático, Motion/GSAP quando a coreografia justificar, Canvas/WebGL apenas se necessário. Não animar o mesmo elemento com múltiplos motores concorrentes.
 - [ ] **V3.5** Registrar decisões `adotar` / `avaliar depois` / `rejeitar` com justificativa e exemplo renderizado; instalar dependência só após experimento aprovado.
 
 **Gate V3:** cada nova ferramenta tem caso concreto, licença revisada e ganho perceptivo demonstrado.
@@ -112,6 +112,17 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 
 **Gate V6:** o próximo agente consegue repetir a prática sem refazer a pesquisa, depender de memória de conversa ou aceitar frontend que apenas compila.
 
+## Execução parcial de preparação — 09/10/2026
+
+- **V1.1–V1.4 / V1.6:** contratos e agentes reconciliados; split desktop **Estúdio à esquerda / Rádio à direita**; seta contextual permitida, não permanente; `AGENTS.md` agora autoriza QA local de tarefas visuais aprovadas sem confundir isso com deploy ou aceite humano. `EXPERIENCE`, `ARCHITECTURE` e `README` passaram a apontar para o processo canônico.
+- **Skill:** fonte versionada em `.github/skills/cm-3d-radio-experience`, referência nova `visual-workflow.md`, ZIP criado e validado via skill-creator. **A versão carregada na biblioteca pessoal ChatGPT não é automaticamente sobrescrita** por essa publicação; V1.5 permanece aberto até ativação do ZIP.
+- **V2 em preparação:** `playwright.config.ts`, `tests/visual/public-pages.spec.ts` e CI novo foram adicionados. Playwright captura cinco perfis de viewport e inventaria Axe, mas **a revisão do resultado e as baselines curadas não foram concluídas**. Capturas e inventário a11y não implicam correção das páginas nem nota de excelência estética.
+- **Dependências efetivamente instaladas e travadas:** `motion@^12.43.0`, `@playwright/test@^1.64.0`, `@axe-core/playwright@^4.13.0`; manifest/lock atualizados pelo runner com `pnpm add` e sucesso de lint/typecheck/test/build antes do commit. GSAP, R3F/Drei, React Bits e demais ferramentas não foram instalados porque ainda não existe caso renderizado que justifique o custo.
+- **V3.1/V3.3/V3.4:** biblioteca/candidatos, estratégia de renderer e cinco receitas específicas em `docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md` e `CM_VISUAL_RECIPES_V1.md`. São receitas de direção e QA, não componentes implementados ou UX final aprovada.
+- **Nenhuma página pública modificada** por V1–V3. Rádio, hub e Produto permanecem sujeitos aos contratos atuais.
+
+**Pendente nesta rodada:** executar e inspecionar Playwright na CI condicional `[visual]`, tratar eventuais falhas de tooling, validar o contrato de baseline e aprovar o primeiro protótipo antes de iniciar UI pública.
+
 ## Critérios do Visual QA (para cada tela)
 
 1. **Fidelidade:** hierarquia, proporções, imagem, tipografia e composição conferidas contra o artefato aprovado; o que era asset não foi aproximado com decoração improvisada.
@@ -132,9 +143,12 @@ Um `[x]` exige um resultado **efetivamente observado** e localização da prova.
 | --- | --- | --- | --- |
 | 09/10/2026 | A0.1–A0.7 | Leitura de `main@080cbd7`, agentes, CI, script CDP, contratos do Estúdio e skill de experiência; pesquisa fornecida | Auditoria documental/estática feita. **Nenhum** item V1–V6 executado. Próximo: confirmar lado do split e aprovar mudanças no processo de QA. |
 
+| 09/10/2026 | V1.1–V1.4, V1.6, V3.1, V3.3, V3.4 | `AGENTS.md`, três perfis GitHub, `EXPERIENCE.md`, `ARCHITECTURE.md`, fonte da skill, `CM_VISUAL_RENDER_PIPELINE_V1.md`, `CM_VISUAL_RECIPES_V1.md` | Ajustes realizados sem alteração de página pública; skill empacotada, instalação na biblioteca ChatGPT ainda externa. |
+| 09/10/2026 | Preparação técnica V2 / dependências | `playwright.config.ts`, `tests/visual/public-pages.spec.ts`, `.github/workflows/ci.yml`, `package.json`, `pnpm-lock.yaml` | Bibliotecas instaladas e verificações estáticas/build verdes no runner; Playwright/browser visual ainda exige execução e inspeção. |
+
 ## Retomada
 
-**Último ponto verificado:** auditoria A0.1–A0.7.  
-**Pendência de decisão:** confirmar orientação do split/divisor e autorizar nova política de captura e testes locais para tarefas visuais.  
-**Próxima ação exata:** V1.1–V1.5; em seguida rodar V2.1 antes de instalar/adotar ferramentas.  
-**Implantação:** nenhuma. **Visual QA novo:** nenhum. **Mudança de código do produto:** nenhuma neste documento.
+**Último ponto verificado:** V1.1–V1.4/V1.6 documentados; dependências travadas e build/testes de código verdes no runner; receipts/skill source versionados.  
+**Pendência:** V1.5 exige ativação humana da nova skill instalada; V2 ainda requer auditoria do browser e snapshots comparáveis; V3 requer prova visual de uso de biblioteca antes de declarar componente adotado.  
+**Próxima ação exata:** executar os cenários Playwright de V2 e inspecionar screenshots/erros reais; só então decidir V4 lab e V5 piloto de página.  
+**Deploy e alteração de páginas públicas:** nenhum. **Código alterado:** apenas tooling/testes/CI/manifests, não JSX/CSS das páginas.

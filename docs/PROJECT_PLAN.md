@@ -82,10 +82,10 @@ Essas possibilidades entram no roadmap somente quando houver necessidade e decis
 
 - cobertura geográfica de projetos personalizados;
 - até onde o Estúdio modela a partir de ideia, foto, logo ou desenho;
-- origem/atualização dos dados de produtos;
-- backend e retenção dos pedidos de orçamento;
+- implementação e cutover da ponte editorial de Produtos, cujo contrato está definido mas não foi implantado;
+- provisionamento do novo Supabase CM e execução do backend/retention de Orçamento, cujos contratos já estão definidos;
 - contato de continuidade após triagem;
 - configuração local/área de serviço no Google;
 - domínio público definitivo.
 
-As propostas técnicas estão em [ARCHITECTURE.md](ARCHITECTURE.md). A auditoria do legado é uma referência histórica, não um segundo plano de execução.
+As decisões técnicas estão em [ARCHITECTURE.md](ARCHITECTURE.md) e [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md); seus estados de execução estão somente no [roadmap](ROADMAP.md). A auditoria do legado é uma referência histórica, não um segundo plano de execução.

@@ -80,7 +80,7 @@ test('concurrent cron does not delete or sweep while lease is owned', async () =
   assert.deepEqual(calls.map(([n]) => n), ['busy']);
 });
 
-test('Storage failure never releases bytes or proceeds to cleanup; records failure', async () => {
+test('Storage failure preserves the attachment, but still scrubs unrelated expired PII', async () => {
   calls.length = 0;
   const res = await handleQuoteRetention(auth(), {
     ...stub, async removeAndConfirm() {
@@ -89,9 +89,42 @@ test('Storage failure never releases bytes or proceeds to cleanup; records failu
     },
   });
   assert.equal(res.status, 503);
-  assert.deepEqual(await res.json(), { error: 'retention_unavailable' });
+  const body = await res.json();
+  assert.equal(body.error, 'retention_partial_failure');
+  assert.equal(body.failedObjects, 1);
+  assert.equal(body.objects, 0);
+  assert.equal(JSON.stringify(body).includes(path), false);
   assert.deepEqual(calls.map(([n]) => n),
-    ['acquire', 'candidates', 'storage_failure', 'finish']);
+    ['acquire', 'candidates', 'storage_failure', 'sweep', 'finish']);
+  assert.equal(calls.at(-1)[1], false);
+  assert.equal(calls.at(-1)[2].failedObjects, 1);
+});
+
+test('a failed object does not prevent the rest of its bounded batch being removed', async () => {
+  calls.length = 0;
+  const sibling = '55f4a510-295c-468c-b337-31089e79b07a';
+  const siblingPath = requestId + '/' + sibling + '.pdf';
+  const result = await handleQuoteRetention(auth(), {
+    ...stub,
+    async candidates() {
+      calls.push(['candidates']);
+      return [
+        {attachment_id: attachmentId, request_id: requestId, object_path: path},
+        {attachment_id: sibling, request_id: requestId, object_path: siblingPath},
+      ];
+    },
+    async removeAndConfirm(p) {
+      calls.push(['remove', p]);
+      if (p === path) throw new Error('synthetic object storage failure');
+    },
+  });
+  assert.equal(result.status, 503);
+  const body = await result.json();
+  assert.equal(body.failedObjects, 1);
+  assert.equal(body.objects, 1);
+  assert.equal(body.bytes, 50_000_000);
+  assert.deepEqual(calls.map(([n]) => n),
+    ['acquire', 'candidates', 'remove', 'remove', 'finalize', 'sweep', 'finish']);
   assert.equal(calls.at(-1)[1], false);
 });
 

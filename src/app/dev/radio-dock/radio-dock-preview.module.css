@@ -8,48 +8,48 @@
 /* The route reuses the real CM header and shell. These overrides are limited
    to the development-only preview wrapper; no production CSS is modified. */
 @media (min-width: 73.75rem) {
-  .preview :global(.siteHeader) {
+  .preview [data-preview-header] {
     transition: right 660ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
-  .preview :global(.desktopShell) {
+  .preview [data-preview-shell] {
     transition: grid-template-columns 660ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
-  .preview :global(.socialIcons) {
+  .preview [data-preview-socials] {
     position: relative;
     z-index: 1;
     flex: none;
   }
 
-  .preview[data-dock-phase="docked"] :global(.siteHeader),
-  .preview[data-dock-phase="docking"] :global(.siteHeader) {
+  .preview[data-dock-phase="docked"] [data-preview-header],
+  .preview[data-dock-phase="docking"] [data-preview-header] {
     right: 0 !important;
   }
 
-  .preview[data-dock-phase="docked"] :global(.desktopShell),
-  .preview[data-dock-phase="docking"] :global(.desktopShell) {
+  .preview[data-dock-phase="docked"] [data-preview-shell],
+  .preview[data-dock-phase="docking"] [data-preview-shell] {
     grid-template-columns: minmax(0, 1fr) 0 0 !important;
   }
 
-  .preview[data-dock-phase="docked"] :global(.radioPanel),
-  .preview[data-dock-phase="docking"] :global(.radioPanel),
-  .preview[data-dock-phase="restoring"] :global(.radioPanel) {
+  .preview[data-dock-phase="docked"] [data-preview-radio],
+  .preview[data-dock-phase="docking"] [data-preview-radio],
+  .preview[data-dock-phase="restoring"] [data-preview-radio] {
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
   }
 
-  .preview[data-dock-phase="docked"] :global(.resizeHandle),
-  .preview[data-dock-phase="docking"] :global(.resizeHandle),
-  .preview[data-dock-phase="restoring"] :global(.resizeHandle) {
+  .preview[data-dock-phase="docked"] [data-preview-divider],
+  .preview[data-dock-phase="docking"] [data-preview-divider],
+  .preview[data-dock-phase="restoring"] [data-preview-divider] {
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
   }
 
-  .preview[data-dock-phase="docked"] :global(.siteHeader > .socialIcons),
-  .preview[data-dock-phase="docking"] :global(.siteHeader > .socialIcons) {
+  .preview[data-dock-phase="docked"] [data-preview-socials],
+  .preview[data-dock-phase="docking"] [data-preview-socials] {
     display: flex !important;
   }
 }
@@ -332,8 +332,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .preview :global(.siteHeader),
-  .preview :global(.desktopShell),
+  .preview [data-preview-header],
+  .preview [data-preview-shell],
   .dockSlot,
   .edgeHandle {
     transition-duration: 1ms !important;

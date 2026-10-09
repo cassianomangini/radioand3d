@@ -82,13 +82,15 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 
 **Objetivo:** comparar alternativas antes de introduzi-las nas páginas reais.
 
-- [ ] **V4.1** Reaproveitar `/dev/foundation` e evoluí-la com experimentos isolados; criar rota nova somente se houver incompatibilidade real. Garantir indisponibilidade no build público, não apenas `noindex`.
-- [ ] **V4.2** Montar um experimento com até 3 alternativas visuais da **mesma superfície**, usando composição, mídia/fixtures honestas e critérios equivalentes.
-- [ ] **V4.3** Renderizar e comparar lado a lado desktop/mobile; registrar componentes, técnica gráfica, estados e custo de desempenho, sem selecionar a primeira alternativa por padrão.
+- [x] **V4.1** Reaproveitar `/dev/foundation` e evoluí-la com experimentos isolados; criar rota nova somente se houver incompatibilidade real. Garantir indisponibilidade no build público, não apenas `noindex`.
+- [x] **V4.2** Montar um experimento com até 3 alternativas visuais da **mesma superfície**, usando composição, mídia/fixtures honestas e critérios equivalentes.
+- [x] **V4.3** Renderizar e comparar lado a lado desktop/mobile; registrar componentes, técnica gráfica, estados e custo de desempenho, sem selecionar a primeira alternativa por padrão.
 - [ ] **V4.4** Congelar a melhor variante e sua evidência; não sobrescrever a referência vencedora durante iterações.
 - [ ] **V4.5** Apresentar o resultado à aprovação de Cassiano. Não publicar experimento diretamente.
 
-**Gate V4:** protótipo visual verificável, alternativa vencedora identificada, e diferenças de qualidade registradas.
+**Gate V4:** parcialmente atingido. Protótipo e comparação reais verificáveis; **nenhuma alternativa vencedora selecionada**. Aprovação por Cassiano e congelamento de baseline continuam V4.4/V4.5.
+
+**Evidência V4.1–V4.3:** rota isolada `/dev/visual-lab` criada separadamente de `/dev/foundation` porque experimentos compositivos com Motion não devem alterar a vitrine de primitivas/tokens já existente. Em produção, rota 404; no dev, três composições do mesmo conteúdo com placeholders honestos. Playwright comparou 1440/1024/390/360 e gerou `comparativo.html`; inclui troca com teclado, colisões de texto, scroll e inventário de custo de JS/frames do servidor dev. [Relatório de execução e limites](evidence/08v-lab-performance-2026-10-09.md) e [diário de defeitos corrigidos](evidence/08v-lab-iterations-2026-10-09.md).
 
 ### V5 — Piloto de evolução real no Estúdio
 
@@ -125,9 +127,15 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 
 ## QA renderizada realmente executada
 
-**CI [visual] validada:** [run 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995): lint, typecheck, 84 testes unitários e build passaram; **25/25** testes Playwright passaram, com cinco perfis de tela, 20 capturas e 5 auditorias Axe. O CDP existente capturou mais 23 imagens de estados e navegação. Foram inspecionados exemplos desktop/mobile da Home, do Estúdio e dos estados da Rádio. Detalhes e resultados não resolvidos estão no [relatório de evidência](evidence/08v-visual-qa-audit-2026-10-09.md).
+**CI [visual] inicial validada:** [run 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995): lint, typecheck, 84 testes unitários e build passaram; **25/25** testes Playwright passaram, com cinco perfis de tela, 20 capturas e 5 auditorias Axe. O CDP existente capturou mais 23 imagens de estados e navegação. Foram inspecionados exemplos desktop/mobile da Home, do Estúdio e dos estados da Rádio. Detalhes e resultados não resolvidos estão no [relatório de evidência](evidence/08v-visual-qa-audit-2026-10-09.md).
 
 **A11y diagnosticou problemas moderados, não corrigidos:** `page-has-heading-one` no hub em todos os perfis e `region` para o divisor em desktops amplos. O cenário sem R2 real mostra playlist vazia. O CI verde comprova o harness técnico, **não** comprova design 2040, áudio verdadeiro em reprodução ou aceitação das páginas. V2.2, V2.5, V2.6, V2.7 e V2.8 continuam abertos na parte ainda não coberta.
+
+## Comparação isolada do laboratório (V4)
+
+**CI final do Visual Lab:** [run 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229), commit `fcb615b66cbc1360cba58b5a4094bd5b413f90fa`. **30/30** testes Playwright públicos/404 e **16/16** testes do laboratório em quatro viewports passaram sem retries; 84 testes unitários, lint, tipos e build verdes. Foram produzidas **12 capturas reais** e comparativo HTML da mesma superfície **Impressões** em três composições. [Relatório de QA + medições de desempenho (ambiente dev)](evidence/08v-lab-performance-2026-10-09.md).
+
+A inspeção dos PNGs apontou inicialmente sobreposição de texto no **Mostruário**; depois o QA detectou clique anterior à hidratação React. Ambos foram corrigidos e verificados por cenário automatizado sem retry. **Não significa que os estudos sejam arte final.** Original da referência aprovada, fotografia real E3, seleção de variante e baselines pixel-diff continuam pendentes. Página pública/Rádio não foram modificadas.
 
 ## Critérios do Visual QA (para cada tela)
 
@@ -152,9 +160,11 @@ Um `[x]` exige um resultado **efetivamente observado** e localização da prova.
 | 09/10/2026 | Preparação técnica V2 / dependências | `playwright.config.ts`, `tests/visual/public-pages.spec.ts`, `.github/workflows/ci.yml`, `package.json`, `pnpm-lock.yaml` | Bibliotecas instaladas e verificações estáticas/build verdes no runner; Playwright/browser visual ainda exige execução e inspeção. |
 | 09/10/2026 | V2.1/V2.3/V2.4 e V3.2 | [run 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995), [evidência observada](evidence/08v-visual-qa-audit-2026-10-09.md) | 25/25 Playwright, 23 capturas CDP; 5 perfis e Axe com 1–2 violações moderadas por viewport. Baseline perceptual/aceite humano pendentes. |
 
+| 09/10/2026 | V4.1–V4.3 | [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229), [evidência V4](evidence/08v-lab-performance-2026-10-09.md) | Rota protegida 404 em produção, 3 estudos × 4 viewports, 16 testes dev sem retry, comparação HTML e inventário de custos. V4.4/V4.5 aguardam escolha/aprovação. |
+
 ## Retomada
 
-**Último ponto verificado:** V1.1–V1.4/V1.6; V2.1/V2.3/V2.4; V3.1/V3.2/V3.3/V3.4 com evidências. CI 37936816995 verde (25/25), resultados a11y registrados. Skill ZIP validada, ainda exige importação/ativação pessoal.  
-**Pendência:** V1.5 exige ativação humana da nova skill instalada; V2 ainda requer auditoria do browser e snapshots comparáveis; V3 requer prova visual de uso de biblioteca antes de declarar componente adotado.  
-**Próxima ação exata:** executar os cenários Playwright de V2 e inspecionar screenshots/erros reais; só então decidir V4 lab e V5 piloto de página.  
-**Deploy e alteração de páginas públicas:** nenhum. **Código alterado:** apenas tooling/testes/CI/manifests, não JSX/CSS das páginas.
+**Último ponto verificado:** auditoria A0; V1.1–V1.4/V1.6; V2.1/V2.3/V2.4; V3.1–V3.4; V4.1–V4.3. [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229) verde, laboratório renderizado 3×4, custos dev registrados e defeitos de texto/hidratação corrigidos.  
+**Pendências:** V1.5 (importação da skill pessoal); V2 (fixtures/baselines aprovadas, checks integrais), V3.5 (adoção de efeitos após seleção), **V4.4/V4.5 (escolha e aceite visual)**, V5/V6 não iniciados. Dados visuais reais E3 permanecem ausentes.  
+**Próxima ação exata:** apresentar os três estudos em desktop/mobile, coletar direção/ajustes de Cassiano; só congelar vencedor após aprovação. A seguir validar assets reais e abrir V5 respeitando os contratos comerciais.  
+**Deploy e alteração de páginas públicas:** nenhum. **Código alterado:** apenas laboratório isolado de desenvolvimento, testes, scripts, CI e documentação; Home, Estúdio público, Produto e Rádio preservados.

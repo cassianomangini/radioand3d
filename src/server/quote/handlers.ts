@@ -71,10 +71,12 @@ export async function handleQuoteAttachmentInit(
       reportedMime: typeof body.type === 'string' ? body.type : null,
       sizeBytes: body.size as number,
     });
-    // Supabase upload signatures live for 2 hours. A retry must not mint a
-    // signature that outlives the database reservation (3 hours from init).
+    // Signed token lives up to 2h, but the TUS upload URL opened at the end
+    // of that window may remain valid for another 24h. Reservations last 27h
+    // (2h + 24h + 1h margin); never re-sign beyond that safety window.
     const remainingMs = Date.parse(reserved.reservation_expires_at) - Date.now();
-    if (!Number.isFinite(remainingMs) || remainingMs < 2 * 60 * 60 * 1000 + 5 * 60 * 1000) {
+    const maximumNewTusLifetimeMs = (2 + 24) * 60 * 60 * 1000 + 5 * 60 * 1000;
+    if (!Number.isFinite(remainingMs) || remainingMs < maximumNewTusLifetimeMs) {
       throw new QuoteHttpError(409, 'upload_reservation_expiring');
     }
     const signed = await db.signUpload(reserved.object_path);
@@ -87,7 +89,7 @@ export async function handleQuoteAttachmentInit(
       tokenHeader: 'x-signature',
       uploadTokenExpiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
       reservationExpiresAt: reserved.reservation_expires_at,
-    }, 200);
+    }, 200, { 'Set-Cookie': issueSessionCookie(token) });
   } catch (error) { return responseError(error); }
 }
 
@@ -114,7 +116,8 @@ export async function handleQuoteAttachmentComplete(
     const owned = await db.ownedAttachment(body.requestId, hash, body.attachmentId);
     if (owned.validation_status === 'validated' &&
       owned.validated_size_bytes !== null) {
-      return responseJson({ attachmentId: owned.attachment_id, validated: true });
+      return responseJson({ attachmentId: owned.attachment_id, validated: true }, 200,
+        { 'Set-Cookie': issueSessionCookie(token) });
     }
     if (!['pending-upload','uploaded'].includes(owned.validation_status)) {
       throw new QuoteHttpError(409, 'quote_file_invalid');
@@ -138,7 +141,8 @@ export async function handleQuoteAttachmentComplete(
     if (!detected) throw new QuoteHttpError(409, 'unsupported_file_content');
 
     await db.validateAttachment(body.requestId, hash, body.attachmentId, actualSize, detected);
-    return responseJson({ attachmentId: owned.attachment_id, validated: true });
+    return responseJson({ attachmentId: owned.attachment_id, validated: true }, 200,
+      { 'Set-Cookie': issueSessionCookie(token) });
   } catch (error) { return responseError(error); }
 }
 

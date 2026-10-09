@@ -64,6 +64,10 @@ const gateway = {
     assert.equal(size,pdf.length);
     assert.equal(detected,'pdf');
   },
+  async submissionReceipt() {
+    calls.push('receipt');
+    return null;
+  },
   async submitQuote(data) {
     calls.push('submit');
     assert.equal(data.requestId,requestId);
@@ -110,6 +114,7 @@ test('complete checks cookie+owner, object size, bounded signature, then DB tran
   assert.equal(r.status,200);
   assert.deepEqual(calls,['owned','info','range','validated']);
   assert.equal((await r.json()).validated,true);
+  assert.match(r.headers.get('set-cookie') || '', /SameSite=Strict/);
 });
 
 test('complete denies missing session before any fetch and rejects false file signature', async () => {
@@ -135,8 +140,27 @@ test('submit validates canonical draft, classifies on server, and returns privat
   const response=await handleQuoteSubmit(request('/api/quote/submit',
     {requestId,submissionKey,draft:draft(),attachmentIds:[]},session),gateway);
   assert.equal(response.status,201);
-  assert.deepEqual(calls,['submit']);
+  assert.deepEqual(calls,['receipt','submit']);
   assert.deepEqual(await response.json(),
+    {requestId,submittedAt:'2026-10-09T14:00:00Z'});
+});
+
+test('idempotent replay bypasses the exhausted hourly limiter and submit write', async () => {
+  const session = await cookie();
+  calls.length = 0;
+  const replay = await handleQuoteSubmit(request('/api/quote/submit',
+    {requestId,submissionKey,draft:draft(),attachmentIds:[]},session),{
+      ...gateway,
+      async submissionReceipt() {
+        calls.push('receipt');
+        return {request_id:requestId,submission_time:'2026-10-09T14:00:00Z'};
+      },
+      async consumeRate() { throw Error('retry must not consume rate budget'); },
+      async submitQuote() { throw Error('retry must not repeat a write'); }
+    });
+  assert.equal(replay.status,201);
+  assert.deepEqual(calls,['receipt']);
+  assert.deepEqual(await replay.json(),
     {requestId,submittedAt:'2026-10-09T14:00:00Z'});
 });
 

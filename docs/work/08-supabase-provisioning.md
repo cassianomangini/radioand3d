@@ -1,6 +1,6 @@
 # E2 — Provisionamento seguro do Supabase CM
 
-Estado: **in_progress** (10 migrations; retenção SQL/HTTP implementada/testada sinteticamente; TUS/Storage reais, secrets/Cron e deploy pendentes)  
+Estado: **in_progress** (11 migrations; retenção SQL/HTTP implementada/testada sinteticamente; TUS/Storage reais, secrets/Cron e deploy pendentes)  
 Atualização: **09/10/2026**  
 Owner: **CM Infra / CM Data**  
 Contrato: [Supabase Infrastructure V1](../SUPABASE_INFRASTRUCTURE_V1.md)  
@@ -10,7 +10,7 @@ Contexto: [Estúdio público](08-studio-growth.md) e [Roadmap](../ROADMAP.md)
 
 Em **09/10/2026**, o usuário criou um projeto Supabase **novo e limpo**, na organização independente **Cmangini3d** (plano Free), na região contratada **`sa-east-1` (São Paulo)**. O nome de exibição atual é `cassianomangini's Project`. Identificadores de projeto, URLs administrativas e segredos ficam fora deste Git público.
 
-**Conferência inicial (09/10/2026):** projeto `ACTIVE_HEALTHY`, PostgreSQL 17.11, criado vazio e sem migrations. **Estado posterior:** dez migrations, seis tabelas privadas com RLS, bucket privado e nenhuma solicitação/objeto real; read-back e advisor executados após as alterações. O projeto anterior criado em região dos EUA **não é mais o alvo**; a ferramenta devolveu erro de permissão ao consultar aquela referência antiga, logo a exclusão é informada pelo usuário, mas não auditada de forma independente.
+**Conferência inicial (09/10/2026):** projeto `ACTIVE_HEALTHY`, PostgreSQL 17.11, criado vazio e sem migrations. **Estado posterior:** onze migrations, seis tabelas privadas com RLS, bucket privado e nenhuma solicitação/objeto real; read-back e advisor executados após as alterações. O projeto anterior criado em região dos EUA **não é mais o alvo**; a ferramenta devolveu erro de permissão ao consultar aquela referência antiga, logo a exclusão é informada pelo usuário, mas não auditada de forma independente.
 
 O projeto CM agora corresponde à decisão arquitetural: **banco separado, organização separada, região São Paulo**. A V1 armazena somente dados privados de Orçamento; os produtos e a Shopee continuam no Artesopolis Admin, com ponte editorial read-only independente; músicas e sidecars continuam no R2.
 
@@ -137,8 +137,8 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 
 - **P0:** contratos documentados e HEAD público sanitizado; histórico antigo tem material técnico residual sem credenciais detectadas na auditoria focal.
 - **P1:** staging legado pausado pelo usuário e `INACTIVE`; backup restaurável e inexistência de consumidores **não comprovados**; Admin produção segue `ACTIVE_HEALTHY`, sem testes operacionais completos de regressão.
-- **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo; dez migrations versionadas, seis tabelas privadas, bucket privado. Security Advisor: seis avisos `INFO` de RLS sem policies (negação deliberada). A referência antiga nos EUA não é o alvo.
+- **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo; onze migrations versionadas, seis tabelas privadas, bucket privado. Security Advisor: seis avisos `INFO` de RLS sem policies (negação deliberada). A referência antiga nos EUA não é o alvo.
 - **P3 local:** token opaco, HMAC de posse e testes focais já versionados. Isso não é fluxo persistente funcionando.
-- **Supabase CM remoto:** dez migrations versionadas (incluindo retenção server-only), seis tabelas privadas, quota e bucket privado. RPCs de envio idempotente e posse testadas com rollback. **Nenhum pedido, contato, anexo ou janela de teste persistiu.** As quatro rotas de intake existem só no Git, com flag false; a rota interna de retenção exige CRON_SECRET. Sem secrets, upload TUS real, remoção Storage real ou Cron agendado.
+- **Supabase CM remoto:** onze migrations versionadas (incluindo retenção server-only), seis tabelas privadas, quota e bucket privado. RPCs de envio idempotente e posse testadas com rollback. **Nenhum pedido, contato, anexo ou janela de teste persistiu.** As quatro rotas de intake existem só no Git, com flag false; a rota interna de retenção exige CRON_SECRET. Sem secrets, upload TUS real, remoção Storage real ou Cron agendado.
 - **Vercel:** projeto Radio mantém somente variáveis R2; não foi alterado.
 - **CI fechado e verificado:** `ci` em `e4f352e`, 103/103 testes + lint/typecheck/build verdes. **Próximo passo:** validar TUS e Storage `Range` com arquivos sintéticos e 3MF real; testar remoção Storage real, configurar secret/cron e fazer smoke end-to-end. O worker foi implementado mas não está agendado. **Não habilitar intake público até gate de retenção, backup e custos.**

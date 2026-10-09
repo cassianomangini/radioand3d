@@ -419,7 +419,7 @@ Decisão desta fase:
 
 ## Infra Supabase do Estúdio — contrato revisado em 09/10/2026
 
-- projeto Supabase **novo e limpo** criado pelo usuário, na organização independente **Cmangini3d**, isolado do banco operacional e sem migrations/bucket de Orçamento;
+- projeto Supabase CM criado pelo usuário na organização independente **Cmangini3d**, isolado do banco operacional; migrations base/quota e bucket privado agora **aplicados e verificados**;
 - região contratada **e confirmada**: `sa-east-1` (São Paulo);
 - staging antigo pausado pelo usuário; backup do legado ainda sem comprovação;
 - Supabase do Artesopolis Admin continua owner da ponte Produtos/Shopee;
@@ -432,4 +432,4 @@ Decisão desta fase:
 - retenção: draft/órfão 24 h, arquivos submetidos 90 d, conteúdo/contato 180 d, eventos técnicos 365 d; Cron `GET` + `CRON_SECRET` e idempotência na Vercel (somente depois de implementado);
 - produção real exige migrations/bucket, secrets server-side, testes de segurança e validação live;
 - documento canônico de infra: [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md);
-- checklist de provisionamento/validação remota: [E2](08-supabase-provisioning.md). Banco CM criado e staging pausado pelo usuário, **não** por este agente; nenhuma migration/bucket/Cron aplicada.
+- checklist de provisionamento/validação remota: [E2](08-supabase-provisioning.md). Banco CM criado e staging pausado pelo usuário; **migrations e bucket privados aplicados pelo agente**; nenhum handler de upload/submit, secret Vercel ou Cron publicado.

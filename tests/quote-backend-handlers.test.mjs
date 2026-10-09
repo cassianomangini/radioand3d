@@ -170,7 +170,7 @@ test("old reservation never mints a fresh 2-hour TUS token", async () => {
   calls.length = 0;
   const result = await handleQuoteAttachmentInit(request("/api/quote/attachments/init",
     { requestId, uploadKey, name: "modelo.stl", size: 1234 }, { cookie }),
-    { ...gateway, async reserveAttachment(input) {
+    { ...gateway, async reserveAttachment(_input) {
       return {
         attachment_id: attachmentId,
         object_path: storagePath,

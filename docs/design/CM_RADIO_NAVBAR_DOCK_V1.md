@@ -41,7 +41,28 @@ A Rádio **não desaparece abruptamente**. Ela parece fisicamente ser recolhida 
 
 Esquema funcional, **não mock final**. A ordem da navbar em dock é **logo à esquerda | navegação centrada | player compacto | grupo de redes sociais à extrema direita**. **As redes sociais não desaparecem para abrir espaço para o mini player.** O header deve permanecer equilibrado; não cortar a marca nem empurrar a navegação para fora da tela.
 
-### Referência verificada: Artesópolis Landing (legado, somente comportamento/composição)
+### Revisão aprofundada da referência: Artesópolis Landing (`master`, 09/10/2026)
+
+A leitura anterior de `navbar.tsx` e `mini-player.tsx` reduziu o legado à **ordem dos elementos** e produziu um dock CM **pequeno e genérico demais**. Isso não traduz o que Cassiano mostrou como referência. Após conferir **o player completo**, `control-button.tsx`, `social-icons.tsx`, `globals.css`, `player-context.tsx` e os padrões de frontend do legado, o que deve orientar a **nova** prévia é:
+
+| Característica comprovada na Landing | Implicação correta para o CM |
+| --- | --- |
+| Navbar desktop em grid `1fr auto 1fr`: logo/menu na esquerda, **MiniPlayer central com largura útil alta**, quatro ícones sociais à direita | No CM a nav Início/Estúdio/Rádio continua central, mas o **player antes dos sociais precisa ter escala e presença proporcionais**, não virar um retângulo quase vazio |
+| Player com **capa grande à esquerda**, assinatura `RADIO ARTESÓPOLIS` e **nome da faixa** | Usar capa da faixa/arte CM existente, **CM RÁDIO** e título real, com boa leitura e hierarquia |
+| **Anterior, play/pause, próxima** em `ControlButton`, com controles destacados | **Três transportes essenciais** na versão dock, não somente um play/pause; restaurar lateral em controle separado |
+| **`VISUAL_BAR_COUNT` barras reativas**, registradas no `PlayerProvider` via `setBarRef` | **Visualizer pequeno e REAL**, aproveitando `RadioVisualizer` / sidecars do CM, em vez de omitir toda identidade sonora ou inventar barras em loop |
+| Plano de fundo profundo violeta/azul, contorno cromático magenta/violeta/ciano, iluminação e superfície em camadas | Herança de **acabamento com profundidade e hierarquia**, adaptada à paleta atual do CM. **Não** importar astronauta, etiqueta Artesópolis, gradiente arco-íris ou efeito de glow em toda navbar |
+| Versão mobile própria do MiniPlayer dentro de faixa abaixo do topo | **Não** duplicar o dock no mobile; manter o mini mobile do CM já aceito |
+
+**Dado de referência importante:** o player antigo **já existia permanentemente na navbar** — `navbar.tsx` o renderizava no centro em desktop e abaixo do header em mobile. **Ele não possuía o gesto lateral → navbar**. A animação espacial nova é requisito original do CM e precisa ser construída a partir do motion spine aprovado, e não copiada de uma implementação inexistente no legado.
+
+**Correção de QA criativo:** a prévia isolada `/dev/radio-dock` de 09/10/2026 comprovou posicionamento e gesto com Playwright, mas seu mini tinha **somente arte de 36px, título/artista, play/pause e restaurar**, sem anterior/próxima, sem visualizer e com corpo de ~14–20rem. **Não apresentá-la novamente como representação suficientemente fiel da referência Artesópolis**. Os 6 testes verdes não avaliaram esses requisitos ausentes. O registro D4 é apenas **prova técnica do mecanismo**; o novo estudo visual completo deve ser renderizado e comparado antes de pedir D5.
+
+**Gate de novo estudo:** definir primeiro distribuição e largura do bloco `[capa + faixa][anterior / play / próxima][visualizador real][restaurar]` no grupo imediatamente anterior às redes, sem ocupar a navegação principal, com fallbacks em 1180/1440/1760 e sem alterar layout mobile. Somente depois rever o voo/recolhimento e chamar Cassiano para validar a composição.
+
+#### Nota histórica: primeira leitura, insuficiente para decisão estética
+
+
 
 Cassiano esclareceu em 09/10/2026 que o mini player deve ficar **antes dos botões sociais**, como na experiência de navbar da antiga Landing Artesópolis. O repositório legado foi conferido:
 
@@ -69,7 +90,8 @@ O player compacto aparece **apenas no estado `docked` do desktop**; não aparece
 - **título** e, quando couber, artista, truncados sem corte de controles;
 - **play/pause** funcional, acionando o mesmo `useRadio()` que a sidebar e o mini mobile;
 - um controle distinto para **restaurar a Rádio lateral**;
-- acesso opcional à próxima faixa **somente se couber** em desktop intermediário; não sacrificar legibilidade ou equilibrar a navbar à força.
+- **controles de faixa anterior e próxima** (além de play/pause) e **visualizador musical compacto sincronizado** são agora requisitos visuais a testar, pois eram parte relevante da referência Landing. Em desktop intermediário, a composição pode redistribuir visualizador/metadados sem cortar os controles obrigatórios. 
+- assinatura discreta `CM RÁDIO` e opção `Restaurar Rádio lateral`; não confundir esse último com transporte musical.
 
 O player inteiro não é um segundo motor de áudio nem cópia independente do player completo. Ele é uma **vista pequena do mesmo estado de reprodução**. Playlist, letra, visualizador grande e controles secundários saem de vista enquanto a Rádio está recolhida; permanecem disponíveis após restauração/fullscreen.
 

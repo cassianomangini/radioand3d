@@ -121,7 +121,7 @@ function makeSupabaseRequest(fetcher: typeof fetch) {
 /** Server-only service transport: modern sb_secret key stays in apikey header. */
 export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway {
   const { api, url, fileApi } = makeSupabaseRequest(fetcher);
-  const acceptedPath = /^[0-9a-f-]{36}\\/[0-9a-f-]{36}\\.(?:stl|3mf|obj|step|stp|pdf|png|jpg|jpeg|webp)$/i;
+  const acceptedPath = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}\/[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}\.(?:stl|3mf|obj|step|stp|pdf|png|jpg|jpeg|webp)$/i;
   const assertPath = (path: string) => {
     if (!acceptedPath.test(path)) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
   };
@@ -155,7 +155,7 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
       const row = result?.[0];
       if (!Array.isArray(result) || result.length !== 1 || !uuid(row?.attachment_id) ||
         typeof row.object_path !== 'string' ||
-        !new RegExp(`^${input.requestId}/[0-9a-f-]{36}\\${input.extension}$`, 'i').test(row.object_path) ||
+        row.object_path !== `${input.requestId}/${row.attachment_id}${input.extension}` ||
         !Number.isFinite(Date.parse(row.reservation_expires_at))) {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
       }

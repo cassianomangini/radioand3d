@@ -407,7 +407,7 @@ rejected
 expired
 ```
 
-Não persistir URL pública.
+Não persistir URL pública. A FK do anexo para a solicitação impede exclusão do request enquanto existir objeto a remover; o processo de retenção primeiro exclui via Storage API e depois reconcilia/exclui attachment e request.
 
 ## 11. `quote_events`
 
@@ -447,7 +447,7 @@ Pode registrar:
 - secret;
 - signed URL/token.
 
-Usar IDs internos.
+Usar IDs internos. A FK opcional de `quote_events` para `quote_requests` usa comportamento equivalente a `ON DELETE SET NULL`, preservando eventos não pessoais depois da limpeza do request sem impedir exclusão do contato.
 
 ## 12. Rate limiting e capacidade de Storage
 
@@ -554,7 +554,7 @@ Desde que metadata não contenha PII.
 
 Não excluir registros de `storage.objects` diretamente por SQL. Usar a **Storage API** para apagar os objetos reais e somente depois concluir a exclusão dos registros de Orçamento correspondentes.
 
-**Contrato HTTP vigente: `GET /api/internal/quote-retention`**. Vercel Cron faz GET para a URL de **produção**. A rota verifica `Authorization: Bearer <CRON_SECRET>` contra a variável server-only `CRON_SECRET`, rejeita segredo ausente/incorreto (`401`) e não expõe métricas ou PII a chamadas não autorizadas. User-Agent e `x-vercel-cron-schedule` não são autenticação.
+**Contrato HTTP vigente: `GET /api/internal/quote-retention`**. Vercel Cron faz GET para a URL de **produção**. A rota verifica `Authorization: Bearer <CRON_SECRET>` contra a variável server-only `CRON_SECRET`, rejeita segredo ausente/incorreto (`401`) e não expõe métricas ou PII a chamadas não autorizadas. User-Agent e `x-vercel-cron-schedule` não são autenticação. Resposta com `Cache-Control: no-store`, handler dinâmico e nenhuma exposição de PII; GET é permitido **somente** por ser uma rota interna autenticada do scheduler.
 
 Depois de implementar a rota, configurar em `vercel.json` **preservando `git.deploymentEnabled: false`**:
 

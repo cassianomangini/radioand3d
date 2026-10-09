@@ -5,7 +5,7 @@ Revisão: **09/10/2026**
 Região contratada e confirmada: **sa-east-1 (São Paulo)**  
 Responsável: **CM Infra / CM Data**
 
-Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário criou o projeto Supabase definitivo na organização independente Cmangini3d (Free), em `sa-east-1`**. A Management API confirmou o projeto `ACTIVE_HEALTHY`; consulta SQL funcional, sem tabelas de domínio e sem migrations. O staging antigo do Admin continua pausado. **Migration inicial `create_quote_core` aplicada e versionada em 09/10/2026**: quatro tabelas privadas com RLS e sem grants `anon`/`authenticated`, banco sem dados pessoais. **Bucket, secrets, Cron e deploy do Orçamento continuam pendentes.**
+Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário criou o projeto Supabase definitivo** na organização independente Cmangini3d (Free), em `sa-east-1`. O projeto está `ACTIVE_HEALTHY`; foram aplicadas **seis migrations** versionadas: schema privado, quota, bucket, guards de limpeza, índice de FK e rate limit atômico. São cinco tabelas com RLS, bucket `quote-intake` privado e nenhum dado de clientes. **A camada HTTP de sessão e inicialização de upload existe no Git, mas continua DESATIVADA por flag**; complete, submit, limpeza Storage API, secrets, Cron e deploy seguem pendentes.
 
 A execução e os checkpoints verificáveis estão em [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md). Detalhes operacionais sobre a infraestrutura de outro sistema ficam fora deste repositório público. **Não** usar este documento como autorização para pausar, limpar, migrar ou modificar um banco existente.
 
@@ -77,7 +77,7 @@ Migrations versionadas no Git, dados de seed exclusivamente fictícios e CLI ver
 
 ### Produção
 
-**Projeto CM definitivo criado na organização Cmangini3d em `sa-east-1`.** PostgreSQL 17.11 saudável e SQL funcional. A primeira migration de Orçamento foi aplicada com sucesso e registrada no Git: [`20261009143743_create_quote_core.sql`](../supabase/migrations/20261009143743_create_quote_core.sql). Verificados quatro objetos, zero registros e grants SELECT anônimos negados. Security Advisor registrou quatro observações `INFO` de RLS ativado **sem policies**, configuração de negação intencional nesta etapa. A Vercel ainda não tem variáveis CM Supabase. Identificadores/credenciais concretos ficam fora da documentação pública.
+**Projeto CM definitivo criado na organização Cmangini3d em `sa-east-1`.** PostgreSQL 17.11 saudável e SQL funcional. Seis migrations de Orçamento/infra foram aplicadas e registradas no Git, desde [`create_quote_core`](../supabase/migrations/20261009143743_create_quote_core.sql) até [`quote_rate_limit_atomic`](../supabase/migrations/20261009152128_quote_rate_limit_atomic.sql). Verificadas cinco tabelas privadas, zero pedidos/objetos/janelas de teste persistidos e ACL/RLS negando acesso anônimo. Security Advisor: cinco observações `INFO` de RLS ativado **sem policies**, negação intencional nesta etapa. A Vercel ainda não tem variáveis CM Supabase. Identificadores/credenciais concretos ficam fora da documentação pública.
 
 A organização CM separada **foi criada e confirmada**: Cmangini3d está no plano Free. O isolamento administrativo/de faturamento por organização está estabelecido, sem alterar a assinatura da organização do Artesopolis Admin. Criar outra organização não aumenta o limite de projetos Free ativos da mesma conta.
 
@@ -458,7 +458,7 @@ Usar IDs internos. A FK opcional de `quote_events` para `quote_requests` usa com
 
 ## 12. Rate limiting e capacidade de Storage
 
-Persistir `quote_rate_limit_windows` com **HMAC(server_secret, normalized_ip)**, jamais IP bruto. Política inicial configurável: criar request **5/h**, iniciar upload **25/h**, submit **5/h** por hash; expiração do hash em 24h. Aplicar contagem atomicamente; limitações por IP não substituem quota global nem autenticação da sessão.
+**Implementado no banco:** `quote_consume_rate_limit` consome janelas atômicas em `quote_rate_limit_windows`, persistindo somente **HMAC(secret, IP normalizado)**, jamais IP bruto. Limites atuais: criar request **5/h**, iniciar upload **25/h**, submit **5/h** por hash; registros expiram em 24h. Teste SQL remoto sintético (rollback) comprovou 5 permitidas/6ª negada e separação por ação/hash. As duas primeiras rotas Next já chamam essa RPC; o `submit` ainda não existe. Na Vercel, ler IP de cabeçalho normalizado pelo proxy; fora da Vercel, produção não pode confiar cegamente em `X-Forwarded-For` fornecido pelo visitante.
 
 ### Capacidade global
 
@@ -501,7 +501,7 @@ O bucket `quote-intake` é privado. Não permitir list/read públicos nem upsert
 
 ## 16. Server boundary do Next.js
 
-Routes server-side previstas:
+Routes server-side **contratadas** (estado em 09/10/2026: `session` e `attachments/init` implementadas em código, **sem deploy**; `complete`, `submit` e `quote-retention` ainda pendentes):
 
 ```text
 POST /api/quote/session
@@ -811,8 +811,8 @@ Plano detalhado e checklist: [E2 — Provisionamento Supabase](work/08-supabase-
 
 1. Conferir em ambiente **privado** dependências do ambiente de teste legado, gerar backup externo recuperável e somente depois autorizar/realizar a pausa, sem excluir.
 2. **Concluído pelo usuário e validado:** projeto CM novo, em organização independente, região São Paulo, acessível via SQL e sem migrations. Ver [checklist E2](work/08-supabase-provisioning.md). Identificadores e secrets ficam fora do Git público.
-3. Vincular CLI ao projeto novo apenas com ref previamente conferida, manter migrations versionadas e fazer dry-run antes de push remoto.
-4. **Aplicado e verificado:** schema base, índices, RLS/grants e reserva global transacional com triggers de integridade; ainda falta a integração de backend que realizará as transições.
+3. **Parcial concluído:** migrations versionadas no Git e alvo remoto confirmado antes de cada apply via Supabase MCP; dry-run SQL por transação com rollback e read-back. CLI/Docker de desenvolvimento local continuam sem validação end-to-end neste ambiente.
+4. **Aplicado e verificado:** schema base, índices, RLS/grants, reserva global transacional e rate limit RPC. Handler de sessão/draft e init/signed-TUS foi implementado, mas **somente testado com gateway mockado**; transições reais de complete/submit continuam pendentes.
 5. **Bucket privado criado:** `quote-intake` com limite de 50 milhões de bytes, sem políticas anônimas. **Pendente:** signed TUS, inspeção de conteúdo, limpeza Storage API e testes de upload efetivo.
 6. Configurar variáveis server-side na Vercel e implementar handlers; validar que a Rádio permanece no R2.
 7. **Só após a rota protegida estar operacional:** ativar o GET diário do Vercel Cron, fazer read-back e observar falha/duplicidade.
@@ -871,7 +871,7 @@ Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
 - **Projeto CM definitivo validado** na organização Free independente Cmangini3d e região São Paulo. Migration inicial `create_quote_core` aplicada e versionada, quatro tabelas verificadas e vazias, com RLS/grants restritos.
 - O ambiente de testes legado permanece **inalterado**; pausa depende de inventário, backup e gate próprio.
-- **Cinco migrations aplicadas e versionadas**: schema base, bucket + reserva de quota com trigger, proteção de exclusão/limpeza, imutabilidade da validade TUS e índice cobrindo a FK de `quote_events`.  Bucket privado confirmado; dados de clientes: zero; testes SQL sintéticos de limites e liberação executados com `ROLLBACK`. **Rotas, uploads reais, segredos na Vercel e Cron não aplicados/deployados**.
+- **Seis migrations aplicadas e versionadas**: schema base, bucket/reserva de quota, proteção de limpeza, validade TUS, índice de FK e rate limit atômico. Bucket privado confirmado; dados de clientes: zero. SQL sintético testado com rollback. **Duas rotas HTTP (`session`, `attachments/init`) implementadas com flag `CM_QUOTE_INTAKE_ENABLED=false` e testes mockados; ainda sem TUS real, `complete`, `submit`, segredos Vercel ou Cron**.
 - Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 - Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
 - O Performance Advisor apontou FK de `quote_events` sem índice, corrigida na migration `index_quote_events_request_fk`; o novo read-back eliminou esse aviso. Sete avisos `INFO` de índices não utilizados são esperados enquanto não existe workload real.

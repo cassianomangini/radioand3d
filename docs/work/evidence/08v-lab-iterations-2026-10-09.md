@@ -19,8 +19,8 @@
 - [x] Laboratório protegido com HTTP 404 em produção nas execuções observadas.
 - [x] Três composições isoladas funcionam e estão acessíveis em desenvolvimento.
 - [x] A CI captura desktop/mobile e gera comparativo; o arquivo é diagnóstico e **não** baseline aprovado.
-- [ ] Comprovar ausência de regressão e **nenhum retry** após o marcador de hidratação (aguarda CI de revisão).
+- [x] Comprovar ausência de regressão e **nenhum retry** após o marcador de hidratação: CI [37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229), 30/30 casos públicos/limite e 16/16 do laboratório, sem retries, 84 testes unitários, lint/typecheck/build verdes.
 - [ ] Obter avaliação visual de Cassiano e selecionar uma direção.
 - [ ] Receber mídia real aprovada E3 antes de qualquer finalização da página Impressões.
 
-**Artefatos:** [capturas da segunda iteração](https://github.com/cassianomangini/radioand3d/actions/runs/37940392229/artifacts/11620553430). A existência de imagens e contato visual não implica aprovação estética.
+**Artefatos:** [capturas e relatório final do navegador](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229/artifacts/11622475963), comparativo HTML no ZIP e [inventário de desempenho/QA](08v-lab-performance-2026-10-09.md). A existência de imagens e contato visual não implica aprovação estética.

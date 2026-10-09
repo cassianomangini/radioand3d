@@ -42,6 +42,12 @@ Server Components por padrão para leitura e composição. Interatividade e áud
 
 Contratos próprios: [rádio](RADIO.md), [biblioteca](MUSIC_PIPELINE.md) e [catálogo](CATALOG_3D.md). Consumidores públicos recebem dados explicitamente publicáveis, não registros internos completos. Compartilhar tipos não substitui validação de entrada no servidor.
 
+## Escolha de renderer e ferramentas visuais
+
+O contrato visual operável fica em [CM Visual Render Pipeline V1](design/CM_VISUAL_RENDER_PIPELINE_V1.md), com bibliotecas candidatas, critérios de licença, fallback e ciclo de screenshot. CSS permanece apropriado para layout, tipografia e feedback simples; não é regra que efeitos artísticos, transições compartilhadas ou cenas 3D sejam reconstruídos manualmente em CSS. Aprovar a direção visual antes de instalar um renderer de produção pesado ou alterar as páginas finais.
+
+Os scripts de Chrome/CDP e o workflow de captura já existentes são preservados; Playwright complementa — não substitui automaticamente — os testes de continuidade de áudio e transições. Motion é o candidato selecionado para novas animações React autorizadas; GSAP, R3F/Drei e outros permanecem opcionais e dependentes de prova de necessidade, licença e orçamento de desempenho. As versões **realmente instaladas** ficam no `package.json`/`pnpm-lock.yaml`, nunca inferidas desta documentação.
+
 ## Estratégia de frontend
 
 ### Tokens e estilos

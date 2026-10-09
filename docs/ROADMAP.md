@@ -8,7 +8,7 @@ A frente aberta é o Estúdio público: Impressões, Orçamento e Produtos, com 
 
 ## Evolução da qualidade visual — subfrente 08V
 
-O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já existente, laboratório e piloto isolado fica em [08V — Evolução visual](work/08-visual-quality-evolution.md). A auditoria foi concluída; V1 teve contratos/agentes/sources atualizados, o ZIP da skill está preparado (ativação pessoal pendente), V2 já executa 25 testes Playwright em cinco viewports no CI e V3 dispõe de catálogo e receitas. V2 ainda não possui baselines aprovadas nem gate visual integral; V4–V6 continuam pendentes. Este documento não reabre a Rádio aceita e não substitui a fila funcional do Estúdio.
+O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já existente, laboratório e piloto isolado fica em [08V — Evolução visual](work/08-visual-quality-evolution.md). A auditoria foi concluída; V1 teve contratos/agentes atualizados (importação pessoal da skill pendente), V2 opera capturas e Playwright em cinco perfis, V3 tem catálogo/receitas. **V4.1–V4.3 concluídos:** laboratório isolado em `/dev/visual-lab` com três alternativas de Impressões, quatro viewports comparados, 30 testes públicos e 16 do laboratório no CI (sem retries), ver [evidência](work/evidence/08v-lab-performance-2026-10-09.md). **V4.4/V4.5 esperam seleção/aprovação de Cassiano.** V2 ainda não tem baselines visuais aprovadas, V5/V6 não começaram. Este documento não reabre a Rádio aceita e não substitui a fila funcional do Estúdio.
 
 ## Próximos passos
 

@@ -142,7 +142,6 @@ Um `[x]` exige um resultado **efetivamente observado** e localização da prova.
 | Data | IDs | Evidência | Resultado / próximo passo |
 | --- | --- | --- | --- |
 | 09/10/2026 | A0.1–A0.7 | Leitura de `main@080cbd7`, agentes, CI, script CDP, contratos do Estúdio e skill de experiência; pesquisa fornecida | Auditoria documental/estática feita. **Nenhum** item V1–V6 executado. Próximo: confirmar lado do split e aprovar mudanças no processo de QA. |
-
 | 09/10/2026 | V1.1–V1.4, V1.6, V3.1, V3.3, V3.4 | `AGENTS.md`, três perfis GitHub, `EXPERIENCE.md`, `ARCHITECTURE.md`, fonte da skill, `CM_VISUAL_RENDER_PIPELINE_V1.md`, `CM_VISUAL_RECIPES_V1.md` | Ajustes realizados sem alteração de página pública; skill empacotada, instalação na biblioteca ChatGPT ainda externa. |
 | 09/10/2026 | Preparação técnica V2 / dependências | `playwright.config.ts`, `tests/visual/public-pages.spec.ts`, `.github/workflows/ci.yml`, `package.json`, `pnpm-lock.yaml` | Bibliotecas instaladas e verificações estáticas/build verdes no runner; Playwright/browser visual ainda exige execução e inspeção. |
 

@@ -1,6 +1,6 @@
 # E2 — Provisionamento seguro do Supabase CM
 
-Estado: **in_progress** (nove migrations; reparos de compilação, 3MF, TTL TUS, replay e draft aplicados; testes HTTP/TUS reais, retenção e deploy pendentes)  
+Estado: **in_progress** (10 migrations; retenção SQL/HTTP implementada/testada sinteticamente; TUS/Storage reais, secrets/Cron e deploy pendentes)  
 Atualização: **09/10/2026**  
 Owner: **CM Infra / CM Data**  
 Contrato: [Supabase Infrastructure V1](../SUPABASE_INFRASTRUCTURE_V1.md)  
@@ -10,7 +10,7 @@ Contexto: [Estúdio público](08-studio-growth.md) e [Roadmap](../ROADMAP.md)
 
 Em **09/10/2026**, o usuário criou um projeto Supabase **novo e limpo**, na organização independente **Cmangini3d** (plano Free), na região contratada **`sa-east-1` (São Paulo)**. O nome de exibição atual é `cassianomangini's Project`. Identificadores de projeto, URLs administrativas e segredos ficam fora deste Git público.
 
-**Conferência inicial (09/10/2026):** projeto `ACTIVE_HEALTHY`, PostgreSQL 17.11, criado vazio e sem migrations. **Estado posterior:** nove migrations, cinco tabelas privadas com RLS, bucket privado e nenhuma solicitação/objeto real; read-back e advisor executados após as alterações. O projeto anterior criado em região dos EUA **não é mais o alvo**; a ferramenta devolveu erro de permissão ao consultar aquela referência antiga, logo a exclusão é informada pelo usuário, mas não auditada de forma independente.
+**Conferência inicial (09/10/2026):** projeto `ACTIVE_HEALTHY`, PostgreSQL 17.11, criado vazio e sem migrations. **Estado posterior:** dez migrations, seis tabelas privadas com RLS, bucket privado e nenhuma solicitação/objeto real; read-back e advisor executados após as alterações. O projeto anterior criado em região dos EUA **não é mais o alvo**; a ferramenta devolveu erro de permissão ao consultar aquela referência antiga, logo a exclusão é informada pelo usuário, mas não auditada de forma independente.
 
 O projeto CM agora corresponde à decisão arquitetural: **banco separado, organização separada, região São Paulo**. A V1 armazena somente dados privados de Orçamento; os produtos e a Shopee continuam no Artesopolis Admin, com ponte editorial read-only independente; músicas e sidecars continuam no R2.
 
@@ -73,7 +73,7 @@ Gate: contratos sincronizados com o estado real de implementação; detalhes de 
 - [ ] Validar as quatro rotas em um processo Next real com secrets controlados, duas sessões, expiração e falhas; o envio público continua desativado.
 - [x] Adicionar e testar boundary HTTP de `Origin` same-origin, `Sec-Fetch-Site`, `Content-Type` JSON, corpo limitado a 16 KiB, cookie duplicado rejeitado, IP confiável na Vercel e falha segura fora de proxy confiável. [http.ts](../../src/server/quote/http.ts) · [testes](../../tests/quote-backend-handlers.test.mjs).
 - [ ] Testar esses controles em ambiente Next real, incluindo expiração, troca de cookie e tentativa de cross-session; bloqueios atuais permanecem `BLOCKED` por ausência de secrets/integração E2E.
-- [x] Habilitar RLS e negar privilégios diretos `anon`/`authenticated` **nas cinco tabelas** de Orçamento/limites; SQL live confirmou leitura anônima negada e EXECUTE anônimo negado nas RPCs. **Bucket `quote-intake` privado**, sem policies para `storage.objects`; Security Advisor mantém 5 avisos `INFO` intencionais de RLS sem policies. Ainda falta prova HTTP real de negação anônima.
+- [x] Habilitar RLS e negar privilégios diretos `anon`/`authenticated` **nas seis tabelas** de Orçamento/limites/retencao; SQL live confirmou leitura anônima negada e EXECUTE anônimo negado nas RPCs. **Bucket `quote-intake` privado**, sem policies para `storage.objects`; Security Advisor mantém 6 avisos `INFO` intencionais de RLS sem policies. Ainda falta prova HTTP real de negação anônima.
 - [x] Prova SQL transacional de `quote_submit`: envio sem arquivo permitido somente para tipos compatíveis, primeira transição e replay com mesma key devolvem o mesmo recibo, key diferente/requisição de outra sessão rejeitadas, sem duplicar evento; `impressao` sem arquivo validado rejeitada; `anon` sem EXECUTE nas RPCs. [Teste SQL](../../tests/sql/quote-validation-submit.sql). Zero contatos ou arquivos persistidos após rollback.
 - [ ] Testes HTTP/Storage E2E de posse cruzada, concorrência real entre conexões e upload de arquivo efetivo (os testes SQL não substituem isso).
 
@@ -96,11 +96,14 @@ Gate: não há acesso horizontal por adivinhar/obter ID de orçamento.
 - [x] **Implementar validação no código** de `attachments/complete`: RPC owner-bound retorna o path, Storage API verifica tamanho real, leitura parcial limitada compara assinatura PDF/PNG/JPEG/WebP/STL/OBJ/STEP e estrutura ZIP/OPC 3MF com diretório central, EOCD, cabeçalhos locais, CRC de manifestos, limites e detecção de nomes adulterados; RPC transacional exige tamanho real igual ao declarado e consistência de tipo/extensão. [Validador de formatos](../../src/server/quote/file-sniffer.ts) · [Parser 3MF](../../src/server/quote/zip-3mf.ts) · [Teste ZIP local](../../tests/quote-3mf.test.mjs) · [Migration de compatibilidade de tipo](../../supabase/migrations/20261009154035_quote_detected_type_guard.sql). **A estrutura 3MF não é um parser CAD completo e não faz antivírus.**
 - [ ] Executar upload TUS real, retomar interrupção, validar `Range` da Storage API, 3MF de impressora real, inspeção de conteúdo e isolamento; sem credenciais server-only configuradas não é possível promover esta prova.
 - [ ] Testar corrida real em duas conexões/duas sessões e recuperação de falha parcial; os locks estão implementados, mas essa prova ainda não foi executada.
-- [ ] Implementar limpeza pela **Storage API**: confirmar exclusão do objeto, aguardar expiração do grant, chamar release idempotente e só então apagar metadados. Não tratar ausência de `storage.objects` como prova isolada de remoção física.
-- [ ] Implementar e autenticar `GET /api/internal/quote-retention` com `CRON_SECRET`, agendar diariamente **após** rotas/segredos testados.
-- [ ] Provar retenção de uploads órfãos, drafts, anexos submetidos, contatos e eventos, alertas de falha/ausência do cron e execução manual protegida.
+- [x] Implementar **em código e SQL** limpeza segura: lease global de 10min, seleção de anexos vencidos **somente após 27h TUS**, exclusão via Storage API DELETE seguida de GET info 404, e RPC final que revalida vencimento/ausência e libera quota. Reinício após falha mantém os registros para retry. [Migration](../../supabase/migrations/20261009232648_quote_retention_service_lease_and_cleanup.sql) · [Gateway](../../src/server/quote/retention-gateway.ts) · [Handler](../../src/server/quote/retention-handler.ts). **Ainda sem deleção real: código com mocks e SQL remoto com ROLLBACK apenas.**
+- [ ] Validar **Storage real**: remoção física, falha parcial, repetição, retomada e chamadas paralelas; só isso fecha o gate de limpeza.
+- [x] Criar `GET /api/internal/quote-retention` com `CRON_SECRET` (Bearer, comparação temporal segura, no-store e 401 sem credencial), execução mesmo com intake OFF e testes mockados de sucesso, concorrência e falha. [Rota](../../src/app/api/internal/quote-retention/route.ts) · [Teste JS](../../tests/quote-retention.test.mjs).
+- [ ] Configurar `CRON_SECRET` na Vercel, testar rota HTTP com secret real em ambiente controlado e só então **agendar** execução diária no `vercel.json`.
+- [x] Executar [teste SQL sintético](../../tests/sql/quote-retention.sql) com `BEGIN/ROLLBACK` para TUS ainda ativo, arquivos vencidos, limpeza 90d, requests/contato 180d, rate limit 24h, eventos 365d, lease exclusivo e grants; banco permaneceu sem registros reais.
+- [ ] Comprovar retenção com objetos reais, falhas/duplicidade, execução autenticada na Vercel e alertas de ausência/falha do Cron.
 
-**Gate P4 ainda aberto:** quota e bucket configurados, mas a ponta a ponta (Storage API, TUS e limpeza real) continua bloqueante para produção.
+**Gate P4 ainda aberto:** worker de retenção versionado e testado sinteticamente; TUS real, deleção física real e cron/alertas ainda bloqueiam produção.
 
 ## P5 — Integrar ao site sem antecipar publicação
 
@@ -109,7 +112,7 @@ Gate: não há acesso horizontal por adivinhar/obter ID de orçamento.
 - [x] Implementar rotas `POST /api/quote/attachments/complete` e `POST /api/quote/submit` no Git com feature gate OFF; `submit` reutiliza parser/validação/triagem canônicos, exige attachment IDs e submissionKey únicos, chama RPC SQL idempotente com lock por draft e rate limit no banco. [Rotas](../../src/app/api/quote/submit/route.ts) · [Gateway](../../src/server/quote/supabase-gateway.ts). Teste SQL positivo para no-file e negativos passaram com rollback; [testes JS foram escritos](../../tests/quote-complete-submit.test.mjs) **mas o CI completo não foi confirmado**.
 - [x] **CI real verificado em main:** workflow `ci` execução [37977555280](https://github.com/cassianomangini/radioand3d/actions/runs/37977555280), commit `e4f352e351a36ae51912e8622466091662448491`: **lint PASS, typecheck PASS, 103/103 testes PASS, build Next PASS (26 páginas estáticas)**. O erro anterior do mock foi corrigido e a execução final completa passou.
 - [ ] Testar smoke HTTP/Storage com secrets server-only controladas, TUS real, `Range`, isolamento de sessão e cenário de token expirado; **suite CI verde não substitui E2E remoto**.
-- [ ] Manter `vercel.json` **sem** `crons` até existir rota pronta: agendar caminho inexistente gera invocação e erro.
+- [x] Manter `vercel.json` **sem `crons`**, embora a rota agora exista: falta configurar secrets e comprovar remoção real antes do agendamento.
 - [ ] Respeitar `git.deploymentEnabled: false`: preparar deploy **explícito**; não presumir autodeploy.
 - [ ] Confirmar que a Rádio permanece independente do Supabase CM, e que a ponte pública de Produtos continua em entrega distinta.
 - [ ] Rodar smoke real de submit, tentativa de acesso indevido, upload interrompido, limpeza, advisor e monitoramento.
@@ -134,8 +137,8 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 
 - **P0:** contratos documentados e HEAD público sanitizado; histórico antigo tem material técnico residual sem credenciais detectadas na auditoria focal.
 - **P1:** staging legado pausado pelo usuário e `INACTIVE`; backup restaurável e inexistência de consumidores **não comprovados**; Admin produção segue `ACTIVE_HEALTHY`, sem testes operacionais completos de regressão.
-- **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo; nove migrations versionadas, cinco tabelas privadas, bucket privado. Security Advisor: cinco avisos `INFO` de RLS sem policies (negação deliberada). A referência antiga nos EUA não é o alvo.
+- **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo; dez migrations versionadas, seis tabelas privadas, bucket privado. Security Advisor: seis avisos `INFO` de RLS sem policies (negação deliberada). A referência antiga nos EUA não é o alvo.
 - **P3 local:** token opaco, HMAC de posse e testes focais já versionados. Isso não é fluxo persistente funcionando.
-- **Supabase CM remoto:** nove migrations versionadas (incluindo TTL 27h, touch de draft e replay), cinco tabelas privadas, quota e bucket privado. RPCs de envio idempotente e posse testadas com rollback. **Nenhum pedido, contato, anexo ou janela de teste persistiu.** As quatro rotas existem só no Git, com flag false; sem secrets, TUS real ou Cron.
+- **Supabase CM remoto:** dez migrations versionadas (incluindo retenção server-only), seis tabelas privadas, quota e bucket privado. RPCs de envio idempotente e posse testadas com rollback. **Nenhum pedido, contato, anexo ou janela de teste persistiu.** As quatro rotas de intake existem só no Git, com flag false; a rota interna de retenção exige CRON_SECRET. Sem secrets, upload TUS real, remoção Storage real ou Cron agendado.
 - **Vercel:** projeto Radio mantém somente variáveis R2; não foi alterado.
-- **CI fechado e verificado:** `ci` em `e4f352e`, 103/103 testes + lint/typecheck/build verdes. **Próximo passo:** testar signed TUS e Storage `Range` com arquivos sintéticos e 3MF real, implementar limpeza idempotente Storage API e Vercel Cron GET autenticado, então fazer smoke end-to-end. **Não habilitar intake público até gate de retenção, backup e custos.**
+- **CI fechado e verificado:** `ci` em `e4f352e`, 103/103 testes + lint/typecheck/build verdes. **Próximo passo:** validar TUS e Storage `Range` com arquivos sintéticos e 3MF real; testar remoção Storage real, configurar secret/cron e fazer smoke end-to-end. O worker foi implementado mas não está agendado. **Não habilitar intake público até gate de retenção, backup e custos.**

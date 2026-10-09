@@ -4,7 +4,7 @@
 **Vínculo:** subfrente da entrega 08 (Estúdio público); não é uma nova fila paralela nem reabre C1–C8 da Rádio.  
 **Base consultada:** `main` em 09/10/2026, commit `080cbd7d2078848f9d6e66bf33efc154c672b4ed`.  
 **Responsáveis por domínio:** CM Experience (direção), CM Frontend (implementação), CM Review (evidência), CM Planning (controle do checklist).  
-**Referências:** `AGENTS.md`, `docs/EXPERIENCE.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/design/CM_MOTION_EXPERIENCE_PLAN_V1.md`, `docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md` e pesquisa entregue por Cassiano em 09/10/2026 sobre interfaces render-first.
+**Referências:** `AGENTS.md`, `docs/EXPERIENCE.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/design/CM_MOTION_EXPERIENCE_PLAN_V1.md`, `docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md`, `docs/design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md` e pesquisa entregue por Cassiano em 09/10/2026 sobre interfaces render-first.
 
 ## Objetivo e definição de sucesso
 
@@ -35,6 +35,19 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 - [x] **A0.7** Revisar a pesquisa render-first: escolha híbrida DOM/CSS/SVG/asset/Canvas/WebGL, receitas visuais, biblioteca de referências, feedback visual e preservação da melhor alternativa.
 
 **Limite da auditoria:** leitura de código, documentação, skill e CI; não houve execução local do app, inspeção dos PNGs atuais, teste de interação real ou aprovação visual. Uma run recente de CI bem-sucedida não comprova que a etapa condicional de captura executou.
+
+## A1 — Auditoria visual real do CM (correção de rota em 09/10/2026)
+
+Em 09/10/2026, Cassiano identificou que a primeira rodada do laboratório **não havia estudado realmente as telas existentes, cores e composição da marca**. Essa crítica invalida a apresentação das três variantes V1 como opções de produto, embora os testes e a infraestrutura continuem úteis.
+
+- [x] **A1.1** Inspecionar as seis referências fornecidas (Home split, Rádio em foco, banner e selo CMANGINI 3D, X1, caso Placa Personalizada), separando marca global, subidentidade do Estúdio, UI da Rádio e mídia de peça.
+- [x] **A1.2** Confrontar screenshots com `tokens.css`, `layout.tsx`, shell/stylesheet do site, `EXPERIENCE`, `CM_VISUAL_SYSTEM` e handoffs comerciais; registrar paleta verdadeira, gradientes efetivos, tipografia e tratamento de mídia.
+- [x] **A1.3** Registrar hierarquia e gramática por superfície: Home integrada, Rádio focada, hub 3 entradas, galeria Impressões, produto, orçamento, responsivo; identificar precisamente por que o laboratório V1 não pertence ao mesmo universo.
+- [x] **A1.4** Suspender aprovação artística das três variantes V1 e manter somente seu valor como harness de QA. Criar gate obrigatório de **contexto do site existente antes do design**.
+- [ ] **A1.5** Inspecionar capturas reais da rota-alvo Impressões e fluxo mobile completo nas condições representativas; adquirir versão verificável de referência visual aprovada para comparação de precisão quando disponível.
+- [ ] **A1.6** Produzir nova proposta de Impressões **inserida no shell CM** e submeter direção/identidade visual a Cassiano antes de experimentar implementação de página pública.
+
+**Artefato de estudo:** [CM — Auditoria da identidade visual aplicada ao site](../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md). **Gate:** V4.4/V4.5 e V5 estão bloqueados até A1.5/A1.6, conforme pertinência da tela. Não pedir que o usuário escolha entre três propostas que compartilham um erro de identidade. **A implementação pública continua intocada.**
 
 ## Sequência de execução — marcar somente com evidência
 
@@ -88,7 +101,7 @@ Não confundir: (a) CI verde; (b) screenshot gerado; (c) revisão visual do agen
 - [ ] **V4.4** Congelar a melhor variante e sua evidência; não sobrescrever a referência vencedora durante iterações.
 - [ ] **V4.5** Apresentar o resultado à aprovação de Cassiano. Não publicar experimento diretamente.
 
-**Gate V4:** parcialmente atingido. Protótipo e comparação reais verificáveis; **nenhuma alternativa vencedora selecionada**. Aprovação por Cassiano e congelamento de baseline continuam V4.4/V4.5.
+**Gate V4:** parcialmente atingido **apenas na infraestrutura**. Os experimentos V1 são **rejeitados como direção de arte** após a auditoria A1, porque não partem do sistema visual do site. Nenhuma alternativa vencedora selecionada; V4.4/V4.5 somente após nova proposta contextual e aprovação explícita de Cassiano.
 
 **Evidência V4.1–V4.3:** rota isolada `/dev/visual-lab` criada separadamente de `/dev/foundation` porque experimentos compositivos com Motion não devem alterar a vitrine de primitivas/tokens já existente. Em produção, rota 404; no dev, três composições do mesmo conteúdo com placeholders honestos. Playwright comparou 1440/1024/390/360 e gerou `comparativo.html`; inclui troca com teclado, colisões de texto, scroll e inventário de custo de JS/frames do servidor dev. [Relatório de execução e limites](evidence/08v-lab-performance-2026-10-09.md) e [diário de defeitos corrigidos](evidence/08v-lab-iterations-2026-10-09.md).
 
@@ -162,9 +175,11 @@ Um `[x]` exige um resultado **efetivamente observado** e localização da prova.
 
 | 09/10/2026 | V4.1–V4.3 | [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229), [evidência V4](evidence/08v-lab-performance-2026-10-09.md) | Rota protegida 404 em produção, 3 estudos × 4 viewports, 16 testes dev sem retry, comparação HTML e inventário de custos. V4.4/V4.5 aguardam escolha/aprovação. |
 
+| 09/10/2026 | A1.1–A1.4 | [Auditoria visual real do site](../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md), seis imagens do usuário, tokens/CSS/TSX e contratos aceitos | Erro de identidade dos 3 conceitos V1 reconhecido; descartados como proposta artística, mantidos somente para QA. A1.5/A1.6 abertos. |
+
 ## Retomada
 
 **Último ponto verificado:** auditoria A0; V1.1–V1.4/V1.6; V2.1/V2.3/V2.4; V3.1–V3.4; V4.1–V4.3. [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229) verde, laboratório renderizado 3×4, custos dev registrados e defeitos de texto/hidratação corrigidos.  
 **Pendências:** V1.5 (importação da skill pessoal); V2 (fixtures/baselines aprovadas, checks integrais), V3.5 (adoção de efeitos após seleção), **V4.4/V4.5 (escolha e aceite visual)**, V5/V6 não iniciados. Dados visuais reais E3 permanecem ausentes.  
-**Próxima ação exata:** apresentar os três estudos em desktop/mobile, coletar direção/ajustes de Cassiano; só congelar vencedor após aprovação. A seguir validar assets reais e abrir V5 respeitando os contratos comerciais.  
+**Próxima ação exata:** A1.5 — verificar a rota real `/studio/impressoes` e o mobile do CM no navegador; A1.6 — refazer a direção de Impressões dentro da composição existente, com paleta/tipografia/marca documentadas. **Não** solicitar escolha entre os três estudos iniciais rejeitados.  
 **Deploy e alteração de páginas públicas:** nenhum. **Código alterado:** apenas laboratório isolado de desenvolvimento, testes, scripts, CI e documentação; Home, Estúdio público, Produto e Rádio preservados.

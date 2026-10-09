@@ -37,7 +37,7 @@ Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio
 
 Contratos: [Search](STUDIO_SEARCH_DISCOVERY_V1.md), [Orçamento](STUDIO_QUOTE_FLOW_V1.md), [Supabase](SUPABASE_INFRASTRUCTURE_V1.md), [Catálogo 3D](CATALOG_3D.md), [ponte de Produtos](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md), [wireframes](design/STUDIO_COMMERCE_WIREFRAMES_V1.md) e [mídia](design/STUDIO_MEDIA_INVENTORY_V1.md).
 
-Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hub, Impressões, impressão sob demanda, Placas, Caixas, Orçamento, Produtos, gate de lançamento e crescimento por dados. A origem de Produtos está resolvida como projeção editorial controlada do Artesópolis Admin/Shopee; o snapshot estático atual é estado transitório até o cutover definido em [PRODUCT_CATALOG_BRIDGE_PLAN_V1.md](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md). Infraestrutura de Search e Supabase que não cristalize layout pode avançar com o gate visual ainda aberto.
+Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hub, Impressões, impressão sob demanda, Placas, Caixas, Orçamento, Produtos, gate de lançamento e crescimento por dados. A **arquitetura** de Produtos está contratada como projeção editorial controlada do Artesópolis Admin/Shopee, mas a integração live **não está implantada**; o snapshot estático atual é transitório até o cutover definido em [PRODUCT_CATALOG_BRIDGE_PLAN_V1.md](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md). Infraestrutura de Search e Supabase que não cristalize layout pode avançar com o gate visual ainda aberto.
 
 ## Bloqueios externos
 

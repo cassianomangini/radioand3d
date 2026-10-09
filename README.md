@@ -49,7 +49,9 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 
 | Documento | Responsabilidade exclusiva |
 | --- | --- |
-| [Arquitetura](docs/ARCHITECTURE.md) | Stack, módulos, segurança, infraestrutura e estratégia de frontend |
+| [Pipeline visual render-first](docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md) | Decisão de renderer, bibliotecas avaliadas, revisão visual e critérios de evidência |
+| [Skill de experiência CM versionada](.github/skills/cm-3d-radio-experience/SKILL.md) | Direção visual do Estúdio e Rádio sincronizada com os contratos atuais; ZIP distribuído separadamente para atualização da skill instalada |
+| [Arquitetura](docs/ARCHITECTURE.md) || [Arquitetura](docs/ARCHITECTURE.md) | Stack, módulos, segurança, infraestrutura e estratégia de frontend |
 | [Experiência CM](docs/EXPERIENCE.md) | Identidade, movimento, responsividade e aprovação visual |
 | [Catálogo 3D](docs/CATALOG_3D.md) | Peças, materiais, cores, disponibilidade, portfólio e separação entre prova, serviço e produto |
 | [Plano de crescimento do Estúdio](docs/STUDIO_GROWTH_PLAN_V1.md) | Três pilares, páginas comerciais prioritárias, aquisição e fases S1 |

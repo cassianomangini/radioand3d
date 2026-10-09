@@ -129,7 +129,7 @@ A limpeza/pausa de recursos do ambiente legado exige inventário **privado** e o
 
 - **P0:** contratos documentados e HEAD público sanitizado; histórico antigo tem material técnico residual sem credenciais detectadas na auditoria focal.
 - **P1:** staging legado pausado pelo usuário e `INACTIVE`; backup restaurável e inexistência de consumidores **não comprovados**; Admin produção segue `ACTIVE_HEALTHY`, sem testes operacionais completos de regressão.
-- **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo; seis migrations versionadas, cinco tabelas privadas, bucket privado. Security Advisor: cinco avisos `INFO` de RLS sem policies (negação deliberada). A referência antiga nos EUA não é o alvo.
+- **P2:** projeto definitivo na organização separada **Cmangini3d**, **região São Paulo**, ativo; oito migrations versionadas, cinco tabelas privadas, bucket privado. Security Advisor: cinco avisos `INFO` de RLS sem policies (negação deliberada). A referência antiga nos EUA não é o alvo.
 - **P3 local:** token opaco, HMAC de posse e testes focais já versionados. Isso não é fluxo persistente funcionando.
 - **Supabase CM remoto:** oito migrations versionadas (incluindo validate/submit e constraint de tipo), cinco tabelas privadas, quota e bucket privado. RPCs de envio idempotente e posse testadas com rollback. **Nenhum pedido, contato, anexo ou janela de teste persistiu.** As quatro rotas existem só no Git, com flag false; sem secrets, TUS real ou Cron.
 - **Vercel:** projeto Radio mantém somente variáveis R2; não foi alterado.

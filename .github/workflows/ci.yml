@@ -97,6 +97,10 @@ jobs:
         if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
         run: pnpm visual:qa
 
+      - name: Install browser video recorder for optional 03c QA
+        if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
+        run: pnpm exec playwright install ffmpeg
+
       - name: Render isolated visual lab in development
         if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
         shell: bash

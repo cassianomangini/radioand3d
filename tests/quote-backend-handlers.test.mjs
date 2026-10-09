@@ -51,7 +51,7 @@ const gateway = {
     return {
       attachment_id: attachmentId,
       object_path: storagePath,
-      reservation_expires_at: "2026-10-09T14:00:00Z"
+      reservation_expires_at: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString()
     };
   },
   async signUpload(objectPath) {
@@ -143,6 +143,8 @@ test("attachment init validates file and ownership, then signs only the reserved
   assert.equal(result.uploadPath, storagePath);
   assert.equal(result.tokenHeader, "x-signature");
   assert.equal(result.uploadToken, "signed-token-for-tests-only");
+  assert.ok(Date.parse(result.uploadTokenExpiresAt) > Date.now());
+  assert.ok(Date.parse(result.uploadTokenExpiresAt) <= Date.parse(result.reservationExpiresAt));
   assert.equal(calls[0].action, "upload");
   assert.equal(calls[1].sizeBytes, 50_000_000);
   assert.equal(calls[2].objectPath, storagePath);
@@ -157,6 +159,24 @@ test("attachment init validates file and ownership, then signs only the reserved
     assert.equal(invalid.status, 400);
     assert.equal(calls.length, 0);
   }
+});
+
+test("old reservation never mints a fresh 2-hour TUS token", async () => {
+  const response = await handleQuoteSession(request("/api/quote/session",
+    { projectType: "impressao" }), gateway);
+  const cookie = response.headers.get("set-cookie")?.split(";")[0];
+  calls.length = 0;
+  const result = await handleQuoteAttachmentInit(request("/api/quote/attachments/init",
+    { requestId, uploadKey, name: "modelo.stl", size: 1234 }, { cookie }),
+    { ...gateway, async reserveAttachment(input) {
+      return {
+        attachment_id: attachmentId,
+        object_path: storagePath,
+        reservation_expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+      };
+    } });
+  assert.equal(result.status, 409);
+  assert.equal(calls.some(call => call.method === "sign"), false);
 });
 
 test("rate limiter responds 429, upstream errors never expose sensitive messages", async () => {
@@ -180,7 +200,7 @@ test("native gateway sends sb_secret only as apikey, with no auth Bearer header"
     if (url.includes("quote_reserve_attachment")) {
       return Response.json([{
         attachment_id: attachmentId, object_path: storagePath,
-        reservation_expires_at: "2026-10-09T14:00:00Z"
+        reservation_expires_at: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString()
       }]);
     }
     if (url.includes("/storage/v1/object/upload/sign/")) {

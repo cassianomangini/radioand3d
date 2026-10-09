@@ -30,7 +30,7 @@ export default defineConfig({
   webServer: {
     command: process.env.CI ? "pnpm start" : "pnpm dev",
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true, // CI's earlier CDP capture leaves the same Next server listening on :3000
     timeout: 120_000,
     env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" }
   }

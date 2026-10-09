@@ -42,7 +42,8 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 6. [Search Discovery do Estúdio](docs/STUDIO_SEARCH_DISCOVERY_V1.md): crawling, indexação, canonical, sitemap, imagens, schema, Search Console e gate de lançamento.
 7. [Fluxo de Orçamento](docs/STUDIO_QUOTE_FLOW_V1.md): qualificação progressiva antes de contato manual.
 8. [Roadmap](docs/ROADMAP.md): estado real, dependências e próxima entrega.
-9. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
+9. [Evolução visual e Visual QA — 08V](docs/work/08-visual-quality-evolution.md): auditoria, plano, critérios de qualidade e checklist de execução com evidências.
+10. [AGENTS.md](AGENTS.md): como trabalhar sem duplicar decisões ou atropelar outra área.
 
 ## Mapa da documentação
 

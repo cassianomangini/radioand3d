@@ -26,6 +26,12 @@ Uma referência válida precisa indicar **a mesma rota/superfície, estado de UI
 | Impressões | [Receita R1](CM_VISUAL_RECIPES_V1.md) | Ainda sem fotografia autorizada | **Não existe baseline de produto real** |
 | `/dev/visual-lab` | [Brief 08V](CM_VISUAL_LAB_V1.md) | Geração pelo CI de desenvolvimento, após teste | **Apenas estudos; nenhuma opção aprovada** |
 
+## Referências novas da auditoria da marca (09/10/2026)
+
+Cassiano anexou seis referências nesta conversa: **Rádio em foco**, **Home em split**, **banner CMANGINI 3D + X1**, **selo circular CMANGINI 3D**, **X1 vertical** e **apresentação de Placa Personalizada/Mano Jotta**. Elas foram comparadas aos assets e à implementação. **Não estão versionadas no Git como arquivos nesta rodada.** Ver [análise completa](CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md).
+
+O [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229) possui render do shell atual de Home, hub, Produto e Orçamento em desktop/mobile. É referência de **implementação observada**, não mock criativo ou baseline homologada. Os três estudos de Impressões do laboratório V1 estão **rejeitados como candidatos estéticos**, preservados só para QA.
+
 ## Protocolo para comparação antes/depois
 
 1. Conferir se a tela possui mock aprovado com arquivo e condições de reprodução. Se não houver, manter a comparação descritiva e solicitar a referência; não inventar pixel parity.

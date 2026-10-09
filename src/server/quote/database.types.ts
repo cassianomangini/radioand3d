@@ -227,6 +227,36 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_retention_control: {
+        Row: {
+          last_failure_at: string | null
+          last_result: Json
+          last_started_at: string | null
+          last_success_at: string | null
+          lease_until: string | null
+          name: string
+          run_token: string | null
+        }
+        Insert: {
+          last_failure_at?: string | null
+          last_result?: Json
+          last_started_at?: string | null
+          last_success_at?: string | null
+          lease_until?: string | null
+          name: string
+          run_token?: string | null
+        }
+        Update: {
+          last_failure_at?: string | null
+          last_result?: Json
+          last_started_at?: string | null
+          last_success_at?: string | null
+          lease_until?: string | null
+          name?: string
+          run_token?: string | null
+        }
+        Relationships: []
+      }
       quote_upload_limits: {
         Row: {
           bucket_id: string
@@ -297,6 +327,44 @@ export type Database = {
           reservation_expires_at: string
         }[]
       }
+      quote_retention_acquire: { Args: { p_token: string }; Returns: boolean }
+      quote_retention_active: { Args: { p_token: string }; Returns: boolean }
+      quote_retention_candidates: {
+        Args: { p_limit?: number; p_token: string }
+        Returns: {
+          attachment_id: string
+          object_path: string
+          request_id: string
+        }[]
+      }
+      quote_retention_finalize_attachment: {
+        Args: { p_attachment_id: string; p_token: string }
+        Returns: number
+      }
+      quote_retention_finish: {
+        Args: { p_ok: boolean; p_result?: Json; p_token: string }
+        Returns: boolean
+      }
+      quote_retention_sweep: {
+        Args: { p_limit?: number; p_token: string }
+        Returns: {
+          drafts_deleted: number
+          events_deleted: number
+          rate_windows_deleted: number
+          submitted_deleted: number
+        }[]
+      }
+      quote_submission_receipt: {
+        Args: {
+          p_owner_session_hash: string
+          p_request_id: string
+          p_submission_key: string
+        }
+        Returns: {
+          request_id: string
+          submission_time: string
+        }[]
+      }
       quote_submit: {
         Args: {
           p_attachment_ids: string[]
@@ -320,6 +388,7 @@ export type Database = {
           submission_time: string
         }[]
       }
+      quote_touch_draft: { Args: { p_request_id: string }; Returns: undefined }
       quote_validate_attachment: {
         Args: {
           p_actual_size_bytes: number

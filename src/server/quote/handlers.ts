@@ -175,6 +175,12 @@ export async function handleQuoteSubmit(
     const triage = classifyQuoteRequestDraft(draft);
     if (triage.status === 'incomplete') throw new QuoteHttpError(400, 'invalid_quote_submit');
     const db = gateway ?? createQuoteGateway();
+    // A completed operation with the same ownership + submission key is
+    // a replay, not a new submission: do not charge the hourly rate window.
+    const replay = await db.submissionReceipt(data.requestId, hash, data.submissionKey);
+    if (replay) {
+      return responseJson({ requestId: replay.request_id, submittedAt: replay.submission_time }, 201);
+    }
     if (!await db.consumeRate('submit', rateLimitHash(request))) {
       throw new QuoteHttpError(429, 'quote_rate_limited');
     }

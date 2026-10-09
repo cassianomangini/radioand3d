@@ -418,7 +418,7 @@ A landing de serviço deve apontar para orçamento. O formulário não precisa c
 
 ## Decisões abertas
 
-O **contrato técnico** está definido em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md); **o projeto remoto, schema de Orçamento, bucket privado e reserva SQL já existem**. Ainda faltam handlers, upload TUS real, inspeção, retenção, secrets e smoke. Estado e evidências: [checklist E2](work/08-supabase-provisioning.md).
+O **contrato técnico** está definido em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md); **o projeto remoto, schema de Orçamento, bucket privado e reserva SQL já existem**. Os handlers de `session`/`attachments/init` existem em código, desativados por flag; ainda faltam `complete`/`submit`, upload TUS real, inspeção, retenção, secrets e smoke. Estado e evidências: [checklist E2](work/08-supabase-provisioning.md).
 
 Continuam abertas apenas decisões de operação/comercial:
 

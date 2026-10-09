@@ -37,6 +37,9 @@ for (const route of routes) {
         description: `${route.path}: document width ${measured.scroll}px vs viewport ${measured.viewport}px; triage before visual acceptance`
       });
     }
+    expect(measured.scroll, `horizontal overflow on ${route.path}`).toBeLessThanOrEqual(
+      measured.viewport + 1
+    );
     expect(measured.heading.length, `missing heading for ${route.path}`).toBeGreaterThan(0);
   });
 }

@@ -26,9 +26,9 @@ pnpm build
 
 ### Laboratório de composição (apenas desenvolvimento)
 
-Abra `/dev/visual-lab` com `pnpm dev` para comparar três estudos de **Impressões** (Editorial, Mostruário e Detalhe), sem alterar as páginas públicas. A rota deve responder **404** em `pnpm start`/produção e no preview Vercel. O protótipo usa `motion/react` apenas para troca entre variantes, incluindo movimento reduzido; os espaços de fotografia são honestamente sinalizados como pendentes.
+Abra `/dev/visual-lab` com `pnpm dev` para reproduzir três **fixtures técnicos de composição** (Editorial, Mostruário e Detalhe), sem alterar as páginas públicas. **Esses três estudos foram rejeitados como direção artística em 09/10/2026**, pois não respeitam adequadamente a identidade e o shell CM existentes; não pedir escolha/aprovação entre eles. O estudo real está na [Auditoria da identidade visual do site](docs/design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md). A rota deve responder **404** em `pnpm start`/produção e no preview Vercel. O protótipo usa `motion/react` apenas para troca entre variantes, incluindo movimento reduzido; os espaços de fotografia são honestamente sinalizados como pendentes.
 
-A CI `[visual]` valida a proteção da rota e renderiza separadamente as três composições em desktop/mobile. Imagens geradas no teste são **candidatas para avaliação**, nunca referências aprovadas. [Brief do laboratório](docs/design/CM_VISUAL_LAB_V1.md) · [Registro de referências/baselines](docs/design/CM_VISUAL_REFERENCE_REGISTER_V1.md).
+A CI `[visual]` valida a proteção da rota e renderiza os três casos de teste em desktop/mobile. Imagens geradas nesse lab **não são candidatas atuais ao design do site**; servem somente para QA até termos novo conceito fiel à identidade CM. [Brief do laboratório](docs/design/CM_VISUAL_LAB_V1.md) · [Registro de referências/baselines](docs/design/CM_VISUAL_REFERENCE_REGISTER_V1.md).
 
 ### QA visual renderizado (ferramentas de desenvolvimento)
 
@@ -67,9 +67,10 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 | Documento | Responsabilidade exclusiva |
 | --- | --- |
 | [Receitas visuais CM](docs/design/CM_VISUAL_RECIPES_V1.md) | Casos de uso reais, limites de arte/assets e inventário de referências |
+| [Auditoria da identidade visual CM](docs/design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md) | Referências do site real, paleta/fontes implementadas, marcas, layout e bloqueio de estudos genéricos |
 | [Pipeline visual render-first](docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md) | Decisão de renderer, bibliotecas avaliadas, revisão visual e critérios de evidência |
 | [Skill de experiência CM versionada](.github/skills/cm-3d-radio-experience/SKILL.md) | Direção visual do Estúdio e Rádio sincronizada com os contratos atuais; ZIP distribuído separadamente para atualização da skill instalada |
-| [Arquitetura](docs/ARCHITECTURE.md) || [Arquitetura](docs/ARCHITECTURE.md) | Stack, módulos, segurança, infraestrutura e estratégia de frontend |
+| [Arquitetura](docs/ARCHITECTURE.md) | Stack, módulos, segurança, infraestrutura e estratégia de frontend |
 | [Experiência CM](docs/EXPERIENCE.md) | Identidade, movimento, responsividade e aprovação visual |
 | [Catálogo 3D](docs/CATALOG_3D.md) | Peças, materiais, cores, disponibilidade, portfólio e separação entre prova, serviço e produto |
 | [Plano de crescimento do Estúdio](docs/STUDIO_GROWTH_PLAN_V1.md) | Três pilares, páginas comerciais prioritárias, aquisição e fases S1 |

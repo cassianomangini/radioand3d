@@ -29,7 +29,7 @@ function mostlyText(bytes: Uint8Array): boolean {
 }
 
 export function detectQuoteFile(
-  extension: string, head: Uint8Array, sizeBytes: number, tail?: Uint8Array
+  extension: string, head: Uint8Array, sizeBytes: number
 ): DetectedQuoteFile | null {
   if (!Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 50_000_000 ||
     head.length < 8 || head.length > 131_072) return null;

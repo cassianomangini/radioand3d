@@ -1,11 +1,11 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **nove migrations aplicadas · 4 handlers versionados · reparos de revisão aplicados · TUS E2E/retencão/deploy pendentes**  
+Status: **dez migrations aplicadas · 4 handlers de Orçamento + rota interna de retenção · TUS/Storage E2E, Cron e deploy pendentes**  
 Revisão: **09/10/2026**  
 Região contratada e confirmada: **sa-east-1 (São Paulo)**  
 Responsável: **CM Infra / CM Data**
 
-Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário criou o projeto Supabase definitivo** na organização independente Cmangini3d (Free), em `sa-east-1`. O projeto está `ACTIVE_HEALTHY`; foram aplicadas **nove migrations** versionadas: schema privado, quota, bucket, guards de limpeza, índice de FK, rate limit atômico, confirmação/envio idempotente e validação de tipo de arquivo. São cinco tabelas com RLS, bucket `quote-intake` privado e nenhum dado de clientes. **As quatro rotas HTTP de sessão, init, complete e submit existem no Git, mas continuam DESATIVADAS por flag**; somente as RPCs foram testadas transacionalmente. Upload TUS real, limpeza Storage API, secrets, Cron, E2E e deploy seguem pendentes.
+Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário criou o projeto Supabase definitivo** na organização independente Cmangini3d (Free), em `sa-east-1`. O projeto está `ACTIVE_HEALTHY`; foram aplicadas **dez migrations** versionadas: schema privado, quota, bucket, guards de limpeza, índice de FK, rate limit atômico, confirmação/envio idempotente e validação de tipo de arquivo. São seis tabelas com RLS, bucket `quote-intake` privado e nenhum dado de clientes. **As quatro rotas HTTP de sessão, init, complete e submit existem no Git, mas continuam DESATIVADAS por flag**; somente as RPCs foram testadas transacionalmente. Upload TUS real, execução de remoção Storage real, secrets, agendamento Cron, E2E e deploy seguem pendentes. **Worker SQL + HTTP de retenção já existem e passaram testes sintéticos.**
 
 A execução e os checkpoints verificáveis estão em [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md). Detalhes operacionais sobre a infraestrutura de outro sistema ficam fora deste repositório público. **Não** usar este documento como autorização para pausar, limpar, migrar ou modificar um banco existente.
 
@@ -77,7 +77,7 @@ Migrations versionadas no Git, dados de seed exclusivamente fictícios e CLI ver
 
 ### Produção
 
-**Projeto CM definitivo criado na organização Cmangini3d em `sa-east-1`.** PostgreSQL 17.11 saudável e SQL funcional. Nove migrations de Orçamento/infra foram aplicadas e registradas no Git, desde [`create_quote_core`](../supabase/migrations/20261009143743_create_quote_core.sql) até [`quote_tus_ttl_touch_and_replay`](../supabase/migrations/20261009185555_quote_tus_ttl_touch_and_replay.sql). Verificadas cinco tabelas privadas, zero pedidos/objetos/janelas de teste persistidos e ACL/RLS negando acesso anônimo. Security Advisor: cinco observações `INFO` de RLS ativado **sem policies**, negação intencional nesta etapa. A Vercel ainda não tem variáveis CM Supabase. Identificadores/credenciais concretos ficam fora da documentação pública.
+**Projeto CM definitivo criado na organização Cmangini3d em `sa-east-1`.** PostgreSQL 17.11 saudável e SQL funcional. Dez migrations de Orçamento/infra foram aplicadas e registradas no Git, desde [`create_quote_core`](../supabase/migrations/20261009143743_create_quote_core.sql) até [`quote_retention_service_lease_and_cleanup`](../supabase/migrations/20261009232648_quote_retention_service_lease_and_cleanup.sql). Verificadas seis tabelas privadas, zero pedidos/objetos/janelas de teste persistidos e ACL/RLS negando acesso anônimo. Security Advisor: seis observações `INFO` de RLS ativado **sem policies**, negação intencional nesta etapa. A Vercel ainda não tem variáveis CM Supabase. Identificadores/credenciais concretos ficam fora da documentação pública.
 
 A organização CM separada **foi criada e confirmada**: Cmangini3d está no plano Free. O isolamento administrativo/de faturamento por organização está estabelecido, sem alterar a assinatura da organização do Artesopolis Admin. Criar outra organização não aumenta o limite de projetos Free ativos da mesma conta.
 
@@ -473,7 +473,7 @@ O orçamento global está persistido no singleton `quote_upload_limits.max_bytes
 
 O trigger `quote_attachment_capacity_guard` serializa inserts/updates pelo lock da linha de limite global, compara a soma de reservas com 600 MB e também aplica 5 anexos/100 MB contabilizados por solicitação, inclusive sob concorrência. Somente depois de verificar que um objeto existe, seu tamanho real no Storage e seu conteúdo permitido, o backend poderá reduzir `accounted_bytes` ao tamanho efetivo. O banco confere metadados `storage.objects`; inspeção de tipo/conteúdo permanece responsabilidade da camada server-side.
 
-Reserva pendente, upload rejeitado ou upload órfão **continuam ocupando orçamento** até expiração da janela TUS conservadora e remoção/ausência confirmada pela Storage API. `quote_touch_draft` renova `last_activity_at`, o prazo de 24h do draft e de seus anexos nas operações autorizadas de reserva e confirmação; o cookie de sessão também é renovado nesses handlers. O processo de limpeza é idempotente e protegido por `quote_release_attachment`; **a execução real da limpeza ainda não está implementada**. As validações SQL com dados sintéticos foram executadas dentro de transações desfeitas por `ROLLBACK`; testes end-to-end de TUS e concorrência em conexões simultâneas seguem pendentes.
+Reserva pendente, upload rejeitado ou upload órfão **continuam ocupando orçamento** até expiração da janela TUS conservadora e remoção/ausência confirmada pela Storage API. `quote_touch_draft` renova `last_activity_at`, o prazo de 24h do draft e de seus anexos nas operações autorizadas de reserva e confirmação; o cookie de sessão também é renovado nesses handlers. O processo de limpeza foi implementado com **lease global e RPCs de retenção exclusivas do servidor**, uso da Storage API (`DELETE` seguido de verificação GET info 404), checagem SQL de vencimento e ausência do objeto antes da liberação de quota, e idempotência em falhas parciais. **A implementação ainda não foi executada contra um objeto real do Storage.** As validações SQL com dados sintéticos foram executadas dentro de transações desfeitas por `ROLLBACK`; testes end-to-end de TUS e concorrência em conexões simultâneas seguem pendentes.
 
 Quando teto/quota acabar, devolver erro acionável de capacidade sem emitir novos tokens; alertar operação. Não depender de uma única quota por visitante, de `Content-Length` informado pelo browser ou de remoção manual.
 
@@ -504,7 +504,7 @@ O bucket `quote-intake` é privado. Não permitir list/read públicos nem upsert
 
 ## 16. Server boundary do Next.js
 
-Routes server-side **contratadas** (estado em 09/10/2026: quatro endpoints de sessão, init, complete e submit implementados em código, **sem deploy nem testes HTTP reais**; `quote-retention` ainda pendente):
+Routes server-side **contratadas** (estado em 09/10/2026: quatro endpoints de Orçamento e uma rota **interna** de retenção implementados em código, **sem deploy nem teste HTTP integrado real**):
 
 ```text
 POST /api/quote/session
@@ -567,6 +567,9 @@ Desde que metadata não contenha PII.
 **24 horas**.
 
 ## 18. Retenção automatizada e Vercel Cron
+
+**Implementação atual:** a décima migration [`quote_retention_service_lease_and_cleanup`](../supabase/migrations/20261009232648_quote_retention_service_lease_and_cleanup.sql) adicionou um lease exclusivo, seleção dos elegíveis e finalização transacional. O [handler interno](../src/server/quote/retention-handler.ts) autentica `GET` por `CRON_SECRET` e o [gateway](../src/server/quote/retention-gateway.ts) executa remoção via Storage API antes da baixa SQL. [Teste SQL](../tests/sql/quote-retention.sql) e [teste de rota mockada](../tests/quote-retention.test.mjs) passaram. O `vercel.json` permanece **SEM `crons`** até as credenciais de produção e a exclusão física real serem validadas. **Nenhum objeto de cliente foi eliminado/testado externamente.**
+
 
 Não excluir registros de `storage.objects` diretamente por SQL. Usar a **Storage API** para apagar os objetos reais e somente depois concluir a exclusão dos registros de Orçamento correspondentes.
 
@@ -825,9 +828,9 @@ A ponte de Produtos **não depende** da base CM. No ambiente operacional da orig
 
 ## 29. O que pode avançar sem Supabase remoto
 
-**Implementado em código e banco:** migrations, schema, grants/RLS, parser 3MF com testes sintéticos, sessão anônima, quatro handlers, reserva/quota, rate limit, recibo idempotente e 27h de proteção de TUS. **Ainda NÃO implementado:** scheduler/retention via Storage API e Cron Vercel. O CI verde não significa que upload TUS ou submit estejam operacionais na produção.
+**Implementado em código e banco:** migrations, schema, grants/RLS, parser 3MF com testes sintéticos, sessão anônima, quatro handlers, reserva/quota, rate limit, recibo idempotente e 27h de proteção de TUS. **Implementado:** worker SQL e handler da retenção, com testes unitários/mock e SQL em rollback. **Ainda NÃO ativo:** execução real pela Storage API, secret Cron na Vercel, agendamento e observabilidade externa. O CI verde não significa que upload TUS ou submit estejam operacionais na produção.
 
-**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **nove migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `e4f352e`: lint + typecheck + 103 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, secrets Vercel, TUS e Range reais, validação de arquivos Bambu reais, limpeza via Storage API, smoke E2E e release. O backup do legado segue sem comprovação.
+**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **nove migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `e4f352e`: lint + typecheck + 103 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, secrets Vercel, TUS e Range reais, validação de 3MF Bambu real, **prova de remoção real via Storage API**, configuração e agendamento de Cron, smoke E2E e release. O backup do legado segue sem comprovação.
 
 ## 30. Gate de infraestrutura pronta
 
@@ -874,7 +877,7 @@ Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
 - **Projeto CM definitivo validado** na organização Free independente Cmangini3d e região São Paulo. Migration inicial `create_quote_core` aplicada e versionada, quatro tabelas verificadas e vazias, com RLS/grants restritos.
 - O ambiente de testes legado permanece **inalterado**; pausa depende de inventário, backup e gate próprio.
-- **Nove migrations aplicadas e versionadas**: schema base, bucket/reserva de quota, proteção de limpeza, validade TUS, índice de FK, rate limit atômico, RPCs de complete/submit verificação de tipo/extensão, prazo TUS seguro e replay de envio. Bucket privado confirmado; dados de clientes: zero. SQL sintético testado com rollback. **Quatro rotas HTTP em código com flag `CM_QUOTE_INTAKE_ENABLED=false`**; testes JS de complete/submit versionados, mas suite CI completa não confirmada. Sem TUS real, segredos Vercel, Cron, limpeza Storage API ou deploy.
+- **Dez migrations aplicadas e versionadas**: schema base, bucket/reserva de quota, proteção de limpeza, validade TUS, índice de FK, rate limit atômico, RPCs de complete/submit verificação de tipo/extensão, prazo TUS seguro e replay de envio. Bucket privado confirmado; dados de clientes: zero. SQL sintético testado com rollback. **Quatro rotas HTTP em código com flag `CM_QUOTE_INTAKE_ENABLED=false`**; testes JS de complete/submit versionados, mas suite CI completa não confirmada. Sem TUS real, segredos Vercel, Cron, limpeza Storage API ou deploy.
 - Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 - Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
 - O Performance Advisor apontou FK de `quote_events` sem índice, corrigida na migration `index_quote_events_request_fk`; o novo read-back eliminou esse aviso. Sete avisos `INFO` de índices não utilizados são esperados enquanto não existe workload real.

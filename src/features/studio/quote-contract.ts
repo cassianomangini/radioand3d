@@ -1,7 +1,7 @@
 export const QUOTE_FILE_POLICY = {
   maxFiles: 5,
-  maxBytesPerFile: 50 * 1024 * 1024,
-  maxTotalBytes: 100 * 1024 * 1024,
+  maxBytesPerFile: 50_000_000,
+  maxTotalBytes: 100_000_000,
   allowedExtensions: [
     ".stl",
     ".3mf",

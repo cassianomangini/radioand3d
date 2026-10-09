@@ -46,7 +46,7 @@ const gateway = {
     calls.push({ method: "create", hash, projectType });
     return { id: requestId, expires_at: "2026-10-10T10:00:00Z" };
   },
-  async reserveAttachment(input) {
+  async reserveAttachment(_input) {
     calls.push({ method: "reserve", ...input });
     return {
       attachment_id: attachmentId,

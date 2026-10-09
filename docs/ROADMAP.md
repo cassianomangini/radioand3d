@@ -13,7 +13,7 @@ O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já ex
 ## Próximos passos
 
 1. **Concluído nos PRs #29 e #30:** contrato local/serializável do Orçamento, arquivos reais em memória, política de formatos/limites, payload versionado, validação estrutural compartilhável e triagem inicial backend-neutral.
-2. **E2 — documentação do Orçamento corrigida; provisionamento remoto pendente:** criar um **novo Supabase CM limpo** em `sa-east-1`, preferencialmente em organização própria. O ambiente legado deve ser inventariado e preservado privadamente antes de eventual pausa para liberar vaga Free. Sessão anônima, quota global e retenção por Vercel Cron GET estão contratadas, **não implementadas**. [Checklist E2](work/08-supabase-provisioning.md).
+2. **E2 — projeto Supabase criado e staging pausado pelo usuário:** conferidos novo banco saudável e vazio e staging inativo. **Desvio importante:** região do projeto real `us-east-1` vs contrato `sa-east-1` (São Paulo); criado na organização do Admin, não na organização CM separada preferida. **Sem migrations/bucket/segredos/deploy remoto até a decisão regional.** Segurança de sessão e retenção seguem em implementação local. [Checklist E2](work/08-supabase-provisioning.md).
 3. **E4 — ponte de Produtos independente e pendente:** o catálogo atual é uma curadoria estática; o consumidor read-only do Admin e o cutover live ainda devem ser executados conforme [Product Catalog Bridge V1](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md).
 4. **Próximo bloco de conteúdo depende de E3:** dataset/fotos reais de Impressões, Placas e Caixas e revisão visual final das superfícies restantes.
 5. **Gate de lançamento:** domínio/alvo público, retirada controlada do `noindex`, Search Console e validações finais continuam depois de E2/E3.
@@ -48,7 +48,7 @@ Ordem interna: contrato e gate de experiência, fundação de Search e rotas, hu
 | Código | Pendência | Quem resolve | O que bloqueia |
 | --- | --- | --- | --- |
 | E1 | Confirmar repositório privado | Cassiano | Cópia de conteúdo privado |
-| E2 | **Em andamento (contratos fechados; remoto não provisionado):** projeto CM novo e limpo, liberação segura de vaga Free, backend de Orçamento com sessão, quota e retenção. [Checklist](work/08-supabase-provisioning.md) | CM Infra / CM Data | Migration/bucket/segredos, smoke live e publicação de envio |
+| E2 | **Em andamento:** usuário criou projeto CM limpo e pausou staging; projeto real **US East** contraria região São Paulo do contrato e compartilhamento de organização impacta faturamento. Aplicação remota suspensa até conciliar. [Checklist](work/08-supabase-provisioning.md) | CM Infra / CM Data | Decisão de região/organização, migration/bucket/segredos, smoke e publicação |
 | E4 | **Pendente, separado de E2:** integração de Produtos/Shopee Admin → catálogo público CM; 9 registros estáticos em uso até paridade/cutover | CM Products / Integração | Atualização automática e décimo produto sem mudança no `radioand3d` |
 | E3 | Selecionar peça, fotos e permissões | Cassiano | Conteúdo real do Estúdio no lançamento |
 | E5 | Definir contato comercial de continuidade | Cassiano | Chamadas comerciais e continuidade após triagem |

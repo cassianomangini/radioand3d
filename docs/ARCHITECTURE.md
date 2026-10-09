@@ -10,13 +10,13 @@ Este documento mantém as decisões arquiteturais do projeto. Nem toda infraestr
 | Estilo e movimento | Tokens próprios, CSS/Tailwind e Motion quando necessário | Aprovação visual e orçamento de desempenho |
 | 3D em tempo real | Three.js/React Three Fiber apenas para interação aprovada | Modelo publicável, fallback e custo no mobile |
 | Pacotes | pnpm, Node suportado e lockfile versionado | Fixar versões no setup e CI |
-| Dados próprios do site | **Supabase PostgreSQL** para Orçamento e futuros dados CM explicitamente contratados | Projeto remoto ainda não criado; contrato em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md) |
+| Dados próprios do site | **Supabase PostgreSQL novo, limpo e separado**, destinado ao Orçamento | Contrato definido; **projeto remoto ainda não provisionado**; [infra CM](SUPABASE_INFRASTRUCTURE_V1.md) e [checklist E2](work/08-supabase-provisioning.md) |
 | Mídia | **R2** permanece no acervo da Rádio; **Supabase Storage privado** recebe somente anexos temporários do Orçamento; mídia de Produtos vem da fonte Shopee/Admin na V1 | Provisionamento remoto do Supabase e gates de produção ainda pendentes |
-| Aplicação hospedada | Vercel é candidata | Conta, plano, domínio e permissões a confirmar |
+| Aplicação hospedada | **Vercel já configurada** para `radioand3d`; integração Git com `deploymentEnabled: false` | Deploy explícito necessário; domínio e plano de lançamento ainda precisam de gate |
 
 Não criar microserviços, monorepo ou infraestrutura de processamento distribuído antes de uma necessidade medida.
 
-A infraestrutura Supabase está fechada em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md): projeto CM separado do Supabase do Artesopolis Admin, região `sa-east-1`, PostgreSQL + Storage privado para Orçamento, upload TUS assinado e nenhuma Data API de negócio exposta ao browser.
+A arquitetura está definida em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md): **criar projeto CM novo e limpo** em `sa-east-1` (organização CM própria preferida); não reutilizar o ambiente de testes legado nem tocar a produção operacional. Orçamento usa PostgreSQL + Storage privado e TUS assinado; o browser não recebe acesso à Data API de negócio. A autenticação de visitantes ocorre por sessão anônima vinculada à solicitação, sem Supabase Auth. O provisionamento remoto **ainda não aconteceu**.
 
 ## Módulos propostos
 
@@ -135,9 +135,13 @@ Acesso público somente a itens publicados. Gestão restrita ao proprietário, c
 
 Escritas, uploads e publicação exigem validação, limites, trilha de resultado e tratamento de repetição. URLs fornecidas por importadores não autorizam fetch arbitrário no servidor. Segredos de banco/storage nunca entram no bundle público.
 
-A integração de **Produtos** com o Artesopolis Admin está definida em [PRODUCT_CATALOG_BRIDGE_PLAN_V1.md](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md). O site consome uma projeção pública server-side com lista explícita de campos; não copia banco, estoque, custos, pedidos ou clientes. O novo Supabase do CM não espelha o catálogo do Admin.
+A integração de **Produtos** com o Artesopolis Admin está **planejada**, não implantada: [PRODUCT_CATALOG_BRIDGE_PLAN_V1.md](PRODUCT_CATALOG_BRIDGE_PLAN_V1.md). O alvo é consumir uma projeção pública server-side com lista explícita de campos; não copiar banco, estoque, custos, pedidos ou clientes. Atualmente o catálogo de Produtos no site ainda é um snapshot curado no código, até a validação live da ponte. O Supabase CM não espelha o catálogo do Admin.
 
 ## Infraestrutura a preparar
+
+A sequência para liberar uma vaga Free e criar um banco CM sem legado está no [checklist E2](work/08-supabase-provisioning.md). Pausar ambiente antigo exige levantamento privado e backup recuperável; a cota Free é compartilhada entre as organizações administradas pelo usuário.
+
+Vercel Cron só entra em `vercel.json` quando a rota autenticada `GET /api/internal/quote-retention` e `CRON_SECRET` tiverem sido implementados e verificados. Manter `git.deploymentEnabled: false` e usar deploy explícito. Os limites, segurança, retry e política de retenção estão no contrato de infraestrutura.
 
 Separar desenvolvimento, preview/teste e produção, incluindo dados e credenciais. O setup local deve funcionar com amostras identificadas e sem segredos de produção. Proibir indexação de previews e proteger gestão; `noindex` não é controle de acesso.
 

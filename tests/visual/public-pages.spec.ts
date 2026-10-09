@@ -4,6 +4,7 @@ import { expect, test } from "@playwright/test";
 const routes = [
   { name: "home", path: "/" },
   { name: "studio", path: "/studio" },
+  { name: "prints", path: "/studio/impressoes" },
   { name: "quote", path: "/studio/orcamento" },
   { name: "product", path: "/studio/produtos/porta-curativos-compacto" }
 ] as const;

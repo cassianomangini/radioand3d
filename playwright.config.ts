@@ -1,0 +1,37 @@
+import { defineConfig } from "@playwright/test";
+
+const baseURL = process.env.VISUAL_REVIEW_URL ?? "http://127.0.0.1:3000";
+
+export default defineConfig({
+  testDir: "./tests/visual",
+  fullyParallel: false,
+  timeout: 60_000,
+  expect: { timeout: 15_000 },
+  retries: process.env.CI ? 1 : 0,
+  reporter: [["list"], ["html", { outputFolder: "playwright-report", open: "never" }]],
+  outputDir: "test-results/visual",
+  use: {
+    baseURL,
+    browserName: "chromium",
+    channel: "chrome",
+    locale: "pt-BR",
+    timezoneId: "America/Sao_Paulo",
+    screenshot: "only-on-failure",
+    trace: "retain-on-failure",
+    reducedMotion: "reduce"
+  },
+  projects: [
+    { name: "desktop-1440", use: { viewport: { width: 1440, height: 900 } } },
+    { name: "desktop-1024", use: { viewport: { width: 1024, height: 768 } } },
+    { name: "desktop-short", use: { viewport: { width: 1760, height: 824 } } },
+    { name: "mobile-390", use: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 } },
+    { name: "mobile-360", use: { viewport: { width: 360, height: 800 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 } }
+  ],
+  webServer: {
+    command: process.env.CI ? "pnpm start" : "pnpm dev",
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+    env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" }
+  }
+});

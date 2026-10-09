@@ -126,6 +126,13 @@ jobs:
 
           node scripts/build-visual-lab-review.mjs
 
+          # D4: render a dedicated preview with the real CM shell and audio provider.
+          # The route must remain unavailable in the production build.
+          VISUAL_LAB_QA=1 VISUAL_REVIEW_URL=http://127.0.0.1:3100 \
+            pnpm exec playwright test tests/visual/radio-dock-preview.spec.ts \
+            --project=desktop-1440 --project=desktop-short \
+            --project=desktop-1024 --project=mobile-390
+
       - name: Upload Playwright diagnostics
         if: always() && (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]'))
         uses: actions/upload-artifact@v4

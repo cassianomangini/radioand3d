@@ -54,6 +54,43 @@ test.describe("Visual Lab development preview", () => {
       expect(collision.missing, "Lab content must expose readable title and description").toBe(false);
       expect(collision.overlapping, "Text glyphs must not collide with the description").toBe(false);
 
+      // Diagnostic, not a performance certification: these samples come from
+      // headless Chromium against the *development* server, not production RUM.
+      const performanceInventory = await page.evaluate(async () => {
+        const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+        const resources = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
+        const scripts = resources.filter((resource) =>
+          resource.initiatorType === "script" || /\\.js(?:\\?|$)/.test(resource.name)
+        );
+        const samples = await new Promise<number[]>((resolve) => {
+          const intervals: number[] = [];
+          let previous: number | null = null;
+          const began = performance.now();
+          function frame(timestamp: number) {
+            if (previous !== null) intervals.push(timestamp - previous);
+            previous = timestamp;
+            if (timestamp - began < 350) requestAnimationFrame(frame);
+            else resolve(intervals);
+          }
+          requestAnimationFrame(frame);
+        });
+        return {
+          mode: "development",
+          sampleDurationMs: 350,
+          navigationDomContentLoadedMs: nav?.domContentLoadedEventEnd ?? null,
+          jsResourceRequests: scripts.length,
+          jsDecodedBodyBytesReported: scripts.reduce((sum, resource) => sum + resource.decodedBodySize, 0),
+          maxAnimationFrameIntervalMs: samples.length ? Math.round(Math.max(...samples)) : null,
+          intervalsOver50Ms: samples.filter((ms) => ms > 50).length,
+          sampleCount: samples.length,
+          caveat: "Lab costs only; development server overhead and CI runner load distort real production performance."
+        };
+      });
+      await testInfo.attach("visual-lab-performance-inventory.json", {
+        body: Buffer.from(JSON.stringify(performanceInventory, null, 2), "utf8"),
+        contentType: "application/json"
+      });
+
       // Next dev badge is not part of the authored composition.
       await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
       await page.screenshot({

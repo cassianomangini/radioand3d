@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./visual-lab.module.css";
 
 type StudyId = "editorial" | "mostruario" | "detalhe";
@@ -102,11 +102,21 @@ function DetailStudy() {
 
 export function VisualLabClient() {
   const [active, setActive] = useState<StudyId>("editorial");
+  const rootRef = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
+
+  // The route is server-rendered. Browser tests must not click before hydration
+  // has attached React handlers, otherwise an early click can be silently lost.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    root.dataset.labReady = "true";
+    return () => { delete root.dataset.labReady; };
+  }, []);
   const selected = studies.find((study) => study.id === active) ?? studies[0];
 
   return (
-    <main className={styles.lab} data-visual-lab="true">
+    <main ref={rootRef} className={styles.lab} data-visual-lab="true">
       <div className={styles.layout}>
         <header className={styles.labHeader}>
           <div>

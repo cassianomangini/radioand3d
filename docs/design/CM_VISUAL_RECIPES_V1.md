@@ -2,6 +2,10 @@
 
 **Condição:** referências e especificações de experimentos. A implementação final de uma receita exige `artifact_ref`, render real e aprovação de Cassiano quando representar mudança de design. Ver [pipeline](CM_VISUAL_RENDER_PIPELINE_V1.md).
 
+## Gate comum de identidade
+
+Antes de aplicar qualquer receita, ler [CM Site Visual Identity Audit V1](CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md) e o render atual da rota receptora. A receita não autoriza escolher outro preto/teal, font-family ou gramática de CTA, nem produzir layout isolado sem header/player. **Home, hub, Impressões, Produto e Orçamento têm hierarquias distintas dentro da mesma marca.** O laboratório V1 de Impressões está arquivado como teste técnico e rejeitado como proposta artística.
+
 ## R1 — Superfície editorial do Estúdio (consumidor: Impressões)
 
 **Objetivo:** valorizar peças realmente produzidas com enquadramento, luz, material e legibilidade — não uma grade SaaS.

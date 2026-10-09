@@ -31,12 +31,20 @@ test("quote file policy rejects unsupported and empty files", () => {
   assert.equal(empty.code, "empty-file");
 });
 
-test("quote file policy enforces per-file, total and count limits", () => {
+test("quote file policy enforces exact decimal free-tier limits", () => {
+  assert.equal(QUOTE_FILE_POLICY.maxBytesPerFile, 50_000_000);
+  assert.equal(QUOTE_FILE_POLICY.maxTotalBytes, 100_000_000);
+  assert.deepEqual(validateQuoteFiles([fakeFile("limit.stl", 50_000_000)]), { ok: true });
   const tooLarge = validateQuoteFiles([
     fakeFile("modelo.stl", QUOTE_FILE_POLICY.maxBytesPerFile + 1)
   ]);
   assert.equal(tooLarge.ok, false);
   assert.equal(tooLarge.code, "file-too-large");
+
+  const totalExactly = validateQuoteFiles([
+    fakeFile("a.stl", 50_000_000), fakeFile("b.stl", 50_000_000)
+  ]);
+  assert.deepEqual(totalExactly, { ok: true });
 
   const totalTooLarge = validateQuoteFiles([
     fakeFile("a.stl", 40 * 1024 * 1024),

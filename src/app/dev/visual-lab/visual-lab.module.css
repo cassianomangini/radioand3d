@@ -340,7 +340,7 @@
 
 .copyCompact {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.85fr);
   align-items: end;
   column-gap: 2.2rem;
 }
@@ -350,7 +350,7 @@
 }
 
 .copyCompact h2 {
-  font-size: clamp(2.9rem, 5vw, 5rem);
+  font-size: clamp(2.9rem, 4.1vw, 4.2rem);
 }
 
 .copyCompact .description {

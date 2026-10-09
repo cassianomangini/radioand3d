@@ -24,6 +24,17 @@ pnpm typecheck
 pnpm build
 ```
 
+### QA visual renderizado (ferramentas de desenvolvimento)
+
+O projeto mantém `scripts/capture-radio-states.mjs`/CDP para a Rádio e adiciona diagnósticos com Playwright Test. As bibliotecas `motion`, `@playwright/test` e `@axe-core/playwright` estão versionadas no lockfile; instalar ferramentas **não** modifica a aparência das páginas.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm visual:qa
+```
+
+O visual runner usa o **Google Chrome** instalado (`channel: chrome`) e inicia `pnpm dev` localmente. Na CI, após `pnpm build`, usa `pnpm start`. Captura Home, Estúdio, Orçamento e Produto em cinco perfis de tela e anexa inventário inicial de acessibilidade. **Não gera/aprova baselines automaticamente** nem substitui comparação humana com o mock aprovado. Resultados e pendências: [08V](docs/work/08-visual-quality-evolution.md) e [pipeline](docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md).
+
 ### Catálogo da rádio no R2
 
 O ambiente local configurado lê as 343 músicas do bucket R2 `musicas`. Para configurar outra máquina, copie `.env.example` para `.env.local`, preencha as credenciais S3 **somente de leitura** e defina `RADIO_CATALOG_SOURCE=r2`. A URL `R2_S3_ENDPOINT` termina em `r2.cloudflarestorage.com`; `musicas` fica em `R2_BUCKET`, sem repetir o nome do bucket no endpoint. Não coloque credenciais no repositório nem no navegador.
@@ -49,6 +60,7 @@ A rota `/dev/foundation` existe somente fora de produção para validar tokens e
 
 | Documento | Responsabilidade exclusiva |
 | --- | --- |
+| [Receitas visuais CM](docs/design/CM_VISUAL_RECIPES_V1.md) | Casos de uso reais, limites de arte/assets e inventário de referências |
 | [Pipeline visual render-first](docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md) | Decisão de renderer, bibliotecas avaliadas, revisão visual e critérios de evidência |
 | [Skill de experiência CM versionada](.github/skills/cm-3d-radio-experience/SKILL.md) | Direção visual do Estúdio e Rádio sincronizada com os contratos atuais; ZIP distribuído separadamente para atualização da skill instalada |
 | [Arquitetura](docs/ARCHITECTURE.md) || [Arquitetura](docs/ARCHITECTURE.md) | Stack, módulos, segurança, infraestrutura e estratégia de frontend |

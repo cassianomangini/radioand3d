@@ -14,7 +14,7 @@ O plano de evolução render-first, catálogo de bibliotecas, reuso do QA já ex
 
 Em 09/10/2026, Cassiano pediu que arrastar a Rádio lateral **para a direita** faça a superfície **subir para a navbar** e virar um **player compacto**, liberando o Estúdio. A Rádio lateral volta por botão no header ou arrastando da borda direita para a esquerda. **Localização fixada por Cassiano em seguida:** mini imediatamente antes dos ícones sociais existentes, no conjunto de ações da direita, preservando a navegação principal centralizada. Referência verificada: `cassianomangini/artesopolis-landing/src/components/navbar.tsx`. Esse estado será exclusivamente desktop e não duplica o áudio nem o player móvel. [Contrato de direção e movimento](design/CM_RADIO_NAVBAR_DOCK_V1.md) · [Checklist 03c](work/03c-radio-navbar-dock.md).
 
-**Estado:** `in_progress` apenas em documentação e revisão de comportamento. D1–D3 concluídos por inspeção; D4 (prévia contextual de interação), D5 (aprovação visual) e código/testes ainda pendentes. Isso **não** revoga o aceite anterior da Rádio nem altera a prioridade funcional do Estúdio.
+**Estado:** `in_progress` na fase de aprovação visual. D1–D4 concluídos: contrato + [prévia interativa contextual com shell real](work/evidence/03c-radio-dock-preview-2026-10-09.md), **6 testes Playwright renderizados passaram**, vídeo e screenshots da Rádio lateral, subida ao mini antes das redes sociais e retorno. **D5 (aprovação visual), I1–I6 (integração pública) e Q1–Q7 (QA final) permanecem pendentes.** Isso **não** revoga o aceite anterior da Rádio nem altera a prioridade funcional do Estúdio.
 
 ## Próximos passos
 

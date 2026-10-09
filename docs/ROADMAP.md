@@ -35,7 +35,7 @@ Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio
 | 02 | Aplicação e verificações mínimas | done | App, lockfile, lint, tipos, build e CI na `main` |
 | 03 | Contrato visual Estúdio + Rádio | done | Aprovado por Cassiano; pacote em [STUDIO_RADIO_APPROVAL_PACKAGE_V1.md](design/STUDIO_RADIO_APPROVAL_PACKAGE_V1.md) |
 | 03b | Base visual compartilhada | done | Cassiano aceitou a passagem da Rádio em 05/10/2026; [checklist](work/03b-frontend-foundation.md) |
-| 03c | Rádio — dock reversível no header desktop | in_progress | **Somente especificação D1–D3 concluída**; novo gesto à direita e mini na navbar, retorno por botão/arraste. Prévia e aprovação estética pendentes, nenhuma implementação. [Checklist](work/03c-radio-navbar-dock.md) |
+| 03c | Rádio — dock reversível no header desktop | in_progress | **D1–D4 concluídos, incluindo preview dev-only com vídeo e 6 testes de browser**; mini antes de redes sociais, retorno por botão/arraste. Aprovação estética D5 e implementação pública I1–I6 pendentes. [Checklist](work/03c-radio-navbar-dock.md) |
 | 04 | Biblioteca e ingestão | blocked | Fora do caminho atual |
 | 05 | Music Inbox | blocked | Fora do caminho atual |
 | 06 | Motor de rádio e visualizador | done | Cassiano aceitou as barras em 05/10/2026; [checklist](work/06-radio-engine.md) |

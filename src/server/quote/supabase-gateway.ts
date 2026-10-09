@@ -177,5 +177,96 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
       const host = new URL(url).hostname.replace('.supabase.co', '.storage.supabase.co');
       return { token, endpoint: `https://${host}/storage/v1/upload/resumable` };
     },
+    async ownedAttachment(requestId, ownerHash, attachmentId) {
+      const rows = await api<OwnedQuoteAttachment[]>('/rest/v1/rpc/quote_owned_attachment', {
+        p_request_id: requestId, p_owner_session_hash: ownerHash, p_attachment_id: attachmentId,
+      });
+      if (!Array.isArray(rows) || rows.length !== 1) {
+        throw new QuoteHttpError(404, 'quote_attachment_not_found');
+      }
+      const row = rows[0];
+      if (!uuid(row.attachment_id) || !acceptedPath.test(row.storage_path) ||
+        typeof row.extension !== 'string' ||
+        !Number.isSafeInteger(row.reported_size_bytes)) {
+        throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+      }
+      return row;
+    },
+    async storageFileSize(path) {
+      assertPath(path);
+      const response = await fileApi(`/storage/v1/object/info/quote-intake/${path}`);
+      let info: unknown;
+      try { info = await response.json(); }
+      catch { throw new QuoteHttpError(503, 'quote_upstream_unavailable'); }
+      const size = (info as { size?: unknown } | null)?.size;
+      if (!Number.isSafeInteger(size) || (size as number) < 1 || (size as number) > 50_000_000) {
+        throw new QuoteHttpError(409, 'quote_file_invalid');
+      }
+      return size as number;
+    },
+    async readStorageRange(path, first, last) {
+      assertPath(path);
+      if (!Number.isSafeInteger(first) || !Number.isSafeInteger(last) ||
+        first < 0 || last < first || last - first >= 131_072) {
+        throw new QuoteHttpError(400, 'invalid_quote_range');
+      }
+      const response = await fileApi(`/storage/v1/object/quote-intake/${path}`, {
+        Range: `bytes=${first}-${last}`,
+      });
+      if (response.status !== 206 || !response.body) {
+        throw new QuoteHttpError(503, 'quote_range_unavailable');
+      }
+      const reader = response.body.getReader();
+      const chunks: Uint8Array[] = [];
+      let length = 0;
+      try {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          length += value.length;
+          if (length > last - first + 1) throw new QuoteHttpError(503, 'quote_range_unavailable');
+          chunks.push(value);
+        }
+      } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+      if (length !== last - first + 1) throw new QuoteHttpError(503, 'quote_range_unavailable');
+      const bytes = new Uint8Array(length);
+      let offset = 0;
+      for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+      return bytes;
+    },
+    async validateAttachment(requestId, ownerHash, attachmentId, sizeBytes, detectedType) {
+      const result = await api<boolean>('/rest/v1/rpc/quote_validate_attachment', {
+        p_request_id: requestId, p_owner_session_hash: ownerHash,
+        p_attachment_id: attachmentId, p_actual_size_bytes: sizeBytes,
+        p_detected_type: detectedType,
+      });
+      if (result !== true) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+    },
+    async submitQuote(input) {
+      const result = await api<Array<{ request_id: string; submission_time: string }>>(
+        '/rest/v1/rpc/quote_submit', {
+          p_request_id: input.requestId,
+          p_owner_session_hash: input.ownerHash,
+          p_submission_key: input.submissionKey,
+          p_project_type: input.projectType,
+          p_no_file: input.noFile,
+          p_starting_points: input.startingPoints,
+          p_source_origin: input.sourceOrigin,
+          p_source_reference: input.sourceReference,
+          p_production: input.production,
+          p_project: input.project,
+          p_contact_method: input.contactMethod,
+          p_contact_name: input.contactName,
+          p_contact_value: input.contactValue,
+          p_triage_status: input.triageStatus,
+          p_attachment_ids: input.attachmentIds,
+        });
+      if (!Array.isArray(result) || result.length !== 1 ||
+        !uuid(result[0]?.request_id) ||
+        !Number.isFinite(Date.parse(result[0]?.submission_time))) {
+        throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+      }
+      return result[0];
+    },
   };
 }

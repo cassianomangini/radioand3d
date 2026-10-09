@@ -55,6 +55,8 @@ export type QuoteGateway = {
   readStorageRange(path: string, first: number, last: number): Promise<Uint8Array>;
   validateAttachment(requestId: string, ownerHash: string, attachmentId: string,
     sizeBytes: number, detectedType: string): Promise<void>;
+  submissionReceipt(requestId: string, ownerHash: string, submissionKey: string):
+    Promise<{ request_id: string; submission_time: string } | null>;
   submitQuote(input: QuoteSubmitInput): Promise<{ request_id: string; submission_time: string }>;
 };
 
@@ -241,6 +243,23 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
         p_detected_type: detectedType,
       });
       if (result !== true) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+    },
+    async submissionReceipt(requestId, ownerHash, submissionKey) {
+      const rows = await api<Array<{ request_id: string; submission_time: string }>>(
+        '/rest/v1/rpc/quote_submission_receipt', {
+          p_request_id: requestId,
+          p_owner_session_hash: ownerHash,
+          p_submission_key: submissionKey,
+        });
+      if (!Array.isArray(rows) || rows.length > 1) {
+        throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+      }
+      if (rows.length === 0) return null;
+      const receipt = rows[0];
+      if (!uuid(receipt.request_id) || !Number.isFinite(Date.parse(receipt.submission_time))) {
+        throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+      }
+      return receipt;
     },
     async submitQuote(input) {
       const result = await api<Array<{ request_id: string; submission_time: string }>>(

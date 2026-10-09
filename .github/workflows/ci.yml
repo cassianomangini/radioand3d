@@ -97,6 +97,32 @@ jobs:
         if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
         run: pnpm visual:qa
 
+      - name: Render isolated visual lab in development
+        if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm dev --hostname 127.0.0.1 --port 3100 > /tmp/cm-visual-lab-next.log 2>&1 &
+          LAB_PID=$!
+          trap 'kill "$LAB_PID" 2>/dev/null || true' EXIT
+
+          for attempt in {1..75}; do
+            STATUS="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/dev/visual-lab || true)"
+            if [ "$STATUS" = "200" ]; then
+              break
+            fi
+            if [ "$attempt" -eq 75 ]; then
+              cat /tmp/cm-visual-lab-next.log
+              echo "Development visual lab did not respond with HTTP 200"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          VISUAL_LAB_QA=1 VISUAL_REVIEW_URL=http://127.0.0.1:3100 \
+            pnpm exec playwright test tests/visual/visual-lab.spec.ts \
+            --project=desktop-1440 --project=mobile-390
+
       - name: Upload Playwright diagnostics
         if: always() && (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]'))
         uses: actions/upload-artifact@v4
@@ -104,6 +130,7 @@ jobs:
           name: cm-visual-diagnostics
           path: |
             test-results/visual/**
+            test-results/visual-lab/**
             playwright-report/**
           if-no-files-found: warn
           retention-days: 7

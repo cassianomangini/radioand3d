@@ -189,6 +189,9 @@ Requisitos de engenharia:
 - extensão e MIME fornecido pelo navegador não são prova de formato;
 - nome do arquivo não é confiável;
 - armazenamento privado por padrão;
+- **sessão anônima opaca e vinculada no servidor a cada orçamento**; o UUID ou a posse do arquivo, isoladamente, nunca autoriza acesso;
+- cookie de sessão seguro e HttpOnly, verificação de Origin/CSRF e rejeição de acesso cruzado entre visitantes;
+- **quota global de bytes reservados + armazenados**, além de limite por solicitação e rate limit;
 - validar conteúdo/assinatura quando aplicável antes da gravação definitiva;
 - não executar, renderizar ou interpretar arquivo enviado no processo de ingestão;
 - não publicar anexos automaticamente;
@@ -338,21 +341,22 @@ A triagem estrutural inicial pode resultar em:
 
 “Revisão manual / fora de escopo” é uma decisão operacional posterior, não um status automático calculado pelo contrato.
 
-Storage, persistência, retenção, rate limiting e ingestão remota estão definidos no contrato de infraestrutura Supabase.
+Storage, sessão/posse anônima, persistência, retenção (Vercel Cron GET), limites globais, rate limiting e ingestão remota estão definidos no [contrato de infraestrutura Supabase](SUPABASE_INFRASTRUCTURE_V1.md). Definição aprovada não implica implementação/deploy.
 
 Resumo vigente:
 
-- projeto Supabase próprio do CM 3D & Radio;
+- **projeto Supabase CM novo e limpo, ainda não criado**;
 - região `sa-east-1`;
 - bucket privado `quote-intake`;
 - upload direto por signed resumable upload/TUS;
 - nenhum secret Supabase no browser;
-- Route Handlers server-side como boundary do Orçamento;
+- Route Handlers server-side como boundary do Orçamento, com sessão HttpOnly e autorização por posse;
 - validação de conteúdo depois do upload e antes do submit;
 - draft/upload órfão: 24 h;
 - arquivos submetidos: 90 dias;
 - conteúdo/contato do intake: 180 dias;
-- eventos técnicos sem PII: 365 dias.
+- eventos técnicos sem PII: 365 dias;
+- limpeza por Vercel Cron GET autenticado por `CRON_SECRET`, somente depois de rota/segredos disponíveis.
 
 O arquivo de infraestrutura é a autoridade para implementação desses itens.
 
@@ -414,7 +418,7 @@ A landing de serviço deve apontar para orçamento. O formulário não precisa c
 
 ## Decisões abertas
 
-Infra e retenção **não estão mais abertas**; foram fechadas em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md).
+O **contrato técnico** de sessão, segurança, infra e retenção está definido em [SUPABASE_INFRASTRUCTURE_V1.md](SUPABASE_INFRASTRUCTURE_V1.md); **implementação, provisionamento e smoke ainda estão pendentes**, conforme [checklist E2](work/08-supabase-provisioning.md).
 
 Continuam abertas apenas decisões de operação/comercial:
 
@@ -432,6 +436,8 @@ O fluxo está pronto quando:
 - um visitante pode concluir sem WhatsApp;
 - origem e referência podem chegar pré-preenchidas;
 - anexos são privados e validados;
+- outra sessão não consegue acessar, concluir upload nem enviar a solicitação;
+- quota de arquivo/pedido **e quota global** são respeitadas sob concorrência;
 - solicitação gera registro persistente;
 - triagem é possível;
 - confirmação não promete o que não existe;

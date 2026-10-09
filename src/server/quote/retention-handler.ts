@@ -29,6 +29,7 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
   let finished = false;
   const counters = {
     objects: 0,
+    failedObjects: 0,
     bytes: 0,
     drafts: 0,
     submitted: 0,
@@ -57,12 +58,20 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
           backlogMayRemain = true;
           break;
         }
-        await db.removeAndConfirm(object.object_path);
-        // The RPC rechecks age, reservation expiry and storage.objects under
-        // a transaction. A failed API call never releases capacity.
-        const released = await db.finalizeAttachment(token, object.attachment_id);
-        counters.objects++;
-        counters.bytes += released;
+        try {
+          await db.removeAndConfirm(object.object_path);
+          // The RPC rechecks age, reservation expiry and storage.objects
+          // under a transaction. A failed call never releases capacity.
+          const released = await db.finalizeAttachment(token, object.attachment_id);
+          counters.objects++;
+          counters.bytes += released;
+        } catch {
+          // One inaccessible Storage object must not prevent unrelated
+          // expired customer contact and rate-limit records being purged.
+          // Do not retry the same failing page repeatedly within one run.
+          counters.failedObjects++;
+          backlogMayRemain = true;
+        }
       }
       if (backlogMayRemain) break;
       if (due.length < PER_BATCH) break;
@@ -78,12 +87,18 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
     // may exist and will be processed on the next authenticated invocation.
     backlogMayRemain ||= Object.values(result).some(n => n === SWEEP_LIMIT);
 
-    finished = await db.finish(token, true, {
-      objects: counters.objects, bytes: counters.bytes,
-      drafts: counters.drafts, submitted: counters.submitted,
-      rateWindows: counters.rateWindows, events: counters.events,
+    const fullySuccessful = counters.failedObjects === 0;
+    finished = await db.finish(token, fullySuccessful, {
+      objects: counters.objects, failedObjects: counters.failedObjects,
+      bytes: counters.bytes, drafts: counters.drafts,
+      submitted: counters.submitted, rateWindows: counters.rateWindows,
+      events: counters.events,
     });
     if (!finished) throw Error('retention_lease_expired');
+    if (!fullySuccessful) {
+      return responseJson({ error: 'retention_partial_failure', ...counters,
+        backlogMayRemain: true }, 503);
+    }
     return responseJson({ status: 'ok', ...counters, backlogMayRemain });
   } catch {
     // Never expose paths, contact details, SQL messages or secrets.

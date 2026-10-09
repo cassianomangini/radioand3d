@@ -121,7 +121,8 @@ jobs:
 
           VISUAL_LAB_QA=1 VISUAL_REVIEW_URL=http://127.0.0.1:3100 \
             pnpm exec playwright test tests/visual/visual-lab.spec.ts \
-            --project=desktop-1440 --project=mobile-390
+            --project=desktop-1440 --project=desktop-1024 \
+            --project=mobile-390 --project=mobile-360
 
           node scripts/build-visual-lab-review.mjs
 

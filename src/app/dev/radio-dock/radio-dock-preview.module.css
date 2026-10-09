@@ -1,0 +1,341 @@
+.preview {
+  position: relative;
+  min-height: 100dvh;
+  isolation: isolate;
+  background: var(--surface-page);
+}
+
+/* The route reuses the real CM header and shell. These overrides are limited
+   to the development-only preview wrapper; no production CSS is modified. */
+@media (min-width: 73.75rem) {
+  .preview :global(.siteHeader) {
+    transition: right 660ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .preview :global(.desktopShell) {
+    transition: grid-template-columns 660ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .preview :global(.socialIcons) {
+    position: relative;
+    z-index: 1;
+    flex: none;
+  }
+
+  .preview[data-dock-phase="docked"] :global(.siteHeader),
+  .preview[data-dock-phase="docking"] :global(.siteHeader) {
+    right: 0 !important;
+  }
+
+  .preview[data-dock-phase="docked"] :global(.desktopShell),
+  .preview[data-dock-phase="docking"] :global(.desktopShell) {
+    grid-template-columns: minmax(0, 1fr) 0 0 !important;
+  }
+
+  .preview[data-dock-phase="docked"] :global(.radioPanel),
+  .preview[data-dock-phase="docking"] :global(.radioPanel),
+  .preview[data-dock-phase="restoring"] :global(.radioPanel) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .preview[data-dock-phase="docked"] :global(.resizeHandle),
+  .preview[data-dock-phase="docking"] :global(.resizeHandle),
+  .preview[data-dock-phase="restoring"] :global(.resizeHandle) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .preview[data-dock-phase="docked"] :global(.siteHeader > .socialIcons),
+  .preview[data-dock-phase="docking"] :global(.siteHeader > .socialIcons) {
+    display: flex !important;
+  }
+}
+
+/* Portalled to the existing social-actions container. Since SocialIcons is a
+   private component, the preview positions its small surface just to its left.
+   The final implementation must make it a proper sibling in the real header. */
+.dockSlot {
+  position: absolute;
+  right: calc(100% + 0.85rem);
+  top: 50%;
+  z-index: 2;
+  width: clamp(14.25rem, 24vw, 20rem);
+  min-width: 0;
+  height: 2.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.56rem;
+  padding: 0.3rem 0.38rem;
+  overflow: hidden;
+  background: linear-gradient(125deg, #0c1722 0%, #090d17 55%, #131025 100%);
+  border: 1px solid rgb(82 214 255 / 31%);
+  border-radius: 0.7rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 33%), inset 0 1px 0 rgb(255 255 255 / 4%);
+  transform: translateY(-50%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 160ms ease, border-color 180ms ease;
+}
+
+.preview[data-dock-phase="docked"] .dockSlot {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.dockSlot:hover {
+  border-color: rgb(82 214 255 / 58%);
+}
+
+.dockCover {
+  width: 2.15rem;
+  height: 2.15rem;
+  flex: 0 0 auto;
+  border-radius: 0.3rem;
+  object-fit: cover;
+  object-position: center;
+}
+
+.dockCopy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  gap: 0.13rem;
+  white-space: nowrap;
+}
+
+.dockCopy strong {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+}
+
+.dockCopy small {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.63rem;
+  font-weight: 550;
+  text-overflow: ellipsis;
+}
+
+.dockControl,
+.dockRestore {
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  border-radius: 0.48rem;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.dockControl {
+  background: rgb(78 157 255 / 14%);
+  color: #85dfff;
+}
+
+.dockControl:hover:not(:disabled),
+.dockRestore:hover {
+  color: #fff;
+  background: rgb(82 214 255 / 22%);
+}
+
+.dockControl:disabled {
+  cursor: not-allowed;
+  color: var(--text-disabled);
+  background: rgb(255 255 255 / 4%);
+}
+
+.dockRestore {
+  color: var(--text-secondary);
+}
+
+.flight {
+  position: fixed;
+  z-index: 95;
+  top: 0;
+  left: 0;
+  display: none;
+  visibility: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgb(82 214 255 / 48%);
+  background: #03050a;
+  box-shadow: 0 1.25rem 3.5rem rgb(6 48 106 / 33%), 0 0 0 1px rgb(139 109 255 / 15%);
+}
+
+.flightArtwork {
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.8;
+}
+
+.flight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(2 3 5 / 17%), rgb(3 5 10 / 18%) 40%, rgb(3 5 10 / 94%) 100%);
+}
+
+.flightCaption {
+  position: absolute;
+  z-index: 1;
+  bottom: 1rem;
+  left: 1.2rem;
+  right: 1rem;
+  display: grid;
+  gap: 0.24rem;
+  white-space: nowrap;
+}
+
+.flightCaption strong {
+  overflow: hidden;
+  font-size: clamp(0.8rem, 2vw, 1.25rem);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+}
+
+.flightCaption small {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.edgeHandle {
+  position: fixed;
+  z-index: 65;
+  top: var(--header-height, 4.25rem);
+  right: 0;
+  width: 1rem;
+  height: calc(100dvh - var(--header-height, 4.25rem));
+  padding: 0;
+  border: 0;
+  border-left: 1px solid rgb(82 214 255 / 16%);
+  background: linear-gradient(180deg, rgb(82 214 255 / 22%), rgb(139 109 255 / 18%), rgb(2 3 5 / 4%));
+  opacity: 0.28;
+  touch-action: none;
+  cursor: ew-resize;
+  transition: opacity 160ms ease;
+}
+
+.edgeHandle:hover,
+.edgeHandle:focus-visible {
+  opacity: 1;
+}
+
+.previewGuide {
+  position: fixed;
+  z-index: 66;
+  left: clamp(1rem, 2.3vw, 2rem);
+  bottom: clamp(0.85rem, 2vw, 1.6rem);
+  width: min(21rem, calc(100vw - 2.5rem));
+  display: grid;
+  justify-items: start;
+  gap: 0.45rem;
+  padding: 1rem 1.15rem;
+  background: rgb(3 7 13 / 93%);
+  border: 1px solid rgb(82 214 255 / 27%);
+  border-radius: 0.84rem;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 47%);
+}
+
+.previewKicker {
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+}
+
+.previewGuide > strong {
+  color: #fff;
+  font-size: 0.92rem;
+  letter-spacing: -0.02em;
+}
+
+.previewGuide p {
+  max-width: 36ch;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.previewGuide button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  min-height: 2.5rem;
+  color: #effaff;
+  background: #0c2334;
+  border: 1px solid rgb(82 214 255 / 39%);
+  border-radius: 0.45rem;
+  font-weight: 750;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.previewGuide button:hover:not(:disabled) {
+  background: #14384d;
+  border-color: var(--accent-cyan);
+}
+
+.previewGuide button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.previewGuide small {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+
+.srOnly {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 73.74rem) {
+  .dockSlot,
+  .previewGuide,
+  .flight,
+  .edgeHandle {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview :global(.siteHeader),
+  .preview :global(.desktopShell),
+  .dockSlot,
+  .edgeHandle {
+    transition-duration: 1ms !important;
+  }
+}

@@ -14,6 +14,7 @@ test.describe("03c production protection", () => {
 });
 
 test.describe("03c visual dock preview", () => {
+  test.use({ video: "on" });
   test.skip(!previewRun, "Run the isolated animation preview against pnpm dev");
 
   test("real CM header: dock then restore using explicit player control", async ({ page }, testInfo) => {
@@ -36,6 +37,9 @@ test.describe("03c visual dock preview", () => {
     expect(beforeAudioCount, "One shared RadioProvider must own the audio element").toBeLessThanOrEqual(1);
 
     await page.locator('[data-dock-demo-toggle="true"]').click();
+    await expect(root).toHaveAttribute("data-dock-phase", "docking", { timeout: 1500 });
+    await page.waitForTimeout(240);
+    await page.screenshot({ path: testInfo.outputPath("radio-flight-to-navbar.png"), animations: "allow" });
     await expect(root).toHaveAttribute("data-dock-phase", "docked", { timeout: 4000 });
     const mini = page.locator('[data-dock-mini="true"]');
     await expect(mini).toBeVisible();

@@ -1,6 +1,6 @@
 # 08V — Evolução da produção visual e Visual QA
 
-**Estado:** planejamento documentado; implementação não iniciada. A auditoria inicial está concluída.  
+**Estado:** em execução; auditoria e base de agentes/dependências/QA renderizado verificadas. Baselines aprovadas, QA ampliado, laboratório, piloto e adoção contínua ainda pendentes.  
 **Vínculo:** subfrente da entrega 08 (Estúdio público); não é uma nova fila paralela nem reabre C1–C8 da Rádio.  
 **Base consultada:** `main` em 09/10/2026, commit `080cbd7d2078848f9d6e66bf33efc154c672b4ed`.  
 **Responsáveis por domínio:** CM Experience (direção), CM Frontend (implementação), CM Review (evidência), CM Planning (controle do checklist).  

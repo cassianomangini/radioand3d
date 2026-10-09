@@ -8,7 +8,8 @@ export default defineConfig({
   fullyParallel: false,
   timeout: 60_000,
   expect: { timeout: 15_000 },
-  retries: process.env.CI ? 1 : 0,
+  // Dev-lab QA must pass on the first attempt; do not hide hydration races with retries.
+  retries: labPreview ? 0 : process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", {
     outputFolder: labPreview ? "playwright-report/visual-lab" : "playwright-report/public",
     open: "never"

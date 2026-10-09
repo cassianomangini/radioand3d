@@ -1,11 +1,11 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **projeto definitivo criado na região e organização corretas · schema ainda não aplicado**  
+Status: **projeto definitivo confirmado; migration inicial de Orçamento aplicada e validada; Storage/handlers/produção pendentes**  
 Revisão: **09/10/2026**  
 Região contratada e confirmada: **sa-east-1 (São Paulo)**  
 Responsável: **CM Infra / CM Data**
 
-Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário criou o projeto Supabase definitivo na organização independente Cmangini3d (Free), em `sa-east-1`**. A Management API confirmou o projeto `ACTIVE_HEALTHY`; consulta SQL funcional, sem tabelas de domínio e sem migrations. O staging antigo do Admin continua pausado. **Ainda não foram aplicados schema de negócio, bucket privado, secrets, Cron nem deploy do Orçamento.**
+Esta é a arquitetura canônica do backend próprio do site. **Em 09/10/2026, o usuário criou o projeto Supabase definitivo na organização independente Cmangini3d (Free), em `sa-east-1`**. A Management API confirmou o projeto `ACTIVE_HEALTHY`; consulta SQL funcional, sem tabelas de domínio e sem migrations. O staging antigo do Admin continua pausado. **Migration inicial `create_quote_core` aplicada e versionada em 09/10/2026**: quatro tabelas privadas com RLS e sem grants `anon`/`authenticated`, banco sem dados pessoais. **Bucket, secrets, Cron e deploy do Orçamento continuam pendentes.**
 
 A execução e os checkpoints verificáveis estão em [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md). Detalhes operacionais sobre a infraestrutura de outro sistema ficam fora deste repositório público. **Não** usar este documento como autorização para pausar, limpar, migrar ou modificar um banco existente.
 
@@ -77,7 +77,7 @@ Migrations versionadas no Git, dados de seed exclusivamente fictícios e CLI ver
 
 ### Produção
 
-**Projeto CM definitivo criado na organização Cmangini3d em `sa-east-1`.** A API confirma PostgreSQL 17.11, banco saudável, sem tabelas públicas de domínio ou migrations, com acesso SQL read-only e Security Advisor sem lints iniciais. A Vercel do Radio ainda não contém variáveis Supabase CM. Identificadores/credenciais concretos pertencem ao inventário privado, não a este documento.
+**Projeto CM definitivo criado na organização Cmangini3d em `sa-east-1`.** PostgreSQL 17.11 saudável e SQL funcional. A primeira migration de Orçamento foi aplicada com sucesso e registrada no Git: [`20261009143743_create_quote_core.sql`](../supabase/migrations/20261009143743_create_quote_core.sql). Verificados quatro objetos, zero registros e grants SELECT anônimos negados. Security Advisor registrou quatro observações `INFO` de RLS ativado **sem policies**, configuração de negação intencional nesta etapa. A Vercel ainda não tem variáveis CM Supabase. Identificadores/credenciais concretos ficam fora da documentação pública.
 
 A organização CM separada **foi criada e confirmada**: Cmangini3d está no plano Free. O isolamento administrativo/de faturamento por organização está estabelecido, sem alterar a assinatura da organização do Artesopolis Admin. Criar outra organização não aumenta o limite de projetos Free ativos da mesma conta.
 
@@ -856,9 +856,9 @@ Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
 ## 32. Retomada — 09/10/2026
 
-- **Projeto CM definitivo criado e validado** na organização Free independente Cmangini3d e região São Paulo; acesso SQL funciona; banco ainda sem tabelas de negócio/migrations.
+- **Projeto CM definitivo validado** na organização Free independente Cmangini3d e região São Paulo. Migration inicial `create_quote_core` aplicada e versionada, quatro tabelas verificadas e vazias, com RLS/grants restritos.
 - O ambiente de testes legado permanece **inalterado**; pausa depende de inventário, backup e gate próprio.
-- Migrations, bucket, segredo de sessão remoto, quota persistente, Route Handlers e Cron: **não aplicados/deployados**. Apenas a primitiva criptográfica de sessão existe no código.
+- **Migration inicial aplicada** (schema base, índices, FKs, constraints, RLS/grants). Bucket, segredo de sessão remoto, quota transacional completa, Route Handlers e Cron: **não aplicados/deployados**. Primitiva de sessão existe apenas no código.
 - Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 - Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
-- Próximo gate: versionar schema e testes locais, validar RLS/grants/quotas e depois aplicar migration no projeto CM definitivo com read-back. O desenvolvimento local não deve coletar dados pessoais reais.
+- Próximo gate: completar limite global de bytes e transições seguras, bucket privado, autorização nos handlers e testes de falha. O teste de SQL com `BEGIN`/`ROLLBACK`, read-back das quatro tabelas e ACL já passou; CLI/Docker locais indisponíveis neste ambiente. Não aceitar dados pessoais reais até o gate de lançamento.

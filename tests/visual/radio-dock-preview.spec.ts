@@ -13,8 +13,9 @@ test.describe("03c production protection", () => {
   });
 });
 
+test.use({ video: "on" });
+
 test.describe("03c visual dock preview", () => {
-  test.use({ video: "on" });
   test.skip(!previewRun, "Run the isolated animation preview against pnpm dev");
 
   test("real CM header: dock then restore using explicit player control", async ({ page }, testInfo) => {

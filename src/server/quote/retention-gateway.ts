@@ -16,7 +16,7 @@ export type RetentionSweep = {
 
 export type RetentionGateway = {
   acquire(runToken: string): Promise<boolean>;
-  scrubSubmitted(runToken: string, limit: number): Promise<number>;
+  scrubExpiredPrivateData(runToken: string, limit: number): Promise<number>;
   candidates(runToken: string, limit: number): Promise<RetentionAttachment[]>;
   removeAndConfirm(path: string): Promise<void>;
   finalizeAttachment(runToken: string, attachmentId: string): Promise<number>;
@@ -69,7 +69,7 @@ export function createRetentionGateway(fetcher: typeof fetch = fetch): Retention
       if (typeof result !== 'boolean') return unavailable();
       return result;
     },
-    async scrubSubmitted(runToken, limit) {
+    async scrubExpiredPrivateData(runToken, limit) {
       if (!uuid(runToken) || !Number.isInteger(limit) || limit < 1 || limit > 250) {
         return unavailable();
       }

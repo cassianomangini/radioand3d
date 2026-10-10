@@ -113,6 +113,24 @@ export async function runStorageSmoke({
   const uploadOrigin = 'https://' + expectedProjectRef + '.storage.supabase.co';
   let created = false;
   try {
+    // Fail BEFORE any write if this is not the isolated CM schema/bucket.
+    // A matching URL/ref alone cannot prove that an operator selected CM.
+    const serviceReady = await http(fetcher,
+      base + '/rest/v1/rpc/quote_retention_active', {
+        method:'POST',headers:auth,body:JSON.stringify({p_token:uuid()}),
+      },'verify_cm_schema',[200]);
+    if (await json(serviceReady,'verify_cm_schema') !== false) {
+      throw new StorageSmokeError('unexpected_lease_proof');
+    }
+    const coreBucket = await http(fetcher,
+      base + '/storage/v1/bucket/quote-intake', {
+        method:'GET',headers:{apikey:serviceKey},
+      },'verify_cm_private_bucket',[200]);
+    const core = await json(coreBucket,'verify_cm_private_bucket');
+    if (core?.id !== 'quote-intake' || core.public !== false) {
+      throw new StorageSmokeError('wrong_cm_storage_boundary');
+    }
+
     const bucketResponse = await http(fetcher,base + '/storage/v1/bucket',{
       method:'POST',headers:auth,body:JSON.stringify({id:bucket,name:bucket,
         public:false,file_size_limit:10000000,

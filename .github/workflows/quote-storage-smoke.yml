@@ -1,0 +1,65 @@
+name: isolated-quote-storage-smoke
+
+# Deliberately manual only. Never invoked by push, PR or deploy.
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Confirmacao de escrita/limpeza no bucket sintetico e privado."
+        required: true
+        type: choice
+        options:
+          - RUN_ISOLATED_SUPABASE_STORAGE_SMOKE
+      expected_project_ref:
+        description: "Referencia de 20 caracteres do projeto CM, comparada com CM_SUPABASE_URL."
+        required: true
+        type: string
+      mode:
+        description: "small=134 bytes; resume=6MiB+128 bytes com retomada de PATCH."
+        required: true
+        type: choice
+        default: resume
+        options:
+          - small
+          - resume
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quote-storage-smoke
+  cancel-in-progress: false
+
+jobs:
+  storage:
+    if: inputs.confirmation == 'RUN_ISOLATED_SUPABASE_STORAGE_SMOKE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check scoped server-only secrets
+        shell: bash
+        env:
+          PROJECT_URL: ${{ secrets.CM_SUPABASE_URL }}
+          STORAGE_SECRET: ${{ secrets.CM_SUPABASE_SECRET_KEY }}
+        run: |
+          if [ -z "$PROJECT_URL" ] || [ -z "$STORAGE_SECRET" ]; then
+            echo "Manual Storage QA requires CM_SUPABASE_URL and CM_SUPABASE_SECRET_KEY as repository secrets."
+            exit 1
+          fi
+
+      - name: Signed TUS, resume, private GET, Range, and teardown
+        env:
+          CM_STORAGE_SMOKE_CONFIRM: ${{ inputs.confirmation }}
+          CM_STORAGE_SMOKE_PROJECT_REF: ${{ inputs.expected_project_ref }}
+          CM_STORAGE_SMOKE_MODE: ${{ inputs.mode }}
+          CM_SUPABASE_URL: ${{ secrets.CM_SUPABASE_URL }}
+          CM_SUPABASE_SECRET_KEY: ${{ secrets.CM_SUPABASE_SECRET_KEY }}
+        run: node scripts/quote-storage-smoke.mjs

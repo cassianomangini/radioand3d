@@ -5,7 +5,7 @@ import { runStorageSmoke, StorageSmokeError } from '../scripts/quote-storage-smo
 const REF = 'aaaaaaaaaaaaaaaaaaaa';
 const BASE = 'https://' + REF + '.supabase.co';
 const KEY = 'sb_secret_' + 'K'.repeat(48);
-const TOKEN = 't'.repeat(48);
+const TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.' + 'A'.repeat(43);
 
 function mockStorage({mode='normal'}={}) {
   const calls=[], objects = new Map();
@@ -37,14 +37,18 @@ function mockStorage({mode='normal'}={}) {
       ended=true;return answer({message:'Successfully deleted'});
     }
     if(path==='/storage/v1/bucket/'+bucket && method==='GET'){
-      return answer({code:'NoSuchBucket'},ended?404:200);
+      if (mode === 'bad-cleanup' && ended) return answer({code:'AccessDenied'},400);
+      // Hosted Supabase Storage returns HTTP 400, code NoSuchBucket.
+      return answer({code:'NoSuchBucket'},ended?400:200);
     }
     if(path.startsWith('/storage/v1/object/upload/sign/') && method==='POST'){
       object=path.slice(('/storage/v1/object/upload/sign/'+bucket+'/').length);
-      return answer({url:'/object/upload/sign/'+bucket+'/'+object+'?token='+TOKEN});
+      return answer({url:'/object/upload/sign/'+bucket+'/'+object+'?token='+
+        (mode==='invalid-signature'?'not-a-jws':TOKEN)});
     }
     if(path==='/storage/v1/upload/resumable' && method==='POST'){
       assert.equal(opts.headers['x-signature'],TOKEN);
+      if (mode === 'tus-signature-failure') return answer({code:'AccessDenied'},400);
       data=Buffer.alloc(Number(opts.headers['Upload-Length']));
       assert.ok(Buffer.byteLength(opts.headers['Upload-Metadata'])>0);
       return new Response(null,{status:201,
@@ -154,4 +158,27 @@ test('TUS chunk failure attempts cleanup without leaving an unclaimed bucket',as
   const mock=mockStorage({mode:'patch-failure'});
   await assert.rejects(runStorageSmoke(input(mock,true)),/tus_first_chunk_503/);
   assert.equal(mock.clean(),true);
+});
+
+test('hosted Supabase 400 NoSuchBucket confirms cleanup without masking TUS errors',async()=>{
+  const mock=mockStorage({mode:'tus-signature-failure'});
+  await assert.rejects(runStorageSmoke(input(mock)),
+    err => err instanceof StorageSmokeError &&
+      err.stage==='tus_create' && err.message==='storage_smoke_tus_create_400');
+  assert.equal(mock.clean(),true);
+  assert.deepEqual(mock.calls.slice(-4).map(x=>x.method),['DELETE','POST','DELETE','GET']);
+});
+
+test('rejects invalid signed token format before TUS and still cleans test bucket',async()=>{
+  const mock=mockStorage({mode:'invalid-signature'});
+  await assert.rejects(runStorageSmoke(input(mock)),
+    err => err instanceof StorageSmokeError && err.stage==='signed_token_not_compact_jws');
+  assert.equal(mock.calls.some(x=>x.path==='/storage/v1/upload/resumable'),false);
+  assert.equal(mock.clean(),true);
+});
+
+test('does not treat arbitrary Storage 400 as confirmation of bucket deletion',async()=>{
+  const mock=mockStorage({mode:'bad-cleanup'});
+  await assert.rejects(runStorageSmoke(input(mock)),
+    err => err instanceof StorageSmokeError && err.stage.startsWith('cleanup_required_'));
 });

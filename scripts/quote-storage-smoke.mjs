@@ -91,9 +91,15 @@ async function teardown(fetcher, base, key, bucket, path) {
     {method:'POST',headers},'teardown_empty',[200,201,204]);
   await http(fetcher,base + '/storage/v1/bucket/' + bucket,
     {method:'DELETE',headers},'teardown_bucket',[200,201,204]);
-  // A successful DELETE alone is not the acceptance criterion.
-  await http(fetcher,base + '/storage/v1/bucket/' + bucket,
-    {method:'GET',headers:{apikey:key}},'confirm_bucket_absent',[404]);
+  // Supabase Storage responds HTTP 400 with code NoSuchBucket after a
+  // successful DELETE (the internal status is 404). Require the exact
+  // Storage error code: a generic 400/404 is NOT sufficient evidence.
+  const absent = await http(fetcher,base + '/storage/v1/bucket/' + bucket,
+    {method:'GET',headers:{apikey:key}},'confirm_bucket_absent',[400,404]);
+  const absence = await json(absent,'confirm_bucket_absent');
+  if (absence?.code !== 'NoSuchBucket') {
+    throw new StorageSmokeError('bucket_absence_unconfirmed');
+  }
 }
 
 /** Only synthetic data. Never copies a file or reveals secrets or upload URLs. */
@@ -112,6 +118,7 @@ export async function runStorageSmoke({
   const auth = {apikey:serviceKey,'content-type':'application/json'};
   const uploadOrigin = 'https://' + expectedProjectRef + '.storage.supabase.co';
   let created = false;
+  let primaryFailure = null;
   try {
     // Fail BEFORE any write if this is not the isolated CM schema/bucket.
     // A matching URL/ref alone cannot prove that an operator selected CM.
@@ -149,8 +156,11 @@ export async function runStorageSmoke({
       throw new StorageSmokeError('invalid_signed_url');
     }
     const token = new URL(signed.url,base + '/storage/v1/').searchParams.get('token');
-    if (!token || token.length < 16 || token.length > 4096) {
-      throw new StorageSmokeError('invalid_signed_token');
+    if (!token || token.length > 4096 ||
+        !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) {
+      // The x-signature contract requires a compact JWS; report its shape
+      // only. Never print token bytes or a signed URL to the job log.
+      throw new StorageSmokeError('signed_token_not_compact_jws');
     }
 
     const tusEndpoint = uploadOrigin + '/storage/v1/upload/resumable';
@@ -212,10 +222,22 @@ export async function runStorageSmoke({
     return { result:'PASS', mode:resumable?'resumed-6MiB':'small',
       bytes:file.length, signedTus:true, offsetResume:true, ranges:true,
       anonymousDenied:true, isolatedTestBucket:true };
+  } catch (error) {
+    primaryFailure = error;
+    throw error;
   } finally {
     if (created) {
       try { await teardown(fetcher,base,serviceKey,bucket,path); }
-      catch { throw new StorageSmokeError('cleanup_required_' + bucket); }
+      catch {
+        // Never replace the upload error with an ambiguous cleanup error.
+        // The only surfaced identifier is our random synthetic bucket.
+        const reason = primaryFailure instanceof StorageSmokeError
+          ? primaryFailure.message.replace(/^storage_smoke_/, '')
+          : primaryFailure ? 'unexpected' : null;
+        throw new StorageSmokeError(
+          'cleanup_required_' + bucket + (reason ? '_after_' + reason : '')
+        );
+      }
     }
   }
 }

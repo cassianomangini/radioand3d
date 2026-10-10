@@ -1,6 +1,6 @@
 # E2 — Prova de Storage isolada (runbook)
 
-Estado: **ready_for_manual_smoke** (script e mocks no Git; **sem prova de chamada real ao Storage**).  
+Estado: **smoke_small_failed** (primeira execução real em 10/10/2026; credenciais válidas para pré-checagens, bucket sintético removido; TUS ainda bloqueado).  
 Parent: [Checklist E2](08-supabase-provisioning.md) · [Infraestrutura](../SUPABASE_INFRASTRUCTURE_V1.md)
 
 ## Objetivo e fronteiras
@@ -8,6 +8,15 @@ Parent: [Checklist E2](08-supabase-provisioning.md) · [Infraestrutura](../SUPAB
 Validar, no **Supabase CM isolado**, os contratos HTTP reais de upload assinado TUS, offset/retomada, leitura parcial autenticada, bloqueio de leitura anônima e remoção física. Usar exclusivamente dados **sintéticos e gerados em memória**, sem foto, peça do cliente, contato ou SKU. A prova cria um **bucket privado temporário aleatório**, separado do `quote-intake`, e tenta eliminá-lo no `finally`.
 
 Esta prova **não envia nem submete um orçamento**, não valida a autorização entre duas sessões de visitante, não exercita a retenção agendada e não substitui o E2E final com as quatro rotas Next e os procedimentos de privacidade.
+
+## Primeira execução real — 10/10/2026
+
+- Execução manual `small`: [GitHub Action #38046349681](https://github.com/cassianomangini/radioand3d/actions/runs/38046349681) — **FAIL**, sem marcar TUS como validado.
+- **PASS:** três Environment Secrets presentes; verificação do schema CM via RPC; `quote-intake` privado; bucket de QA criado; endpoint de assinatura de upload retornou 200.
+- **FAIL real:** criação da sessão assinada `POST /storage/v1/upload/resumable` retornou **HTTP 400**, com log Supabase Storage `Invalid Compact JWS`. Ainda não comprovamos a causa (token/contrato vs comportamento Storage); não alterar RLS, habilitar upload público ou substituir assinatura por credencial privilegiada no browser.
+- **Cleanup físico confirmado:** DELETE de objeto 200, empty bucket 200; GET posterior do bucket retornou **HTTP 400 + `NoSuchBucket`**, e consulta SQL ao projeto não encontrou qualquer bucket `cm-storage-qa-*` nem objeto no `quote-intake`. Isso revela um bug do harness: esperava 404 e sobrescreveu a falha de TUS com o falso erro `cleanup_required`.
+- **Correção de observabilidade:** harness aceita **somente** código `NoSuchBucket` quando a resposta de ausência é 400/404; distingue erro de TUS de falha real de teardown e valida que o token possui formato Compact JWS sem registrar o token. Testes de regressão versionados. **Não há um segundo smoke real aprovado.**
+- O modo `resume` permanece **bloqueado**; não liberamos intake, deploy nem Cron.
 
 ## Preparação (somente pelo operador autorizado)
 
@@ -34,7 +43,7 @@ Também é possível executar `pnpm quote:storage:smoke` localmente com as mesma
 
 ## Falhas e reconciliação
 
-Se retornar `storage_smoke_cleanup_required_cm-storage-qa-...`, o bucket aleatório da execução não foi comprovadamente removido. **Não** mexer em `quote-intake`, não assumir que o Storage foi limpo, e não liberar o site. Inspecionar somente o bucket temporário mencionado e fazer a remoção pela interface/API Storage autorizada; documentar o resultado. Falhas anteriores à criação do bucket não deixam dados de teste.
+Se retornar `storage_smoke_cleanup_required_cm-storage-qa-...`, o bucket aleatório da execução não foi comprovadamente removido pelo próprio script; conferir read-back na Storage API ou SQL antes de afirmar que existe vazamento de bucket. **Não** mexer em `quote-intake`, não assumir que o Storage foi limpo, e não liberar o site. Inspecionar somente o bucket temporário mencionado e fazer a remoção pela interface/API Storage autorizada; documentar o resultado. Falhas anteriores à criação do bucket não deixam dados de teste.
 
 Se houver 401/403 na assinatura ou endpoints TUS, conferir primeiro **URL/ref/chave do projeto CM**, configuração do API gateway e comportamento do `apikey` moderno. Se `Range` não retornar 206, corrigir o contrato do gateway (não promover `complete` como validado). Repetir o modo pequeno antes da prova de retomada.
 

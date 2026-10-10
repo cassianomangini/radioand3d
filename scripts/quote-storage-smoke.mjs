@@ -91,6 +91,9 @@ async function teardown(fetcher, base, key, bucket, path) {
     {method:'POST',headers},'teardown_empty',[200,201,204]);
   await http(fetcher,base + '/storage/v1/bucket/' + bucket,
     {method:'DELETE',headers},'teardown_bucket',[200,201,204]);
+  // A successful DELETE alone is not the acceptance criterion.
+  await http(fetcher,base + '/storage/v1/bucket/' + bucket,
+    {method:'GET',headers:{apikey:key}},'confirm_bucket_absent',[404]);
 }
 
 /** Only synthetic data. Never copies a file or reveals secrets or upload URLs. */

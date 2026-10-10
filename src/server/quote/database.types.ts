@@ -167,6 +167,7 @@ export type Database = {
           lifecycle_status: string
           no_file: boolean
           owner_session_hash: string
+          personal_data_erased_at: string | null
           production: Json
           project: Json
           project_type: string
@@ -190,6 +191,7 @@ export type Database = {
           lifecycle_status?: string
           no_file?: boolean
           owner_session_hash: string
+          personal_data_erased_at?: string | null
           production?: Json
           project?: Json
           project_type: string
@@ -213,6 +215,7 @@ export type Database = {
           lifecycle_status?: string
           no_file?: boolean
           owner_session_hash?: string
+          personal_data_erased_at?: string | null
           production?: Json
           project?: Json
           project_type?: string
@@ -344,6 +347,10 @@ export type Database = {
       quote_retention_finish: {
         Args: { p_ok: boolean; p_result?: Json; p_token: string }
         Returns: boolean
+      }
+      quote_retention_scrub_submitted: {
+        Args: { p_limit?: number; p_token: string }
+        Returns: number
       }
       quote_retention_sweep: {
         Args: { p_limit?: number; p_token: string }

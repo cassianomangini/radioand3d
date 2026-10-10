@@ -7,6 +7,8 @@ declare
   run_token uuid:=gen_random_uuid();
   rid uuid;
   aid uuid;
+  expired_draft uuid;
+  draft_file uuid;
   n integer;
   q public.quote_requests%rowtype;
   a public.quote_attachments%rowtype;
@@ -55,6 +57,38 @@ begin
   if not exists(select 1 from public.quote_attachments where id=aid) then
     raise exception 'stuck_file_lost_before_storage_cleanup'; end if;
 
+  -- Drafts may contain personal information in original filenames even
+  -- before contact/project fields have been submitted.
+  insert into public.quote_requests(project_type,owner_session_hash,created_at,expires_at)
+    values('placa',repeat('d',64),now()-interval '4 days',now()-interval '2 days')
+    returning id into expired_draft;
+  insert into public.quote_attachments(
+    quote_request_id,upload_key,storage_path,original_name,
+    extension,size_bytes,accounted_bytes,created_at,expires_at,grant_expires_at
+  ) values(
+    expired_draft,gen_random_uuid(),
+    expired_draft::text||'/'||gen_random_uuid()::text||'.obj',
+    'synthetic-private-name.obj','.obj',100,50000000,
+    now()-interval '4 days',now()-interval '2 days',now()+interval '1 day'
+  ) returning id into draft_file;
+  insert into public.quote_events(quote_request_id,event_type,event_status,metadata)
+    values(expired_draft,'technical.test','ok',
+      '{"email":"synthetic@example.invalid"}'::jsonb);
+  if (select public.quote_retention_scrub_submitted(run_token,50))<>1
+    then raise exception 'expired_draft_metadata_not_scrubbed'; end if;
+  select * into q from public.quote_requests where id=expired_draft;
+  select * into a from public.quote_attachments where id=draft_file;
+  if q.owner_session_hash<>repeat('0',64) or q.personal_data_erased_at is null
+    or a.original_name<>'expired-upload' or a.quota_released_at is not null
+    then raise exception 'expired_draft_metadata_leaked_or_quota_released'; end if;
+  if exists(select 1 from public.quote_events
+    where quote_request_id=expired_draft and metadata<>'{}'::jsonb) then
+    raise exception 'expired_draft_event_metadata_leaked'; end if;
+  if not exists(select 1 from public.quote_attachments where id=draft_file) then
+    raise exception 'active_tus_metadata_discarded_early'; end if;
+  if (select public.quote_retention_scrub_submitted(run_token,50))<>0
+    then raise exception 'second_scrub_not_idempotent'; end if;
+
   begin
     perform public.quote_retention_scrub_submitted(gen_random_uuid(),50);
   exception when others then blocked:=true; end;
@@ -62,6 +96,6 @@ begin
   if has_function_privilege('anon','public.quote_retention_scrub_submitted(uuid,integer)','execute')
     or has_function_privilege('authenticated','public.quote_retention_scrub_submitted(uuid,integer)','execute')
     then raise exception 'public_scrub_rpc_exposed'; end if;
-  raise notice 'PASS: 180d scrub independent of Storage, idempotency, quota and ACL';
+  raise notice 'PASS: 24h draft and 180d submission PII scrub independent of Storage, idempotency, quota and ACL';
 end $$;
 rollback;

@@ -22,6 +22,7 @@ const auth = () => new Request('https://studio.example/api/internal/quote-retent
 const calls = [];
 const stub = {
   async acquire(token) { calls.push(['acquire', token]); return true; },
+  async scrubSubmitted(token) { calls.push(['scrub', token]); return 2; },
   async candidates(token) {
     calls.push(['candidates', token]);
     return [{ attachment_id: attachmentId, request_id: requestId, object_path: path }];
@@ -58,6 +59,7 @@ test('retention deletes through Storage before SQL and publishes aggregates only
   const result = await res.json();
   assert.equal(result.status, 'ok');
   assert.equal(result.objects, 1);
+  assert.equal(result.anonymized, 2);
   assert.equal(result.bytes, 50_000_000);
   assert.equal(result.drafts, 1);
   assert.equal(result.submitted, 1);
@@ -66,8 +68,8 @@ test('retention deletes through Storage before SQL and publishes aggregates only
   assert.equal(JSON.stringify(result).includes(path), false);
   assert.equal(JSON.stringify(result).includes(SECRET), false);
   assert.deepEqual(calls.map(([n]) => n),
-    ['acquire', 'candidates', 'remove', 'finalize', 'sweep', 'finish']);
-  assert.equal(calls[5][1], true);
+    ['acquire', 'scrub', 'candidates', 'remove', 'finalize', 'sweep', 'finish']);
+  assert.equal(calls[6][1], true);
 });
 
 test('concurrent cron does not delete or sweep while lease is owned', async () => {
@@ -92,10 +94,11 @@ test('Storage failure preserves the attachment, but still scrubs unrelated expir
   const body = await res.json();
   assert.equal(body.error, 'retention_partial_failure');
   assert.equal(body.failedObjects, 1);
+  assert.equal(body.anonymized, 2);
   assert.equal(body.objects, 0);
   assert.equal(JSON.stringify(body).includes(path), false);
   assert.deepEqual(calls.map(([n]) => n),
-    ['acquire', 'candidates', 'storage_failure', 'sweep', 'finish']);
+    ['acquire', 'scrub', 'candidates', 'storage_failure', 'sweep', 'finish']);
   assert.equal(calls.at(-1)[1], false);
   assert.equal(calls.at(-1)[2].failedObjects, 1);
 });
@@ -124,8 +127,26 @@ test('a failed object does not prevent the rest of its bounded batch being remov
   assert.equal(body.objects, 1);
   assert.equal(body.bytes, 50_000_000);
   assert.deepEqual(calls.map(([n]) => n),
-    ['acquire', 'candidates', 'remove', 'remove', 'finalize', 'sweep', 'finish']);
+    ['acquire', 'scrub', 'candidates', 'remove', 'remove', 'finalize', 'sweep', 'finish']);
   assert.equal(calls.at(-1)[1], false);
+});
+
+test('PII scrub executes before file cleanup and uses only the dedicated service RPC', async () => {
+  process.env.CM_SUPABASE_URL = 'https://example-project.supabase.co';
+  process.env.CM_SUPABASE_SECRET_KEY = 'sb_secret_' + 'S'.repeat(48);
+  const sent = [];
+  const gateway = createRetentionGateway(async (url, opts) => {
+    sent.push({ url, opts });
+    return Response.json(3);
+  });
+  const run = 'bd931601-b4f8-4b0a-8a16-7e99b0d2fe0d';
+  assert.equal(await gateway.scrubSubmitted(run, 50), 3);
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].url.endsWith('/rest/v1/rpc/quote_retention_scrub_submitted'), true);
+  assert.deepEqual(JSON.parse(sent[0].opts.body), { p_token:run, p_limit:50 });
+  assert.equal(sent[0].opts.headers.Authorization, undefined);
+  await assert.rejects(gateway.scrubSubmitted(run, 251));
+  assert.equal(sent.length, 1);
 });
 
 test('service gateway uses DELETE prefixes then GET info 404 with only apikey', async () => {

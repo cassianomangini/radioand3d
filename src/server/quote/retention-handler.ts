@@ -45,10 +45,10 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
     if (!acquired) return responseJson({ status: 'already_running' });
 
     // Privacy cutoff does NOT depend on the success of physical deletion.
-    // Scrub 180-day-old contact, project text and original filenames first;
+    // Scrub 24h drafts and 180-day submissions (filenames/contact/text) first;
     // keep only minimal UUID metadata so Storage retries can still finish.
     let backlogMayRemain = false;
-    counters.anonymized = await db.scrubSubmitted(token, SWEEP_LIMIT);
+    counters.anonymized = await db.scrubExpiredPrivateData(token, SWEEP_LIMIT);
     if (counters.anonymized === SWEEP_LIMIT) backlogMayRemain = true;
     for (let batch = 0; batch < MAX_BATCHES; batch++) {
       if (Date.now() - start >= MAX_RUN_MS) {

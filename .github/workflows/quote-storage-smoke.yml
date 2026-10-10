@@ -29,6 +29,8 @@ concurrency:
 jobs:
   storage:
     if: inputs.confirmation == 'RUN_ISOLATED_SUPABASE_STORAGE_SMOKE'
+    # Configure this GitHub Environment with required reviewer + secrets.
+    environment: cm-storage-qa
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

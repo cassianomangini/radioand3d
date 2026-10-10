@@ -10,15 +10,11 @@ on:
         type: choice
         options:
           - RUN_ISOLATED_SUPABASE_STORAGE_SMOKE
-      expected_project_ref:
-        description: "Referencia de 20 caracteres do projeto CM, comparada com CM_SUPABASE_URL."
-        required: true
-        type: string
       mode:
         description: "small=134 bytes; resume=6MiB+128 bytes com retomada de PATCH."
         required: true
         type: choice
-        default: resume
+        default: small
         options:
           - small
           - resume
@@ -49,16 +45,17 @@ jobs:
         env:
           PROJECT_URL: ${{ secrets.CM_SUPABASE_URL }}
           STORAGE_SECRET: ${{ secrets.CM_SUPABASE_SECRET_KEY }}
+          EXPECTED_REF: ${{ secrets.CM_STORAGE_SMOKE_PROJECT_REF }}
         run: |
-          if [ -z "$PROJECT_URL" ] || [ -z "$STORAGE_SECRET" ]; then
-            echo "Manual Storage QA requires CM_SUPABASE_URL and CM_SUPABASE_SECRET_KEY as repository secrets."
+          if [ -z "$PROJECT_URL" ] || [ -z "$STORAGE_SECRET" ] || [ -z "$EXPECTED_REF" ]; then
+            echo "Manual Storage QA requires 3 project-scoped secrets; no Storage writes attempted."
             exit 1
           fi
 
       - name: Signed TUS, resume, private GET, Range, and teardown
         env:
           CM_STORAGE_SMOKE_CONFIRM: ${{ inputs.confirmation }}
-          CM_STORAGE_SMOKE_PROJECT_REF: ${{ inputs.expected_project_ref }}
+          CM_STORAGE_SMOKE_PROJECT_REF: ${{ secrets.CM_STORAGE_SMOKE_PROJECT_REF }}
           CM_STORAGE_SMOKE_MODE: ${{ inputs.mode }}
           CM_SUPABASE_URL: ${{ secrets.CM_SUPABASE_URL }}
           CM_SUPABASE_SECRET_KEY: ${{ secrets.CM_SUPABASE_SECRET_KEY }}

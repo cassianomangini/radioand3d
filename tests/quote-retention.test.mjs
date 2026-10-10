@@ -22,7 +22,7 @@ const auth = () => new Request('https://studio.example/api/internal/quote-retent
 const calls = [];
 const stub = {
   async acquire(token) { calls.push(['acquire', token]); return true; },
-  async scrubSubmitted(token) { calls.push(['scrub', token]); return 2; },
+  async scrubExpiredPrivateData(token) { calls.push(['scrub', token]); return 2; },
   async candidates(token) {
     calls.push(['candidates', token]);
     return [{ attachment_id: attachmentId, request_id: requestId, object_path: path }];
@@ -140,12 +140,12 @@ test('PII scrub executes before file cleanup and uses only the dedicated service
     return Response.json(3);
   });
   const run = 'bd931601-b4f8-4b0a-8a16-7e99b0d2fe0d';
-  assert.equal(await gateway.scrubSubmitted(run, 50), 3);
+  assert.equal(await gateway.scrubExpiredPrivateData(run, 50), 3);
   assert.equal(sent.length, 1);
   assert.equal(sent[0].url.endsWith('/rest/v1/rpc/quote_retention_scrub_submitted'), true);
   assert.deepEqual(JSON.parse(sent[0].opts.body), { p_token:run, p_limit:50 });
   assert.equal(sent[0].opts.headers.Authorization, undefined);
-  await assert.rejects(gateway.scrubSubmitted(run, 251));
+  await assert.rejects(gateway.scrubExpiredPrivateData(run, 251));
   assert.equal(sent.length, 1);
 });
 

@@ -213,7 +213,7 @@ if (invokedAsCli) {
         expectedProjectRef:process.env.CM_STORAGE_SMOKE_PROJECT_REF,
         resumable:process.env.CM_STORAGE_SMOKE_MODE !== 'small',
       });
-      console.log(JSON.stringify(result));
+      process.stdout.write(JSON.stringify(result) + '\n');
     } catch (error) {
       console.error(error instanceof StorageSmokeError ? error.message : 'storage_smoke_failed');
       process.exitCode = 1;

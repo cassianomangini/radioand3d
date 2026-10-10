@@ -18,6 +18,13 @@ function mockStorage({mode='normal'}={}) {
       new Response(value==null?null:JSON.stringify(value),{
         status,headers:{...headers,...(value==null?{}:{'content-type':'application/json'})},
       });
+    if(path==='/rest/v1/rpc/quote_retention_active' && method==='POST'){
+      assert.match(opts.headers.apikey,/^sb_secret_/);
+      return answer(false);
+    }
+    if(path==='/storage/v1/bucket/quote-intake' && method==='GET'){
+      return answer({id:'quote-intake',public:false});
+    }
     if(path==='/storage/v1/bucket' && method==='POST'){
       bucket=JSON.parse(opts.body).id;
       assert.equal(JSON.parse(opts.body).public,false);
@@ -103,6 +110,7 @@ test('signed TUS -> authenticated byte-range -> anonymous deny -> physical clean
   assert.equal(outcome.anonymousDenied,true);
   assert.equal(mock.clean(),true);
   const steps=mock.calls.map(x=>x.method);
+  assert.deepEqual(steps.slice(0,2),['POST','GET']);
   assert.equal(steps.filter(x=>x==='PATCH').length,1);
   assert.equal(steps.filter(x=>x==='HEAD').length,2);
   assert.deepEqual(steps.slice(-4),['DELETE','POST','DELETE','GET']);

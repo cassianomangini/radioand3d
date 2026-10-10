@@ -1,6 +1,6 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **quatorze migrations aplicadas · Orçamento e retenção revisados · CI 111/111 · TUS/Storage E2E, Cron e deploy pendentes**  
+Status: **quatorze migrations aplicadas · Orçamento e retenção revisados · CI 117/117 · TUS/Storage E2E, Cron e deploy pendentes**  
 Revisão: **09/10/2026**  
 Região contratada e confirmada: **sa-east-1 (São Paulo)**  
 Responsável: **CM Infra / CM Data**
@@ -574,7 +574,7 @@ Desde que metadata não contenha PII.
 - O prazo de **180 dias para contato e conteúdo** dependia da remoção física de todos os anexos; se o Storage falhasse indefinidamente, os dados pessoais também permaneciam. A nova RPC server-only anonimiza contato, texto e nomes de arquivo **mesmo com anexos presos**, mantendo somente metadados mínimos para retentativa e a quota preservada. [Migration](../supabase/migrations/20261009235957_quote_retention_scrub_stuck_submission_pii.sql) · [prova SQL](../tests/sql/quote-retention-privacy.sql).
 - Um **draft vencido sem submit** também retinha o nome original do anexo e `metadata` dos eventos enquanto a janela TUS impedia a remoção física. O mesmo expurgo privado agora atua sobre drafts vencidos **após 24h** (sem liberar a reserva TUS de 27h). [Migration](../supabase/migrations/20261010000521_quote_retention_scrub_expired_draft_metadata.sql) · [teste SQL](../tests/sql/quote-retention-privacy.sql).
 
-**Provas:** SQL sintético com `BEGIN/ROLLBACK`, isolamento por lease e grants privados; GitHub Actions [CI](https://github.com/cassianomangini/radioand3d/actions/runs/38007579574): **111/111 testes, lint, TypeScript e build aprovados**. A validação **não** substitui a prova de remoção binária real ou de upload TUS; o Cron segue sem agendamento e o intake público permanece OFF.
+**Provas:** SQL sintético com `BEGIN/ROLLBACK`, isolamento por lease e grants privados; GitHub Actions [CI](https://github.com/cassianomangini/radioand3d/actions/runs/38010820582): **117/117 testes, lint, TypeScript e build aprovados**. A validação **não** substitui a prova de remoção binária real ou de upload TUS; o Cron segue sem agendamento e o intake público permanece OFF.
 
 **Implementação atual:** a décima migration [`quote_retention_service_lease_and_cleanup`](../supabase/migrations/20261009232648_quote_retention_service_lease_and_cleanup.sql) adicionou um lease exclusivo, seleção dos elegíveis e finalização transacional. O [handler interno](../src/server/quote/retention-handler.ts) autentica `GET` por `CRON_SECRET` e o [gateway](../src/server/quote/retention-gateway.ts) executa remoção via Storage API antes da baixa SQL. [Teste SQL](../tests/sql/quote-retention.sql) e [teste de rota mockada](../tests/quote-retention.test.mjs) passaram. O `vercel.json` permanece **SEM `crons`** até as credenciais de produção e a exclusão física real serem validadas. **Nenhum objeto de cliente foi eliminado/testado externamente.**
 
@@ -838,7 +838,7 @@ A ponte de Produtos **não depende** da base CM. No ambiente operacional da orig
 
 **Implementado em código e banco:** migrations, schema, grants/RLS, parser 3MF com testes sintéticos, sessão anônima, quatro handlers, reserva/quota, rate limit, recibo idempotente e 27h de proteção de TUS. **Implementado:** worker SQL e handler da retenção, com testes unitários/mock e SQL em rollback. **Ainda NÃO ativo:** execução real pela Storage API, secret Cron na Vercel, agendamento e observabilidade externa. O CI verde não significa que upload TUS ou submit estejam operacionais na produção.
 
-**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **quatorze migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `541412cb0`: lint + typecheck + 111 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, secrets Vercel, TUS e Range reais, validação de 3MF Bambu real, **prova de remoção real via Storage API**, configuração e agendamento de Cron, smoke E2E e release. O backup do legado segue sem comprovação.
+**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **quatorze migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `c68fead53`: lint + typecheck + 117 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, secrets Vercel, TUS e Range reais, validação de 3MF Bambu real, **prova de remoção real via Storage API**, configuração e agendamento de Cron, smoke E2E e release. O backup do legado segue sem comprovação.
 
 ## 30. Gate de infraestrutura pronta
 

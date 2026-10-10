@@ -29,6 +29,9 @@ function mockStorage({mode='normal'}={}) {
     if(path==='/storage/v1/bucket/'+bucket && method==='DELETE'){
       ended=true;return answer({message:'Successfully deleted'});
     }
+    if(path==='/storage/v1/bucket/'+bucket && method==='GET'){
+      return answer({code:'NoSuchBucket'},ended?404:200);
+    }
     if(path.startsWith('/storage/v1/object/upload/sign/') && method==='POST'){
       object=path.slice(('/storage/v1/object/upload/sign/'+bucket+'/').length);
       return answer({url:'/object/upload/sign/'+bucket+'/'+object+'?token='+TOKEN});
@@ -102,7 +105,7 @@ test('signed TUS -> authenticated byte-range -> anonymous deny -> physical clean
   const steps=mock.calls.map(x=>x.method);
   assert.equal(steps.filter(x=>x==='PATCH').length,1);
   assert.equal(steps.filter(x=>x==='HEAD').length,2);
-  assert.deepEqual(steps.slice(-3),['DELETE','POST','DELETE']);
+  assert.deepEqual(steps.slice(-4),['DELETE','POST','DELETE','GET']);
   for(const row of mock.calls){
     if(row.path.includes('/upload/resumable')){
       assert.equal(row.headers.Authorization,undefined);

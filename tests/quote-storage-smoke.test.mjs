@@ -23,7 +23,7 @@ function mockStorage({mode='normal'}={}) {
       return answer(false);
     }
     if(path==='/storage/v1/bucket/quote-intake' && method==='GET'){
-      return answer({id:'quote-intake',public:false});
+      return answer({id:mode==='wrong-boundary'?'something-else':'quote-intake',public:false});
     }
     if(path==='/storage/v1/bucket' && method==='POST'){
       bucket=JSON.parse(opts.body).id;
@@ -135,6 +135,13 @@ test('cannot contact any project except the explicitly confirmed project',async(
   await assert.rejects(runStorageSmoke(input(mock,false,'bbbbbbbbbbbbbbbbbbbb')),
     err=>err instanceof StorageSmokeError && err.stage==='wrong_project');
   assert.deepEqual(mock.calls,[]);
+});
+test('a wrong private-bucket boundary is rejected before any Storage mutation',async()=>{
+  const mock=mockStorage({mode:'wrong-boundary'});
+  await assert.rejects(runStorageSmoke(input(mock)),
+    err=>err instanceof StorageSmokeError && err.stage==='wrong_cm_storage_boundary');
+  assert.deepEqual(mock.calls.map(x=>x.method),['POST','GET']);
+  assert.equal(mock.calls.some(x=>x.path==='/storage/v1/bucket' && x.method==='POST'),false);
 });
 test('invalid range and public leak both fail closed, still deleting isolated bucket',async()=>{
   for(const mode of ['wrong-range','public-leak']){

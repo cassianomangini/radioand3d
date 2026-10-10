@@ -13,7 +13,8 @@
     "lyrics:sync": "node scripts/sync-radio-lyrics.mjs",
     "visualizer:sync": "node scripts/sync-radio-visualizer.mjs",
     "visualizer:inspect": "node --experimental-strip-types scripts/inspect-radio-visualizer.mjs",
-    "visual:qa": "playwright test"
+    "visual:qa": "playwright test",
+    "quote:storage:smoke": "node scripts/quote-storage-smoke.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1143.0",

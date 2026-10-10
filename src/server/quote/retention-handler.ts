@@ -30,6 +30,7 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
   const counters = {
     objects: 0,
     failedObjects: 0,
+    anonymized: 0,
     bytes: 0,
     drafts: 0,
     submitted: 0,
@@ -43,7 +44,12 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
     acquired = await db.acquire(token);
     if (!acquired) return responseJson({ status: 'already_running' });
 
+    // Privacy cutoff does NOT depend on the success of physical deletion.
+    // Scrub 180-day-old contact, project text and original filenames first;
+    // keep only minimal UUID metadata so Storage retries can still finish.
     let backlogMayRemain = false;
+    counters.anonymized = await db.scrubSubmitted(token, SWEEP_LIMIT);
+    if (counters.anonymized === SWEEP_LIMIT) backlogMayRemain = true;
     for (let batch = 0; batch < MAX_BATCHES; batch++) {
       if (Date.now() - start >= MAX_RUN_MS) {
         backlogMayRemain = true;
@@ -90,7 +96,7 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
     const fullySuccessful = counters.failedObjects === 0;
     finished = await db.finish(token, fullySuccessful, {
       objects: counters.objects, failedObjects: counters.failedObjects,
-      bytes: counters.bytes, drafts: counters.drafts,
+      anonymized: counters.anonymized, bytes: counters.bytes, drafts: counters.drafts,
       submitted: counters.submitted, rateWindows: counters.rateWindows,
       events: counters.events,
     });

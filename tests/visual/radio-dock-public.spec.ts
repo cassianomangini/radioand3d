@@ -160,12 +160,15 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     await expect(shell).not.toHaveAttribute("data-radio-docked", "true");
     await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
 
-    // Pointer cancellation is NOT a resize commitment or a dock.
+    // Pointer cancellation mid-drag is NOT a dock and restores last width.
     const next = await divider.boundingBox();
     expect(next).not.toBeNull();
-    await divider.evaluate((node) => node.dispatchEvent(
-      new PointerEvent("pointercancel", { bubbles: true, pointerId: 333, pointerType: "mouse", clientX: 0 })
-    ));
+    const x2 = next!.x + next!.width / 2;
+    await page.mouse.move(x2, y);
+    await page.mouse.down();
+    await page.mouse.move(x2 + 130, y, { steps: 8 });
+    await divider.dispatchEvent("pointercancel", { pointerId: 1, pointerType: "mouse", clientX: x2 + 130 });
+    await page.mouse.up();
     await expect(shell).not.toHaveAttribute("data-radio-docked", "true");
     await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
   });
@@ -202,7 +205,7 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
 
     const trackTitle = await dock.locator('[data-dock-title="true"]').textContent();
     await page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link", { name: "Estúdio" }).click();
-    await expect(page).toHaveURL(/\\/studio$/);
+    await expect(page).toHaveURL(/\/studio$/);
     await expect(page.locator('[data-radio-navbar-mini="true"]')).toBeVisible();
     await expect(dock.locator('[data-dock-title="true"]')).toHaveText(trackTitle ?? "");
     await expect(dock).toHaveAttribute("data-playback-state", "playing");

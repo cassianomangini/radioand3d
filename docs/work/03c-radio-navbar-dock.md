@@ -1,6 +1,6 @@
 # 03c — Dock reversível da Rádio no cabeçalho
 
-**Estado da entrega:** `in_progress` em **prévia visual de desenvolvimento renderizada (D4)**; integração na Rádio pública e testes finais ainda não iniciados.  
+**Estado da entrega:** `in_progress` no **gate D5 — avaliação estética da prévia V2**; D4.1/D4.2 foram implementadas e verificadas no navegador. Integração na Rádio pública e QA final ainda não iniciados.  
 **Responsável:** CM Experience (contrato); CM Frontend (implementação após aprovação); CM Review (QA/evidências).  
 **Solicitação:** Cassiano, 09/10/2026. Nova capacidade expressamente solicitada; **03b/06 e C1–C8 permanecem aceitas**, com modificação apenas do que esta função exigir.  
 **Contrato visual/comportamental:** [CM Rádio — Dock na navbar V1](../design/CM_RADIO_NAVBAR_DOCK_V1.md).  
@@ -23,8 +23,8 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 - [x] **D3.1** Conferir referência `cassianomangini/artesopolis-landing` (`master`, `src/components/navbar.tsx` e `mini-player.tsx`) e registrar correção de Cassiano: dock **imediatamente antes dos ícones sociais**, preservando a nav CM centralizada. A landing usava mini na coluna central e sociais na última coluna; reaproveitar a relação e o comportamento, não sua paleta/código.
 - [x] **D3.2** Reestudar **integralmente a referência Artesópolis Landing**: navbar, mini-player completo, botões, barras reativas/engine, camadas de acabamento e padrões documentados; confrontar com a prévia CM atual. [Contrato de direção atualizado](../design/CM_RADIO_NAVBAR_DOCK_V1.md). Resultado: o primeiro mini CM perdeu controles e identidade sonora; referência não foi bem traduzida.
 - [x] **D4 (prova técnica apenas)** Criar e renderizar prévia com `StudioRadioShell` real em `/dev/radio-dock`, demonstrando gesto/posição/transição; [vídeo e teste browser](evidence/03c-radio-dock-preview-2026-10-09.md). **Os 6 testes não demonstram fidelidade visual à Landing**; não apresentar esse mock como direção de arte.
-- [ ] **D4.1 (correção obrigatória)** Refazer o **mini-player da prévia** respeitando densidade e funções verificadas na Landing: capa, CM RÁDIO/faixa, **anterior + play/pause + próxima**, visualizer compacto **alimentado pela análise real** e controle de restaurar; adaptação CM, sem copiar astronauta ou tema antigo; manter redes visíveis/nav centrada.
-- [ ] **D4.2** Comparar **render real em 1180, 1440 e 1760** com a referência de composição e CM, inclusive faixa longa, paused/playing, reduced-motion, teclado, vídeo de ida/volta; corrigir colisões e registrar mídia/capturas antes de solicitar escolha.
+- [x] **D4.1 (correção obrigatória)** Mini-player da prévia refeito com capa, etiqueta CM RÁDIO, título/artista, **anterior + play/pause + próxima**, `RadioVisualizer` real de 13 barras e restaurar, usando a mesma fila e áudio. Não foi adotado novo engine de animação ou DJ legado. [Evidência V2](evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md).
+- [x] **D4.2** Capturas reais **1180/1440/1760**, faixa longa com ellipsis, pausa/reprodução (WAV sintético de QA), visualização de barras por Web Audio (não fake), teclado/fila anterior/próxima, vídeo reversível, mobile 390, laptop 1024, reduced-motion e sem colisão horizontal. Corrigida a **legenda enorme/cortada em pleno voo** usando CSS container units. [Run 38137954780 (9 passed / 23 skipped deliberados)](https://github.com/cassianomangini/radioand3d/actions/runs/38137954780) · [relatório visual](evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md). **Revisão estética do agente, não aprovação de Cassiano.**
 
 - [ ] **D5** Cassiano aprovar a direção da transição e as dimensões do player do topo. Somente então mudar `ready_for_frontend` para `yes` com referência de aprovação verdadeira.
 
@@ -71,9 +71,11 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 
 - **09/10/2026 — auditoria complementar da referência:** primeiro estudo inspecionou os arquivos mas não traduziu a **densidade funcional** e **expressão sonora** da Landing. Leitura adicional de `control-button.tsx`, `social-icons.tsx`, `globals.css`, `player-context.tsx` e `docs/frontend-patterns.md` demonstrou a omissão de botões anterior/próxima e barras reais no protótipo. Novas etapas D4.1/D4.2 abertas; **D5 não pode seguir com o mock anterior**.
 
+- **11/10/2026 — D4.1/D4.2 concluídos:** [CI 38137954780](https://github.com/cassianomangini/radioand3d/actions/runs/38137954780) (9 testes de navegador, 23 skips por cenário), [CI geral 38137954786](https://github.com/cassianomangini/radioand3d/actions/runs/38137954786) verde. Comparativo em 1180/1440/1760, áudio sintético realmente controla 13 barras e pausa relaxa, retorno por tecla, fluxo de gestos, e clipping do texto durante o voo corrigido. [Relatório](evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md). D5 pendente.
+
 ## Retomada
 
-**Último ponto comprovado:** D1–D3.2 e D4 **somente como mecanismo técnico**; ao revisar o mini real da Landing ficou comprovado que a prévia omitiu **anterior/próxima e o visualizer**, além de reduzir excessivamente presença e acabamento. [Diagnóstico corrigido no contrato](../design/CM_RADIO_NAVBAR_DOCK_V1.md).  
-**Próxima atividade:** **D4.1 e D4.2** — nova prévia fiel às características relevantes da Landing dentro do CM e comparação em navegador. **Não solicitar D5 ainda**; implementação pública bloqueada até aceite explícito.  
-**Deploy:** nenhum. **QA da prévia:** 6 casos Playwright passaram; testes reais de áudio e CI completo de produção continuam não executados/com falhas externas ao escopo. **Aprovação visual:** não obtida.  
+**Último ponto comprovado:** D1–D4.2 — nova prévia V2 fiel ao conteúdo relevante da Landing e identidade atual CM, com **9 testes de browser efetivamente executados sem retries**, prova de áudio sintético *real* no navegador, layout a 1180/1440/1760, teclado e reduced motion. [QA + vídeo + capturas](evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md). CI geral [38137954786](https://github.com/cassianomangini/radioand3d/actions/runs/38137954786) verde (lint, typecheck, testes, build).  
+**Próxima atividade:** **D5 — avaliação visual de Cassiano** da V2. Somente após aprovação explícita iniciar I1–I6 na Rádio pública.  
+**Deploy:** nenhum. **Produção:** inalterada. **Prova musical:** somente fixture WAV sintética de 8s; ainda não prova reprodução R2 real. **Aprovação visual:** não obtida.  
 **Não fazer:** não reabrir Rádio inteira, não instalar outro engine de animação por reflexo, não criar dois áudio players, não trocar o comportamento do link Rádio existente.

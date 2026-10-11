@@ -2,8 +2,18 @@
 
 **Pedido funcional:** Cassiano, 09/10/2026. **Contexto:** nova evolução pontual da Rádio após a passagem aceita em 05/10, **não** reabertura automática de C1–C8.  
 **Comportamento solicitado:** ao empurrar/arrastar a Rádio lateral **para a direita**, ela deve **subir e se transformar em um player compacto dentro da navbar**, liberando o Estúdio. O usuário consegue **restaurar a Rádio lateral** por um botão na navegação ou arrastando novamente a partir da borda direita.  
-**Gate:** comportamento indicado pelo usuário; **posição do dock no cabeçalho confirmada por Cassiano: imediatamente ANTES do grupo de ícones sociais, à direita da navegação principal; acabamento e animação ainda não aprovados em mock/render**. `ready_for_frontend: no` até revisão da prévia do movimento. `visual_approved_by: null`. `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`.  
+**Gate atual (11/10/2026):** Cassiano aprovou seguir **com a integração funcional** do dock, mas **não aprovou a centralização/espaçamento visual final** do mini entre menu e ícones sociais. `ready_for_frontend: yes` **somente para mecânica autorizada**; `visual_approved_by: null`, D5 pendente. `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`.  
 **Checklist:** [03c — Dock da Rádio](../work/03c-radio-navbar-dock.md).
+
+## Integração funcional autorizada e implementada (11/10/2026)
+
+Após gostar da V2.1, Cassiano esclareceu que o espaçamento do mini ainda estava incorreto — **o player precisa ficar melhor centralizado no vão entre `Início / Estúdio / Rádio` e os botões sociais** — e pediu **deixar o acabamento para depois, prosseguindo com a funcionalidade**. Portanto, a implementação real foi liberada **sem equivaler a aprovação estética D5**.
+
+A versão atual da `main` integra `docked` no `StudioRadioShell` real, com leitura de overshoot antes do clamp, retorno por botão/arraste de borda/teclado, fullscreen e navegação Home↔Estúdio, painel lateral oculto/inert, header e Estúdio refluindo, e um `RadioNavbarDock` antes dos ícones sociais. Mantém `useRadio()` único e visualizador sincero de 13 barras; a antiga rota `/dev/radio-dock` passou a reutilizar o **mesmo shell integrado**, sem segundo overlay/gesto independente. `RadioLayoutMode` e os testes unitários cobrem o modo `docked`; WAAPI/FLIP preserva a transformação espacial e a reversão.
+
+**QA comprovada até aqui:** [CI de navegador 38140243922](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922) com 8 cenários aplicáveis aprovados e screenshots/vídeo reais, [CI geral 38140584046](https://github.com/cassianomangini/radioand3d/actions/runs/38140584046) verde em lint/typecheck/testes/build. [Relatório da integração](../work/evidence/03c-radio-dock-integrated-2026-10-11.md). Testes adicionais de áudio e interrupção estão em andamento; não marcar esses gates como concluídos sem evidência.
+
+**Pendente:** D5 para espaçamento do dock, aprovação visual final por Cassiano e eventuais regressões com música real R2. A implementação não pressupõe novo design da Rádio lateral já aceita.
 
 ## Ajuste de composição solicitado em 11/10/2026 — menu mais perto da marca
 
@@ -13,13 +23,13 @@ Cassiano **gostou da V2** (mini com controles, identidade e visualizador), mas *
 
 A navegação entra no agrupamento à esquerda, com uma separação curta e intencional após o logotipo. O mini ocupa o espaço realmente liberado, mantendo capa, faixa, anterior/play/próxima, 13 barras e restaurar. As redes sociais permanecem à extrema direita, sem desaparecer. **No estado lateral, o header original permanece exatamente como foi aceito**; não redesenhar navegação global nem mobile.
 
-Este feedback **substitui** as orientações anteriores que exigiam nav geometricamente centralizada no modo `docked`. Continua pendente aprovação visual da composição ajustada; nenhum trecho do histórico da Landing prova que o menu do site CM deva ficar centralizado. A prévia isolada realiza esse ajuste sem publicar alterações de produção.
+Este feedback **substitui** as orientações anteriores que exigiam nav geometricamente centralizada no modo `docked`. Continua pendente aprovação visual da composição ajustada; nenhum trecho do histórico da Landing prova que o menu do site CM deva ficar centralizado. A prévia isolada validou a intenção inicialmente; **a integração funcional posterior está no shell real**, sem conclusão do alinhamento visual.
 
 ## Atualização técnica — V2 avaliada no navegador (11/10/2026)
 
 As tarefas **D4.1/D4.2** foram concluídas **somente na prévia de desenvolvimento** `/dev/radio-dock` depois da comparação aprofundada com a Landing: capa, marca/faixa, anterior/play/próxima, 13 barras reais alimentadas por `RadioVisualizer`, restaurar e posição **antes das redes sociais**. [Evidências, screenshots e falhas corrigidas](../work/evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md). [Browser 38137954780](https://github.com/cassianomangini/radioand3d/actions/runs/38137954780): 9 testes passaram. [CI 38137954786](https://github.com/cassianomangini/radioand3d/actions/runs/38137954786): lint/typecheck/testes/build passaram. Verificação de onda ativa usou WAV sintético de desenvolvimento; **não afirma teste R2 em produção**.
 
-A revisão visual do agente detectou clipping de texto durante compressão/voo e corrigiu-o usando tipografia proporcional à altura da superfície animada (`cqh`). **A aprovação visual por Cassiano não foi obtida**, e o protótipo não integra o estado `docked` ao shell público. Manter `ready_for_frontend: no`, `visual_approved_by: null` até o gate D5. As seções de diagnóstico e críticas à **V1** abaixo ficam como histórico, não descrevem a V2 atual.
+A revisão visual do agente detectou clipping de texto durante compressão/voo e corrigiu-o usando tipografia proporcional à altura da superfície animada (`cqh`). **Esta observação é histórica da V2 isolada:** o estado `docked` foi posteriormente integrado ao shell público sob autorização funcional específica. A **aprovação visual por Cassiano não foi obtida**, e o gate D5 continua pendente. As seções de diagnóstico e críticas à **V1** abaixo ficam como histórico, não descrevem a V2 atual.
 
 ## 1. Princípio de interação
 
@@ -126,7 +136,7 @@ Direção: **deslocamento para cima + compressão horizontal e vertical + encaix
 
 Inspecionado em 09/10/2026:
 
-- `src/components/studio-radio/radio-motion-spine.ts`: `RadioLayoutMode` só conhece `split | custom | focus | fullscreen`; será necessária extensão explícita para `docked` sem quebrar callers e contratos já testados.
+- **Implementado após o estudo:** `radio-motion-spine.ts` já conhece `docked`, com prioridade de fullscreen e testes unitários; preservar essa decisão em futuras alterações.
 - `studio-radio-shell.tsx`: resize usa `clampRadioWidth`, `handlePointerDown`, `handlePointerMove`, `stopDragging`; o valor é calculado por `rect.right - event.clientX - dragOffsetRef.current`. O limite mínimo atual impede dock por simples resize. Detectar **overshoot para a direita antes do clamp** e aplicar gatilho/histerese independente do fullscreen, que usa overshoot na direção oposta.
 - `radio-panel-drag.ts`: snap points existentes são `compact, balanced, focus` (todos com sidebar). O dock é **estado terminal diferente de `compact`**: não transformar o snap `compact` em `docked` automaticamente.
 - `studio-radio-shell.module.css`: o header desktop termina em `right: calc(var(--radio-width) + var(--rail-width))`, a Rádio é fixa à direita e o divisor permanece à esquerda dela. Em dock, o header precisa **ocupar todo o viewport** sem alterar a navegação global; o Estúdio ocupa a área liberada. O bloco direito atual contém `SocialIcons` e tem espaço limitado: será preciso compor um grupo **[dock player][SocialIcons]**, mantendo o menu principal geometricamente centrado. Atualmente o CSS oculta os ícones sociais em expansão/focus; **essa regra não pode esconder redes sociais em dock**. O antigo `resizeHandle` deixa de estar na fronteira do painel e vira uma zona de retorno na borda da tela.

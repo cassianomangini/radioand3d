@@ -6,8 +6,8 @@
 **Contrato visual/comportamental:** [CM Rádio — Dock na navbar V1](../design/CM_RADIO_NAVBAR_DOCK_V1.md).  
 **Auditoria da marca:** [CM Site Visual Identity Audit V1](../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md).  
 **Código inspecionado:** `src/components/studio-radio/studio-radio-shell.tsx`, `studio-radio-shell.module.css`, `radio-panel-drag.ts`, `radio-motion-spine.ts`; `docs/EXPERIENCE.md`, `docs/PROJECT_PLAN.md`, `docs/design/CM_MOTION_EXPERIENCE_PLAN_V1.md`.  
-**Arquivos técnicos previstos (ainda não alterados):** shell TSX/CSS, estado de layout, helpers de drag e testes de motion/browser relacionados.  
-**Artefato:** `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`, `approved_by_visual: null`, `ready_for_frontend: no`.
+**Arquivos técnicos já alterados:** shell TSX/CSS, estado de layout e helpers de drag, novo player navbar, testes de unidade + E2E do shell. **Escopo visual pendente:** centralização/respiração entre nav, mini e redes (D5).  
+**Artefato:** `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`, `approved_by_visual: null`, `ready_for_frontend: yes` **somente para função expressamente autorizada**; D5 óptico não aprovado.
 
 ## Resultado esperado
 
@@ -33,19 +33,19 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 
 ### B — Implementação restrita à capacidade nova
 
-- [ ] **I1** Acrescentar layout `docked` à máquina de estados, sem transformar `compact` atual em dock e sem reimplementar `fullscreen`.
-- [ ] **I2** Reconhecer overshoot para direita **antes de clamp**; preview, limiar de confirmação, cancelamento, magnet, reversão e restauro de largura anterior.
-- [ ] **I3** Header ocupar toda a largura quando `docked`; Estúdio fazer reflow; integrar player mais largo **ANTES de SocialIcons**, ambos no grupo à direita, somente com lateral oculta; **não esconder ícones sociais** e aproximar a nav do logo **somente no dock**. Restaurar header original quando lateral.
-- [ ] **I4** Criar botão **Abrir Rádio lateral** no dock e uma zona acessível de arraste na borda direita; preservar o link **Rádio** que abre fullscreen.
+- [x] **I1** Estado `docked` integrado em `radio-motion-spine.ts` e no shell público, mutuamente exclusivo de compact/focus/fullscreen; precedência de fullscreen testada em CI. [Evidência](evidence/03c-radio-dock-integrated-2026-10-11.md).
+- [x] **I2** Overshoot direito detectado **antes do clamp**, limiar de 96px, affordance do divisor, snap compact separado e width/mode originais restaurados; cancelamento sem dock. E2E de arraste e unit tests no [relatório](evidence/03c-radio-dock-integrated-2026-10-11.md).
+- [x] **I3 (funcional, não art approval)** Header/Estúdio refluem, mini antes dos botões sociais somente em dock, nav junto ao logo somente neste modo, sidebar original restaurada. **Centralização óptica fina explicitamente pendente em D5**. Capturas 1440/1760 no [relatório](evidence/03c-radio-dock-integrated-2026-10-11.md).
+- [x] **I4** Retorno pelo botão do mini, pela borda direita e via teclado; link **Rádio** abre fullscreen e retorna ao dock quando apropriado. E2E 03c no [relatório](evidence/03c-radio-dock-integrated-2026-10-11.md).
 - [ ] **I5** Coreografar lateral → topo → lateral com spine WAAPI/FLIP único, interrupção segura, tempos de assinatura e fallback reduced-motion.
 - [ ] **I6** Preservar `useRadio`/um único áudio, faixa/tempo/playlist/fila, navegação de rotas, teclado/foco e mini-player mobile sem duplicação.
 
 ### C — Prova e aprovação
 
-- [ ] **Q1** Testes unitários de estado e limites (dock vs resize e fullscreen), incluindo cancel/velocity/snap.
+- [x] **Q1** Cobertura unitária de modo `docked`, precedência fullscreen, limites de overshoot, compact snap, velocidade/width e cancelamento de gesto; lint/typecheck/unit/build [verdes](https://github.com/cassianomangini/radioand3d/actions/runs/38140584046).
 - [ ] **Q2** Navegador: drag desktop 1440, 1180 e desktop curto; trocar rota durante dock; trigger por botão; reversão durante a animação; um áudio; nenhum overflow; **player largo antes de sociais, nav aproximada do logo em dock, e header lateral inalterado**.
 - [ ] **Q3** Mobile 390/360, zoom/teclado/touch, long titles, músicas sem capa, sem catálogo, error/buffering e reduced-motion.
-- [ ] **Q4** Evidência de continuidade perceptível (vídeo/sequência real) da transformação para o header e retorno; comparação com interface CM existente.
+- [x] **Q4 (revisão técnica, não aprovação estética)** [Vídeo e screenshots reais](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922/artifacts/11703125315) de lateral → sobreposição em voo → navbar → lateral em shell público 1440/1760, incluindo mobile original 390. O espaço ainda não foi homologado por Cassiano.
 - [ ] **Q5** Lint, typecheck, unit, build e browser QA executados de verdade; analisar/registrar falhas e reexecutar após ajustes.
 - [ ] **Q6** Cassiano conferir e aprovar a transformação final. Não confundir CI verde com aprovação visual.
 - [ ] **Q7** Atualizar evidências e roadmap, sem reabrir C1–C8 para refazer elementos aceitos.
@@ -79,6 +79,8 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 - **11/10/2026 — ajuste solicitado:** Cassiano gostou da V2 (transportes, barras e caráter do mini), mas considerou **menu central longe do logo**, deixando o player espremido. Nova composição definida: **logo e nav juntos à esquerda em dock → mini mais largo → redes**, mantendo shell lateral original. D4.3 aberta; D5 continua pendente.
 
 - **11/10/2026 — D4.3 validado no navegador:** layout `logo + menu à esquerda | mini largo | redes à direita` em 1180/1440/1760, sem overlap; vídeo/screenshot da subida e retorno revistos. Um teste foi corrigido para consultar `textContent` em vez de `innerText` durante fase ocultada por CSS. [9 testes passaram](https://github.com/cassianomangini/radioand3d/actions/runs/38138854501), [CI verde](https://github.com/cassianomangini/radioand3d/actions/runs/38138902620), [registro detalhado](evidence/03c-radio-dock-menu-beside-logo-2026-10-11.md). Aprovação visual D5 pendente.
+
+- **11/10/2026 — integração funcional comprovada:** [CI Playwright 38140243922](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922) (8 cenários aplicáveis, capturas e vídeos reais) e [CI global 38140584046](https://github.com/cassianomangini/radioand3d/actions/runs/38140584046) verde. Marcados I1–I4 e Q1/Q4; I5/I6 e Q2/Q3/Q5 ainda exigem validações complementares (incluindo áudio durante rota). [Relatório](evidence/03c-radio-dock-integrated-2026-10-11.md). D5/Q6 mantidos em aberto pela falta de espaçamento central.
 
 ## Retomada
 

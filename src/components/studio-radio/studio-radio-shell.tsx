@@ -1541,6 +1541,11 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       closeRadioFullscreen(false);
     } else if (shouldDock) {
       runRadioDockTransition(true, initialRadioWidthRef.current, initialRadioLayoutModeRef.current);
+    } else if (event.type === "pointercancel" && dragOriginRef.current === "sidebar" && !dragFullscreenRef.current) {
+      // A cancelled pointer is not an implicit dock, nor a committed resize.
+      customWidthRef.current = initialRadioLayoutModeRef.current === "custom";
+      setRadioWidth(initialRadioWidthRef.current);
+      setRadioExpanded(initialRadioLayoutModeRef.current === "focus");
     } else if (shouldSettle) {
       const shell = shellRef.current;
       if (shell) {

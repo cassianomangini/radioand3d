@@ -1,6 +1,6 @@
 # 03c — Dock reversível da Rádio no cabeçalho
 
-**Estado da entrega:** `in_progress` no **gate D5 de revisão visual após correção D4.3**. Cassiano gostou da V2, solicitou aproximar a nav do logo para dar largura ao mini, e a alteração foi validada tecnicamente. Integração na Rádio pública e QA final ainda não iniciados.  
+**Estado da entrega:** `in_progress` na implementação I1–I6 do dock real, **expressamente autorizada apesar de D5 visual pendente**. A centralização óptica do player entre menu e sociais continua aberta; nenhuma aprovação final foi presumida.  
 **Responsável:** CM Experience (contrato); CM Frontend (implementação após aprovação); CM Review (QA/evidências).  
 **Solicitação:** Cassiano, 09/10/2026. Nova capacidade expressamente solicitada; **03b/06 e C1–C8 permanecem aceitas**, com modificação apenas do que esta função exigir.  
 **Contrato visual/comportamental:** [CM Rádio — Dock na navbar V1](../design/CM_RADIO_NAVBAR_DOCK_V1.md).  
@@ -28,7 +28,8 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 
 - [x] **D4.3** Feedback de 11/10 incorporado **somente no modo docked**: nav ao lado do logo, player mais largo antes das redes, header lateral intacto. Capturas reais **1180/1440/1760**, título longo e QA de colisão/overflow; gesto ida/volta, teclado, Web Audio sintético e mobile. [QA 38138854501: 9/9 testes aplicáveis](https://github.com/cassianomangini/radioand3d/actions/runs/38138854501), [CI 38138902620 verde](https://github.com/cassianomangini/radioand3d/actions/runs/38138902620) e [revisão visual do agente](evidence/03c-radio-dock-menu-beside-logo-2026-10-11.md). **Ainda não é aprovação estética por Cassiano.**
 
-- [ ] **D5** Cassiano aprovar a direção da transição e as dimensões do player do topo. Somente então mudar `ready_for_frontend` para `yes` com referência de aprovação verdadeira.
+- [x] **D5f — autorização funcional com ressalva:** em 11/10 Cassiano disse **“o espaçamento a gente corrige depois porque ainda está errado; não está centralizado entre os botões de Início/Estúdio/Rádio e os botões sociais; pode seguir”**. Autorizou continuar **I1–I6 (interação real)**, sem aprovar a geometria final nem encerrar D5.
+- [ ] **D5 — geometria/acabamento final:** refinar o **equilíbrio real do espaço entre a nav e o grupo social** após os gestos/estado funcionarem no shell público, e obter aceite explícito. Não marcar essa aprovação só porque CI passou.
 
 ### B — Implementação restrita à capacidade nova
 

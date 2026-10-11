@@ -3,9 +3,10 @@ import { expect, test } from "@playwright/test";
 const run = process.env.VISUAL_LAB_QA === "1";
 const desktop = new Set(["desktop-1440", "desktop-short"]);
 
+test.use({ video: run ? "on" : "off" });
+
 test.describe("03c — integrated public Radio dock (development fixture)", () => {
   test.skip(!run, "Interactive Radio gestures run against the isolated development CI server");
-  test.use({ video: run ? "on" : "off" });
 
   test("overshoot transforms the real sidebar into the navbar and restores without remounting audio", async ({ page }, testInfo) => {
     test.skip(!desktop.has(testInfo.project.name), "Desktop full Radio only");

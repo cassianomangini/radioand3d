@@ -133,6 +133,42 @@ test.describe("03c visual dock preview", () => {
     }
   });
 
+  test("13 dock bars respond to the actual Web Audio fixture and relax after pausing", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Audio analyzer sample on one real Chromium desktop");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto(previewRoute, { waitUntil: "domcontentloaded" });
+    const root = page.locator('[data-radio-dock-preview="true"][data-preview-ready="true"]');
+    await expect(root).toBeVisible();
+    await page.locator('[data-dock-demo-toggle="true"]').click();
+    await expect(root).toHaveAttribute("data-dock-phase", "docked", { timeout: 3000 });
+
+    const mini = page.locator('[data-dock-mini="true"]');
+    const bars = mini.locator('[data-dock-signal="true"] [role="img"] > span');
+    await expect(bars).toHaveCount(13);
+    await mini.getByRole("button", { name: "Tocar CM Rádio" }).click();
+    await expect(mini).toHaveAttribute("data-playback-state", "playing", { timeout: 7000 });
+    await expect.poll(
+      async () => bars.evaluateAll((elements) =>
+        Math.max(...elements.map((element) =>
+          Number.parseFloat((element as HTMLElement).style.height || "4")
+        ))
+      ),
+      { message: "The 13 bars must react to the real analyzer, never a fake CSS loop", timeout: 5000, intervals: [90, 150, 190, 220] }
+    ).toBeGreaterThan(4.5);
+    await page.screenshot({ path: testInfo.outputPath("radio-dock-real-fixture-playing.png"), animations: "allow" });
+
+    await mini.getByRole("button", { name: "Pausar CM Rádio" }).click();
+    await expect(mini).toHaveAttribute("data-playback-state", "paused", { timeout: 2500 });
+    await expect.poll(
+      async () => bars.evaluateAll((elements) =>
+        Math.max(...elements.map((element) =>
+          Number.parseFloat((element as HTMLElement).style.height || "4")
+        ))
+      ),
+      { message: "Dock bars should settle when playback stops", timeout: 3500, intervals: [100, 170, 250] }
+    ).toBeLessThanOrEqual(4.5);
+  });
+
   test("overshoot right docks; pulling right edge left restores", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop-1440", "Gesture proof on representative wide desktop");
     await page.emulateMedia({ reducedMotion: "no-preference" });

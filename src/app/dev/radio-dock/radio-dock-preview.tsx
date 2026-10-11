@@ -79,7 +79,9 @@ export function RadioDockPreview() {
   // overflow QA. It never creates a track, touches the queue or fakes audio.
   useEffect(() => {
     const candidate = new URLSearchParams(window.location.search).get("previewTitle");
-    if (candidate) setTestTitle(candidate.slice(0, 160));
+    if (!candidate) return;
+    const frame = requestAnimationFrame(() => setTestTitle(candidate.slice(0, 160)));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   function commitPhase(next: PreviewPhase) {

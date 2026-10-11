@@ -1,6 +1,6 @@
 # 03c — Dock reversível da Rádio no cabeçalho
 
-**Estado da entrega:** `in_progress` na implementação I1–I6 do dock real, **expressamente autorizada apesar de D5 visual pendente**. A centralização óptica do player entre menu e sociais continua aberta; nenhuma aprovação final foi presumida.  
+**Estado da entrega:** `in_progress` em **QA complementar e aprovação visual D5**. **I1–I6 concluídos funcionalmente no shell público** após autorização expressa de Cassiano, com 11 testes de browser verdes. A centralização óptica do player entre menu e sociais continua aberta e músicas R2 não foram homologadas; nenhuma aprovação final foi presumida.  
 **Responsável:** CM Experience (contrato); CM Frontend (implementação após aprovação); CM Review (QA/evidências).  
 **Solicitação:** Cassiano, 09/10/2026. Nova capacidade expressamente solicitada; **03b/06 e C1–C8 permanecem aceitas**, com modificação apenas do que esta função exigir.  
 **Contrato visual/comportamental:** [CM Rádio — Dock na navbar V1](../design/CM_RADIO_NAVBAR_DOCK_V1.md).  
@@ -37,8 +37,8 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 - [x] **I2** Overshoot direito detectado **antes do clamp**, limiar de 96px, affordance do divisor, snap compact separado e width/mode originais restaurados; cancelamento sem dock. E2E de arraste e unit tests no [relatório](evidence/03c-radio-dock-integrated-2026-10-11.md).
 - [x] **I3 (funcional, não art approval)** Header/Estúdio refluem, mini antes dos botões sociais somente em dock, nav junto ao logo somente neste modo, sidebar original restaurada. **Centralização óptica fina explicitamente pendente em D5**. Capturas 1440/1760 no [relatório](evidence/03c-radio-dock-integrated-2026-10-11.md).
 - [x] **I4** Retorno pelo botão do mini, pela borda direita e via teclado; link **Rádio** abre fullscreen e retorna ao dock quando apropriado. E2E 03c no [relatório](evidence/03c-radio-dock-integrated-2026-10-11.md).
-- [ ] **I5** Coreografar lateral → topo → lateral com spine WAAPI/FLIP único, interrupção segura, tempos de assinatura e fallback reduced-motion.
-- [ ] **I6** Preservar `useRadio`/um único áudio, faixa/tempo/playlist/fila, navegação de rotas, teclado/foco e mini-player mobile sem duplicação.
+- [x] **I5 (funcional)** Voo WAAPI/FLIP único entre lateral e navbar, retorno inverso, duração-base 660ms, token de cancelamento, fallback reduced-motion e reversão durante animação verificada no [E2E 38140803545](https://github.com/cassianomangini/radioand3d/actions/runs/38140803545). Refinamento estético D5 separado.
+- [x] **I6 (funcional, fixture de desenvolvimento)** Mesmo `useRadio`, posição do áudio avançando durante dock, visualizador de 13 bandas lendo WAV real, manutenção de reprodução ao navegar para Estúdio, fullscreen com retorno ao dock, teclado/foco e mini mobile preservado; [E2E com 11 testes verdes](https://github.com/cassianomangini/radioand3d/actions/runs/38140803545). **Faixas R2 privadas ainda não homologadas.**
 
 ### C — Prova e aprovação
 
@@ -46,9 +46,9 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 - [ ] **Q2** Navegador: drag desktop 1440, 1180 e desktop curto; trocar rota durante dock; trigger por botão; reversão durante a animação; um áudio; nenhum overflow; **player largo antes de sociais, nav aproximada do logo em dock, e header lateral inalterado**.
 - [ ] **Q3** Mobile 390/360, zoom/teclado/touch, long titles, músicas sem capa, sem catálogo, error/buffering e reduced-motion.
 - [x] **Q4 (revisão técnica, não aprovação estética)** [Vídeo e screenshots reais](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922/artifacts/11703125315) de lateral → sobreposição em voo → navbar → lateral em shell público 1440/1760, incluindo mobile original 390. O espaço ainda não foi homologado por Cassiano.
-- [ ] **Q5** Lint, typecheck, unit, build e browser QA executados de verdade; analisar/registrar falhas e reexecutar após ajustes.
+- [x] **Q5** Lint/typecheck/unit/build [verdes na CI geral 38140689340](https://github.com/cassianomangini/radioand3d/actions/runs/38140689340); browser E2E [38140803545](https://github.com/cassianomangini/radioand3d/actions/runs/38140803545) **11 passaram, 29 skips planejados, zero retries**. Corrigido teste de busca por slider que ficava propositalmente inacessível por `aria-hidden`/`inert`, sem relaxar acessibilidade.
 - [ ] **Q6** Cassiano conferir e aprovar a transformação final. Não confundir CI verde com aprovação visual.
-- [ ] **Q7** Atualizar evidências e roadmap, sem reabrir C1–C8 para refazer elementos aceitos.
+- [x] **Q7** Contrato 03c, evidência integrada, roadmap e README atualizados; C1–C8 e a Rádio lateral preexistente preservados. **D5/Q6 e QA complementar não homologados.**
 
 ## Matriz mínima de estados (a testar)
 
@@ -82,9 +82,11 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 
 - **11/10/2026 — integração funcional comprovada:** [CI Playwright 38140243922](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922) (8 cenários aplicáveis, capturas e vídeos reais) e [CI global 38140584046](https://github.com/cassianomangini/radioand3d/actions/runs/38140584046) verde. Marcados I1–I4 e Q1/Q4; I5/I6 e Q2/Q3/Q5 ainda exigem validações complementares (incluindo áudio durante rota). [Relatório](evidence/03c-radio-dock-integrated-2026-10-11.md). D5/Q6 mantidos em aberto pela falta de espaçamento central.
 
+- **11/10/2026 — integração I1–I6 e Q5 verificadas:** [Playwright 38140803545](https://github.com/cassianomangini/radioand3d/actions/runs/38140803545) **11 passaram** (29 skips planejados); interruptibilidade do voo, pointercancel, áudio WAV em reprodução contínua entre dock e rota, 13 barras reais, fullscreen e responsive. [CI global](https://github.com/cassianomangini/radioand3d/actions/runs/38140689340) verde. [Evidência ampliada](evidence/03c-radio-dock-integrated-2026-10-11.md). Q2/Q3 adicionais e D5/Q6 ficam pendentes.
+
 ## Retomada
 
-**Último ponto comprovado:** D1–D4.3 concluídos no laboratório dev-only. A correção do alinhamento/nav mais próxima ao logo e mini mais largo foi renderizada e inspecionada em 1180/1440/1760, mantendo gesto/áudio/fila e mobile. [Evidência](evidence/03c-radio-dock-menu-beside-logo-2026-10-11.md). [Playwright 38138854501](https://github.com/cassianomangini/radioand3d/actions/runs/38138854501) 9 passaram, 23 skips planejados, sem retry; [CI 38138902620](https://github.com/cassianomangini/radioand3d/actions/runs/38138902620) verde.  
-**Próxima atividade:** **D5 — Cassiano conferir a prévia corrigida do mini e do menu junto ao logo**. Nenhuma implementação pública sem aprovação explícita.  
-**Deploy:** nenhum. **Produção:** inalterada. **Prova musical:** somente fixture WAV sintética de 8s; ainda não prova reprodução R2 real. **Aprovação visual:** não obtida.  
+**Último ponto comprovado:** **I1–I6 completos na integração funcional**, não apenas em dev-only. [Run 38140803545](https://github.com/cassianomangini/radioand3d/actions/runs/38140803545) = 11 testes aplicáveis passaram, 29 skips por perfil, zero retry; inclusive cancelamento, interrupção em pleno voo e reprodução **WAV realmente avançando** durante dock/navegação, bandas reais e pausa. [CI 38140689340](https://github.com/cassianomangini/radioand3d/actions/runs/38140689340) global verde; [screenshots/vídeo da integração](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922/artifacts/11703125315). [Relatório completo](evidence/03c-radio-dock-integrated-2026-10-11.md).  
+**Próxima atividade:** **Q2/Q3 complementares** (1180 desktop real, 360 mobile, zoom, mídia ausente, resize cruzando breakpoint e R2 real quando disponíveis) e **D5**: Cassiano revisar a **centralização exata do mini no espaço entre a nav e os botões sociais**, deferida explicitamente. **Q6** ainda não aprovado.  
+**Deploy:** nenhum solicitado. **Código público na main:** sim, integração funcional sem mudança do catálogo/motor. **Prova musical:** somente fixture WAV sintética real de 8s; ainda não prova reprodução com o acervo R2. **Aprovação visual final:** não obtida.  
 **Não fazer:** não reabrir Rádio inteira, não instalar outro engine de animação por reflexo, não criar dois áudio players, não trocar o comportamento do link Rádio existente.

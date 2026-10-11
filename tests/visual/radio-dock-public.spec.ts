@@ -1,0 +1,157 @@
+import { expect, test } from "@playwright/test";
+
+const run = process.env.VISUAL_LAB_QA === "1";
+const desktop = new Set(["desktop-1440", "desktop-short"]);
+
+test.describe("03c — integrated public Radio dock (development fixture)", () => {
+  test.skip(!run, "Interactive Radio gestures run against the isolated development CI server");
+  test.use({ video: run ? "on" : "off" });
+
+  test("overshoot transforms the real sidebar into the navbar and restores without remounting audio", async ({ page }, testInfo) => {
+    test.skip(!desktop.has(testInfo.project.name), "Desktop full Radio only");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const root = page.locator('[data-radio-layout-mode]');
+    const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+    const aside = page.locator('aside[aria-label="CM Rádio"]');
+    await expect(divider).toBeVisible();
+    await expect(aside).toBeVisible();
+    await expect(root).not.toHaveAttribute("data-radio-docked", "true");
+    await page.evaluate(() => document.fonts.ready);
+    await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+    await page.screenshot({ path: testInfo.outputPath("01-lateral-original.png"), animations: "disabled" });
+
+    const beforeAudioCount = await page.locator("audio").count();
+    const before = await divider.boundingBox();
+    expect(before).not.toBeNull();
+    const x = before!.x + before!.width / 2;
+    const y = before!.y + Math.min(240, before!.height / 3);
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 250, y, { steps: 20 });
+    await page.mouse.up();
+
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked", { timeout: 4800 });
+    await expect(root).toHaveAttribute("data-radio-docked", "true");
+    const mini = page.locator('[data-radio-navbar-mini="true"]');
+    await expect(mini).toBeVisible();
+    await expect(mini.getByRole("button", { name: "Faixa anterior" })).toBeVisible();
+    await expect(mini.getByRole("button", { name: "Próxima faixa" })).toBeVisible();
+    await expect(mini.locator('[data-dock-signal="true"] [role="img"] > span')).toHaveCount(13);
+    await expect(aside).toBeHidden();
+    await expect(aside).toHaveAttribute("inert", "");
+    await expect(mini).not.toHaveAttribute("inert", "");
+
+    const geometry = await page.evaluate(() => {
+      const rect = (selector: string) => document.querySelector(selector)?.getBoundingClientRect();
+      const brand = rect('header a[aria-label="CM 3D e Rádio, início"]');
+      const nav = rect('nav[aria-label="Navegação principal"]');
+      const mini = rect('[data-radio-navbar-mini="true"]');
+      const social = rect('[role="group"][aria-label="Contato e redes sociais"]');
+      if (!brand || !nav || !mini || !social) return null;
+      return {
+        brandRight: brand.right,
+        navLeft: nav.left,
+        navRight: nav.right,
+        miniLeft: mini.left,
+        miniRight: mini.right,
+        socialLeft: social.left,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
+      };
+    });
+    expect(geometry).not.toBeNull();
+    expect(geometry!.navLeft, "Navigation must remain after the CM logo").toBeGreaterThan(geometry!.brandRight);
+    expect(geometry!.miniLeft, "Mini must not overlap navigation").toBeGreaterThan(geometry!.navRight);
+    expect(geometry!.socialLeft, "Social buttons must remain after the mini").toBeGreaterThan(geometry!.miniRight);
+    expect(geometry!.overflow, "Dock must not add horizontal page scroll").toBeLessThanOrEqual(1);
+    await page.screenshot({ path: testInfo.outputPath("02-dock-in-real-navbar.png"), animations: "disabled" });
+
+    // The single player/context is shared by both presentations.
+    expect(await page.locator("audio").count()).toBe(beforeAudioCount);
+    await mini.getByRole("button", { name: "Restaurar a Rádio lateral" }).click();
+    await expect(root).toHaveAttribute("data-radio-docked", "false", { timeout: 4000 }).catch(async () => {
+      await expect(root).not.toHaveAttribute("data-radio-docked", "true");
+    });
+    await expect(aside).toBeVisible();
+    await expect(mini).toBeHidden();
+    await expect(divider).toBeVisible();
+    expect(await page.locator("audio").count()).toBe(beforeAudioCount);
+    await page.screenshot({ path: testInfo.outputPath("03-restored-lateral.png"), animations: "disabled" });
+  });
+
+  test("dock survives Studio navigation; full Radio opens and returns to dock", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Route and fullscreen continuity on representative desktop");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const root = page.locator('[data-radio-layout-mode]');
+    const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+    await expect(divider).toBeVisible();
+
+    await divider.focus();
+    await divider.press("Home");
+    await divider.press("ArrowRight");
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
+    const mini = page.locator('[data-radio-navbar-mini="true"]');
+    await expect(mini).toBeVisible();
+
+    await page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link", { name: "Estúdio" }).click();
+    await expect(page).toHaveURL(/\/studio$/);
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
+    await expect(mini).toBeVisible();
+
+    await page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link", { name: "Rádio" }).click();
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "fullscreen");
+    await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
+    const fullDivider = page.getByRole("separator", { name: "Arraste para a direita para mostrar o Estúdio" });
+    await expect(fullDivider).toBeVisible();
+    await fullDivider.focus();
+    await fullDivider.press("Escape");
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
+    await expect(mini).toBeVisible();
+
+    await page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link", { name: "Início" }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
+  });
+
+  test("dragging dock edge back left restores; reduced motion avoids flight", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Dock restoration gesture and reduced-motion");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const root = page.locator('[data-radio-layout-mode]');
+    const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+    await expect(divider).toBeVisible();
+    await divider.focus();
+    await divider.press("Home");
+    await divider.press("ArrowRight");
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
+    const edge = page.locator('[data-radio-dock-edge="true"]');
+    await expect(edge).toBeVisible();
+
+    const box = await edge.boundingBox();
+    expect(box).not.toBeNull();
+    const x = box!.x + box!.width / 2;
+    const y = box!.y + Math.min(230, box!.height / 3);
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x - 130, y, { steps: 12 });
+    await page.mouse.up();
+    await expect(root).not.toHaveAttribute("data-radio-docked", "true");
+    await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
+    await expect(page.locator('[data-radio-dock-flight="true"]')).toBeHidden();
+  });
+
+  test("mobile and narrow desktop retain the existing compact layout", async ({ page }, testInfo) => {
+    test.skip(desktop.has(testInfo.project.name), "Test the unchanged smaller-width layout");
+    await page.goto("/");
+    const root = page.locator('[data-radio-layout-mode]');
+    await expect(root).toBeVisible();
+    await expect(page.getByRole("region", { name: "Mini player da CM Rádio" })).toBeVisible();
+    await expect(page.locator('[data-radio-navbar-mini="true"]')).toBeHidden();
+    await expect(page.locator('[data-radio-dock-edge="true"]')).toHaveCount(0);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+    await page.screenshot({ path: testInfo.outputPath("mobile-original-layout.png"), animations: "disabled" });
+  });
+});

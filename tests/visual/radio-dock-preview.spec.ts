@@ -179,6 +179,7 @@ test.describe("03c visual dock preview", () => {
     await expect(root).toHaveAttribute("data-dock-phase", "docked");
     const mini = page.locator('[data-dock-mini="true"]');
     const title = mini.locator('[data-dock-title="true"]');
+    await expect(title, "Wait for actual development catalog before queue assertions").toContainText("Amostra técnica");
     const originalTitle = await title.innerText();
 
     await mini.getByRole("button", { name: "Próxima faixa" }).click();

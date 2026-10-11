@@ -45,6 +45,12 @@ test.describe("03c visual dock preview", () => {
     await expect(root).toHaveAttribute("data-dock-phase", "docked", { timeout: 4000 });
     const mini = page.locator('[data-dock-mini="true"]');
     await expect(mini).toBeVisible();
+    await expect(mini.getByText("CM RÁDIO", { exact: true })).toBeVisible();
+    await expect(mini.getByRole("button", { name: "Faixa anterior" })).toBeVisible();
+    await expect(mini.getByRole("button", { name: "Tocar CM Rádio" })).toBeVisible();
+    await expect(mini.getByRole("button", { name: "Próxima faixa" })).toBeVisible();
+    await expect(mini.locator('[data-dock-signal="true"] [role="img"] > span')).toHaveCount(13);
+    await expect(mini.getByRole("button", { name: "Restaurar a Rádio lateral" })).toBeVisible();
     await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeHidden();
 
     const placement = await page.evaluate(() => {
@@ -53,7 +59,9 @@ test.describe("03c visual dock preview", () => {
       const nav = document.querySelector('nav[aria-label="Navegação principal"]')?.getBoundingClientRect();
       if (!dock || !group || !nav) return null;
       return {
+        miniLeft: dock.left,
         miniRight: dock.right,
+        navRight: nav.right,
         socialsLeft: group.left,
         navCenter: nav.left + nav.width / 2,
         viewportCenter: document.documentElement.clientWidth / 2,
@@ -62,6 +70,7 @@ test.describe("03c visual dock preview", () => {
     });
     expect(placement).not.toBeNull();
     expect(placement!.miniRight, "The mini must be BEFORE the social icons").toBeLessThan(placement!.socialsLeft);
+    expect(placement!.miniLeft, "Mini-player cannot cover the centered CM navigation").toBeGreaterThanOrEqual(placement!.navRight + 3);
     expect(Math.abs(placement!.navCenter - placement!.viewportCenter), "Centered navigation must remain centered").toBeLessThan(24);
     expect(placement!.overflow, "No horizontal page scroll from new navbar slot").toBeLessThanOrEqual(1);
     expect(await page.locator("audio").count()).toBe(beforeAudioCount);
@@ -73,6 +82,55 @@ test.describe("03c visual dock preview", () => {
     await expect(mini).toBeHidden();
     expect(await page.locator("audio").count()).toBe(beforeAudioCount);
     await page.screenshot({ path: testInfo.outputPath("radio-side-restored.png"), animations: "disabled" });
+  });
+
+  test("legacy-informed player fits 1180, 1440 and 1760 with a long track title", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Run the resizing comparison once on desktop");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const veryLongTitle = "Uma faixa intencionalmente muito longa para testar o nome da música no cabeçalho sem esconder os controles de anterior, tocar e próxima nem ocupar a navegação principal";
+    await page.goto(previewRoute + "?previewTitle=" + encodeURIComponent(veryLongTitle), { waitUntil: "domcontentloaded" });
+    const root = page.locator('[data-radio-dock-preview="true"][data-preview-ready="true"]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute("data-preview-long-title", "true");
+    await page.locator('[data-dock-demo-toggle="true"]').click();
+    await expect(root).toHaveAttribute("data-dock-phase", "docked");
+    await page.evaluate(() => document.fonts.ready);
+    await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+
+    const mini = page.locator('[data-dock-mini="true"]');
+    for (const width of [1180, 1440, 1760]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect(mini).toBeVisible();
+      const measured = await page.evaluate(() => {
+        const mini = document.querySelector('[data-dock-mini="true"]');
+        const nav = document.querySelector('nav[aria-label="Navegação principal"]');
+        const group = document.querySelector('[role="group"][aria-label="Contato e redes sociais"]');
+        const title = document.querySelector('[data-dock-title="true"]');
+        const transport = document.querySelector('[data-dock-mini="true"] [role="group"][aria-label="Controles da Rádio"]');
+        const signal = document.querySelector('[data-dock-signal="true"]');
+        const restore = document.querySelector('[data-dock-restore="true"]');
+        if (!mini || !nav || !group || !title || !transport || !signal || !restore) return null;
+        const box = (e: Element) => e.getBoundingClientRect();
+        const m = box(mini), n = box(nav), g = box(group);
+        return {
+          miniLeft: m.left, miniRight: m.right,
+          navRight: n.right, socialLeft: g.left,
+          titleOverflowed: title.scrollWidth > title.clientWidth,
+          transportLeft: box(transport).left, transportRight: box(transport).right,
+          signalLeft: box(signal).left, signalRight: box(signal).right,
+          restoreRight: box(restore).right,
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
+        };
+      });
+      expect(measured, "Expected actual navigation and controls in CM shell").not.toBeNull();
+      expect(measured!.miniLeft, `CM navigation overlaps dock at ${width}px`).toBeGreaterThan(measured!.navRight + 2);
+      expect(measured!.miniRight, `Social icons overlap dock at ${width}px`).toBeLessThan(measured!.socialLeft);
+      expect(measured!.transportRight, `Transport collides with spectrum at ${width}px`).toBeLessThan(measured!.signalLeft);
+      expect(measured!.signalRight, `Spectrum collides with restore at ${width}px`).toBeLessThan(measured!.restoreRight);
+      expect(measured!.overflow, `Horizontal scroll at ${width}px`).toBeLessThanOrEqual(1);
+      expect(measured!.titleOverflowed, `Long title should truncate at ${width}px`).toBe(true);
+      await page.screenshot({ path: testInfo.outputPath(`radio-navbar-${width}-long-title.png`), animations: "disabled" });
+    }
   });
 
   test("overshoot right docks; pulling right edge left restores", async ({ page }, testInfo) => {

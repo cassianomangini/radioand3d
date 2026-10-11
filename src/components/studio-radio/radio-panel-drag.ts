@@ -105,3 +105,15 @@ export function getRadioDragPreview(
     ready: width > 0 && pointerDistanceFromLeft <= startDistanceFromLeft / 2
   };
 }
+
+/** A deliberate push past minimum sidebar width docks the Radio to the navbar.
+ * Use the *unclamped* pointer-requested width, never the resize width.
+ * The compact snap point remains a real sidebar width, not the dock.
+ */
+export function getRadioDockIntent(requestedWidth: number, minWidth: number, threshold = 96) {
+  const overshoot = Math.max(0, minWidth - requestedWidth);
+  return {
+    overshoot,
+    ready: Number.isFinite(requestedWidth) && overshoot >= threshold
+  };
+}

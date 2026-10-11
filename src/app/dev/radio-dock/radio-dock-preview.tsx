@@ -4,6 +4,7 @@ import Image from "next/image";
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRadio } from "@/features/radio/radio-provider";
+import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { StudioRadioShell } from "@/components/studio-radio/studio-radio-shell";
 import shellStyles from "@/components/studio-radio/studio-radio-shell.module.css";
 import styles from "./radio-dock-preview.module.css";
@@ -24,6 +25,22 @@ function PlayGlyph({ playing }: { playing: boolean }) {
   ) : (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="m8 5 11 7-11 7V5Z" />
+    </svg>
+  );
+}
+
+function PreviousGlyph() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M5 4h2v16H5V4Zm14 1v14l-11-7 11-7Z" />
+    </svg>
+  );
+}
+
+function NextGlyph() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17 4h2v16h-2V4ZM5 5l11 7-11 7V5Z" />
     </svg>
   );
 }
@@ -52,10 +69,18 @@ export function RadioDockPreview() {
   const [phase, setPhase] = useState<PreviewPhase>("side");
   const [ready, setReady] = useState(false);
   const [socialTarget, setSocialTarget] = useState<Element | null>(null);
+  const [testTitle, setTestTitle] = useState<string | null>(null);
   const cover = radio.currentTrack?.artwork ?? FALLBACK_COVER;
-  const title = radio.currentTrack?.title ?? "CM Rádio";
+  const title = testTitle ?? radio.currentTrack?.title ?? "CM Rádio";
   const artist = radio.currentTrack?.artist ?? "Aguardando catálogo";
-  const playing = radio.status === "playing";
+  const playing = radio.status === "playing" || radio.status === "loading" || radio.status === "buffering";
+
+  // The query parameter changes displayed text ONLY for deterministic visual
+  // overflow QA. It never creates a track, touches the queue or fakes audio.
+  useEffect(() => {
+    const candidate = new URLSearchParams(window.location.search).get("previewTitle");
+    if (candidate) setTestTitle(candidate.slice(0, 160));
+  }, []);
 
   function commitPhase(next: PreviewPhase) {
     phaseRef.current = next;
@@ -234,26 +259,67 @@ export function RadioDockPreview() {
       data-radio-dock-preview="true"
       data-dock-phase={phase}
       data-mock-approved="false"
+      data-preview-long-title={testTitle ? "true" : undefined}
     >
       <StudioRadioShell />
 
       {socialTarget ? createPortal(
-        <div className={styles.dockSlot} ref={dockRef} data-dock-mini="true" aria-hidden={phase !== "docked" ? true : undefined} inert={phase !== "docked"}>
-          <Image src={cover} width={36} height={36} unoptimized alt="" className={styles.dockCover} />
-          <span className={styles.dockCopy}>
-            <strong title={title}>{title}</strong>
-            <small>{artist}</small>
+        <div
+          className={styles.dockSlot}
+          ref={dockRef}
+          data-dock-mini="true"
+          data-dock-ui-version="legacy-informed-v2"
+          data-playback-state={radio.status}
+          role="region"
+          aria-label="Mini-player CM Rádio na navbar"
+          aria-hidden={phase !== "docked" ? true : undefined}
+          inert={phase !== "docked"}
+        >
+          <span className={styles.dockCoverShell}>
+            <Image src={cover} width={52} height={52} unoptimized alt="" className={styles.dockCover} />
           </span>
-          <button
-            type="button"
-            onClick={radio.toggle}
-            disabled={!radio.currentTrack}
-            aria-label={playing ? "Pausar CM Rádio" : "Tocar CM Rádio"}
-            title={playing ? "Pausar" : "Tocar"}
-            className={styles.dockControl}
-          >
-            <PlayGlyph playing={playing} />
-          </button>
+          <span className={styles.dockCopy}>
+            <span className={styles.dockBrand}>CM RÁDIO</span>
+            <strong title={title} data-dock-title="true">{title}</strong>
+            <small title={artist}>{artist}</small>
+          </span>
+          <span className={styles.dockTransport} role="group" aria-label="Controles da Rádio">
+            <button
+              type="button"
+              className={styles.dockSkip}
+              aria-label="Faixa anterior"
+              title="Faixa anterior"
+              onClick={radio.previous}
+              disabled={!radio.currentTrack}
+            >
+              <PreviousGlyph />
+            </button>
+            <button
+              type="button"
+              onClick={radio.toggle}
+              disabled={!radio.currentTrack}
+              aria-label={playing ? "Pausar CM Rádio" : "Tocar CM Rádio"}
+              title={playing ? "Pausar" : "Tocar"}
+              className={styles.dockPlay}
+              data-dock-play="true"
+            >
+              <PlayGlyph playing={playing} />
+            </button>
+            <button
+              type="button"
+              className={styles.dockSkip}
+              aria-label="Próxima faixa"
+              title="Próxima faixa"
+              onClick={radio.next}
+              disabled={!radio.currentTrack || !radio.canSkipNext}
+            >
+              <NextGlyph />
+            </button>
+          </span>
+          <div className={styles.dockSignal} data-dock-signal="true">
+            <RadioVisualizer className={styles.dockSpectrum} barCount={13} active={phase === "docked"} />
+          </div>
+          <span className={styles.dockSeparator} aria-hidden="true" />
           <button
             type="button"
             onClick={() => transition("side")}
@@ -310,7 +376,7 @@ export function RadioDockPreview() {
           {phase === "docked" ? "Restaurar lateral" : "Recolher na navbar"}
           <span aria-hidden="true">↗</span>
         </button>
-        <small>Prova de movimento, sem alteração do layout público.</small>
+        <small>{testTitle ? "Título longo fictício para QA de layout; áudio e playlist não foram alterados." : "Prévia de composição, sem alteração da Rádio pública."}</small>
       </aside>
 
       <span className={styles.srOnly} role="status" aria-live="polite">

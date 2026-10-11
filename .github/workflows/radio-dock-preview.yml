@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths:
       - "src/app/dev/radio-dock/**"
+      - "src/components/studio-radio/**"
       - "tests/visual/radio-dock-preview.spec.ts"
+      - "tests/visual/radio-dock-public.spec.ts"
       - "playwright.config.ts"
       - ".github/workflows/radio-dock-preview.yml"
   workflow_dispatch:

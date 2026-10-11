@@ -1726,7 +1726,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             : "";
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-layout-mode={radioLayoutMode} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-wider-than-default={shellWidth !== null && radioWidth !== null && radioWidth > getDefaultWidth(shellWidth) ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-layout-mode={radioLayoutMode} data-radio-docked={radioDocked ? "true" : undefined} data-radio-dock-motion={radioDockMotion ?? undefined} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-wider-than-default={shellWidth !== null && radioWidth !== null && radioWidth > getDefaultWidth(shellWidth) ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
         {playbackStatusMessage}
       </span>
@@ -1759,7 +1759,15 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <a ref={radioNavRef} href="#radio" aria-current={activeNav === "radio" ? "page" : undefined} onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
         </nav>
 
-        <SocialIcons />
+        <div className={styles.headerActions} data-radio-dock-actions="true">
+          <RadioNavbarDock
+            miniRef={dockMiniRef}
+            visible={radioDocked && !radioDockMotion && !radioFullscreen}
+            animating={radioDockMotion !== null}
+            onRestore={() => runRadioDockTransition(false)}
+          />
+          <SocialIcons />
+        </div>
 
         <button
           type="button"
@@ -2044,9 +2052,10 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           title={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Arraste para ajustar livremente a largura da CM Rádio"}
         />
 
-        <aside id="radio" className={styles.radioPanel} data-radio-flip-root="true" aria-label="CM Rádio">
+        <aside id="radio" className={styles.radioPanel} data-radio-flip-root="true" aria-label="CM Rádio" inert={radioDocked} aria-hidden={radioDocked}>
           <RadioContent
             focus={radioExpanded && !radioFullscreen}
+            visualizerActive={!radioDocked}
             expanded={radioFullscreen}
             trackStepKind={trackStepMotion?.kind}
             onPrevious={previousTrack}
@@ -2055,6 +2064,53 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           />
         </aside>
       </div>
+
+      <div ref={dockFlightRef} className={styles.radioDockFlight} aria-hidden="true" data-radio-dock-flight="true">
+        <Image
+          src={radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png"}
+          fill
+          sizes="(min-width: 1180px) 60vw, 480px"
+          unoptimized
+          alt=""
+          className={styles.radioDockFlightArtwork}
+        />
+        <span className={styles.radioDockFlightCaption}>
+          <strong>{radio.currentTrack?.title ?? "CM Rádio"}</strong>
+          <small>{radio.currentTrack?.artist ?? "Aguardando catálogo"}</small>
+        </span>
+      </div>
+
+      {radioDocked ? (
+        <button
+          type="button"
+          className={styles.radioDockEdge}
+          data-radio-dock-edge="true"
+          aria-label="Puxe para a esquerda para restaurar a Rádio lateral"
+          title="Arraste para a esquerda para restaurar a Rádio"
+          onPointerDown={(event) => {
+            if (event.pointerType === "mouse" && event.button !== 0) return;
+            dockEdgeDragRef.current = { pointerId: event.pointerId, startX: event.clientX };
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerUp={(event) => {
+            const drag = dockEdgeDragRef.current;
+            dockEdgeDragRef.current = null;
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+              event.currentTarget.releasePointerCapture(event.pointerId);
+            }
+            if (drag?.pointerId === event.pointerId && drag.startX - event.clientX >= RADIO_DOCK_EDGE_RESTORE_PX) {
+              runRadioDockTransition(false);
+            }
+          }}
+          onPointerCancel={() => { dockEdgeDragRef.current = null; }}
+          onKeyDown={(event) => {
+            if (["Enter", " ", "ArrowLeft"].includes(event.key)) {
+              event.preventDefault();
+              runRadioDockTransition(false);
+            }
+          }}
+        />
+      ) : null}
 
       <dialog
         ref={mobileDialogRef}

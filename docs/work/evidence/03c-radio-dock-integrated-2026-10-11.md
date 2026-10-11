@@ -1,0 +1,31 @@
+# 03c — Rádio dock integrada ao shell público (11/10/2026)
+
+**Status:** integração funcional na `main` (sem deploy manual); **espaçamento óptico final entre menu / player / redes ainda não aprovado**. A integração foi autorizada explicitamente por Cassiano apesar dessa pendência: “o espaçamento a gente corrige depois ... pode seguir”. **D5 permanece em aberto.**
+
+## Alterações verificadas
+
+- `src/components/studio-radio/radio-motion-spine.ts` agora suporta o estado explícito `docked`, mutuamente exclusivo com fullscreen/focus/custom/split. O modo `fullscreen` conserva prioridade e seu retorno pode restaurar `docked`.
+- `radio-panel-drag.ts` diferencia `compact` (largura física da lateral) de `docked` (empurrar **além** do mínimo em 96 px), usando largura solicitada **antes** de clamp; cancelamento não faz dock.
+- `studio-radio-shell.tsx` integra gesto, teclado, borda direita de retorno, botão restaurar, navegação Home↔Estúdio, painel lateral preservado e inerte quando oculto, um único `useRadio` para todos os modos. O motor e a fila não foram reinstanciados.
+- `radio-navbar-dock.tsx` + CSS: player compacto somente em `docked`, imediatamente antes dos ícones sociais, marca CM RÁDIO, faixa/capa, anterior/play/próxima, **13 bandas do visualizador real** e restaurar. A análise visual do painel oculto deixa de animar.
+- `studio-radio-shell.module.css`: o header/Estúdio crescem; o menu se aproxima do logo apenas em `docked`; o player e redes ficam à direita. **A composição ainda não está centralizada visualmente como Cassiano deseja** e será ajustada depois.
+- Transição lateral ↔ navbar usa uma superfície cinematográfica de imagem + título com WAAPI, FLIP no menu, interrupção com token/cancelamento, duração-base de 660ms e fallback para `prefers-reduced-motion`.
+- `/dev/radio-dock` não mantém um segundo mock com drag independente: reutiliza o shell integrado, para evitar duas fontes de estado. Rota 404 no build de produção.
+
+## Evidência técnica do navegador
+
+**Run confirmado:** [03c Playwright 38140243922](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922) — **8 testes passaram**, 20 skips deliberados por perfil, sem retries, com lint restrito e vídeo. [Artefato com screenshots/vídeos](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922/artifacts/11703125315).
+
+**CI global:** [38140584046](https://github.com/cassianomangini/radioand3d/actions/runs/38140584046) — lint, typecheck, testes e build verdes com implementação integrada e os novos testes versionados.
+
+**Conferência renderizada do agente:** capturas reais `01-lateral-original.png`, `02-dock-in-real-navbar.png` e `03-restored-lateral.png` em **1440×900 e 1760×824**, mais mobile 390. A sequência do vídeo mostra o painel lateral refluindo à direita enquanto a superfície da arte sobe e se contrai para o cabeçalho. Na fase docked o logo/nav ficam à esquerda, mini ocupa a maior parte da região seguinte, redes permanecem visíveis à direita; na volta reaparecem painel/playlist/divisor, sem segundo player desktop. A revisão visual **não substitui** aprovação de Cassiano.
+
+**Cenários automáticos confirmados:** overshoot 1440/1760, dock e retorno por botão, mesmo áudio/estado global, navegação `/`→`/studio` com `docked` persistente, fullscreen a partir de dock e retorno, teclado e arraste da borda direita, reduced motion, ausência de segundo mini em 1024 e 390, sem overflow detectado. **Prova de continuidade do áudio com música R2 real ainda pendente.** A CI emprega amostras WAV sintéticas de desenvolvimento, não o catálogo privado completo.
+
+## Pendências / gate honesto
+
+- **D5 (obrigatória):** acertar alinhamento/centralização espacial do mini **entre o fim do menu Início/Estúdio/Rádio e o começo dos botões sociais**, mesmo em larguras intermediárias. Pedido para deixar para depois; não fazer ajuste cosmético arbitrário agora.
+- **I5/I6 e Q:** reforçar prova de interrupção/cancelamento do gesto e reprodução real contínua na rota com fixture; testar rotas internas, resize de desktop↔mobile durante dock, faixa longa, playback real R2 e retorno em fullscreen. Testes E2E adicionais foram acrescentados; somente registrar como aprovados após conclusão efetiva de novo run.
+- **Q6:** aceite visual final por Cassiano não foi dado; sem marcar entrega completa. **Sem deploy autorizado nesta etapa.**
+
+**Fonte de verdade dos próximos passos:** [03c checklist](../03c-radio-navbar-dock.md), [contrato visual](../../design/CM_RADIO_NAVBAR_DOCK_V1.md).

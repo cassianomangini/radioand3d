@@ -194,7 +194,7 @@ test.describe("03c visual dock preview", () => {
     // innerText() can temporarily be empty while the dock is CSS-hidden during
     // reduced-motion hydration, even though the underlying track text exists.
     const originalTitle = (await title.textContent())?.trim() ?? "";
-    expect(originalTitle).toMatch(/^Amostra técnica \\d{2}$/);
+    expect(originalTitle).toMatch(/^Amostra técnica \d{2}$/);
 
     await mini.getByRole("button", { name: "Próxima faixa" }).click();
     await expect(title).not.toHaveText(originalTitle);

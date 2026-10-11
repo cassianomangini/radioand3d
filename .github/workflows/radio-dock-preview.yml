@@ -57,7 +57,7 @@ jobs:
           done
 
           VISUAL_LAB_QA=1 VISUAL_REVIEW_URL=http://127.0.0.1:3100 \
-            pnpm exec playwright test tests/visual/radio-dock-preview.spec.ts \
+            pnpm exec playwright test tests/visual/radio-dock-preview.spec.ts tests/visual/radio-dock-public.spec.ts \
             --project=desktop-1440 --project=desktop-short \
             --project=desktop-1024 --project=mobile-390
 

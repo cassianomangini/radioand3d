@@ -4242,3 +4242,174 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     display: none;
   }
 }
+
+
+/* 03c — real Radio dock. Mutually exclusive with the accepted lateral player.
+ * The final optical centering of the mini between nav and socials remains a
+ * deliberately OPEN visual adjustment requested by Cassiano.
+ */
+.headerActions {
+  justify-self: end;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 0;
+}
+
+.headerActions .socialIcons {
+  flex: 0 0 auto;
+}
+
+.radioDockFlight {
+  position: fixed;
+  z-index: calc(var(--layer-nav) + 12);
+  inset: 0 auto auto 0;
+  display: none;
+  visibility: hidden;
+  overflow: hidden;
+  isolation: isolate;
+  container: radio-dock-flight / size;
+  pointer-events: none;
+  background: #03050a;
+  border: 1px solid rgb(82 214 255 / 48%);
+  box-shadow: 0 1.2rem 3.4rem rgb(6 48 106 / 30%);
+}
+
+.radioDockFlightArtwork {
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.78;
+}
+
+.radioDockFlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(2 3 5 / 13%), rgb(3 5 10 / 20%) 40%, rgb(3 5 10 / 94%));
+  pointer-events: none;
+}
+
+.radioDockFlightCaption {
+  position: absolute;
+  z-index: 1;
+  left: clamp(0.55rem, 3cqw, 1.2rem);
+  right: clamp(0.45rem, 2cqw, 1rem);
+  bottom: clamp(0.3rem, 2cqh, 0.9rem);
+  display: grid;
+  gap: clamp(0rem, 0.5cqh, 0.24rem);
+  white-space: nowrap;
+}
+
+.radioDockFlightCaption strong {
+  overflow: hidden;
+  font-size: clamp(0.62rem, 3.1cqh, 1.05rem);
+  line-height: 1.14;
+  text-overflow: ellipsis;
+}
+
+.radioDockFlightCaption small {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: clamp(0.5rem, 2.2cqh, 0.7rem);
+  line-height: 1.12;
+  text-overflow: ellipsis;
+}
+
+.radioDockEdge {
+  display: none;
+}
+
+@media (max-width: 73.74rem) {
+  .siteHeader > .headerActions {
+    display: none;
+  }
+}
+
+@media (min-width: 73.75rem) {
+  /* Match the prior rule for a full/focused/wider Radio, now that social icons
+     live inside the header-actions wrapper rather than as a header child. */
+  .site:is([data-radio-expanded="true"], [data-radio-wider-than-default="true"], [data-radio-dragging="true"], [data-radio-layout-motion]) .headerActions .socialIcons,
+  .site[data-radio-fullscreen="true"] .headerActions .socialIcons {
+    display: none;
+  }
+
+  .site[data-radio-docked="true"] .siteHeader {
+    right: 0;
+    grid-template-columns: max-content max-content minmax(0, 1fr);
+    column-gap: clamp(1.3rem, 2.2vw, 2.4rem);
+  }
+
+  .site[data-radio-docked="true"] .desktopNav {
+    justify-self: start;
+  }
+
+  .site[data-radio-docked="true"] .headerActions {
+    justify-self: stretch;
+    width: 100%;
+    gap: clamp(0.6rem, 0.9vw, 0.85rem);
+  }
+
+  .site[data-radio-docked="true"] .headerActions .socialIcons {
+    display: flex !important;
+  }
+
+  .site[data-radio-docked="true"] [data-radio-navbar-mini="true"] {
+    display: flex;
+  }
+
+  .site[data-radio-docked="true"] .desktopShell {
+    grid-template-columns: minmax(0, 1fr) 0px 0px;
+  }
+
+  .site[data-radio-docked="true"] .radioPanel,
+  .site[data-radio-docked="true"] .resizeHandle,
+  .site[data-radio-dock-motion="restoring"] .radioPanel,
+  .site[data-radio-dock-motion="restoring"] .resizeHandle {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .site[data-radio-dock-motion="docking"] [data-radio-navbar-mini="true"] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .site[data-radio-docked="true"] .radioDockEdge {
+    position: fixed;
+    display: block;
+    top: var(--header-height);
+    right: 0;
+    z-index: calc(var(--layer-nav) + 5);
+    width: 0.9rem;
+    height: calc(100dvh - var(--header-height));
+    padding: 0;
+    border: 0;
+    border-left: 1px solid rgb(82 214 255 / 15%);
+    background: linear-gradient(180deg, rgb(82 214 255 / 23%), rgb(139 109 255 / 17%), transparent);
+    opacity: 0.28;
+    touch-action: none;
+    cursor: ew-resize;
+    transition: opacity 180ms ease;
+  }
+
+  .site[data-radio-docked="true"] .radioDockEdge:hover,
+  .site[data-radio-docked="true"] .radioDockEdge:focus-visible {
+    opacity: 1;
+  }
+
+  .site[data-radio-dock-motion] .desktopShell,
+  .site[data-radio-dock-motion] .siteHeader {
+    transition-duration: 660ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site[data-radio-dock-motion] .desktopShell,
+  .site[data-radio-dock-motion] .siteHeader,
+  .radioDockEdge {
+    transition: none !important;
+  }
+}

@@ -57,21 +57,25 @@ test.describe("03c visual dock preview", () => {
       const dock = document.querySelector('[data-dock-mini="true"]')?.getBoundingClientRect();
       const group = document.querySelector('[role="group"][aria-label="Contato e redes sociais"]')?.getBoundingClientRect();
       const nav = document.querySelector('nav[aria-label="Navegação principal"]')?.getBoundingClientRect();
-      if (!dock || !group || !nav) return null;
+      const brand = document.querySelector('header a[aria-label="CM 3D e Rádio, início"]')?.getBoundingClientRect();
+      if (!dock || !group || !nav || !brand) return null;
       return {
-        miniLeft: dock.left,
-        miniRight: dock.right,
+        brandRight: brand.right,
+        navLeft: nav.left,
         navRight: nav.right,
+        miniLeft: dock.left,
+        miniWidth: dock.width,
+        miniRight: dock.right,
         socialsLeft: group.left,
-        navCenter: nav.left + nav.width / 2,
-        viewportCenter: document.documentElement.clientWidth / 2,
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
       };
     });
     expect(placement).not.toBeNull();
     expect(placement!.miniRight, "The mini must be BEFORE the social icons").toBeLessThan(placement!.socialsLeft);
-    expect(placement!.miniLeft, "Mini-player cannot cover the centered CM navigation").toBeGreaterThanOrEqual(placement!.navRight + 3);
-    expect(Math.abs(placement!.navCenter - placement!.viewportCenter), "Centered navigation must remain centered").toBeLessThan(24);
+    expect(placement!.navLeft - placement!.brandRight, "Dock-only nav should sit near the CM logo").toBeGreaterThanOrEqual(16);
+    expect(placement!.navLeft - placement!.brandRight, "Do not keep nav centered while docked").toBeLessThanOrEqual(52);
+    expect(placement!.miniLeft, "Wide dock must not cover the left-aligned navigation").toBeGreaterThanOrEqual(placement!.navRight + 15);
+    expect(placement!.miniWidth, "Mini-player must use the space released by left-aligning nav").toBeGreaterThan(700);
     expect(placement!.overflow, "No horizontal page scroll from new navbar slot").toBeLessThanOrEqual(1);
     expect(await page.locator("audio").count()).toBe(beforeAudioCount);
     await page.screenshot({ path: testInfo.outputPath("radio-docked-before-socials.png"), animations: "disabled" });
@@ -104,17 +108,19 @@ test.describe("03c visual dock preview", () => {
       const measured = await page.evaluate(() => {
         const mini = document.querySelector('[data-dock-mini="true"]');
         const nav = document.querySelector('nav[aria-label="Navegação principal"]');
+        const brand = document.querySelector('header a[aria-label="CM 3D e Rádio, início"]');
         const group = document.querySelector('[role="group"][aria-label="Contato e redes sociais"]');
         const title = document.querySelector('[data-dock-title="true"]');
         const transport = document.querySelector('[data-dock-mini="true"] [role="group"][aria-label="Controles da Rádio"]');
         const signal = document.querySelector('[data-dock-signal="true"]');
         const restore = document.querySelector('[data-dock-restore="true"]');
-        if (!mini || !nav || !group || !title || !transport || !signal || !restore) return null;
+        if (!mini || !nav || !brand || !group || !title || !transport || !signal || !restore) return null;
         const box = (e: Element) => e.getBoundingClientRect();
         const m = box(mini), n = box(nav), g = box(group);
         return {
-          miniLeft: m.left, miniRight: m.right,
-          navRight: n.right, socialLeft: g.left,
+          miniLeft: m.left, miniRight: m.right, miniWidth: m.width,
+          brandRight: box(brand).right,
+          navLeft: n.left, navRight: n.right, socialLeft: g.left,
           titleOverflowed: title.scrollWidth > title.clientWidth,
           transportLeft: box(transport).left, transportRight: box(transport).right,
           signalLeft: box(signal).left, signalRight: box(signal).right,
@@ -123,7 +129,12 @@ test.describe("03c visual dock preview", () => {
         };
       });
       expect(measured, "Expected actual navigation and controls in CM shell").not.toBeNull();
-      expect(measured!.miniLeft, `CM navigation overlaps dock at ${width}px`).toBeGreaterThan(measured!.navRight + 2);
+      expect(measured!.navLeft - measured!.brandRight, `Navigation too far from logo at ${width}px`).toBeGreaterThanOrEqual(16);
+      expect(measured!.navLeft - measured!.brandRight, `Navigation still centered at ${width}px`).toBeLessThanOrEqual(52);
+      expect(measured!.miniLeft, `CM navigation overlaps dock at ${width}px`).toBeGreaterThan(measured!.navRight + 15);
+      expect(measured!.miniWidth, `The player is still too cramped at ${width}px`).toBeGreaterThan(
+        width === 1180 ? 500 : width === 1440 ? 740 : 830
+      );
       expect(measured!.miniRight, `Social icons overlap dock at ${width}px`).toBeLessThan(measured!.socialLeft);
       expect(measured!.transportRight, `Transport collides with spectrum at ${width}px`).toBeLessThan(measured!.signalLeft);
       expect(measured!.signalRight, `Spectrum collides with restore at ${width}px`).toBeLessThan(measured!.restoreRight);

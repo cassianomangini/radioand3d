@@ -251,6 +251,54 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     await expect(page.locator('[data-radio-navbar-mini="true"]')).toBeHidden();
   });
 
+  test("1180px dock does not overlap socials; resizing across mobile breakpoint resolves to ONE original mini", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Responsive transition on a desktop context");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1180, height: 800 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    const root = page.locator('[data-radio-layout-mode]');
+    const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+    await expect(divider).toBeVisible();
+    await divider.focus();
+    await divider.press("Home");
+    await divider.press("ArrowRight");
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
+    const dock = page.locator('[data-radio-navbar-mini="true"]');
+    await expect(dock).toBeVisible();
+    await expect(dock.getByRole("button", { name: "Próxima faixa" })).toBeVisible();
+
+    const geometry = await page.evaluate(() => {
+      const mini = document.querySelector('[data-radio-navbar-mini="true"]')?.getBoundingClientRect();
+      const nav = document.querySelector('nav[aria-label="Navegação principal"]')?.getBoundingClientRect();
+      const socials = document.querySelector('[role="group"][aria-label="Contato e redes sociais"]')?.getBoundingClientRect();
+      return mini && nav && socials ? {
+        navRight: nav.right,
+        miniLeft: mini.left,
+        miniRight: mini.right,
+        socialLeft: socials.left,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
+      } : null;
+    });
+    expect(geometry).not.toBeNull();
+    expect(geometry!.miniLeft, "Navbar mini cannot cover nav at 1180px").toBeGreaterThan(geometry!.navRight);
+    expect(geometry!.socialLeft, "Social icons cannot be overlaid at 1180px").toBeGreaterThan(geometry!.miniRight);
+    expect(geometry!.overflow).toBeLessThanOrEqual(1);
+    await page.screenshot({ path: testInfo.outputPath("public-dock-1180.png"), animations: "disabled" });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page.getByRole("region", { name: "Mini player da CM Rádio" })).toBeVisible();
+    await expect(dock).toBeHidden();
+    await expect(page.locator('[data-radio-dock-edge="true"]')).toHaveCount(0);
+    await expect(root).not.toHaveAttribute("data-radio-docked", "true");
+    expect(await page.locator("audio").count()).toBeLessThanOrEqual(1);
+    await page.screenshot({ path: testInfo.outputPath("docked-to-mobile-390.png"), animations: "disabled" });
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" })).toBeVisible();
+    await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
+    await expect(dock).toBeHidden();
+  });
+
   test("mobile and narrow desktop retain the existing compact layout", async ({ page }, testInfo) => {
     test.skip(desktop.has(testInfo.project.name), "Test the unchanged smaller-width layout");
     await page.goto("/");

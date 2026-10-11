@@ -45,3 +45,10 @@ test("radio layout state distinguishes free custom width from the split default"
     "split"
   );
 });
+
+test("docked is a real presentation state and fullscreen still wins", () => {
+  const base = { expanded: false, width: 480, defaultWidth: 480 };
+  assert.equal(resolveRadioLayoutMode({ ...base, fullscreen: false, docked: true }), "docked");
+  assert.equal(resolveRadioLayoutMode({ ...base, fullscreen: true, docked: true }), "fullscreen");
+  assert.equal(resolveRadioLayoutMode({ ...base, fullscreen: false, docked: false }), "split");
+});

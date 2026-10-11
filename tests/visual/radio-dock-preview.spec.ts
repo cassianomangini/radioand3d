@@ -169,6 +169,30 @@ test.describe("03c visual dock preview", () => {
     ).toBeLessThanOrEqual(4.5);
   });
 
+  test("next, previous and keyboard restore reuse the actual RadioProvider", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Shared queue and keyboard check on desktop");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(previewRoute, { waitUntil: "domcontentloaded" });
+    const root = page.locator('[data-radio-dock-preview="true"][data-preview-ready="true"]');
+    await expect(root).toBeVisible();
+    await page.locator('[data-dock-demo-toggle="true"]').click();
+    await expect(root).toHaveAttribute("data-dock-phase", "docked");
+    const mini = page.locator('[data-dock-mini="true"]');
+    const title = mini.locator('[data-dock-title="true"]');
+    const originalTitle = await title.innerText();
+
+    await mini.getByRole("button", { name: "Próxima faixa" }).click();
+    await expect(title).not.toHaveText(originalTitle);
+    await mini.getByRole("button", { name: "Faixa anterior" }).click();
+    await expect(title).toHaveText(originalTitle);
+    const restore = mini.getByRole("button", { name: "Restaurar a Rádio lateral" });
+    await restore.focus();
+    await expect(restore).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(root).toHaveAttribute("data-dock-phase", "side");
+    await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
+  });
+
   test("overshoot right docks; pulling right edge left restores", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop-1440", "Gesture proof on representative wide desktop");
     await page.emulateMedia({ reducedMotion: "no-preference" });

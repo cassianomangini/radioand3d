@@ -1,6 +1,6 @@
 # 03c — Dock reversível da Rádio no cabeçalho
 
-**Estado da entrega:** `in_progress` na **correção de composição D4.3**, solicitada após avaliação da V2: links da navbar mais perto do logo e player mais largo. D5 permanece pendente; integração na Rádio pública e QA final ainda não iniciados.  
+**Estado da entrega:** `in_progress` no **gate D5 de revisão visual após correção D4.3**. Cassiano gostou da V2, solicitou aproximar a nav do logo para dar largura ao mini, e a alteração foi validada tecnicamente. Integração na Rádio pública e QA final ainda não iniciados.  
 **Responsável:** CM Experience (contrato); CM Frontend (implementação após aprovação); CM Review (QA/evidências).  
 **Solicitação:** Cassiano, 09/10/2026. Nova capacidade expressamente solicitada; **03b/06 e C1–C8 permanecem aceitas**, com modificação apenas do que esta função exigir.  
 **Contrato visual/comportamental:** [CM Rádio — Dock na navbar V1](../design/CM_RADIO_NAVBAR_DOCK_V1.md).  
@@ -26,7 +26,7 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 - [x] **D4.1 (correção obrigatória)** Mini-player da prévia refeito com capa, etiqueta CM RÁDIO, título/artista, **anterior + play/pause + próxima**, `RadioVisualizer` real de 13 barras e restaurar, usando a mesma fila e áudio. Não foi adotado novo engine de animação ou DJ legado. [Evidência V2](evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md).
 - [x] **D4.2** Capturas reais **1180/1440/1760**, faixa longa com ellipsis, pausa/reprodução (WAV sintético de QA), visualização de barras por Web Audio (não fake), teclado/fila anterior/próxima, vídeo reversível, mobile 390, laptop 1024, reduced-motion e sem colisão horizontal. Corrigida a **legenda enorme/cortada em pleno voo** usando CSS container units. [Run 38137954780 (9 passed / 23 skipped deliberados)](https://github.com/cassianomangini/radioand3d/actions/runs/38137954780) · [relatório visual](evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md). **Revisão estética do agente, não aprovação de Cassiano.**
 
-- [ ] **D4.3** Incorporar feedback visual de 11/10/2026: **deslocar links Início/Estúdio/Rádio para perto do logo somente no modo docked**, e aumentar a largura útil do mini mantendo-o antes dos ícones sociais. Capturar e conferir 1180/1440/1760, sem colisão/título cortado indevidamente; verificar transição/retorno, layout lateral original, áudio e mobile. Marcar somente após CI e revisão real das capturas.
+- [x] **D4.3** Feedback de 11/10 incorporado **somente no modo docked**: nav ao lado do logo, player mais largo antes das redes, header lateral intacto. Capturas reais **1180/1440/1760**, título longo e QA de colisão/overflow; gesto ida/volta, teclado, Web Audio sintético e mobile. [QA 38138854501: 9/9 testes aplicáveis](https://github.com/cassianomangini/radioand3d/actions/runs/38138854501), [CI 38138902620 verde](https://github.com/cassianomangini/radioand3d/actions/runs/38138902620) e [revisão visual do agente](evidence/03c-radio-dock-menu-beside-logo-2026-10-11.md). **Ainda não é aprovação estética por Cassiano.**
 
 - [ ] **D5** Cassiano aprovar a direção da transição e as dimensões do player do topo. Somente então mudar `ready_for_frontend` para `yes` com referência de aprovação verdadeira.
 
@@ -77,9 +77,11 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 
 - **11/10/2026 — ajuste solicitado:** Cassiano gostou da V2 (transportes, barras e caráter do mini), mas considerou **menu central longe do logo**, deixando o player espremido. Nova composição definida: **logo e nav juntos à esquerda em dock → mini mais largo → redes**, mantendo shell lateral original. D4.3 aberta; D5 continua pendente.
 
+- **11/10/2026 — D4.3 validado no navegador:** layout `logo + menu à esquerda | mini largo | redes à direita` em 1180/1440/1760, sem overlap; vídeo/screenshot da subida e retorno revistos. Um teste foi corrigido para consultar `textContent` em vez de `innerText` durante fase ocultada por CSS. [9 testes passaram](https://github.com/cassianomangini/radioand3d/actions/runs/38138854501), [CI verde](https://github.com/cassianomangini/radioand3d/actions/runs/38138902620), [registro detalhado](evidence/03c-radio-dock-menu-beside-logo-2026-10-11.md). Aprovação visual D5 pendente.
+
 ## Retomada
 
-**Último ponto comprovado:** D1–D4.2 — nova prévia V2 fiel ao conteúdo relevante da Landing e identidade atual CM, com **9 testes de browser efetivamente executados sem retries**, prova de áudio sintético *real* no navegador, layout a 1180/1440/1760, teclado e reduced motion. [QA + vídeo + capturas](evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md). CI geral [38137954786](https://github.com/cassianomangini/radioand3d/actions/runs/38137954786) verde (lint, typecheck, testes, build).  
-**Próxima atividade:** **D4.3 — corrigir a posição do menu no dock e dar largura ao mini, validar browser e screenshots**; só depois solicitar D5. Sem aprovação implícita da V2 anterior.  
+**Último ponto comprovado:** D1–D4.3 concluídos no laboratório dev-only. A correção do alinhamento/nav mais próxima ao logo e mini mais largo foi renderizada e inspecionada em 1180/1440/1760, mantendo gesto/áudio/fila e mobile. [Evidência](evidence/03c-radio-dock-menu-beside-logo-2026-10-11.md). [Playwright 38138854501](https://github.com/cassianomangini/radioand3d/actions/runs/38138854501) 9 passaram, 23 skips planejados, sem retry; [CI 38138902620](https://github.com/cassianomangini/radioand3d/actions/runs/38138902620) verde.  
+**Próxima atividade:** **D5 — Cassiano conferir a prévia corrigida do mini e do menu junto ao logo**. Nenhuma implementação pública sem aprovação explícita.  
 **Deploy:** nenhum. **Produção:** inalterada. **Prova musical:** somente fixture WAV sintética de 8s; ainda não prova reprodução R2 real. **Aprovação visual:** não obtida.  
 **Não fazer:** não reabrir Rádio inteira, não instalar outro engine de animação por reflexo, não criar dois áudio players, não trocar o comportamento do link Rádio existente.

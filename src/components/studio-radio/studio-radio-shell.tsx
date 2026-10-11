@@ -1284,13 +1284,19 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     const shell = shellRef.current;
     const shellWidth = shell?.getBoundingClientRect().width;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const wasDocked = dockedRef.current;
 
     clearSignatureStageTimer();
+    if (wasDocked) {
+      cancelDockFlight();
+      dockedRef.current = false;
+    }
 
     if (!fromDrag) {
-      initialRadioWidthRef.current =
-        radioWidth ?? (shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH);
-      initialRadioLayoutModeRef.current = radioLayoutMode;
+      initialRadioWidthRef.current = wasDocked
+        ? dockRestoreWidthRef.current
+        : radioWidth ?? (shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH);
+      initialRadioLayoutModeRef.current = wasDocked ? "docked" : radioLayoutMode;
     }
 
     openedFromDragRef.current = fromDrag;
@@ -1301,6 +1307,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       runRadioMotion("opening", () => {
         clearDragPreview();
         setShowResizeHint(false);
+        setRadioDocked(false);
+        setRadioDockMotion(null);
         setRadioFullscreen(true);
       });
     };
@@ -1310,6 +1318,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       !fromDrag &&
       !radioExpanded &&
       !radioFullscreen &&
+      !wasDocked &&
       shellWidth
     ) {
       customWidthRef.current = false;
@@ -1332,20 +1341,31 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     runRadioMotion("closing", () => {
       clearDragPreview();
       dragFullscreenRef.current = false;
-      customWidthRef.current = returnMode === "custom";
+      customWidthRef.current = returnMode === "custom" || (returnMode === "docked" && dockRestoreModeRef.current === "custom");
+      dockedRef.current = returnMode === "docked";
       setRadioWidth(initialRadioWidthRef.current);
+      setRadioDocked(returnMode === "docked");
+      setRadioDockMotion(null);
       setRadioExpanded(returnMode === "focus");
       setRadioFullscreen(false);
       clearReturnPreview();
     });
     if (restoreFocus) {
       requestAnimationFrame(() => {
-        (openedFromDragRef.current ? resizeHandleRef.current : radioNavRef.current)?.focus();
+        (returnMode === "docked"
+          ? dockMiniRef.current?.querySelector<HTMLButtonElement>('[data-dock-restore="true"]')
+          : openedFromDragRef.current ? resizeHandleRef.current : radioNavRef.current)?.focus();
       });
     }
   }
 
   function restoreInitialRadioLayout() {
+    // Navigation within the Studio does not unexpectedly reopen the sidebar.
+    if (dockedRef.current && !radioFullscreen) return;
+    if (radioFullscreen && initialRadioLayoutModeRef.current === "docked") {
+      closeRadioFullscreen(false);
+      return;
+    }
     clearSignatureStageTimer();
     const shellWidth = shellRef.current?.getBoundingClientRect().width;
     const initialWidth = shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH;
@@ -1447,6 +1467,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     }
 
     const requested = rect.right - event.clientX - dragOffsetRef.current;
+    const dockIntent = getRadioDockIntent(requested, MIN_RADIO_WIDTH);
+    if (dockIntent.ready) shell.dataset.radioDockReady = "true";
+    else delete shell.dataset.radioDockReady;
     const maximum = clampRadioWidth(rect.width, Number.POSITIVE_INFINITY);
     const pointerDistance = event.clientX - rect.left;
     const preview = getRadioDragPreview(rect.width, maximum, requested, pointerDistance, dragStartDistanceRef.current);
@@ -1504,6 +1527,11 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       dragOriginRef.current === "sidebar" &&
       !dragFullscreenRef.current &&
       !dragRestoredRef.current;
+    const shellAtRelease = shellRef.current;
+    const requestedAtRelease = shellAtRelease
+      ? shellAtRelease.getBoundingClientRect().right - event.clientX - dragOffsetRef.current
+      : MIN_RADIO_WIDTH;
+    const shouldDock = shouldSettle && getRadioDockIntent(requestedAtRelease, MIN_RADIO_WIDTH).ready;
 
     pointerActiveRef.current = false;
     setDragging(false);
@@ -1511,6 +1539,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
 
     if (shouldRestore || shouldReturn) {
       closeRadioFullscreen(false);
+    } else if (shouldDock) {
+      runRadioDockTransition(true, initialRadioWidthRef.current, initialRadioLayoutModeRef.current);
     } else if (shouldSettle) {
       const shell = shellRef.current;
       if (shell) {
@@ -1534,6 +1564,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     }
 
     setDividerMagnet(null);
+    if (shellAtRelease) delete shellAtRelease.dataset.radioDockReady;
     previewResetFrameRef.current = requestAnimationFrame(() => {
       clearDragPreview();
       clearReturnPreview();
@@ -1571,9 +1602,14 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
 
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      customWidthRef.current = true;
-      updateRadioWidth((radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width)) - step);
-      setRadioExpanded(false);
+      const width = radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width);
+      if (width <= MIN_RADIO_WIDTH + 1) {
+        runRadioDockTransition(true, width, radioLayoutMode);
+      } else {
+        customWidthRef.current = true;
+        updateRadioWidth(width - step);
+        setRadioExpanded(false);
+      }
     }
 
     if (event.key === "Home") {

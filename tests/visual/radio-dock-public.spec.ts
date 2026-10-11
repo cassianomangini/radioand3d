@@ -180,7 +180,10 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
 
     const sidebar = page.locator('aside[aria-label="CM Rádio"]');
     await expect(sidebar).toBeVisible();
-    const seek = sidebar.getByRole("slider", { name: "Posição da música" });
+    // Query the preserved DOM input directly: once docked, the sidebar is
+    // correctly aria-hidden/inert and getByRole() intentionally excludes it.
+    // Its controlled value still reflects the ONE shared audio position.
+    const seek = sidebar.locator('input[type="range"][aria-label="Posição da música"]');
     await expect(seek).toBeVisible();
     await sidebar.getByRole("button", { name: "Tocar", exact: true }).click();
     await expect.poll(async () => Number(await seek.inputValue()), { timeout: 5000 }).toBeGreaterThan(0.15);

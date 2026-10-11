@@ -64,6 +64,7 @@ export function RadioDockPreview() {
   const dockRef = useRef<HTMLDivElement>(null);
   const flightRef = useRef<HTMLDivElement>(null);
   const activeAnimationRef = useRef<Animation | null>(null);
+  const navAnimationRef = useRef<Animation | null>(null);
   const motionTokenRef = useRef(0);
   const phaseRef = useRef<PreviewPhase>("side");
   const [phase, setPhase] = useState<PreviewPhase>("side");
@@ -99,6 +100,7 @@ export function RadioDockPreview() {
     // source class names as :global(.siteHeader) would not match the DOM.
     const targets = [
       [shellStyles.siteHeader, "data-preview-header"],
+      [shellStyles.desktopNav, "data-preview-nav"],
       [shellStyles.desktopShell, "data-preview-shell"],
       [shellStyles.radioPanel, "data-preview-radio"],
       [shellStyles.resizeHandle, "data-preview-divider"],
@@ -123,6 +125,7 @@ export function RadioDockPreview() {
   useEffect(() => () => {
     motionTokenRef.current += 1;
     activeAnimationRef.current?.cancel();
+    navAnimationRef.current?.cancel();
   }, []);
 
   const transition = useCallback((destination: "docked" | "side") => {
@@ -135,6 +138,9 @@ export function RadioDockPreview() {
 
     const aside = root.querySelector(`.${shellStyles.radioPanel}`);
     if (!(aside instanceof HTMLElement)) return;
+    const nav = root.querySelector(`.${shellStyles.desktopNav}`);
+    navAnimationRef.current?.cancel();
+    const navFrom = nav instanceof HTMLElement ? nav.getBoundingClientRect() : null;
     const from = destination === "docked" ? aside.getBoundingClientRect() : slot.getBoundingClientRect();
     const token = ++motionTokenRef.current;
     activeAnimationRef.current?.cancel();
@@ -149,6 +155,24 @@ export function RadioDockPreview() {
       if (!targetElement) return;
       const to = targetElement.getBoundingClientRect();
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // The new grid puts Início/Estúdio/Rádio alongside the CM logo, instead
+      // of keeping it centered and shrinking the navbar player. FLIP prevents
+      // a visible menu teleport when switching the two header compositions.
+      if (!reduced && navFrom && nav instanceof HTMLElement) {
+        const navTo = nav.getBoundingClientRect();
+        const offsetX = navFrom.left - navTo.left;
+        if (Math.abs(offsetX) > 1) {
+          const navAnimation = nav.animate(
+            [{ transform: `translateX(${offsetX}px)` }, { transform: "translateX(0)" }],
+            { duration: FLIGHT_DURATION_MS, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
+          );
+          navAnimationRef.current = navAnimation;
+          void navAnimation.finished.catch(() => undefined).then(() => {
+            if (navAnimationRef.current === navAnimation) navAnimationRef.current = null;
+          });
+        }
+      }
 
       if (reduced || !from.width || !to.width) {
         flight.style.visibility = "hidden";

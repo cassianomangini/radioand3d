@@ -17,6 +17,7 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 import styles from "./studio-radio-shell.module.css";
+import { RadioNavbarDock } from "./radio-navbar-dock";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
@@ -25,6 +26,7 @@ import {
   createRadioSnapPoints,
   getRadioDragMagnet,
   getRadioDragPreview,
+  getRadioDockIntent,
   getRadioReleaseTarget,
   type RadioSnapKind
 } from "./radio-panel-drag";
@@ -38,6 +40,8 @@ const MIN_RADIO_WIDTH = 400;
 const MAX_RADIO_WIDTH = 1120;
 const MIN_STUDIO_WIDTH = 640;
 const RESIZE_GUTTER = 32;
+const RADIO_DOCK_FLIGHT_MS = 660;
+const RADIO_DOCK_EDGE_RESTORE_PX = 78;
 
 type ViewTransitionLike = {
   finished: Promise<void>;
@@ -302,7 +306,8 @@ function RadioContent({
   trackStepKind,
   onPrevious,
   onNext,
-  onReshuffle
+  onReshuffle,
+  visualizerActive = true
 }: {
   mobile?: boolean;
   focus?: boolean;
@@ -313,6 +318,7 @@ function RadioContent({
   onPrevious?: () => void;
   onNext?: () => void;
   onReshuffle?: () => void;
+  visualizerActive?: boolean;
 }) {
   const radio = useRadio();
   const [query, setQuery] = useState("");
@@ -555,7 +561,7 @@ function RadioContent({
         <button type="button" className={styles.modeButton} data-radio-flip-key="control-favorite" disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
       </div>
 
-      <RadioVisualizer className={styles.visualizer} motionKey="visualizer" />
+      <RadioVisualizer className={styles.visualizer} motionKey="visualizer" active={visualizerActive} />
 
       <div className={styles.queueHeader} data-radio-motion-key="queue-header">
         <h3>Playlist</h3>
@@ -634,6 +640,17 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const shellRef = useRef<HTMLDivElement>(null);
   const radioNavRef = useRef<HTMLAnchorElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
+  const dockMiniRef = useRef<HTMLDivElement>(null);
+  const dockFlightRef = useRef<HTMLDivElement>(null);
+  const dockAnimationRef = useRef<Animation | null>(null);
+  const dockNavAnimationRef = useRef<Animation | null>(null);
+  const dockFlightFrameRef = useRef<number | null>(null);
+  const dockMotionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dockMotionTokenRef = useRef(0);
+  const dockedRef = useRef(false);
+  const dockRestoreWidthRef = useRef(DEFAULT_RADIO_WIDTH);
+  const dockRestoreModeRef = useRef<RadioLayoutMode>("split");
+  const dockEdgeDragRef = useRef<{ pointerId: number; startX: number } | null>(null);
   const mobileDialogRef = useRef<HTMLDialogElement>(null);
   const customWidthRef = useRef(false);
   const dragOffsetRef = useRef(0);
@@ -665,6 +682,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const [showResizeHint, setShowResizeHint] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [radioFullscreen, setRadioFullscreen] = useState(false);
+  const [radioDocked, setRadioDocked] = useState(false);
+  const [radioDockMotion, setRadioDockMotion] = useState<"docking" | "restoring" | null>(null);
   const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
   const [dividerSettling, setDividerSettling] = useState(false);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
@@ -694,11 +713,12 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     () =>
       resolveRadioLayoutMode({
         fullscreen: radioFullscreen,
+        docked: radioDocked,
         expanded: radioExpanded,
         width: radioWidth,
         defaultWidth: shellWidth === null ? null : getDefaultWidth(shellWidth)
       }),
-    [radioExpanded, radioFullscreen, radioWidth, shellWidth]
+    [radioDocked, radioExpanded, radioFullscreen, radioWidth, shellWidth]
   );
 
   useEffect(() => {
@@ -753,6 +773,10 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     const media = window.matchMedia("(max-width: 73.74rem)");
     function leaveDesktop() {
       if (media.matches) {
+        cancelDockFlight();
+        dockedRef.current = false;
+        setRadioDocked(false);
+        setRadioDockMotion(null);
         setRadioFullscreen(false);
         setRadioExpanded(false);
       }
@@ -768,6 +792,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     for (const animation of activeRadioAnimationsRef.current) animation.cancel();
     activeRadioAnimationsRef.current = [];
     if (dividerSettleTimerRef.current !== null) clearTimeout(dividerSettleTimerRef.current);
+    cancelDockFlight();
   }, []);
 
   useEffect(() => {
@@ -781,7 +806,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       setShellWidth(width);
       setDesktopLayout(window.matchMedia("(min-width: 73.75rem)").matches);
       setRadioWidth((current) =>
-        radioExpanded
+        dockedRef.current
+          ? current
+          : radioExpanded
           ? getExpandedWidth(width)
           : customWidthRef.current
             ? clampRadioWidth(width, current ?? getDefaultWidth(width))

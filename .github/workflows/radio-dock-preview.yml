@@ -31,8 +31,8 @@ jobs:
           cache: pnpm
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
-      - name: Lint only the isolated preview and its tests
-        run: pnpm exec eslint src/app/dev/radio-dock tests/visual/radio-dock-preview.spec.ts
+      - name: Lint both the isolated preview and integrated Radio tests
+        run: pnpm exec eslint src/app/dev/radio-dock src/components/studio-radio tests/visual/radio-dock-preview.spec.ts tests/visual/radio-dock-public.spec.ts
       - name: Install Playwright video recorder (ffmpeg)
         run: pnpm exec playwright install ffmpeg
       - name: Launch development-only preview and exercise motion in Chromium

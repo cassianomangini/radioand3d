@@ -25,6 +25,15 @@
   .preview[data-dock-phase="docked"] [data-preview-header],
   .preview[data-dock-phase="docking"] [data-preview-header] {
     right: 0 !important;
+    /* Only while docked: logo + navigation form a left-aligned cluster.
+       The remaining width belongs to the Radio mini and social links. */
+    grid-template-columns: max-content max-content minmax(0, 1fr);
+    column-gap: clamp(1.3rem, 2.2vw, 2.4rem);
+  }
+
+  .preview[data-dock-phase="docked"] [data-preview-nav],
+  .preview[data-dock-phase="docking"] [data-preview-nav] {
+    justify-self: start;
   }
 
   .preview[data-dock-phase="docked"] [data-preview-shell],
@@ -57,9 +66,9 @@
 /* Portalled to the existing social-actions container. Since SocialIcons is a
    private component, the preview positions its small surface just to its left.
    The final implementation must make it a proper sibling in the real header. */
-/* A technically isolated CM adaptation of the legacy Artesopolis MiniPlayer.
-   The real CM navigation retains its centered position; the player expands to
-   the LEFT of the existing social icons, not into an additional navbar row. */
+/* Only the docked desktop state shifts the menu alongside the CM logo.
+   The radio gains more horizontal space immediately BEFORE the social icons;
+   split/focus/fullscreen and mobile keep their existing header grammar. */
 .dockSlot {
   position: absolute;
   right: calc(100% + 0.7rem);
@@ -67,7 +76,7 @@
   z-index: 2;
   display: flex;
   align-items: center;
-  width: clamp(19rem, calc(50vw - 16.5rem), 34rem);
+  width: clamp(25rem, calc(100vw - 40.5rem), 56rem);
   min-width: 0;
   height: 3.625rem;
   gap: clamp(0.23rem, 0.55vw, 0.63rem);

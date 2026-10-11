@@ -191,7 +191,10 @@ test.describe("03c visual dock preview", () => {
     const mini = page.locator('[data-dock-mini="true"]');
     const title = mini.locator('[data-dock-title="true"]');
     await expect(title, "Wait for actual development catalog before queue assertions").toContainText("Amostra técnica");
-    const originalTitle = await title.innerText();
+    // innerText() can temporarily be empty while the dock is CSS-hidden during
+    // reduced-motion hydration, even though the underlying track text exists.
+    const originalTitle = (await title.textContent())?.trim() ?? "";
+    expect(originalTitle).toMatch(/^Amostra técnica \\d{2}$/);
 
     await mini.getByRole("button", { name: "Próxima faixa" }).click();
     await expect(title).not.toHaveText(originalTitle);

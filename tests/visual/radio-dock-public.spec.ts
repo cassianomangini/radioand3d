@@ -70,9 +70,7 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     // The single player/context is shared by both presentations.
     expect(await page.locator("audio").count()).toBe(beforeAudioCount);
     await mini.getByRole("button", { name: "Restaurar a Rádio lateral" }).click();
-    await expect(root).toHaveAttribute("data-radio-docked", "false", { timeout: 4000 }).catch(async () => {
-      await expect(root).not.toHaveAttribute("data-radio-docked", "true");
-    });
+    await expect(root).not.toHaveAttribute("data-radio-docked", "true", { timeout: 4000 });
     await expect(aside).toBeVisible();
     await expect(mini).toBeHidden();
     await expect(divider).toBeVisible();

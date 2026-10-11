@@ -4,6 +4,7 @@ import {
   createRadioSnapPoints,
   getRadioDragMagnet,
   getRadioDragPreview,
+  getRadioDockIntent,
   getRadioReleaseTarget
 } from "../src/components/studio-radio/radio-panel-drag.ts";
 
@@ -66,4 +67,18 @@ test("a deliberate flick advances to the next snap point in the drag direction",
     width: 480,
     snap: "balanced"
   });
+});
+
+test("rightward overshoot docks only after an intentional extra 96px", () => {
+  assert.deepEqual(getRadioDockIntent(400, 400), { overshoot: 0, ready: false });
+  assert.deepEqual(getRadioDockIntent(330, 400), { overshoot: 70, ready: false });
+  assert.deepEqual(getRadioDockIntent(304, 400), { overshoot: 96, ready: true });
+  assert.deepEqual(getRadioDockIntent(250, 400), { overshoot: 150, ready: true });
+  assert.deepEqual(getRadioDockIntent(Number.NaN, 400), { overshoot: NaN, ready: false });
+});
+
+test("compact snap remains a sidebar width and not an implicit dock", () => {
+  const points = createRadioSnapPoints(400, 480, 690);
+  assert.deepEqual(getRadioReleaseTarget(400, 0, points), { width: 400, snap: "compact" });
+  assert.equal(getRadioDockIntent(400, 400).ready, false);
 });

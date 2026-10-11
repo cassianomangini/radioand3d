@@ -5,6 +5,16 @@
 **Gate:** comportamento indicado pelo usuário; **posição do dock no cabeçalho confirmada por Cassiano: imediatamente ANTES do grupo de ícones sociais, à direita da navegação principal; acabamento e animação ainda não aprovados em mock/render**. `ready_for_frontend: no` até revisão da prévia do movimento. `visual_approved_by: null`. `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`.  
 **Checklist:** [03c — Dock da Rádio](../work/03c-radio-navbar-dock.md).
 
+## Ajuste de composição solicitado em 11/10/2026 — menu mais perto da marca
+
+Cassiano **gostou da V2** (mini com controles, identidade e visualizador), mas **não aprovou a posição dos links `Início / Estúdio / Rádio`**, porque a navegação central consumia largura útil do mini-player. **Decisão revisada e vigente somente no estado desktop `docked`:**
+
+**`[LOGO CM] [Início · Estúdio · Rádio] — [mini-player MAIS LARGO] [redes sociais]`**
+
+A navegação entra no agrupamento à esquerda, com uma separação curta e intencional após o logotipo. O mini ocupa o espaço realmente liberado, mantendo capa, faixa, anterior/play/próxima, 13 barras e restaurar. As redes sociais permanecem à extrema direita, sem desaparecer. **No estado lateral, o header original permanece exatamente como foi aceito**; não redesenhar navegação global nem mobile.
+
+Este feedback **substitui** as orientações anteriores que exigiam nav geometricamente centralizada no modo `docked`. Continua pendente aprovação visual da composição ajustada; nenhum trecho do histórico da Landing prova que o menu do site CM deva ficar centralizado. A prévia isolada realiza esse ajuste sem publicar alterações de produção.
+
 ## Atualização técnica — V2 avaliada no navegador (11/10/2026)
 
 As tarefas **D4.1/D4.2** foram concluídas **somente na prévia de desenvolvimento** `/dev/radio-dock` depois da comparação aprofundada com a Landing: capa, marca/faixa, anterior/play/próxima, 13 barras reais alimentadas por `RadioVisualizer`, restaurar e posição **antes das redes sociais**. [Evidências, screenshots e falhas corrigidas](../work/evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md). [Browser 38137954780](https://github.com/cassianomangini/radioand3d/actions/runs/38137954780): 9 testes passaram. [CI 38137954786](https://github.com/cassianomangini/radioand3d/actions/runs/38137954786): lint/typecheck/testes/build passaram. Verificação de onda ativa usou WAV sintético de desenvolvimento; **não afirma teste R2 em produção**.
@@ -45,7 +55,7 @@ A Rádio **não desaparece abruptamente**. Ela parece fisicamente ser recolhida 
                                              ↑ borda direita arrastável
 ```
 
-Esquema funcional, **não mock final**. A ordem da navbar em dock é **logo à esquerda | navegação centrada | player compacto | grupo de redes sociais à extrema direita**. **As redes sociais não desaparecem para abrir espaço para o mini player.** O header deve permanecer equilibrado; não cortar a marca nem empurrar a navegação para fora da tela.
+Esquema funcional, **não mock final**. A ordem da navbar em dock é **logo e navegação juntos à esquerda | player compacto mais largo | redes sociais à extrema direita**. **As redes sociais não desaparecem para abrir espaço para o mini player.** O header deve permanecer equilibrado; não cortar a marca nem empurrar a navegação para fora da tela.
 
 ### Revisão aprofundada da referência: Artesópolis Landing (`master`, 09/10/2026)
 
@@ -53,7 +63,7 @@ A leitura anterior de `navbar.tsx` e `mini-player.tsx` reduziu o legado à **ord
 
 | Característica comprovada na Landing | Implicação correta para o CM |
 | --- | --- |
-| Navbar desktop em grid `1fr auto 1fr`: logo/menu na esquerda, **MiniPlayer central com largura útil alta**, quatro ícones sociais à direita | No CM a nav Início/Estúdio/Rádio continua central, mas o **player antes dos sociais precisa ter escala e presença proporcionais**, não virar um retângulo quase vazio |
+| Navbar desktop em grid `1fr auto 1fr`: logo/menu na esquerda, **MiniPlayer central com largura útil alta**, quatro ícones sociais à direita | No CM, **somente no modo docked**, a navegação se aproxima do logo à esquerda, abrindo espaço para o mini manter escala e presença proporcionais antes dos sociais |
 | Player com **capa grande à esquerda**, assinatura `RADIO ARTESÓPOLIS` e **nome da faixa** | Usar capa da faixa/arte CM existente, **CM RÁDIO** e título real, com boa leitura e hierarquia |
 | **Anterior, play/pause, próxima** em `ControlButton`, com controles destacados | **Três transportes essenciais** na versão dock, não somente um play/pause; restaurar lateral em controle separado |
 | **`VISUAL_BAR_COUNT` barras reativas**, registradas no `PlayerProvider` via `setBarRef` | **Visualizer pequeno e REAL**, aproveitando `RadioVisualizer` / sidecars do CM, em vez de omitir toda identidade sonora ou inventar barras em loop |
@@ -74,7 +84,7 @@ Cassiano esclareceu em 09/10/2026 que o mini player deve ficar **antes dos botõ
 
 - `cassianomangini/artesopolis-landing/src/components/navbar.tsx` (`master`): no desktop, a navbar organizava **marca/menu | MiniPlayer | SocialIcons** em três áreas do grid, com o player no centro e os ícones na última área à direita.
 - `cassianomangini/artesopolis-landing/src/components/mini-player.tsx`: o player mostrava arte, faixa, controles e um visualizador ativo por um contexto único de áudio.
-- **Distinção deliberada:** no novo CM, a navegação principal `Início / Estúdio / Rádio` **permanece centralizada** e o player passa a integrar o **grupo de ações à direita**, imediatamente **antes dos ícones sociais**, não na coluna central. Não importar o estilo neon, o astronauta, os arquivos do player ou sua antiga arquitetura; apenas usar a relação espacial/comportamental como referência.
+- **Distinção revisada em 11/10/2026:** no novo CM, em **modo docked** a navegação principal `Início / Estúdio / Rádio` fica **ao lado do logo**, não centralizada. O mini mais largo permanece imediatamente **antes dos ícones sociais**. Em modo lateral, a navegação existente continua intacta. Não importar o estilo neon, o astronauta, os arquivos do player ou sua antiga arquitetura; apenas usar a relação espacial/comportamental como referência.
 
 **Decisão confirmada:** posição relativa `dock → redes sociais` aprovada pela indicação direta de Cassiano. **Pendente:** dimensões, conteúdo de controle e percepção visual da transformação, que continuam sujeitos a preview.
 
@@ -135,7 +145,7 @@ Preservar o padrão do mini mobile como referência de **informações** e contr
 - Demonstrar com vídeo/capturas do browser os estados **lateral → puxando à direita → dock no topo → botão de retorno → lateral** e **dock → puxar da borda à esquerda → lateral**.
 - Cobrir início/cancelamento/reversão no meio da animação; drag pequeno não aciona modo sem intenção; overshoot à esquerda para fullscreen continua funcionando.
 - Verificar que playback, tempo, faixa, playlist, shuffle/repeat e seek não reiniciam; **um único áudio** persiste enquanto o dock, header, rota e fullscreen mudam.
-- Confirmar que a nav continua legível e centrada em 1440, 1180, 1024 (sem dock abaixo do breakpoint real), desktop baixo; text overflow e zoom 200%; foco de teclado nunca vai para o painel oculto. No dock, conferir explicitamente a ordem **logo | nav central | mini player | ícones sociais**, nenhum ícone escondido, nenhuma sobreposição e player truncando título antes de roubar espaço do menu.
+- Confirmar que **somente no modo docked** a navegação fica próxima ao logo, abrindo espaço mensurável para o mini. Conferir ordem **logo → nav à esquerda → mini mais largo → ícones sociais** em 1180, 1440 e 1760, sem colisão ou scroll horizontal; 1024/mobile mantêm a composição original. Testar título longo, zoom 200%, foco de teclado e painel oculto fora da ordem de tabulação.
 - Contrastar modo desktop `docked` com mobile 390/360, reduced motion e entrada/saída em resize. Sem layout shift ou scroll horizontal por reaparecimento do painel.
 - Não declarar o efeito pronto só porque CSS animou a largura; a percepção espacial de **subir para navbar** e sua reversão precisam ser revisadas com Cassiano.
 

@@ -347,6 +347,7 @@
   pointer-events: none;
   isolation: isolate;
   overflow: hidden;
+  container: radio-flight / size;
   border: 1px solid rgb(82 214 255 / 48%);
   background: #03050a;
   box-shadow: 0 1.25rem 3.5rem rgb(6 48 106 / 33%), 0 0 0 1px rgb(139 109 255 / 15%);
@@ -365,27 +366,31 @@
   background: linear-gradient(180deg, rgb(2 3 5 / 17%), rgb(3 5 10 / 18%) 40%, rgb(3 5 10 / 94%) 100%);
 }
 
+/* As the surface shrinks toward the 58px navbar slot, typography must
+   shrink WITH the same surface, not keep its full-sidebar font size.
+   cqh reacts to the WAAPI-animated height and prevents clipped flight text. */
 .flightCaption {
   position: absolute;
   z-index: 1;
-  bottom: 1rem;
-  left: 1.2rem;
-  right: 1rem;
+  bottom: clamp(0.3rem, 2cqh, 0.9rem);
+  left: clamp(0.55rem, 3cqw, 1.2rem);
+  right: clamp(0.45rem, 2cqw, 1rem);
   display: grid;
-  gap: 0.24rem;
+  gap: clamp(0rem, 0.5cqh, 0.24rem);
   white-space: nowrap;
 }
 
 .flightCaption strong {
   overflow: hidden;
-  font-size: clamp(0.8rem, 2vw, 1.25rem);
-  line-height: 1.15;
+  font-size: clamp(0.62rem, 3.1cqh, 1.05rem);
+  line-height: 1.14;
   text-overflow: ellipsis;
 }
 
 .flightCaption small {
   color: var(--text-secondary);
-  font-size: 0.72rem;
+  font-size: clamp(0.5rem, 2.2cqh, 0.7rem);
+  line-height: 1.12;
   overflow: hidden;
   text-overflow: ellipsis;
 }

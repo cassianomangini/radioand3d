@@ -5,6 +5,12 @@
 **Gate:** comportamento indicado pelo usuário; **posição do dock no cabeçalho confirmada por Cassiano: imediatamente ANTES do grupo de ícones sociais, à direita da navegação principal; acabamento e animação ainda não aprovados em mock/render**. `ready_for_frontend: no` até revisão da prévia do movimento. `visual_approved_by: null`. `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`.  
 **Checklist:** [03c — Dock da Rádio](../work/03c-radio-navbar-dock.md).
 
+## Atualização técnica — V2 avaliada no navegador (11/10/2026)
+
+As tarefas **D4.1/D4.2** foram concluídas **somente na prévia de desenvolvimento** `/dev/radio-dock` depois da comparação aprofundada com a Landing: capa, marca/faixa, anterior/play/próxima, 13 barras reais alimentadas por `RadioVisualizer`, restaurar e posição **antes das redes sociais**. [Evidências, screenshots e falhas corrigidas](../work/evidence/03c-radio-dock-legacy-informed-v2-2026-10-11.md). [Browser 38137954780](https://github.com/cassianomangini/radioand3d/actions/runs/38137954780): 9 testes passaram. [CI 38137954786](https://github.com/cassianomangini/radioand3d/actions/runs/38137954786): lint/typecheck/testes/build passaram. Verificação de onda ativa usou WAV sintético de desenvolvimento; **não afirma teste R2 em produção**.
+
+A revisão visual do agente detectou clipping de texto durante compressão/voo e corrigiu-o usando tipografia proporcional à altura da superfície animada (`cqh`). **A aprovação visual por Cassiano não foi obtida**, e o protótipo não integra o estado `docked` ao shell público. Manter `ready_for_frontend: no`, `visual_approved_by: null` até o gate D5. As seções de diagnóstico e críticas à **V1** abaixo ficam como histórico, não descrevem a V2 atual.
+
 ## 1. Princípio de interação
 
 O produto passa a ter um novo estado de apresentação da Rádio no desktop: **`docked`**. Ele é mutuamente exclusivo com `split`, `custom`, `focus` e `fullscreen`, sem interferir na reprodução.

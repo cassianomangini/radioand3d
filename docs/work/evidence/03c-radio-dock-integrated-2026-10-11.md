@@ -34,10 +34,18 @@
 
 **Conclusão técnica do escopo autorizado:** I1–I6 implementados e verificados em navegador com amostras técnicas. **O projeto ainda não tem aceite de composição/centralização final (D5 e Q6).** O teste com acervo R2 real e casos de 1180/360/zoom e falhas de mídia permanecem no gate QA complementar.
 
+## QA responsiva final da etapa funcional
+
+**[Playwright 38141001848](https://github.com/cassianomangini/radioand3d/actions/runs/38141001848): 12 testes aplicáveis passaram, 32 skips planejados, sem retries**, incluindo mais um teste exclusivo da integração `1180px → 390px → 1440px`. [Screenshots de dock 1180, mobile 390 e vídeo](https://github.com/cassianomangini/radioand3d/actions/runs/38141001848/artifacts/11703211996). O teste verifica que, **a 1180**, nav, mini e redes não colidem nem provocam overflow; ao cruzar para **390**, volta a existir apenas o mini mobile original, o dock/edge desaparecem e o contexto de áudio não é duplicado; no retorno a **1440**, a Rádio lateral original fica novamente operável.
+
+**[CI geral 38141001879](https://github.com/cassianomangini/radioand3d/actions/runs/38141001879): lint, TypeScript, testes e build verdes** no mesmo código da entrega funcional e dos testes novos.
+
+**Critério Q2:** cumprido tecnicamente para 1180/1440/1760, mudanças de rota, fullscreen, ida/volta, cancelamento e reversão durante animação, sem colisão funcional. **Essa validação NÃO significa aprovação óptica:** o espaçamento entre menu, mini e redes continua errado segundo Cassiano e será ajustado quando ele pedir (D5/Q6).
+
 ## Pendências / gate honesto
 
 - **D5 (obrigatória):** acertar alinhamento/centralização espacial do mini **entre o fim do menu Início/Estúdio/Rádio e o começo dos botões sociais**, mesmo em larguras intermediárias. Pedido para deixar para depois; não fazer ajuste cosmético arbitrário agora.
-- **Q complementar:** interrupção/cancelamento e continuidade de áudio sintético estão comprovados acima. Ainda testar acervo real R2/sidecar, resize desktop↔mobile durante dock, 1180/360/zoom e mídia ausente/erro/buffering, além da avaliação estética D5.
+- **Q complementar:** interrupção/cancelamento, continuidade de áudio WAV e resize desktop↔mobile/1180 estão comprovados acima. Ainda testar acervo real R2/sidecar, 360/zoom e mídia ausente/erro/buffering, além da avaliação estética D5.
 - **Q6:** aceite visual final por Cassiano não foi dado; sem marcar entrega completa. **Sem deploy autorizado nesta etapa.**
 
 **Fonte de verdade dos próximos passos:** [03c checklist](../03c-radio-navbar-dock.md), [contrato visual](../../design/CM_RADIO_NAVBAR_DOCK_V1.md).

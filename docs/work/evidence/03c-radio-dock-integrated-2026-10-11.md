@@ -22,10 +22,22 @@
 
 **Cenários automáticos confirmados:** overshoot 1440/1760, dock e retorno por botão, mesmo áudio/estado global, navegação `/`→`/studio` com `docked` persistente, fullscreen a partir de dock e retorno, teclado e arraste da borda direita, reduced motion, ausência de segundo mini em 1024 e 390, sem overflow detectado. **Prova de continuidade do áudio com música R2 real ainda pendente.** A CI emprega amostras WAV sintéticas de desenvolvimento, não o catálogo privado completo.
 
+## QA complementar concluída (11/10/2026)
+
+**[Execução 38140803545 — 11 testes Playwright passaram, 29 skips deliberados](https://github.com/cassianomangini/radioand3d/actions/runs/38140803545)**, zero retries; [artefato com vídeo, screenshots e traces](https://github.com/cassianomangini/radioand3d/actions/runs/38140803545/artifacts/11702562521). Foram adicionadas provas diretamente na **Home/Estúdio integrados**, não somente na rota de protótipo:
+
+- Arraste curto para a direita **não** faz dock; cancelamento de gesto com `pointercancel` não comita dock ou resize.
+- **Interrupção do voo:** começar a recolher a Rádio e restaurá-la imediatamente pela borda antes do fim da WAAPI não deixa overlay fantasma; sidebar/divisor tornam a ficar visíveis.
+- **Reprodução WAV real no navegador:** tocar o áudio de desenvolvimento, confirmar avanço de `position`, recolher para a navbar sem pausar, confirmar `playing` e que a posição prossegue mesmo com painel lateral `aria-hidden`/`inert`; as **13 barras** reagem à análise do sinal. Navegar para `/studio` mantém mini/estado e permite pausar.
+- Correção genuína de QA: um teste tentou localizar o input de posição por `getByRole('slider')` após a sidebar ficar `aria-hidden` e recebeu timeout — **comportamento de acessibilidade correto**. O teste foi ajustado para ler o `input` DOM retido, sem remover `inert`. Após a correção, a suíte fechou verde.
+- Lint/typecheck/unit/build já estavam verdes na [CI geral 38140689340](https://github.com/cassianomangini/radioand3d/actions/runs/38140689340) com o mesmo código funcional. Nenhum vídeo ou teste sintético equivale à homologação de uma música R2 real.
+
+**Conclusão técnica do escopo autorizado:** I1–I6 implementados e verificados em navegador com amostras técnicas. **O projeto ainda não tem aceite de composição/centralização final (D5 e Q6).** O teste com acervo R2 real e casos de 1180/360/zoom e falhas de mídia permanecem no gate QA complementar.
+
 ## Pendências / gate honesto
 
 - **D5 (obrigatória):** acertar alinhamento/centralização espacial do mini **entre o fim do menu Início/Estúdio/Rádio e o começo dos botões sociais**, mesmo em larguras intermediárias. Pedido para deixar para depois; não fazer ajuste cosmético arbitrário agora.
-- **I5/I6 e Q:** reforçar prova de interrupção/cancelamento do gesto e reprodução real contínua na rota com fixture; testar rotas internas, resize de desktop↔mobile durante dock, faixa longa, playback real R2 e retorno em fullscreen. Testes E2E adicionais foram acrescentados; somente registrar como aprovados após conclusão efetiva de novo run.
+- **Q complementar:** interrupção/cancelamento e continuidade de áudio sintético estão comprovados acima. Ainda testar acervo real R2/sidecar, resize desktop↔mobile durante dock, 1180/360/zoom e mídia ausente/erro/buffering, além da avaliação estética D5.
 - **Q6:** aceite visual final por Cassiano não foi dado; sem marcar entrega completa. **Sem deploy autorizado nesta etapa.**
 
 **Fonte de verdade dos próximos passos:** [03c checklist](../03c-radio-navbar-dock.md), [contrato visual](../../design/CM_RADIO_NAVBAR_DOCK_V1.md).

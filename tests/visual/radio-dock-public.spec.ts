@@ -141,6 +141,110 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     await expect(page.locator('[data-radio-dock-flight="true"]')).toBeHidden();
   });
 
+  test("short or cancelled rightward drag must not dock the sidebar", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Cancellation QA on representative desktop");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    const shell = page.locator('[data-radio-layout-mode]');
+    const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+    await expect(divider).toBeVisible();
+    const box = await divider.boundingBox();
+    expect(box).not.toBeNull();
+    const x = box!.x + box!.width / 2;
+    const y = box!.y + 190;
+
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 60, y, { steps: 10 });
+    await page.mouse.up();
+    await expect(shell).not.toHaveAttribute("data-radio-docked", "true");
+    await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
+
+    // Pointer cancellation is NOT a resize commitment or a dock.
+    const next = await divider.boundingBox();
+    expect(next).not.toBeNull();
+    await divider.evaluate((node) => node.dispatchEvent(
+      new PointerEvent("pointercancel", { bubbles: true, pointerId: 333, pointerType: "mouse", clientX: 0 })
+    ));
+    await expect(shell).not.toHaveAttribute("data-radio-docked", "true");
+    await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
+  });
+
+  test("real development audio continues through dock and Studio route, and spectrum is truthful", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Playback continuity on representative desktop");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const sidebar = page.locator('aside[aria-label="CM Rádio"]');
+    await expect(sidebar).toBeVisible();
+    const seek = sidebar.getByRole("slider", { name: "Posição da música" });
+    await expect(seek).toBeVisible();
+    await sidebar.getByRole("button", { name: "Tocar", exact: true }).click();
+    await expect.poll(async () => Number(await seek.inputValue()), { timeout: 5000 }).toBeGreaterThan(0.15);
+    const positionBefore = Number(await seek.inputValue());
+
+    const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+    await divider.focus();
+    await divider.press("Home");
+    await divider.press("ArrowRight");
+    const dock = page.locator('[data-radio-navbar-mini="true"]');
+    await expect(dock).toBeVisible();
+    await expect(dock).toHaveAttribute("data-playback-state", "playing");
+    await expect(dock.getByRole("button", { name: "Pausar CM Rádio" })).toBeVisible();
+
+    await expect.poll(async () => Number(await seek.inputValue()), { timeout: 4000 }).toBeGreaterThan(positionBefore + 0.2);
+
+    const bars = dock.locator('[data-dock-signal="true"] [role="img"] > span');
+    await expect(bars).toHaveCount(13);
+    await expect.poll(async () => bars.evaluateAll((nodes) =>
+      Math.max(...nodes.map((node) => Number.parseFloat((node as HTMLElement).style.height || "4")))
+    ), { timeout: 3800, intervals: [100, 160, 210] }).toBeGreaterThan(4.5);
+
+    const trackTitle = await dock.locator('[data-dock-title="true"]').textContent();
+    await page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link", { name: "Estúdio" }).click();
+    await expect(page).toHaveURL(/\\/studio$/);
+    await expect(page.locator('[data-radio-navbar-mini="true"]')).toBeVisible();
+    await expect(dock.locator('[data-dock-title="true"]')).toHaveText(trackTitle ?? "");
+    await expect(dock).toHaveAttribute("data-playback-state", "playing");
+
+    await dock.getByRole("button", { name: "Pausar CM Rádio" }).click();
+    await expect(dock).toHaveAttribute("data-playback-state", "paused");
+  });
+
+  test("opening and returning while the dock is still flying never strands the sidebar", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Interrupted-flight resilience");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+    const root = page.locator('[data-radio-layout-mode]');
+    await expect(divider).toBeVisible();
+    const b = await divider.boundingBox();
+    expect(b).not.toBeNull();
+    const x = b!.x + b!.width / 2;
+    const y = b!.y + 180;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 265, y, { steps: 16 });
+    await page.mouse.up();
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
+    const edge = page.locator('[data-radio-dock-edge="true"]');
+    await expect(edge).toBeVisible();
+    const e = await edge.boundingBox();
+    expect(e).not.toBeNull();
+    const edgeX = e!.x + e!.width / 2;
+    const edgeY = e!.y + 220;
+    await page.mouse.move(edgeX, edgeY);
+    await page.mouse.down();
+    await page.mouse.move(edgeX - 140, edgeY, { steps: 8 });
+    await page.mouse.up();
+
+    await expect(root).not.toHaveAttribute("data-radio-docked", "true");
+    await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
+    await expect(page.locator('[data-radio-dock-flight="true"]')).toBeHidden({ timeout: 3500 });
+    await expect(divider).toBeVisible();
+    await expect(page.locator('[data-radio-navbar-mini="true"]')).toBeHidden();
+  });
+
   test("mobile and narrow desktop retain the existing compact layout", async ({ page }, testInfo) => {
     test.skip(desktop.has(testInfo.project.name), "Test the unchanged smaller-width layout");
     await page.goto("/");

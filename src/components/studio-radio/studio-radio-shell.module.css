@@ -4394,6 +4394,11 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transition: opacity 180ms ease;
   }
 
+  .desktopShell[data-radio-dock-ready="true"] .resizeHandle {
+    filter: saturate(1.3) brightness(1.16);
+    box-shadow: -0.3rem 0 1.3rem rgb(82 214 255 / 34%);
+  }
+
   .site[data-radio-docked="true"] .radioDockEdge:hover,
   .site[data-radio-docked="true"] .radioDockEdge:focus-visible {
     opacity: 1;

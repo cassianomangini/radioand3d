@@ -1127,6 +1127,155 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     motionResetTimerRef.current = setTimeout(clearMotionState, totalDuration + 80);
   }
 
+  function cancelDockFlight() {
+    ++dockMotionTokenRef.current;
+    if (dockFlightFrameRef.current !== null) {
+      cancelAnimationFrame(dockFlightFrameRef.current);
+      dockFlightFrameRef.current = null;
+    }
+    if (dockMotionTimerRef.current !== null) {
+      clearTimeout(dockMotionTimerRef.current);
+      dockMotionTimerRef.current = null;
+    }
+    dockAnimationRef.current?.cancel();
+    dockNavAnimationRef.current?.cancel();
+    dockAnimationRef.current = null;
+    dockNavAnimationRef.current = null;
+    if (dockFlightRef.current) {
+      dockFlightRef.current.style.display = "none";
+      dockFlightRef.current.style.visibility = "hidden";
+    }
+  }
+
+  /** The only owner of the sidebar-to-navbar transformation.
+   * Measure the existing surface before updating React, then fly a single
+   * artwork surface to its target while the real Studio and header reflow.
+   * React never remounts the player provider or fabricates audio.
+   */
+  function runRadioDockTransition(nextDocked: boolean, restoreWidth?: number, restoreMode?: RadioLayoutMode) {
+    const shell = shellRef.current;
+    const mini = dockMiniRef.current;
+    const flight = dockFlightRef.current;
+    const panel = shell?.querySelector<HTMLElement>("#radio");
+    if (!shell || !mini || !flight || !panel) return;
+    if (!window.matchMedia("(min-width: 73.75rem)").matches || radioFullscreen) return;
+    if (dockedRef.current === nextDocked && dockAnimationRef.current === null) return;
+
+    const header = shell.closest(`.${styles.site}`)?.querySelector<HTMLElement>(`.${styles.siteHeader}`);
+    const nav = header?.querySelector<HTMLElement>(`.${styles.desktopNav}`);
+    const navFrom = nav?.getBoundingClientRect() ?? null;
+    const currentlyFlying = flight.style.display === "block" && dockAnimationRef.current !== null;
+    const from = currentlyFlying
+      ? flight.getBoundingClientRect()
+      : (nextDocked ? panel : mini).getBoundingClientRect();
+
+    if (nextDocked && !dockedRef.current) {
+      dockRestoreWidthRef.current = restoreWidth ?? radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width);
+      dockRestoreModeRef.current = restoreMode && restoreMode !== "docked" && restoreMode !== "fullscreen"
+        ? restoreMode
+        : radioLayoutMode === "docked" || radioLayoutMode === "fullscreen" ? "split" : radioLayoutMode;
+    }
+
+    cancelDockFlight();
+    const token = dockMotionTokenRef.current;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    dockedRef.current = nextDocked;
+
+    flushSync(() => {
+      setRadioDocked(nextDocked);
+      setRadioDockMotion(reduce ? null : nextDocked ? "docking" : "restoring");
+      if (nextDocked) {
+        setRadioFullscreen(false);
+        setRadioExpanded(false);
+        setShowResizeHint(false);
+      } else {
+        const width = clampRadioWidth(shell.getBoundingClientRect().width, dockRestoreWidthRef.current);
+        customWidthRef.current = dockRestoreModeRef.current === "custom";
+        setRadioWidth(width);
+        setRadioExpanded(dockRestoreModeRef.current === "focus");
+      }
+    });
+
+    if (reduce) {
+      if (!nextDocked) requestAnimationFrame(() => resizeHandleRef.current?.focus());
+      return;
+    }
+
+    const complete = () => {
+      if (dockMotionTokenRef.current !== token) return;
+      if (dockMotionTimerRef.current !== null) {
+        clearTimeout(dockMotionTimerRef.current);
+        dockMotionTimerRef.current = null;
+      }
+      dockAnimationRef.current?.cancel();
+      dockNavAnimationRef.current?.cancel();
+      dockAnimationRef.current = null;
+      dockNavAnimationRef.current = null;
+      flight.style.display = "none";
+      flight.style.visibility = "hidden";
+      setRadioDockMotion(null);
+      if (!nextDocked) requestAnimationFrame(() => resizeHandleRef.current?.focus());
+    };
+
+    // Two frames allow a CSS grid transition to establish the destination
+    // without reading an outdated dock position from the previous layout.
+    dockFlightFrameRef.current = requestAnimationFrame(() => {
+      dockFlightFrameRef.current = requestAnimationFrame(() => {
+        dockFlightFrameRef.current = null;
+        if (dockMotionTokenRef.current !== token) return;
+        const destination = (nextDocked ? mini : panel).getBoundingClientRect();
+        if (!destination.width || !destination.height || !from.width || !from.height) {
+          complete();
+          return;
+        }
+
+        if (nav && navFrom) {
+          const navTo = nav.getBoundingClientRect();
+          const dx = navFrom.left - navTo.left;
+          if (Math.abs(dx) > 1) {
+            const navAnimation = nav.animate(
+              [{ transform: `translateX(${dx}px)` }, { transform: "translateX(0)" }],
+              { duration: RADIO_DOCK_FLIGHT_MS, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
+            );
+            dockNavAnimationRef.current = navAnimation;
+            void navAnimation.finished.catch(() => undefined);
+          }
+        }
+
+        const rightRemaining = nextDocked && header
+          ? Math.max(0, window.innerWidth - header.getBoundingClientRect().right)
+          : 0;
+        flight.style.display = "block";
+        flight.style.visibility = "visible";
+        const animation = flight.animate([
+          {
+            left: `${from.left}px`,
+            top: `${from.top}px`,
+            width: `${from.width}px`,
+            height: `${from.height}px`,
+            borderRadius: nextDocked ? "0px" : "12px",
+            opacity: 0.98
+          },
+          {
+            left: `${destination.left + rightRemaining}px`,
+            top: `${destination.top}px`,
+            width: `${destination.width}px`,
+            height: `${destination.height}px`,
+            borderRadius: nextDocked ? "12px" : "0px",
+            opacity: 0.96
+          }
+        ], {
+          duration: RADIO_DOCK_FLIGHT_MS,
+          easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+          fill: "forwards"
+        });
+        dockAnimationRef.current = animation;
+        void animation.finished.then(complete).catch(() => undefined);
+        dockMotionTimerRef.current = setTimeout(complete, RADIO_DOCK_FLIGHT_MS + 150);
+      });
+    });
+  }
+
   function openRadioFullscreen(fromDrag: boolean) {
     if (!fromDrag && (radioFullscreen || signatureStageTimerRef.current !== null)) {
       return;

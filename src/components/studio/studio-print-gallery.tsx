@@ -37,7 +37,8 @@ export function StudioPrintGallery() {
     const project = projects.findIndex((entry) => entry.media.some((media) => media.id === id));
     if (project === -1) return;
     const media = projects[project].media.findIndex((entry) => entry.id === id);
-    setSelection({ project, media });
+    const frame = window.requestAnimationFrame(() => setSelection({ project, media }));
+    return () => window.cancelAnimationFrame(frame);
   }, [projects]);
 
   useEffect(() => {
@@ -142,7 +143,6 @@ export function StudioPrintGallery() {
                 />
               ) : (
                 // Muted preview: sound from a project video must not start over the Radio.
-                // eslint-disable-next-line jsx-a11y/media-has-caption
                 <video key={currentMedia.src} controls muted playsInline preload="metadata">
                   <source src={currentMedia.src} type={currentMedia.src.endsWith(".webm") ? "video/webm" : "video/mp4"} />
                 </video>

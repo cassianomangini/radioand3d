@@ -108,7 +108,6 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
             />
           ) : (
             // The preview is muted/decorative. The gallery controls the original video.
-            // eslint-disable-next-line jsx-a11y/media-has-caption
             <video
               key={current.src}
               ref={videoRef}

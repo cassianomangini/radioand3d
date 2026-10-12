@@ -131,7 +131,7 @@ if (candidates) {
       id, project, kind, src, title, alt
     }));
     await writeFile(manifestPath, JSON.stringify({ items }, null, 2) + "\n");
-    console.log(`Importados ${items.length} arquivos de ${source}.`);
-    console.log("Confira a apresentação antes de publicar: títulos e enquadramentos vêm dos nomes dos arquivos.");
+    console.warn(`Importados ${items.length} arquivos de ${source}.`);
+    console.warn("Confira a apresentação antes de publicar: títulos e enquadramentos vêm dos nomes dos arquivos.");
   }
 }

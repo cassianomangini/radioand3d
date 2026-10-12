@@ -1,6 +1,6 @@
 # E2 — Prova de Storage isolada (runbook)
 
-Estado: **ready_for_small_retest** (causa do HTTP 400 identificada e código corrigido em 12/10/2026; teste real de 10/10 falhou; nova execução real ainda não verificada).  
+Estado: **small_passed_resume_pending** (teste real assinado de 134 bytes aprovado em 12/10/2026; teste multichunk `resume` ainda não executado).  
 Parent: [Checklist E2](08-supabase-provisioning.md) · [Infraestrutura](../SUPABASE_INFRASTRUCTURE_V1.md)
 
 ## Objetivo e fronteiras
@@ -15,8 +15,15 @@ Esta prova **não envia nem submete um orçamento**, não valida a autorização
 - **PASS:** três Environment Secrets presentes; verificação do schema CM via RPC; `quote-intake` privado; bucket de QA criado; endpoint de assinatura de upload retornou 200.
 - **FAIL real:** o código enviou `x-signature` à rota **errada** `POST /storage/v1/upload/resumable`, que é a variante baseada em JWT de sessão. O Storage retornou **HTTP 400 `Invalid Compact JWS`**. A variante documentada pelo [exemplo oficial de Uppy com upload assinado](https://github.com/supabase/supabase/blob/master/examples/storage/resumable-upload-signed-uppy/index.html) usa **`POST /storage/v1/upload/resumable/sign`** com `x-signature`. Não foi necessário mudar RLS, permissões ou credenciais.
 - **Cleanup físico confirmado:** DELETE de objeto 200, empty bucket 200; GET posterior do bucket retornou **HTTP 400 + `NoSuchBucket`**, e consulta SQL ao projeto não encontrou qualquer bucket `cm-storage-qa-*` nem objeto no `quote-intake`. Isso revela um bug do harness: esperava 404 e sobrescreveu a falha de TUS com o falso erro `cleanup_required`.
-- **Correções no Git:** o harness aceita **somente** `NoSuchBucket` na confirmação do teardown; preserva o erro original; valida JWS sem imprimir token; agora usa **`/upload/resumable/sign`** e exige que a URL de `Location` permaneça no prefixo assinado. O gateway servidor do Orçamento também passou a devolver o endpoint assinado. Testes mockados exigem `/sign`, `x-upsert: false` e ausência de chave privada nos headers TUS. **Não há um segundo smoke real aprovado.**
-- **CI comprovado:** [execução 38232175413](https://github.com/cassianomangini/radioand3d/actions/runs/38232175413) do commit `548ae9a6ba`: lint, TypeScript, **124/124 testes** e build PASS. **Próxima ação manual:** reexecutar **apenas `small`** na `main` com os mesmos três Environment Secrets, sem alterá-los. Executar `resume` somente se `small` confirmar `PASS` e ausência do bucket temporário. Intake, deploy e Cron continuam desativados.
+- **Correções no Git:** o harness aceita **somente** `NoSuchBucket` na confirmação do teardown; preserva o erro original; valida JWS sem imprimir token; agora usa **`/upload/resumable/sign`** e exige que a URL de `Location` permaneça no prefixo assinado. O gateway servidor do Orçamento também passou a devolver o endpoint assinado. Testes mockados exigem `/sign`, `x-upsert: false` e ausência de chave privada nos headers TUS. **Esta foi a correção anterior à segunda execução, que passou em 12/10.**
+- **CI comprovado:** [execução 38232175413](https://github.com/cassianomangini/radioand3d/actions/runs/38232175413) do commit `548ae9a6ba`: lint, TypeScript, **124/124 testes** e build PASS. **`small` passou em 12/10; próxima ação manual:** executar **apenas `resume`** na `main` com os mesmos três Environment Secrets, sem alterá-los. Intake, deploy e Cron continuam desativados.
+
+## Segunda execução real — 12/10/2026
+
+- [GitHub Action #38233821447](https://github.com/cassianomangini/radioand3d/actions/runs/38233821447) — **SUCCESS** (usuário executou manualmente `mode=small`, commit `84f17817fd5eaa0db5a70f957699a7adfe4f627d`). Evidência de log: `{"result":"PASS","mode":"small","bytes":134,"signedTus":true,"offsetResume":true,"ranges":true,"anonymousDenied":true,"isolatedTestBucket":true}`.
+- **Comprovado com Storage real:** assinatura TUS recebida e aceita na rota `/storage/v1/upload/resumable/sign`; upload do STL sintético de 134 bytes; HEAD e PATCH com offset esperado; verificação do objeto; dois GETs autenticados por Range retornando 206 com bytes conferidos; GET anônimo negado; remoção do arquivo e do bucket privado temporário.
+- **Read-back Supabase (após execução):** projeto `ACTIVE_HEALTHY` em São Paulo; `temp_buckets=0`, `temp_objects=0`, `quote_objects=0`, `quote_requests=0`, `active_retention_leases=0`; `quote-intake` permanece `public=false`. Não há dados de cliente nesta prova.
+- **Limite da evidência:** `offsetResume=true` no modo `small` confirma HEAD/offset de um único chunk; **não prova retomada multichunk**. Ainda falta executar `mode=resume` (6 MiB + 128 B com dois PATCH), além de E2E com quatro rotas do orçamento, duas sessões e arquivo 3MF autorizado.
 
 ## Preparação (somente pelo operador autorizado)
 
@@ -31,7 +38,7 @@ Esta prova **não envia nem submete um orçamento**, não valida a autorização
 
 Também é possível executar `pnpm quote:storage:smoke` localmente com as mesmas variáveis server-only e com `CM_STORAGE_SMOKE_CONFIRM=RUN_ISOLATED_SUPABASE_STORAGE_SMOKE`; nunca compartilhar a saída de `.env.local`. Um comando sem a confirmação falha antes de abrir conexões.
 
-## Critérios de aceite (um resultado real por modo)
+## Critérios de aceite (exigidos nos dois modos; `small` aprovado, `resume` pendente)
 
 - [ ] Assinatura de upload foi obtida para um caminho aleatório e **não reutilizável**; nenhum segredo de serviço chegou ao payload TUS.
 - [ ] TUS cria upload (201), HEAD indica offset correto, PATCH progride (204). Em `resume`, HEAD confirma 6 MiB antes do segundo PATCH.

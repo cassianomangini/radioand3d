@@ -22,6 +22,24 @@ for (const route of routes) {
       caret: "hide"
     });
 
+    if (route.name === "prints") {
+      // The Studio route can be taller than one viewport; inspect the complete
+      // editorial sequence and the last service handoff, not just its hero.
+      await page.screenshot({
+        path: testInfo.outputPath("prints-full-page.png"),
+        fullPage: true,
+        animations: "disabled",
+        caret: "hide"
+      });
+      await page.getByRole("heading", { name: "Placas, caixas e outras necessidades" }).scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: testInfo.outputPath("prints-services-viewport.png"),
+        fullPage: false,
+        animations: "disabled",
+        caret: "hide"
+      });
+    }
+
     const measured = await page.evaluate(() => ({
       viewport: document.documentElement.clientWidth,
       scroll: document.documentElement.scrollWidth,

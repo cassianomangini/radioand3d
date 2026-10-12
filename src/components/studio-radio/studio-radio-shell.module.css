@@ -4572,3 +4572,71 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     font-size: clamp(2.45rem, 11vw, 4.7rem);
   }
 }
+
+
+/* S1.2 — the public Studio hub occupies the same desktop viewport as Radio.
+ * Only the hub is locked to the viewport; nested editorial routes still scroll. */
+@media (min-width: 73.75rem) {
+  .studio[data-studio-route="detail"]:not(:has(.studioRouteContent)) {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+}
+
+/* Three surfaces, three deliberate entrances. The shared C1 route/motion spine
+ * is preserved; only the cards reveal sequentially when the Studio hub opens. */
+.studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] > .studioDetailCard {
+  animation: studioHubPanelEnter 760ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] > [data-studio-card="prints"] {
+  --studio-card-entry-x: -24px;
+  animation-delay: 90ms;
+}
+
+.studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] > [data-studio-card="quote"] {
+  --studio-card-entry-x: 24px;
+  animation-delay: 235ms;
+}
+
+.studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] > [data-studio-card="products"] {
+  --studio-card-entry-x: 24px;
+  animation-delay: 390ms;
+}
+
+@keyframes studioHubPanelEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--studio-card-entry-x, 0px), 24px, 0) scale(0.982);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (max-width: 73.74rem) {
+  .studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] > [data-studio-card="prints"] {
+    animation-delay: 65ms;
+  }
+  .studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] > [data-studio-card="quote"] {
+    animation-delay: 205ms;
+  }
+  .studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] > [data-studio-card="products"] {
+    animation-delay: 345ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio[data-studio-route="detail"] .studioDetailRail[aria-hidden="false"] > .studioDetailCard {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

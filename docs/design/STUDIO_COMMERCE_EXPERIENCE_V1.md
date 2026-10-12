@@ -803,3 +803,18 @@ approved_by: **hub/estrutura-base aprovada por Cassiano em 04/10/2026; implement
 **Mídia:** origem local ignorada pelo Git `output/Fotos Impressoes`; importador `pnpm studio:media` publica cópias em `public/images/studio/impressoes` e gera `src/features/studio/prints-media.json`. O agente não acessa o filesystem do usuário. Nenhuma fotografia nova é alegada como importada até o manifest conter itens verificáveis.
 
 **ready_for_frontend:** sim, **apenas** para a composição do hub referenciada; revisão perceptiva e mídia E3 continuam abertas para conclusão final.
+
+
+### Refinamento do hub — altura, autoplay e entrada coreografada (12/10/2026)
+
+**Solicitação direta:** captura com 13 mídias reais locais enviada por Cassiano; Estúdio termina antes da Rádio, fotos parecem paradas e três seções entram de uma vez.
+
+- Em desktop (`min-width: 73.75rem`), **somente o hub `/studio`** ocupa `100dvh` de altura total, terminando junto da Rádio lateral. Não impor essa altura a rotas editoriais longas, nem a mobile.
+- Manter três cards reais, com **entrada separada e escalonada**: Impressões, Orçamento e Produtos, por opacity/transform, sem inventar cards, ícones ou modificar o motor de motion C1 da Rádio.
+- O carrossel gira sozinho com mídia real: 5,6 s por foto; 10 s por prévia de vídeo. Fazer crossfade real entre a mídia anterior e próxima sem sobreposição de donos da animação. Prévia de vídeo sempre muda e toca em silêncio.
+- Não pausar a rotação apenas porque o cursor foi deixado sobre a área fotográfica grande. Interromper ao apontar para **controles/CTA**, ao focar com teclado, ao acionar pausa, quando a aba fica oculta ou o componente sai do viewport.
+- Em `prefers-reduced-motion: reduce`, **sem autoplay nem entrada coreografada inicialmente**; navegação manual continua disponível, e o usuário pode iniciar a rotação explicitamente.
+- CTA Orçamento permanece CM (ciano/azul/violeta). Laranja/coral continua restrito a Produtos/Shopee. Rádio, splitter e player não são escopo desta alteração.
+- Evidência de autoplay em CI depende de fixture isolada em `/dev/studio-carousel-qa` (arte do próprio site, **não fotos reais de peça**), bloqueada em produção; aceitar visual final depende de render com as fotos locais de Cassiano.
+
+**ready_for_frontend:** yes — refinamento funcional e visual solicitado; **approved_by:** Cassiano, 12/10/2026 (direção, não render final).

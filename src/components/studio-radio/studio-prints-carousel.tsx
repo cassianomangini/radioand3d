@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { studioPrintMedia } from "@/features/studio/prints-media";
+import { studioPrintMedia, type StudioPrintMedia } from "@/features/studio/prints-media";
 import styles from "./studio-prints-carousel.module.css";
 
-const IMAGE_INTERVAL_MS = 6500;
+const IMAGE_INTERVAL_MS = 5600;
 const VIDEO_INTERVAL_MS = 10000;
 
 function Chevron({ direction }: { direction: "previous" | "next" }) {
@@ -23,18 +24,44 @@ function Chevron({ direction }: { direction: "previous" | "next" }) {
   );
 }
 
-export function StudioPrintsCarousel({ active }: { active: boolean }) {
+function RotationIcon({ rotating }: { rotating: boolean }) {
+  return rotating ? (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+      <rect x="6" y="5" width="4" height="14" rx="1" />
+      <rect x="14" y="5" width="4" height="14" rx="1" />
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+      <path d="M8 4.5a1 1 0 0 1 1.5-.86l10 7a1.5 1.5 0 0 1 0 2.46l-10 7A1 1 0 0 1 8 19.24V4.5Z" />
+    </svg>
+  );
+}
+
+type Props = {
+  active: boolean;
+  /** Isolated QA uses explicit fixtures. The public hub always uses real imported media. */
+  media?: readonly StudioPrintMedia[];
+};
+
+export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [interacting, setInteracting] = useState(false);
+  const [explicitlyStarted, setExplicitlyStarted] = useState(false);
+  const [controlHover, setControlHover] = useState(false);
+  const [focusWithin, setFocusWithin] = useState(false);
   const [documentVisible, setDocumentVisible] = useState(true);
+  const [inViewport, setInViewport] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const total = studioPrintMedia.length;
-  const current = studioPrintMedia[index] ?? null;
+
+  const total = media.length;
+  const current = media[index] ?? null;
   const canNavigate = total > 1;
-  const autoAdvance = active && canNavigate && !paused && !interacting && !reducedMotion && documentVisible;
+  const rotationRequested = !paused && (!reducedMotion || explicitlyStarted);
+  const autoAdvance =
+    active && canNavigate && rotationRequested && !controlHover &&
+    !focusWithin && documentVisible && inViewport;
 
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -46,8 +73,20 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
 
   useEffect(() => {
     const onVisibility = () => setDocumentVisible(!document.hidden);
+    onVisibility();
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
+
+  useEffect(() => {
+    const element = rootRef.current;
+    if (!element || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInViewport(entry.isIntersecting && entry.intersectionRatio >= 0.25),
+      { threshold: [0, 0.25, 0.75] }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -62,20 +101,31 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (!active || !documentVisible || reducedMotion) {
+    if (!active || !documentVisible || !inViewport || reducedMotion || paused) {
       video.pause();
       return;
     }
-    // Decorative, muted previews never take audio focus from the Radio.
+    // Previews are always muted. Radio remains the only active audio source.
     void video.play().catch(() => undefined);
     return () => video.pause();
-  }, [active, documentVisible, index, reducedMotion]);
+  }, [active, documentVisible, inViewport, index, paused, reducedMotion]);
 
   const goTo = (requested: number) => {
     setIndex((requested + total) % total);
   };
+
+  const toggleRotation = () => {
+    if (rotationRequested) {
+      setPaused(true);
+      setExplicitlyStarted(false);
+    } else {
+      setPaused(false);
+      setExplicitlyStarted(true);
+    }
+  };
+
   const visibleDots = total <= 6
-    ? studioPrintMedia.map((_, offset) => offset)
+    ? media.map((_, offset) => offset)
     : Array.from({ length: 5 }, (_, offset) =>
         Math.min(Math.max(index - 2, 0), total - 5) + offset
       );
@@ -84,47 +134,59 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
     <div
       ref={rootRef}
       className={styles.carousel}
+      role="region"
+      aria-roledescription="carrossel"
+      aria-label="Destaques de impressões do Estúdio"
+      aria-live="off"
       data-studio-prints-carousel="true"
       data-has-media={current ? "true" : "false"}
-      onMouseEnter={() => setInteracting(true)}
-      onMouseLeave={() => setInteracting(false)}
-      onFocusCapture={() => setInteracting(true)}
+      data-active-media-id={current?.id ?? undefined}
+      data-auto-rotating={autoAdvance ? "true" : "false"}
+      onFocusCapture={() => setFocusWithin(true)}
       onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setInteracting(false);
+        if (!event.currentTarget.contains(event.relatedTarget)) setFocusWithin(false);
       }}
-      aria-label="Destaques de impressões do Estúdio"
     >
       <div className={styles.mediaLayer} aria-hidden="true">
-        {current ? (
-          current.kind === "image" ? (
-            <Image
-              key={current.src}
-              className={styles.photo}
-              src={current.src}
-              alt=""
-              fill
-              priority={active && index === 0}
-              sizes="(max-width: 1179px) 100vw, 60vw"
-            />
-          ) : (
-            // The preview is muted/decorative. The gallery controls the original video.
-            <video
-              key={current.src}
-              ref={videoRef}
-              className={styles.photo}
-              muted
-              playsInline
-              loop
-              preload="metadata"
-              poster={current.poster}
-              aria-hidden="true"
+        <AnimatePresence initial={false} mode="sync">
+          {current ? (
+            <motion.div
+              key={current.id}
+              className={styles.mediaSlide}
+              initial={reducedMotion ? false : { opacity: 0, scale: 1.025 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 1.008 }}
+              transition={{ duration: reducedMotion ? 0 : 0.62, ease: "easeInOut" }}
             >
-              <source src={current.src} type={current.src.endsWith(".webm") ? "video/webm" : "video/mp4"} />
-            </video>
-          )
-        ) : (
+              {current.kind === "image" ? (
+                <Image
+                  className={styles.photo}
+                  src={current.src}
+                  alt=""
+                  fill
+                  priority={active && index === 0}
+                  sizes="(max-width: 1179px) 100vw, 60vw"
+                />
+              ) : (
+                <video
+                  ref={videoRef}
+                  className={styles.photo}
+                  muted
+                  playsInline
+                  loop
+                  preload="metadata"
+                  poster={current.poster}
+                  aria-hidden="true"
+                >
+                  <source src={current.src} type={current.src.endsWith(".webm") ? "video/webm" : "video/mp4"} />
+                </video>
+              )}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+        {!current ? (
           <span className={styles.emptyMediaLabel}>FOTO REAL PENDENTE · PEÇA PRODUZIDA</span>
-        )}
+        ) : null}
       </div>
 
       <div className={styles.readability} aria-hidden="true" />
@@ -147,6 +209,8 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
             className={`${styles.arrow} ${styles.previous}`}
             aria-label="Impressão anterior"
             onClick={() => goTo(index - 1)}
+            onPointerEnter={() => setControlHover(true)}
+            onPointerLeave={() => setControlHover(false)}
             tabIndex={active ? 0 : -1}
           >
             <Chevron direction="previous" />
@@ -156,6 +220,8 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
             className={`${styles.arrow} ${styles.next}`}
             aria-label="Próxima impressão"
             onClick={() => goTo(index + 1)}
+            onPointerEnter={() => setControlHover(true)}
+            onPointerLeave={() => setControlHover(false)}
             tabIndex={active ? 0 : -1}
           >
             <Chevron direction="next" />
@@ -168,11 +234,21 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
         <h2>Impressões</h2>
         <p>{current ? current.title : "Veja peças que já saíram das impressoras, com contexto real de produção."}</p>
         <div className={styles.bottomLine}>
-          <Link className={styles.explore} href="/studio/impressoes" tabIndex={active ? 0 : -1}>
+          <Link
+            className={styles.explore}
+            href="/studio/impressoes"
+            tabIndex={active ? 0 : -1}
+            onPointerEnter={() => setControlHover(true)}
+            onPointerLeave={() => setControlHover(false)}
+          >
             Explorar galeria <span aria-hidden="true">→</span>
           </Link>
           {canNavigate ? (
-            <div className={styles.pagination}>
+            <div
+              className={styles.pagination}
+              onPointerEnter={() => setControlHover(true)}
+              onPointerLeave={() => setControlHover(false)}
+            >
               <div className={styles.dots} role="group" aria-label="Selecionar impressão">
                 {visibleDots.map((dot) => (
                   <button
@@ -190,12 +266,12 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
               <button
                 type="button"
                 className={styles.pause}
-                aria-label={paused ? "Retomar carrossel automático" : "Pausar carrossel automático"}
-                aria-pressed={paused}
-                onClick={() => setPaused((value) => !value)}
+                aria-label={rotationRequested ? "Pausar carrossel automático" : "Iniciar carrossel automático"}
+                aria-pressed={rotationRequested}
+                onClick={toggleRotation}
                 tabIndex={active ? 0 : -1}
               >
-                {paused ? "▶" : "Ⅱ"}
+                <RotationIcon rotating={rotationRequested} />
               </button>
             </div>
           ) : null}

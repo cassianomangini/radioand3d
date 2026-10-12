@@ -460,3 +460,21 @@ Risco prioritário: sem as fotos na infraestrutura do site, o hub exibe fallback
 - Capturas inspecionadas de `/studio` lateral desktop 1440 e mobile 390, ainda **sem as fotos do usuário**: hierarquia correta, CTA orçamento ciano/violeta e Produtos laranja.
 - Defeito mobile descoberto durante QA: Home anterior continha heading não quebrável mais largo que o viewport (390: 476px; 360: 440px). O font-size mobile foi ajustado com escala fluida, e o gate horizontal subsequente passou.
 - **Atenção:** sem execução do importador contra `output/Fotos Impressoes`, não há evidência de crop real, reprodução de vídeo, transição com foto nem aprovação estética final. Não marcar E3 ou mídia final como concluídos.
+
+
+## S1.2 — revisão 12/10: altura, carrossel e motion na entrada
+
+Solicitação: print real de `/studio` com 13 fotografias importadas localmente. Na captura o hub termina acima da borda inferior da Rádio, e o carrossel parece parado com o ponteiro sobre a imagem.
+
+- [x] Diagnóstico da diferença de altura: o seletor `.studio[data-studio-route="detail"]` ainda usava `height: calc(100dvh - var(--header-height))`, enquanto a Rádio lateral usa `100dvh`.
+- [x] Corrigir altura do **hub desktop** para `100dvh`, sem impedir scroll das rotas internas e sem alterar o player.
+- [x] Retirar a pausa causada pelo mouse sobre a fotografia inteira; manter pausa intencional/foco, proteção de abas inativas e quando fora de visão.
+- [x] Fazer fotos girarem sozinhas (5,6 s), prévias de vídeo (10 s) e transição crossfade entre mídias.
+- [x] Entrada progressiva em Impressões → Orçamento → Produtos, com delay próprios e reversão elegante sem mexer no motor de animação da Rádio.
+- [x] Implementar fallback de movimento reduzido, sem autoplay até o usuário iniciar explicitamente.
+- [x] Acrescentar testes Playwright para geometria do hub, escalonamento e ambiente de fixture do carrossel.
+- [ ] Executar CI e QA renderizada em desktop 1440/1760, mobile 390/360, docked/split, redução de movimento, fotos reais do usuário e passagens entre slides.
+- [ ] Validar o recorte das 13 fotos originais em ambiente local, que não existem no Git.
+- [ ] Aceite final de Cassiano após visualizar os modos e conteúdo real.
+
+**Nota de prova:** a mídia observada está apenas na captura de tela. A fixture usa assets de desenvolvimento do projeto e não comprova enquadramento das fotografias reais.

@@ -85,3 +85,78 @@ test("docked Radio leaves the approved Studio hub intact", async ({ page }, test
     animations: "disabled"
   });
 });
+
+
+test("Studio grows to the full Radio viewport and reveals cards separately", async ({ page }, testInfo) => {
+  test.skip(
+    !["desktop-1440", "desktop-short"].includes(testInfo.project.name),
+    "Parallel full-height composition only on desktop"
+  );
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.getByRole("navigation", { name: "Navegação principal" })
+    .getByRole("link", { name: "Estúdio" }).click();
+  await expect(page).toHaveURL(/\/studio$/);
+
+  const entrance = await page.evaluate(() => {
+    const cards = ["prints", "quote", "products"].map((name) =>
+      document.querySelector<HTMLElement>(`[data-studio-card="${name}"]`)
+    );
+    return cards.map((element) => ({
+      animation: element ? getComputedStyle(element).animationName : null,
+      delay: element ? parseFloat(getComputedStyle(element).animationDelay) : null
+    }));
+  });
+  expect(entrance.map((entry) => entry.animation))
+    .toEqual(["studioHubPanelEnter", "studioHubPanelEnter", "studioHubPanelEnter"]);
+  expect(entrance[0].delay).toBeLessThan(entrance[1].delay!);
+  expect(entrance[1].delay).toBeLessThan(entrance[2].delay!);
+
+  await expect(page.locator('[data-studio-card="products"]')).toHaveCSS("opacity", "1");
+
+  const geometry = await page.evaluate(() => {
+    const panel = document.querySelector<HTMLElement>("main#studio");
+    const rail = document.querySelector<HTMLElement>('[class*="studioDetailRail"]');
+    const radio = document.querySelector<HTMLElement>('aside[aria-label="CM Rádio"]');
+    const quote = document.querySelector<HTMLElement>('[data-studio-card="quote"]');
+    const products = document.querySelector<HTMLElement>('[data-studio-card="products"]');
+    if (!panel || !rail || !radio || !quote || !products) return null;
+    return {
+      studioBottom: panel.getBoundingClientRect().bottom,
+      railBottom: rail.getBoundingClientRect().bottom,
+      radioBottom: radio.getBoundingClientRect().bottom,
+      quoteHeight: quote.getBoundingClientRect().height,
+      productsHeight: products.getBoundingClientRect().height
+    };
+  });
+  expect(geometry).not.toBeNull();
+  expect(Math.abs(geometry!.studioBottom - geometry!.radioBottom)).toBeLessThan(2);
+  expect(geometry!.radioBottom - geometry!.railBottom).toBeGreaterThanOrEqual(0);
+  expect(geometry!.radioBottom - geometry!.railBottom).toBeLessThan(12);
+  expect(Math.abs(geometry!.quoteHeight - geometry!.productsHeight)).toBeLessThan(3);
+
+  // The mode change must not shrink the Studio back to the old header-offset height.
+  const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+  await divider.focus();
+  await divider.press("Home");
+  await divider.press("ArrowRight");
+  await expect(page.locator("[data-radio-layout-mode]")).toHaveAttribute("data-radio-docked", "true");
+  const dockedBottom = await page.locator("main#studio").evaluate((el) => el.getBoundingClientRect().bottom);
+  expect(Math.abs(dockedBottom - geometry!.radioBottom)).toBeLessThan(2);
+
+  await page.screenshot({
+    path: testInfo.outputPath("studio-docked-stagger-finished.png"),
+    animations: "disabled"
+  });
+});
+
+test("Reduced motion shows each Studio section without entrance choreography", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-1440", "Motion accessibility on representative desktop");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/studio");
+  await expect(page.locator('[data-studio-card="prints"]')).toBeVisible();
+  const animation = await page.locator('[data-studio-card="prints"]').evaluate(
+    (element) => getComputedStyle(element).animationName
+  );
+  expect(animation).toBe("none");
+});

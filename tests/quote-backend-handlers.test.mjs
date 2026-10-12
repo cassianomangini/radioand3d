@@ -57,8 +57,8 @@ const gateway = {
   async signUpload(objectPath) {
     calls.push({ method: "sign", objectPath });
     return {
-      token: "signed-token-for-tests-only",
-      endpoint: "https://studio.storage.supabase.co/storage/v1/upload/resumable"
+      token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0." + "A".repeat(43),
+      endpoint: "https://studio.storage.supabase.co/storage/v1/upload/resumable/sign"
     };
   }
 };
@@ -142,6 +142,9 @@ test("attachment init validates file and ownership, then signs only the reserved
   assert.equal(result.attachmentId, attachmentId);
   assert.equal(result.uploadPath, storagePath);
   assert.equal(result.tokenHeader, "x-signature");
+  assert.match(result.uploadEndpoint,/\/storage\/v1\/upload\/resumable\/sign$/);
+  assert.notEqual(result.uploadEndpoint,
+    "https://studio.storage.supabase.co/storage/v1/upload/resumable");
   assert.equal(result.uploadToken, "signed-token-for-tests-only");
   assert.match(valid.headers.get('set-cookie') || '', /HttpOnly/);
   assert.ok(Date.parse(result.reservationExpiresAt) >= Date.now() + 26 * 60 * 60 * 1000);

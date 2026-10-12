@@ -1,6 +1,6 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **quatorze migrations aplicadas · Orçamento e retenção revisados · CI 124/124 · TUS/Storage E2E, Cron e deploy pendentes**  
+Status: **quatorze migrations aplicadas · CI 124/124 · TUS `small` real PASS em 12/10 · `resume`/orçamento E2E, Cron e deploy pendentes**  
 Revisão: **09/10/2026**  
 Região contratada e confirmada: **sa-east-1 (São Paulo)**  
 Responsável: **CM Infra / CM Data**
@@ -838,7 +838,7 @@ A ponte de Produtos **não depende** da base CM. No ambiente operacional da orig
 
 **Implementado em código e banco:** migrations, schema, grants/RLS, parser 3MF com testes sintéticos, sessão anônima, quatro handlers, reserva/quota, rate limit, recibo idempotente e 27h de proteção de TUS. **Implementado:** worker SQL e handler da retenção, com testes unitários/mock e SQL em rollback. **Ainda NÃO ativo:** execução real pela Storage API, secret Cron na Vercel, agendamento e observabilidade externa. O CI verde não significa que upload TUS ou submit estejam operacionais na produção.
 
-**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **quatorze migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `548ae9a6ba`: lint + typecheck + 124 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, secrets Vercel, **reteste de TUS assinado na rota `/sign` e Range reais**, validação de 3MF Bambu real, prova de remoção física por retenção via Storage API, configuração e agendamento de Cron, smoke E2E e release. Primeiro smoke de bucket temporário em 10/10 confirmou teardown mas falhou na rota incorreta; corrigido em código em 12/10. O backup do legado segue sem comprovação.
+**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **quatorze migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `548ae9a6ba`: lint + typecheck + 124 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Verificado em Storage real:** o [smoke manual `small` #38233821447](https://github.com/cassianomangini/radioand3d/actions/runs/38233821447), em 12/10, confirmou 134 bytes via TUS `/sign`, HEAD/PATCH, Range 206, negação anônima e bucket temporário removido (read-back Supabase: zero). **Ainda pendente:** CLI/Postgres local, secrets Vercel, **TUS `resume` em dois chunks**, 3MF Bambu autorizado, remoção física via worker de retenção, Cron, E2E completo de orçamentos e release. A primeira execução em 10/10 falhou na rota incorreta, depois corrigida. O backup do legado segue sem comprovação.
 
 ## 30. Gate de infraestrutura pronta
 

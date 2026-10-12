@@ -1,6 +1,6 @@
 # Supabase Infrastructure V1 — CM 3D & Radio
 
-Status: **quatorze migrations aplicadas · Orçamento e retenção revisados · CI 117/117 · TUS/Storage E2E, Cron e deploy pendentes**  
+Status: **quatorze migrations aplicadas · Orçamento e retenção revisados · CI 124/124 · TUS/Storage E2E, Cron e deploy pendentes**  
 Revisão: **09/10/2026**  
 Região contratada e confirmada: **sa-east-1 (São Paulo)**  
 Responsável: **CM Infra / CM Data**
@@ -838,7 +838,7 @@ A ponte de Produtos **não depende** da base CM. No ambiente operacional da orig
 
 **Implementado em código e banco:** migrations, schema, grants/RLS, parser 3MF com testes sintéticos, sessão anônima, quatro handlers, reserva/quota, rate limit, recibo idempotente e 27h de proteção de TUS. **Implementado:** worker SQL e handler da retenção, com testes unitários/mock e SQL em rollback. **Ainda NÃO ativo:** execução real pela Storage API, secret Cron na Vercel, agendamento e observabilidade externa. O CI verde não significa que upload TUS ou submit estejam operacionais na produção.
 
-**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **quatorze migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `c68fead53`: lint + typecheck + 117 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, secrets Vercel, **reteste de TUS assinado na rota `/sign` e Range reais**, validação de 3MF Bambu real, prova de remoção física por retenção via Storage API, configuração e agendamento de Cron, smoke E2E e release. Primeiro smoke de bucket temporário em 10/10 confirmou teardown mas falhou na rota incorreta; corrigido em código em 12/10. O backup do legado segue sem comprovação.
+**Já verificado:** projeto CM definitivo em São Paulo/organização independente; **quatorze migrations** aplicadas e versionadas, bucket privado, SQL/RLS/grants e testes transacionais com rollback; **CI real no commit `548ae9a6ba`: lint + typecheck + 124 testes + build PASS**. Banco sem dados de clientes; staging antigo pausado pelo usuário. **Ainda pendente:** CLI/Postgres local completos, secrets Vercel, **reteste de TUS assinado na rota `/sign` e Range reais**, validação de 3MF Bambu real, prova de remoção física por retenção via Storage API, configuração e agendamento de Cron, smoke E2E e release. Primeiro smoke de bucket temporário em 10/10 confirmou teardown mas falhou na rota incorreta; corrigido em código em 12/10. O backup do legado segue sem comprovação.
 
 ## 30. Gate de infraestrutura pronta
 
@@ -885,7 +885,7 @@ Só marcar `infra_ready` quando todas as provas relevantes existirem:
 
 - **Projeto CM definitivo validado** na organização Free independente Cmangini3d e região São Paulo. Migration inicial `create_quote_core` aplicada e versionada, quatro tabelas verificadas e vazias, com RLS/grants restritos.
 - O ambiente de testes legado permanece **inalterado**; pausa depende de inventário, backup e gate próprio.
-- **Quatorze migrations aplicadas e versionadas**: schema base, bucket/reserva de quota, proteção de limpeza, validade TUS, índice de FK, rate limit atômico, RPCs de complete/submit verificação de tipo/extensão, prazo TUS seguro e replay de envio. Bucket privado confirmado; dados de clientes: zero. SQL sintético testado com rollback. **Quatro rotas HTTP em código com flag `CM_QUOTE_INTAKE_ENABLED=false`**; testes JS de complete/submit versionados, mas suite CI completa não confirmada. Sem TUS real, segredos Vercel, Cron, limpeza Storage API ou deploy.
+- **Quatorze migrations aplicadas e versionadas**: schema base, bucket/reserva de quota, proteção de limpeza, validade TUS, índice de FK, rate limit atômico, RPCs de complete/submit verificação de tipo/extensão, prazo TUS seguro e replay de envio. Bucket privado confirmado; dados de clientes: zero. SQL sintético testado com rollback. **Quatro rotas HTTP em código com flag `CM_QUOTE_INTAKE_ENABLED=false`**; testes JS de complete/submit e TUS signed versionados, CI completo confirmado no commit de código `548ae9a6ba` (124/124). Sem TUS real, segredos Vercel, Cron, limpeza Storage API ou deploy.
 - Fonte de verdade para passos e evidências: [E2 — Provisionamento Supabase](work/08-supabase-provisioning.md).
 - Product bridge: contrato próprio aprovado para implementação, mas integração automática e cutover live **não concluídos**.
 - O Performance Advisor apontou FK de `quote_events` sem índice, corrigida na migration `index_quote_events_request_fk`; o novo read-back eliminou esse aviso. Sete avisos `INFO` de índices não utilizados são esperados enquanto não existe workload real.

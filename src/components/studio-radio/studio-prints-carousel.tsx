@@ -103,7 +103,7 @@ export function StudioPrintsCarousel({ active }: { active: boolean }) {
               src={current.src}
               alt=""
               fill
-              priority={index === 0}
+              priority={active && index === 0}
               sizes="(max-width: 1179px) 100vw, 60vw"
             />
           ) : (

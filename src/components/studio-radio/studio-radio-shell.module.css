@@ -4563,3 +4563,12 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transition: none;
   }
 }
+
+
+/* Home mobile: the original split heading's unbroken second line was wider
+ * than 390/360px viewports. Scale the display text without clipping it. */
+@media (max-width: 73.74rem) {
+  .studio[data-studio-route="home"] .studioIdentity h1 {
+    font-size: clamp(2.45rem, 11vw, 4.7rem);
+  }
+}

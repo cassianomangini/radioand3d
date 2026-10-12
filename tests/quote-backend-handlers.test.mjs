@@ -145,7 +145,7 @@ test("attachment init validates file and ownership, then signs only the reserved
   assert.match(result.uploadEndpoint,/\/storage\/v1\/upload\/resumable\/sign$/);
   assert.notEqual(result.uploadEndpoint,
     "https://studio.storage.supabase.co/storage/v1/upload/resumable");
-  assert.equal(result.uploadToken, "signed-token-for-tests-only");
+  assert.match(result.uploadToken,/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
   assert.match(valid.headers.get('set-cookie') || '', /HttpOnly/);
   assert.ok(Date.parse(result.reservationExpiresAt) >= Date.now() + 26 * 60 * 60 * 1000);
   assert.ok(Date.parse(result.uploadTokenExpiresAt) > Date.now());

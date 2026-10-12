@@ -128,6 +128,18 @@ jobs:
             --project=desktop-1440 --project=desktop-1024 \
             --project=mobile-390 --project=mobile-360
 
+          # Preserve honest technical carousel renders before a second
+          # Playwright invocation clears the development lab output directory.
+          mkdir -p visual-review
+          for media_name in carousel-fixture-first-photo.png carousel-fixture-second-photo.png; do
+            capture="$(find test-results/visual-lab -type f -name "$media_name" -print -quit)"
+            if [ -z "$capture" ]; then
+              echo "Expected Studio motion screenshot missing: $media_name" >&2
+              exit 1
+            fi
+            cp "$capture" "visual-review/$media_name"
+          done
+
           node scripts/build-visual-lab-review.mjs
 
           # D4: render a dedicated preview with the real CM shell and audio provider.

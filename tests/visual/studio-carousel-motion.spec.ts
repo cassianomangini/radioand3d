@@ -36,7 +36,15 @@ test.describe("Studio slideshow: real playback clock + truthful image framing", 
     expect(frame.ambientFit).toBe("cover");
     expect(frame.photoWidth).toBe(frame.slideWidth);
 
+    await page.screenshot({
+      path: testInfo.outputPath("carousel-fixture-first-photo.png"),
+      animations: "disabled"
+    });
     await expect(carousel).toHaveAttribute("data-active-media-id", "fixture-beta", { timeout: 8500 });
+    await page.screenshot({
+      path: testInfo.outputPath("carousel-fixture-second-photo.png"),
+      animations: "disabled"
+    });
 
     await page.getByRole("button", { name: "Pausar apresentação" }).click();
     await expect(carousel).toHaveAttribute("data-carousel-playing", "false");

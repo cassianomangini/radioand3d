@@ -163,8 +163,11 @@ export async function runStorageSmoke({
       throw new StorageSmokeError('signed_token_not_compact_jws');
     }
 
-    const tusEndpoint = uploadOrigin + '/storage/v1/upload/resumable';
-    const tusHeaders = {'Tus-Resumable':'1.0.0','x-signature':token};
+    // Signed TUS has its OWN route. /upload/resumable is the JWT-authenticated
+    // route: using it with x-signature triggers "Invalid Compact JWS".
+    // Supabase's signed Uppy example uses /upload/resumable/sign.
+    const tusEndpoint = uploadOrigin + '/storage/v1/upload/resumable/sign';
+    const tusHeaders = {'Tus-Resumable':'1.0.0','x-signature':token,'x-upsert':'false'};
     const metadata = [
       ['bucketName',bucket],['objectName',path],
       ['contentType','application/octet-stream'],['cacheControl','0'],
@@ -177,7 +180,7 @@ export async function runStorageSmoke({
     if (!location) throw new StorageSmokeError('missing_upload_location');
     const uploadUrl = new URL(location,tusEndpoint);
     if (![base,uploadOrigin].includes(uploadUrl.origin) ||
-        !uploadUrl.pathname.startsWith('/storage/v1/upload/resumable/') ||
+        !uploadUrl.pathname.startsWith('/storage/v1/upload/resumable/sign/') ||
         uploadUrl.username || uploadUrl.password) {
       throw new StorageSmokeError('unsafe_upload_location');
     }

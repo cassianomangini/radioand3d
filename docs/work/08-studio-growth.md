@@ -473,8 +473,20 @@ Solicitação: print real de `/studio` com 13 fotografias importadas localmente.
 - [x] Entrada progressiva em Impressões → Orçamento → Produtos, com delay próprios e reversão elegante sem mexer no motor de animação da Rádio.
 - [x] Implementar fallback de movimento reduzido, sem autoplay até o usuário iniciar explicitamente.
 - [x] Acrescentar testes Playwright para geometria do hub, escalonamento e ambiente de fixture do carrossel.
-- [ ] Executar CI e QA renderizada em desktop 1440/1760, mobile 390/360, docked/split, redução de movimento, fotos reais do usuário e passagens entre slides.
+- [x] Executar CI, lint/typecheck/build e QA renderizada em desktop 1440/1760, mobile 390/360, split/docked, redução de movimento e transições, **com placeholder/fixture**; execução `38258489403` (PASS).
+- [x] Testar autoplay com duas mídias de laboratório (não fotografia de peça): foto muda automaticamente mesmo com o cursor sobre a imagem, pausa explícita funciona e movimento reduzido permite navegação manual; `tests/visual/studio-carousel-motion.spec.ts` (PASS).
+- [ ] Revisar e testar autoplay, enquadramentos e vídeos **com as 13 fotos reais locais** de Cassiano no navegador dele.
 - [ ] Validar o recorte das 13 fotos originais em ambiente local, que não existem no Git.
 - [ ] Aceite final de Cassiano após visualizar os modos e conteúdo real.
 
 **Nota de prova:** a mídia observada está apenas na captura de tela. A fixture usa assets de desenvolvimento do projeto e não comprova enquadramento das fotografias reais.
+
+
+### Evidências consolidadas (12/10/2026)
+
+- `792ae5d` — correção da checagem da keyframe para aceitar o nome escopado por CSS Modules.
+- `1c0ac3d` — inclusão de `studio-carousel-motion.spec.ts` no job de laboratório, em `.github/workflows/ci.yml`.
+- GitHub Actions `38258489403`: lint, typecheck, testes unitários, build, captura visual, Playwright visual (55 PASS), laboratório de desenvolvimento (18 PASS) e preview integrado Rádio (2 PASS).
+- Em desktop 1440 e 1760, geometria automatizada confirmou o fim do hub alinhado ao limite inferior da Rádio (diferença de altura menor que 2px); seção por seção apresenta delays de entrada distintos; a Rádio segue com o mesmo elemento `audio`.
+- O teste da fixture demonstrou avanço de `fixture-alpha` para `fixture-beta` **sem tirar o cursor da fotografia**, pausa explícita, retomada e navegação manual em `prefers-reduced-motion`. São artes do próprio projeto usadas apenas como fixture de desenvolvimento, não mídia de produto real.
+- Screenshots de CI representam layout sem as fotografias importadas localmente; **o resultado com as 13 fotos e quaisquer vídeos permanece sem inspeção**. Isso limita a aceitação estética e impede marcar mídia final como concluída.

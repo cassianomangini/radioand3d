@@ -793,7 +793,7 @@ approved_by: **hub/estrutura-base aprovada por Cassiano em 04/10/2026; implement
 - Os três pilares permanecem os mesmos: **Impressões**, **Peça um orçamento**, **Produtos**.
 - A superfície dominante de Impressões torna-se um **carrossel de fotos e vídeos reais**, com título fixo, legenda por mídia quando conhecida, contagem, controles anterior/próximo e link para a galeria.
 - A mídia é decorativa no preview e deve começar **sem áudio**, sem tomar controle da CM Rádio.
-- O carrossel pausa com hover/foco, com controle explícito de pausa, parada quando a página está oculta e sem avanço automático em `prefers-reduced-motion`.
+- O carrossel fica ligado por padrão, inclusive quando a preferência do sistema é reduzir animações (nesse caso, as trocas são cortes sem interpolação). Há botão explícito de pausa, interrupção temporária enquanto controles recebem hover/foco de teclado e proteção quando a aba fica oculta.
 - A entrada em galeria mostra miniaturas por projeto, com abertura ampliada de fotografias/vídeos; projeto não é um item da Shopee por padrão.
 - O CTA **Pedir orçamento** usa a gramática CM de contorno ciano/azul/violeta, **nunca laranja**.
 - **Laranja/coral fica restrito à área Produtos/Shopee** dentro do hub.
@@ -810,10 +810,10 @@ approved_by: **hub/estrutura-base aprovada por Cassiano em 04/10/2026; implement
 **Solicitação direta:** captura com 13 mídias reais locais enviada por Cassiano; Estúdio termina antes da Rádio, fotos parecem paradas e três seções entram de uma vez.
 
 - Em desktop (`min-width: 73.75rem`), **somente o hub `/studio`** ocupa `100dvh` de altura total, terminando junto da Rádio lateral. Não impor essa altura a rotas editoriais longas, nem a mobile.
-- Manter três cards reais, com **entrada separada e escalonada**: Impressões, Orçamento e Produtos, por opacity/transform, sem inventar cards, ícones ou modificar o motor de motion C1 da Rádio.
-- O carrossel gira sozinho com mídia real: 5,6 s por foto; 10 s por prévia de vídeo. Fazer crossfade real entre a mídia anterior e próxima sem sobreposição de donos da animação. Prévia de vídeo sempre muda e toca em silêncio.
-- Não pausar a rotação apenas porque o cursor foi deixado sobre a área fotográfica grande. Interromper ao apontar para **controles/CTA**, ao focar com teclado, ao acionar pausa, quando a aba fica oculta ou o componente sai do viewport.
-- Em `prefers-reduced-motion: reduce`, **sem autoplay nem entrada coreografada inicialmente**; navegação manual continua disponível, e o usuário pode iniciar a rotação explicitamente.
+- Manter três cards reais, com **entrada separada e escalonada controlada por Motion for React**, usando variants (Impressões, Orçamento, Produtos) e animação de opacity/transform. Não usar CSS keyframes como substitutos do Motion nem modificar o motor C1 da Rádio.
+- O carrossel inicia reproduzindo mídia real: **4,8 s por fotografia**, **9 s por vídeo**. Progressão visual e temporização são comandadas pelo relógio do Motion, com pausa/retomada preservando progresso e crossfade de opacidade entre slides; vídeo em silêncio.
+- Não pausar a rotação apenas porque o cursor foi deixado sobre a fotografia; suspender temporariamente sobre **controles/CTA** ou com foco de teclado, além de respeitar a pausa explícita, aba oculta e componente fora do viewport.
+- Em `prefers-reduced-motion: reduce`, sem movimento espacial ou crossfade; o avanço da galeria continua ligado por padrão como solicitado explicitamente, com botão de pausa e navegação manual disponíveis.
 - CTA Orçamento permanece CM (ciano/azul/violeta). Laranja/coral continua restrito a Produtos/Shopee. Rádio, splitter e player não são escopo desta alteração.
 - Evidência de autoplay em CI depende de fixture isolada em `/dev/studio-carousel-qa` (arte do próprio site, **não fotos reais de peça**), bloqueada em produção; aceitar visual final depende de render com as fotos locais de Cassiano.
 

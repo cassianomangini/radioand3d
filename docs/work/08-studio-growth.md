@@ -469,9 +469,9 @@ Solicitação: print real de `/studio` com 13 fotografias importadas localmente.
 - [x] Diagnóstico da diferença de altura: o seletor `.studio[data-studio-route="detail"]` ainda usava `height: calc(100dvh - var(--header-height))`, enquanto a Rádio lateral usa `100dvh`.
 - [x] Corrigir altura do **hub desktop** para `100dvh`, sem impedir scroll das rotas internas e sem alterar o player.
 - [x] Retirar a pausa causada pelo mouse sobre a fotografia inteira; manter pausa intencional/foco, proteção de abas inativas e quando fora de visão.
-- [x] Fazer fotos girarem sozinhas (5,6 s), prévias de vídeo (10 s) e transição crossfade entre mídias.
-- [x] Entrada progressiva em Impressões → Orçamento → Produtos, com delay próprios e reversão elegante sem mexer no motor de animação da Rádio.
-- [x] Implementar fallback de movimento reduzido, sem autoplay até o usuário iniciar explicitamente.
+- [x] Fazer fotos girarem sozinhas (4,8 s), prévias de vídeo (9 s) e transição crossfade sem zoom/crop da mídia principal; progressão comandada por Motion com barra temporal visível.
+- [x] Entrada progressiva Impressões → Orçamento → Produtos por variants/staggerChildren do **Motion for React**, removendo CSS keyframes anteriores; não alterar o motor de animação da Rádio.
+- [x] Implementar preferência de movimento reduzido com cortes instantâneos e sem coreografia; a galeria permanece ligada por padrão conforme pedido, com botão de pausa sempre disponível.
 - [x] Acrescentar testes Playwright para geometria do hub, escalonamento e ambiente de fixture do carrossel.
 - [x] Executar CI, lint/typecheck/build e QA renderizada em desktop 1440/1760, mobile 390/360, split/docked, redução de movimento e transições, **com placeholder/fixture**; execução `38258489403` (PASS).
 - [x] Testar autoplay com duas mídias de laboratório (não fotografia de peça): foto muda automaticamente mesmo com o cursor sobre a imagem, pausa explícita funciona e movimento reduzido permite navegação manual; `tests/visual/studio-carousel-motion.spec.ts` (PASS).

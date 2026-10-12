@@ -94,24 +94,45 @@ test("Studio grows to the full Radio viewport and reveals cards separately", asy
   );
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/", { waitUntil: "domcontentloaded" });
+  // Cards persist across the route change. Record their actual Motion style
+  // updates to prove a staggered entrance instead of a CSS keyframe declaration.
+  await page.evaluate(() => {
+    const names = ["prints", "quote", "products"];
+    const marks: Record<string, number> = {};
+    for (const name of names) {
+      const element = document.querySelector<HTMLElement>(`[data-studio-card="${name}"]`);
+      if (!element) continue;
+      const observer = new MutationObserver(() => {
+        if (marks[name] !== undefined) return;
+        if (Number(getComputedStyle(element).opacity) > 0.035) {
+          marks[name] = performance.now();
+          observer.disconnect();
+        }
+      });
+      observer.observe(element, { attributes: true, attributeFilter: ["style"] });
+    }
+    (window as Window & { __studioEntranceMarks?: Record<string, number> }).__studioEntranceMarks = marks;
+  });
+
   await page.getByRole("navigation", { name: "Navegação principal" })
     .getByRole("link", { name: "Estúdio" }).click();
   await expect(page).toHaveURL(/\/studio$/);
-
-  const entrance = await page.evaluate(() => {
-    const cards = ["prints", "quote", "products"].map((name) =>
-      document.querySelector<HTMLElement>(`[data-studio-card="${name}"]`)
-    );
-    return cards.map((element) => ({
-      animation: element ? getComputedStyle(element).animationName : null,
-      delay: element ? parseFloat(getComputedStyle(element).animationDelay) : null
-    }));
-  });
-  expect(entrance.every((entry) => entry.animation?.endsWith("studioHubPanelEnter"))).toBe(true);
-  expect(entrance[0].delay).toBeLessThan(entrance[1].delay!);
-  expect(entrance[1].delay).toBeLessThan(entrance[2].delay!);
-
+  const rail = page.locator('[data-studio-motion-owner="motion"]');
+  await expect(rail).toHaveAttribute("aria-hidden", "false");
   await expect(page.locator('[data-studio-card="products"]')).toHaveCSS("opacity", "1");
+
+  const entrance = await page.evaluate(() => ({
+    marks: (window as Window & { __studioEntranceMarks?: Record<string, number> }).__studioEntranceMarks,
+    cssAnimationNames: ["prints", "quote", "products"].map((name) => {
+      const element = document.querySelector<HTMLElement>(`[data-studio-card="${name}"]`);
+      return element ? getComputedStyle(element).animationName : "missing";
+    })
+  }));
+  expect(entrance.cssAnimationNames).toEqual(["none", "none", "none"]);
+  expect(entrance.marks).toBeDefined();
+  expect(Object.keys(entrance.marks ?? {}).sort()).toEqual(["prints", "products", "quote"]);
+  expect(entrance.marks!.prints).toBeLessThan(entrance.marks!.quote);
+  expect(entrance.marks!.quote).toBeLessThan(entrance.marks!.products);
 
   const geometry = await page.evaluate(() => {
     const panel = document.querySelector<HTMLElement>("main#studio");

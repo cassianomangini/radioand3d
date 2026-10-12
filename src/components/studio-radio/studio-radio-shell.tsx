@@ -16,6 +16,7 @@ import {
   type PointerEvent as ReactPointerEvent
 } from "react";
 import { flushSync } from "react-dom";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 import styles from "./studio-radio-shell.module.css";
 import { RadioNavbarDock } from "./radio-navbar-dock";
 import { StudioPrintsCarousel } from "./studio-prints-carousel";
@@ -35,6 +36,35 @@ import {
   resolveRadioLayoutMode,
   type RadioLayoutMode
 } from "./radio-motion-spine";
+
+const StudioMotionLink = motion.create(Link);
+
+const studioHubRailVariants: Variants = {
+  hidden: {},
+  shown: { transition: { staggerChildren: 0.16, delayChildren: 0.12 } }
+};
+
+const studioHubCardVariants: Variants = {
+  hidden: (side: "left" | "right") => ({
+    opacity: 0,
+    x: side === "left" ? -48 : 42,
+    y: 22,
+    scale: 0.975,
+    transition: { duration: 0.24 }
+  }),
+  shown: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.82, ease: [0.16, 1, 0.3, 1] }
+  }
+};
+
+const studioHubInstantVariants: Variants = {
+  hidden: { opacity: 0, x: 0, y: 0, scale: 1 },
+  shown: { opacity: 1, x: 0, y: 0, scale: 1, transition: { duration: 0 } }
+};
 
 const DEFAULT_RADIO_WIDTH = 480;
 const MIN_RADIO_WIDTH = 400;
@@ -729,6 +759,7 @@ function RadioContent({
 
 export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const radio = useRadio();
+  const reduceStudioMotion = useReducedMotion();
   const pathname = usePathname();
   const router = useRouter();
   const studioRoute = pathname.startsWith("/studio") ? "detail" : "home";
@@ -2146,22 +2177,32 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             </div>
           </section>
 
-          <div
+          <motion.div
             className={styles.studioDetailRail}
             aria-hidden={!studioHub}
             inert={!studioHub}
+            data-studio-motion-owner="motion"
+            initial={reduceStudioMotion ? false : "hidden"}
+            animate={studioHub ? "shown" : "hidden"}
+            variants={reduceStudioMotion ? undefined : studioHubRailVariants}
           >
-            <section
+            <motion.section
               className={styles.studioDetailCard}
               data-studio-card="prints"
               aria-label="Impressões em destaque"
+              custom="left"
+              variants={reduceStudioMotion ? studioHubInstantVariants : studioHubCardVariants}
             >
               <StudioPrintsCarousel active={studioHub && !radioFullscreen} />
-            </section>
+            </motion.section>
 
-            <Link
+            <StudioMotionLink
               className={styles.studioDetailCard}
               data-studio-card="quote"
+              custom="right"
+              variants={reduceStudioMotion ? studioHubInstantVariants : studioHubCardVariants}
+              whileHover={reduceStudioMotion ? undefined : { y: -3 }}
+              whileTap={reduceStudioMotion ? undefined : { scale: 0.992 }}
               href="/studio/orcamento"
               aria-label="Pedir orçamento"
               tabIndex={studioHub ? 0 : -1}
@@ -2170,11 +2211,15 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               <strong>Peça um orçamento</strong>
               <p>Conte o que você precisa. O fluxo pergunta somente o que faz sentido para o projeto.</p>
               <span className={styles.studioCardAction}>Pedir orçamento →</span>
-            </Link>
+            </StudioMotionLink>
 
-            <Link
+            <StudioMotionLink
               className={styles.studioDetailCard}
               data-studio-card="products"
+              custom="right"
+              variants={reduceStudioMotion ? studioHubInstantVariants : studioHubCardVariants}
+              whileHover={reduceStudioMotion ? undefined : { y: -3 }}
+              whileTap={reduceStudioMotion ? undefined : { scale: 0.992 }}
               href="/studio/produtos"
               aria-label="Ver produtos do estúdio"
               tabIndex={studioHub ? 0 : -1}
@@ -2186,8 +2231,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               <strong>Peças prontas para comprar</strong>
               <p>Conheça cada produto aqui e finalize a compra na Shopee quando estiver disponível.</p>
               <span className={styles.studioCardAction}>Ver produtos →</span>
-            </Link>
-          </div>
+            </StudioMotionLink>
+          </motion.div>
 
           {studioNestedRoute ? (
             <div className={styles.studioRouteContent} data-studio-route-content="true">{children}</div>

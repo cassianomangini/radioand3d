@@ -206,7 +206,7 @@ test("native gateway sends sb_secret only as apikey, with no auth Bearer header"
       }]);
     }
     if (url.includes("/storage/v1/object/upload/sign/")) {
-      return Response.json({ url: `/object/upload/sign/quote-intake/${storagePath}?token=${"s".repeat(48)}` });
+      return Response.json({ url: `/object/upload/sign/quote-intake/${storagePath}?token=${"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0."+"A".repeat(43)}` });
     }
     return Response.json([{ id: requestId, expires_at: "2026-10-10T10:00:00Z" }]);
   };
@@ -220,14 +220,21 @@ test("native gateway sends sb_secret only as apikey, with no auth Bearer header"
   });
   assert.equal(reserved.object_path, storagePath);
   const signed = await db.signUpload(storagePath);
-  assert.equal(signed.token.length, 48);
-  assert.match(signed.endpoint, /^https:\/\/example-project\.storage\.supabase\.co/);
+  assert.match(signed.token,/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
+  assert.equal(signed.endpoint,
+    "https://example-project.storage.supabase.co/storage/v1/upload/resumable/sign");
+  assert.notEqual(signed.endpoint,
+    "https://example-project.storage.supabase.co/storage/v1/upload/resumable");
   for (const sentRequest of sent) {
     assert.match(sentRequest.opts.headers.apikey, /^sb_secret_/);
     assert.equal(sentRequest.opts.headers.Authorization, undefined);
     assert.equal(sentRequest.opts.cache, "no-store");
     assert.equal(sentRequest.opts.redirect, "error");
   }
+  // Reject an invalid signature from the upstream Storage signer.
+  const malformed = createQuoteGateway(async () =>
+    Response.json({ url: `/object/upload/sign/quote-intake/${storagePath}?token=not-a-jws` }));
+  await assert.rejects(malformed.signUpload(storagePath),/quote_upstream_unavailable/);
   delete process.env.CM_SUPABASE_URL;
   assert.throws(() => createQuoteGateway(mockFetch));
 });

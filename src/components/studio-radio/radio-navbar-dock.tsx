@@ -7,21 +7,21 @@ import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import styles from "./radio-navbar-dock.module.css";
 
 function PreviousGlyph() {
-  return <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 4h2v16H5V4Zm14 1v14l-11-7 11-7Z" /></svg>;
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 4h2v16H5V4Zm14 1v14l-11-7 11-7Z" /></svg>;
 }
 
 function NextGlyph() {
-  return <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 4h2v16h-2V4ZM5 5l11 7-11 7V5Z" /></svg>;
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 4h2v16h-2V4ZM5 5l11 7-11 7V5Z" /></svg>;
 }
 
 function PlayGlyph({ playing }: { playing: boolean }) {
   return playing
-    ? <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></svg>
-    : <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z" /></svg>;
+    ? <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></svg>
+    : <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z" /></svg>;
 }
 
 function RestoreGlyph() {
-  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><path d="M9 4H4v5M15 20h5v-5M4 4l7 7m9 9-7-7" /></svg>;
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><path d="M9 4H4v5M15 20h5v-5M4 4l7 7m9 9-7-7" /></svg>;
 }
 
 /** Same global playback provider as the full Radio and mobile mini.
@@ -56,7 +56,7 @@ export function RadioNavbarDock({
       inert={!visible}
     >
       <span className={styles.dockCoverShell}>
-        <Image src={artwork} width={52} height={52} unoptimized alt="" className={styles.dockCover} />
+        <Image src={artwork} width={168} height={84} unoptimized alt="" className={styles.dockCover} />
       </span>
       <span className={styles.dockCopy}>
         <span className={styles.dockBrand}>CM RÁDIO</span>

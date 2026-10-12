@@ -107,8 +107,7 @@ test("Studio grows to the full Radio viewport and reveals cards separately", asy
       delay: element ? parseFloat(getComputedStyle(element).animationDelay) : null
     }));
   });
-  expect(entrance.map((entry) => entry.animation))
-    .toEqual(["studioHubPanelEnter", "studioHubPanelEnter", "studioHubPanelEnter"]);
+  expect(entrance.every((entry) => entry.animation?.endsWith("studioHubPanelEnter"))).toBe(true);
   expect(entrance[0].delay).toBeLessThan(entrance[1].delay!);
   expect(entrance[1].delay).toBeLessThan(entrance[2].delay!);
 

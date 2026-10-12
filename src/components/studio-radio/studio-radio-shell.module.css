@@ -4569,9 +4569,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
  * than 390/360px viewports. Scale the display text without clipping it. */
 @media (max-width: 73.74rem) {
   .studio[data-studio-route="home"] .studioIdentity h1 {
-    /* Narrow screens inherit a non-wrapping two-line title; keep both lines
-     * entirely inside the viewport at 390px and the 1024px compact layout. */
-    font-size: clamp(2.25rem, 9vw, 4.15rem);
+    font-size: clamp(2.45rem, 11vw, 4.7rem);
   }
 }
 
@@ -4583,6 +4581,13 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     height: 100dvh;
     min-height: 100dvh;
   }
+}
+
+/* Motion animates card entry in the visible Studio hub. Outside /studio
+ * the hidden rail must not participate in scrollable overflow. Previously,
+ * translated hidden cards leaked 21-30px beyond the Home viewport. */
+.studioDetailRail[aria-hidden="true"] {
+  display: none;
 }
 
 /* Motion for React owns each Studio card entrance/exit and interaction transform.

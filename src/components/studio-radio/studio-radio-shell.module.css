@@ -1138,6 +1138,31 @@
   color: var(--accent-cyan);
 }
 
+.radioLayoutActions {
+  display: none;
+  margin-left: auto;
+}
+
+@media (min-width: 73.75rem) {
+  .radioLayoutActions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .radioLayoutActions .iconButton {
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+    min-height: 2rem;
+  }
+
+  .radioLayoutActions .iconButton:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+
 .iconButton {
   width: 2.4rem;
   min-width: 2.4rem;
@@ -3615,11 +3640,42 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     letter-spacing 1080ms var(--studio-route-ease);
 }
 
-.studioIdentity h1 span {
+.studioRevealAccent,
+.studioRevealAccent .studioRevealChar {
   background: linear-gradient(100deg, #00d7f5 5%, #1398ff 48%, #b82ee9 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.studioRevealChar {
+  display: inline-block;
+}
+
+.studioRevealWord {
+  display: inline;
+  white-space: nowrap;
+}
+
+.studioRevealLine {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.studioIdentity[data-studio-intro="home"] .studioRevealChar {
+  animation: studio-letter-in 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes studio-letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.55em);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .studioIdentity .lead {
@@ -4097,11 +4153,18 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   .studioIdentity h1,
   .studioIdentity .lead,
   .studioEyebrowStack > span,
+  .studioRevealChar,
   .studioRouteActions .primaryAction,
   .studioCatalogHeader,
   .studioProducts,
   .studioDetailRail {
     transition: none;
+  }
+
+  .studioRevealChar {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -4334,7 +4397,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 
   .site[data-radio-docked="true"] .siteHeader {
-    right: 0;
+    right: var(--rail-width);
     grid-template-columns: max-content max-content minmax(0, 1fr);
     column-gap: clamp(1.3rem, 2.2vw, 2.4rem);
   }
@@ -4379,19 +4442,19 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   .site[data-radio-docked="true"] .radioDockEdge {
     position: fixed;
     display: block;
-    top: var(--header-height);
+    top: 0;
     right: 0;
     z-index: calc(var(--layer-nav) + 5);
-    width: 0.9rem;
-    height: calc(100dvh - var(--header-height));
+    width: var(--rail-width);
+    height: 100dvh;
     padding: 0;
     border: 0;
-    border-left: 1px solid rgb(82 214 255 / 15%);
-    background: linear-gradient(180deg, rgb(82 214 255 / 23%), rgb(139 109 255 / 17%), transparent);
-    opacity: 0.28;
+    background: #03050a url("/images/cm-radio-divider.webp") center / auto 100% no-repeat;
+    opacity: 1;
+    filter: saturate(0.72) brightness(0.78);
     touch-action: none;
     cursor: ew-resize;
-    transition: opacity 180ms ease;
+    transition: filter 180ms ease;
   }
 
   .desktopShell[data-radio-dock-ready="true"] .resizeHandle {
@@ -4401,7 +4464,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
   .site[data-radio-docked="true"] .radioDockEdge:hover,
   .site[data-radio-docked="true"] .radioDockEdge:focus-visible {
-    opacity: 1;
+    filter: saturate(1.2) brightness(1.1);
   }
 
   .site[data-radio-dock-motion] .desktopShell,

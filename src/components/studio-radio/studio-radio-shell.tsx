@@ -230,12 +230,14 @@ function SocialIcons() {
   );
 }
 
-type IconName = "expand" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute";
+type IconName = "expand" | "minimize" | "medium" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute";
 
 function Icon({ name }: { name: IconName }) {
   const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
   const paths: Record<IconName, ReactNode> = {
     expand: <><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" /><path d="m4 4 5 5m11-5-5 5M4 20l5-5m11 5-5-5" /></>,
+    minimize: <><path d="M4 14h6v6M20 10h-6V4" /><path d="m14 10 7-7M3 21l7-7" /></>,
+    medium: <><rect x="3" y="4" width="18" height="16" rx="1.5" /><path d="M14 4v16" /></>,
     close: <><path d="M5 5l14 14M19 5 5 19" /></>,
     heart: <path d="M20.8 8.6c0 4.2-8.8 10-8.8 10s-8.8-5.8-8.8-10a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z" />,
     shuffle: <><path d="M3 6h2c5 0 7 12 12 12h4m-4-4 4 4-4 4" /><path d="M3 18h2c1.8 0 3.2-1.5 4.5-3.5M14.5 9.5C15.8 7.5 17.2 6 19 6h2m-4-4 4 4-4 4" /></>,
@@ -297,11 +299,40 @@ function formatTrackDuration(seconds?: number) {
   return seconds && Number.isFinite(seconds) && seconds > 0 ? formatTime(seconds) : "—";
 }
 
+function revealChars(text: string, startDelayMs: number, stepMs: number) {
+  return [...text].map((char, index) => (
+    <span
+      key={`${startDelayMs}-${index}`}
+      className={styles.studioRevealChar}
+      style={{ animationDelay: `${startDelayMs + index * stepMs}ms` }}
+    >
+      {char}
+    </span>
+  ));
+}
+
+function revealPhrase(text: string, startDelayMs: number, stepMs: number) {
+  let cursor = 0;
+  return text.split(" ").map((word, index, words) => {
+    const delay = startDelayMs + cursor * stepMs;
+    cursor += word.length + 1;
+    return (
+      <span key={`${startDelayMs}-word-${index}`} className={styles.studioRevealWord}>
+        {revealChars(word, delay, stepMs)}
+        {index < words.length - 1 ? " " : null}
+      </span>
+    );
+  });
+}
+
 function RadioContent({
   mobile = false,
   focus = false,
   expanded = false,
   onClose,
+  onDock,
+  onExpand,
+  onMedium,
   mobileMotionEndpoint = false,
   trackStepKind,
   onPrevious,
@@ -313,6 +344,9 @@ function RadioContent({
   focus?: boolean;
   expanded?: boolean;
   onClose?: () => void;
+  onDock?: () => void;
+  onExpand?: () => void;
+  onMedium?: () => void;
   mobileMotionEndpoint?: boolean;
   trackStepKind?: TrackStepKind;
   onPrevious?: () => void;
@@ -428,6 +462,42 @@ function RadioContent({
           >
             <Icon name="close" />
           </button>
+        ) : null}
+        {!mobile && (onDock || onExpand || onMedium) ? (
+          <div className={styles.radioLayoutActions}>
+            {onDock ? (
+              <button
+                type="button"
+                className={styles.iconButton}
+                onClick={onDock}
+                aria-label="Recolher a Rádio para a versão pocket"
+                title="Versão pocket"
+              >
+                <Icon name="minimize" />
+              </button>
+            ) : null}
+            {expanded && onMedium ? (
+              <button
+                type="button"
+                className={styles.iconButton}
+                onClick={onMedium}
+                aria-label="Voltar a Rádio ao tamanho médio"
+                title="Tamanho médio"
+              >
+                <Icon name="medium" />
+              </button>
+            ) : onExpand ? (
+              <button
+                type="button"
+                className={styles.iconButton}
+                onClick={onExpand}
+                aria-label="Expandir a Rádio"
+                title="Tela cheia"
+              >
+                <Icon name="expand" />
+              </button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 
@@ -692,6 +762,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const [mobileRadioMotion, setMobileRadioMotion] = useState<MobileRadioMotionState | null>(null);
   const [trackStepMotion, setTrackStepMotion] = useState<TrackStepMotionState | null>(null);
   const [studioRouteMotion, setStudioRouteMotion] = useState<StudioRouteMotion>(null);
+  const [studioIntroCycle, setStudioIntroCycle] = useState(0);
   const miniVolumeMenuRef = useRef<HTMLDivElement>(null);
   const miniVolumeButtonRef = useRef<HTMLButtonElement>(null);
   const miniOpenButtonRef = useRef<HTMLButtonElement>(null);
@@ -725,6 +796,15 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     router.prefetch("/");
     router.prefetch("/studio");
   }, [router]);
+
+  useEffect(() => {
+    if (studioRoute !== "home") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      setStudioIntroCycle((cycle) => cycle + 1);
+    }, 15000);
+    return () => window.clearInterval(timer);
+  }, [studioRoute]);
 
   useEffect(() => () => {
     if (routeMotionTimerRef.current !== null) {
@@ -1152,13 +1232,14 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
    * artwork surface to its target while the real Studio and header reflow.
    * React never remounts the player provider or fabricates audio.
    */
-  function runRadioDockTransition(nextDocked: boolean, restoreWidth?: number, restoreMode?: RadioLayoutMode) {
+  function runRadioDockTransition(nextDocked: boolean, restoreWidth?: number, restoreMode?: RadioLayoutMode, fromFullscreen = false) {
     const shell = shellRef.current;
     const mini = dockMiniRef.current;
     const flight = dockFlightRef.current;
     const panel = shell?.querySelector<HTMLElement>("#radio");
     if (!shell || !mini || !flight || !panel) return;
-    if (!window.matchMedia("(min-width: 73.75rem)").matches || radioFullscreen) return;
+    if (!window.matchMedia("(min-width: 73.75rem)").matches) return;
+    if (radioFullscreen && !fromFullscreen) return;
     if (dockedRef.current === nextDocked && dockAnimationRef.current === null) return;
 
     const header = shell.closest(`.${styles.site}`)?.querySelector<HTMLElement>(`.${styles.siteHeader}`);
@@ -1333,6 +1414,46 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     }
 
     enterFullscreen();
+  }
+
+  function restoreMediumFromPocket() {
+    const shell = shellRef.current;
+    if (!shell || !dockedRef.current) return;
+    dockRestoreWidthRef.current = getDefaultWidth(shell.getBoundingClientRect().width);
+    dockRestoreModeRef.current = "split";
+    runRadioDockTransition(false);
+  }
+
+  function dockRadio() {
+    if (radioFullscreen) {
+      const shell = shellRef.current;
+      const width = shell ? getDefaultWidth(shell.getBoundingClientRect().width) : DEFAULT_RADIO_WIDTH;
+      runRadioDockTransition(true, width, "split", true);
+      return;
+    }
+    runRadioDockTransition(true);
+  }
+
+  function showMediumRadio() {
+    const shell = shellRef.current;
+    if (!shell) return;
+    clearSignatureStageTimer();
+    const width = getDefaultWidth(shell.getBoundingClientRect().width);
+    runRadioMotion("closing", () => {
+      clearDragPreview();
+      clearReturnPreview();
+      dragFullscreenRef.current = false;
+      openedFromDragRef.current = false;
+      customWidthRef.current = false;
+      dockedRef.current = false;
+      initialRadioWidthRef.current = width;
+      initialRadioLayoutModeRef.current = "split";
+      setRadioWidth(width);
+      setRadioDocked(false);
+      setRadioDockMotion(null);
+      setRadioExpanded(false);
+      setRadioFullscreen(false);
+    });
   }
 
   function closeRadioFullscreen(restoreFocus = true) {
@@ -1940,19 +2061,34 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             <span>PROJETOS PERSONALIZADOS, PEÇAS PRODUZIDAS E PRODUTOS PRONTOS.</span>
           </div>
 
-          <section className={styles.studioIdentity} aria-labelledby="studio-title">
+          <section
+            className={styles.studioIdentity}
+            aria-labelledby="studio-title"
+            data-studio-intro={studioRoute === "home" ? "home" : undefined}
+          >
             <div className={styles.studioEyebrowStack} aria-live="off">
-              <span aria-hidden={studioRoute !== "home"}>ESTÚDIO DE CRIAÇÃO</span>
+              <span key={studioIntroCycle} aria-hidden={studioRoute !== "home"}>{revealPhrase("ESTÚDIO DE CRIAÇÃO", 0, 24)}</span>
               <span aria-hidden={studioRoute !== "detail"}>ESTÚDIO DE IMPRESSÃO 3D</span>
             </div>
 
             <h1 id="studio-title" aria-label="Ideias que ganham forma.">
-              Ideias que<br />ganham <span>forma.</span>
+              <span key={studioIntroCycle}>
+                <span className={styles.studioRevealLine}>{revealPhrase("Ideias que", 120, 36)}</span>
+                <br />
+                <span className={styles.studioRevealLine}>
+                  {revealPhrase("ganham", 120 + 10 * 36, 36)}
+                  {" "}
+                  <span className={styles.studioRevealAccent}>{revealPhrase("forma.", 120 + 17 * 36, 36)}</span>
+                </span>
+              </span>
             </h1>
 
-            <p className={styles.lead}>
-              Peças, materiais e cores produzidos
-              <br className={styles.leadBreak} /> com precisão, camada por camada.
+            <p className={styles.lead} aria-label="Peças, materiais e cores produzidos com precisão, camada por camada.">
+              <span key={studioIntroCycle}>
+                <span className={styles.studioRevealLine}>{revealPhrase("Peças, materiais e cores produzidos", 420, 14)}</span>
+                <br className={styles.leadBreak} />
+                <span className={styles.studioRevealLine}>{revealPhrase("com precisão, camada por camada.", 420 + 38 * 14, 14)}</span>
+              </span>
             </p>
 
             <div className={styles.studioRouteActions}>
@@ -2066,6 +2202,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             onPrevious={previousTrack}
             onNext={nextTrack}
             onReshuffle={radio.reshuffle}
+            onDock={dockRadio}
+            onExpand={() => openRadioFullscreen(false)}
+            onMedium={showMediumRadio}
           />
         </aside>
       </div>
@@ -2090,8 +2229,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           type="button"
           className={styles.radioDockEdge}
           data-radio-dock-edge="true"
-          aria-label="Puxe para a esquerda para restaurar a Rádio lateral"
-          title="Arraste para a esquerda para restaurar a Rádio"
+          aria-label="Arraste para a esquerda para voltar a Rádio ao tamanho médio"
+          title="Arraste para voltar a Rádio ao tamanho médio"
           onPointerDown={(event) => {
             if (event.pointerType === "mouse" && event.button !== 0) return;
             dockEdgeDragRef.current = { pointerId: event.pointerId, startX: event.clientX };
@@ -2104,14 +2243,14 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               event.currentTarget.releasePointerCapture(event.pointerId);
             }
             if (drag?.pointerId === event.pointerId && drag.startX - event.clientX >= RADIO_DOCK_EDGE_RESTORE_PX) {
-              runRadioDockTransition(false);
+              restoreMediumFromPocket();
             }
           }}
           onPointerCancel={() => { dockEdgeDragRef.current = null; }}
           onKeyDown={(event) => {
             if (["Enter", " ", "ArrowLeft"].includes(event.key)) {
               event.preventDefault();
-              runRadioDockTransition(false);
+              restoreMediumFromPocket();
             }
           }}
         />

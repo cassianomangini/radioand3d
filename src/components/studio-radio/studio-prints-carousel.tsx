@@ -68,6 +68,7 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
   const currentIndex = total > 0 ? index % total : 0;
   const current = media[currentIndex] ?? null;
   const canNavigate = total > 1;
+  const slideDuration = current?.kind === "video" ? VIDEO_DURATION_SECONDS : PHOTO_DURATION_SECONDS;
 
   // Reduced-motion removes transitions, not the gallery's explicitly requested
   // initial PLAY state. A visible Pause control always remains available.
@@ -96,10 +97,9 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
   // A manual seek or completed slide creates a new progress clock.
   useEffect(() => {
     progress.set(0);
-    if (!current || !canNavigate) return;
-    const seconds = current.kind === "video" ? VIDEO_DURATION_SECONDS : PHOTO_DURATION_SECONDS;
+    if (!canNavigate) return;
     const clock = animate(progress, 1, {
-      duration: seconds,
+      duration: slideDuration,
       ease: "linear",
       autoplay: false,
       onComplete: () => setIndex((previous) => (previous + 1) % total)
@@ -109,7 +109,7 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
       clock.stop();
       if (clockRef.current === clock) clockRef.current = null;
     };
-  }, [current?.id, canNavigate, total, restart, progress]);
+  }, [current?.id, canNavigate, total, restart, progress, slideDuration]);
 
   useEffect(() => {
     if (advancing) clockRef.current?.play();

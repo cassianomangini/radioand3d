@@ -362,8 +362,10 @@ function RadioContent({
   const [seekPreview, setSeekPreview] = useState<number | null>(null);
   const [trackFlight, setTrackFlight] = useState<{ id: string; phase: "source" | "destination" } | null>(null);
   const trackMotionTokenRef = useRef(0);
+  const trackListRef = useRef<HTMLOListElement>(null);
   const volumeMenuRef = useRef<HTMLDivElement>(null);
   const volumeButtonRef = useRef<HTMLButtonElement>(null);
+  const currentTrackId = radio.currentTrack?.id;
   const volumePanelId = mobile ? "mobile-radio-volume" : "desktop-radio-volume";
   const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
   const listTracks = radio.playlistTracks
@@ -381,6 +383,29 @@ function RadioContent({
   const transportPrevious = onPrevious ?? radio.previous;
   const transportNext = onNext ?? radio.next;
   const transportReshuffle = onReshuffle ?? radio.reshuffle;
+
+  useEffect(() => {
+    const list = trackListRef.current;
+    if (!list || !currentTrackId) return;
+
+    const alignCurrentTrack = () => {
+      const row = list.querySelector<HTMLElement>(`[data-track-id="${CSS.escape(currentTrackId)}"]`);
+      if (!row || list.clientHeight === 0) return false;
+      const paddingTop = Number.parseFloat(getComputedStyle(list).paddingTop) || 0;
+      const top = row.getBoundingClientRect().top - list.getBoundingClientRect().top - paddingTop + list.scrollTop;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      list.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? "auto" : "smooth" });
+      return true;
+    };
+
+    if (alignCurrentTrack()) return;
+
+    const observer = new ResizeObserver(() => {
+      if (alignCurrentTrack()) observer.disconnect();
+    });
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [currentTrackId]);
 
   function selectTrackWithMotion(trackId: string) {
     if (radio.currentTrack?.id === trackId) {
@@ -655,12 +680,13 @@ function RadioContent({
       </div>
 
       <ol
+        ref={trackListRef}
         className={styles.trackList}
         aria-label="Músicas da playlist"
         data-radio-motion-key="queue-list"
       >
         {listTracks.map(({ track, position }) => (
-          <li key={track.id}>
+          <li key={track.id} data-track-id={track.id}>
             <button
               type="button"
               className={styles.trackRow}

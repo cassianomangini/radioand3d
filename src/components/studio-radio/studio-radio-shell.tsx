@@ -2156,7 +2156,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               data-studio-card="prints"
               aria-label="Impressões em destaque"
             >
-              <StudioPrintsCarousel active={studioHub} />
+              <StudioPrintsCarousel active={studioHub && !radioFullscreen} />
             </section>
 
             <Link

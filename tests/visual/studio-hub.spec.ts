@@ -53,3 +53,35 @@ test("Studio carousel navigation and gallery keep the same Radio audio node", as
     await expect(page.getByRole("dialog")).not.toBeVisible();
   }
 });
+
+test("docked Radio leaves the approved Studio hub intact", async ({ page }, testInfo) => {
+  test.skip(
+    !["desktop-1440", "desktop-short"].includes(testInfo.project.name),
+    "Navbar dock exists on desktop only"
+  );
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/studio", { waitUntil: "domcontentloaded" });
+  const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+  await expect(divider).toBeVisible();
+  await divider.focus();
+  await divider.press("Home");
+  await divider.press("ArrowRight");
+
+  const root = page.locator('[data-radio-layout-mode]');
+  await expect(root).toHaveAttribute("data-radio-docked", "true");
+  await expect(page.locator('[data-radio-navbar-mini="true"]')).toBeVisible();
+  await expect(page.locator('[data-studio-card="prints"]')).toBeVisible();
+  await expect(page.locator('[data-studio-card="quote"]')).toBeVisible();
+  await expect(page.locator('[data-studio-card="products"]')).toBeVisible();
+  const measurements = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+    audioNodes: document.querySelectorAll("audio").length
+  }));
+  expect(measurements.scrollWidth).toBeLessThanOrEqual(measurements.viewport + 1);
+  expect(measurements.audioNodes).toBe(1);
+  await page.screenshot({
+    path: testInfo.outputPath("studio-docked-viewport.png"),
+    animations: "disabled"
+  });
+});

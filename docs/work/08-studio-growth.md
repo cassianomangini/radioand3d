@@ -452,3 +452,11 @@ Origem: imagem do site em modo Rádio docked + mock visual contextual aprovado p
 - [ ] Registrar aceite de Cassiano no render final, sem confundi-lo com a aprovação do mock.
 
 Risco prioritário: sem as fotos na infraestrutura do site, o hub exibe fallback neutro; isso não é demonstração do resultado artístico final.
+
+### QA renderizada do hub — 12/10/2026
+
+- CI `38252416649` em `69f670a`: lint, typecheck, unit, build, captura CDP, Playwright em cinco perfis e laboratório visual **PASS**.
+- Novo teste `tests/visual/studio-hub.spec.ts`: três entradas e acentos cromáticos (orçamento CM vs Produtos Shopee), navegação preservando a instância do elemento `audio` — passou em 1440, 1024, desktop curto, 390 e 360.
+- Capturas inspecionadas de `/studio` lateral desktop 1440 e mobile 390, ainda **sem as fotos do usuário**: hierarquia correta, CTA orçamento ciano/violeta e Produtos laranja.
+- Defeito mobile descoberto durante QA: Home anterior continha heading não quebrável mais largo que o viewport (390: 476px; 360: 440px). O font-size mobile foi ajustado com escala fluida, e o gate horizontal subsequente passou.
+- **Atenção:** sem execução do importador contra `output/Fotos Impressoes`, não há evidência de crop real, reprodução de vídeo, transição com foto nem aprovação estética final. Não marcar E3 ou mídia final como concluídos.

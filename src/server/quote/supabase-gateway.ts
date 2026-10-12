@@ -172,12 +172,17 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
       }
       const token = new URL(data.url, `${url}/storage/v1/`).searchParams.get('token');
-      if (!token || token.length < 16 || token.length > 4096) {
+      // Supabase signed TUS expects a compact three-segment JWS in x-signature.
+      // Reject malformed upstream responses before returning them to browsers.
+      if (!token || token.length > 4096 ||
+        !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
       }
-      // Direct Storage hostname is recommended for resumable TUS uploads.
+      // Signed uploads MUST use the /sign TUS route. The otherwise similar
+      // /upload/resumable route expects a session JWT and rejects x-signature
+      // with "Invalid Compact JWS". Never return service credentials.
       const host = new URL(url).hostname.replace('.supabase.co', '.storage.supabase.co');
-      return { token, endpoint: `https://${host}/storage/v1/upload/resumable` };
+      return { token, endpoint: `https://${host}/storage/v1/upload/resumable/sign` };
     },
     async ownedAttachment(requestId, ownerHash, attachmentId) {
       const rows = await api<OwnedQuoteAttachment[]>('/rest/v1/rpc/quote_owned_attachment', {

@@ -4569,7 +4569,9 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
  * than 390/360px viewports. Scale the display text without clipping it. */
 @media (max-width: 73.74rem) {
   .studio[data-studio-route="home"] .studioIdentity h1 {
-    font-size: clamp(2.45rem, 11vw, 4.7rem);
+    /* Narrow screens inherit a non-wrapping two-line title; keep both lines
+     * entirely inside the viewport at 390px and the 1024px compact layout. */
+    font-size: clamp(2.25rem, 9vw, 4.15rem);
   }
 }
 

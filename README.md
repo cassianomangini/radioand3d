@@ -134,3 +134,15 @@ O relatório de reconciliação fica em `output/radio-visualizer/reconciliation.
 A execução usa as credenciais de leitura já usadas pelo catálogo e uma credencial de escrita restrita a `_analysis/v3/*`, configurada em `R2_VISUALIZER_WRITE_ACCESS_KEY_ID` e `R2_VISUALIZER_WRITE_SECRET_ACCESS_KEY`. Essas credenciais são somente do comando local e nunca entram no frontend.
 
 Use `--force` somente quando for necessário regerar todas as análises após uma mudança deliberada no algoritmo/configuração.
+
+
+### Fotos e vídeos do carrossel do Estúdio
+
+A tela `/studio` usa as mídias reais de `src/features/studio/prints-media.json` para o carrossel de Impressões. Para copiar mídias locais **sem publicar a pasta de origem**:
+
+1. Coloque fotos (JPG/PNG/WebP/AVIF) e vídeos (MP4/WebM) em `output/Fotos Impressoes`. A pasta `output` é ignorada pelo Git.
+2. Opcionalmente agrupe arquivos em subpastas por projeto: `output/Fotos Impressoes/Mano Jotta/foto-01.jpg`. Pastas viram projetos na galeria. Arquivos soltos viram entradas individuais.
+3. Execute `pnpm studio:media` a partir da raiz. O script copia os arquivos para `public/images/studio/impressoes` e atualiza o manifest; não inventa dimensões, materiais ou descrições.
+4. Confira títulos (derivados dos nomes de pasta/arquivo), cortes, direitos de imagem, vídeos sem som e peso das fotos **antes** de versionar os arquivos públicos ou fazer deploy.
+
+A ausência da pasta gera erro explícito e preserva o estado do catálogo; as demais rotas continuam funcionando com placeholder honesto.

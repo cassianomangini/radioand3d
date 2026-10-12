@@ -7,6 +7,8 @@ import {
   StudioSection
 } from "@/components/studio/studio-content";
 import catalogStyles from "@/components/studio/studio-catalog.module.css";
+import { StudioPrintGallery } from "@/components/studio/studio-print-gallery";
+import { studioPrintMedia } from "@/features/studio/prints-media";
 import { studioPrints } from "@/features/studio/catalog";
 import { buildPublicMetadata } from "@/lib/site-config";
 
@@ -35,8 +37,10 @@ export default function StudioPrintsPage() {
       pathname="/studio/impressoes"
       breadcrumbLabel="Impressões"
     >
-      <StudioSection title="Peças reais, sem catálogo inventado">
-        {publishedPrints.length ? (
+      <StudioSection title="Peças, detalhes e projetos reais">
+        {studioPrintMedia.length ? (
+          <StudioPrintGallery />
+        ) : publishedPrints.length ? (
           <div className={catalogStyles.grid}>
             {publishedPrints.map((entry) => {
               const image = entry.images[0];

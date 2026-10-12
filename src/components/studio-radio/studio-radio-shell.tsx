@@ -18,6 +18,7 @@ import {
 import { flushSync } from "react-dom";
 import styles from "./studio-radio-shell.module.css";
 import { RadioNavbarDock } from "./radio-navbar-dock";
+import { StudioPrintsCarousel } from "./studio-prints-carousel";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
@@ -2148,22 +2149,15 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <div
             className={styles.studioDetailRail}
             aria-hidden={!studioHub}
+            inert={!studioHub}
           >
-            <Link
+            <section
               className={styles.studioDetailCard}
               data-studio-card="prints"
-              href="/studio/impressoes"
-              aria-label="Ver impressões do estúdio"
-              tabIndex={studioHub ? 0 : -1}
+              aria-label="Impressões em destaque"
             >
-              <span className={styles.studioCardMediaPlaceholder} aria-hidden="true">
-                FOTO REAL PENDENTE · peça produzida
-              </span>
-              <span className={styles.studioCardLabel}>ESTÚDIO DE IMPRESSÃO 3D</span>
-              <strong>Impressões</strong>
-              <p>Veja peças que já saíram das impressoras, com contexto real de produção.</p>
-              <span className={styles.studioCardAction}>Ver impressões →</span>
-            </Link>
+              <StudioPrintsCarousel active={studioHub} />
+            </section>
 
             <Link
               className={styles.studioDetailCard}

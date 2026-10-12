@@ -433,3 +433,22 @@ Decisão desta fase:
 - produção real exige migrations/bucket, secrets server-side, testes de segurança e validação live;
 - documento canônico de infra: [SUPABASE_INFRASTRUCTURE_V1.md](../SUPABASE_INFRASTRUCTURE_V1.md);
 - checklist de provisionamento/validação remota: [E2](08-supabase-provisioning.md). Banco CM criado e staging pausado pelo usuário; **quatorze migrations e bucket privado aplicados**, e handlers `session`/`init`/`complete`/`submit` existem na `main` **com flag OFF**; worker de retenção já existe (não agendado); falta validar upload, remoção real, secrets e Cron. Nenhuma publicação.
+
+
+## Hub 12/10/2026 — carrossel e cores (em execução)
+
+Origem: imagem do site em modo Rádio docked + mock visual contextual aprovado para implementação no hub. O escopo é local ao Estúdio; não reabrir o player.
+
+- [x] Contrato visual fixado: três entradas, Impressões dominante, Orçamento e Produtos empilhados.
+- [x] Fotos/vídeos tratadas como conteúdo real; não inventar material, medidas, nomes, avaliações ou imagens.
+- [x] Implementar componente de carrossel próprio com navegação, pausa, indicador e navegação para galeria.
+- [x] Separar controles do carrossel de links para evitar interações aninhadas.
+- [x] Substituir laranja do Orçamento pela borda ciano/azul/violeta; reservar laranja/coral para Produtos.
+- [x] Preparar importação da pasta local `output/Fotos Impressoes` e manifesto JSON sem falsificar arquivos.
+- [x] Preparar galeria editorial por projeto, fotos/vídeos e visualização ampliada quando existirem mídias reais.
+- [ ] Executar `pnpm studio:media` no ambiente com a pasta local real do usuário; os arquivos não estão no Git nem foram anexados aqui.
+- [ ] Validar media reais: nomes, recorte, autorização de uso, compressão, poster de vídeo e peso de rede.
+- [ ] Executar e inspecionar CI/Playwright e navegador com mídia real em docked/lateral/mobile antes de aceite visual.
+- [ ] Registrar aceite de Cassiano no render final, sem confundi-lo com a aprovação do mock.
+
+Risco prioritário: sem as fotos na infraestrutura do site, o hub exibe fallback neutro; isso não é demonstração do resultado artístico final.

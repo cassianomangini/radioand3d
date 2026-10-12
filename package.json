@@ -14,6 +14,7 @@
     "visualizer:sync": "node scripts/sync-radio-visualizer.mjs",
     "visualizer:inspect": "node --experimental-strip-types scripts/inspect-radio-visualizer.mjs",
     "visual:qa": "playwright test",
+    "studio:media": "node scripts/sync-studio-prints.mjs",
     "quote:storage:smoke": "node scripts/quote-storage-smoke.mjs"
   },
   "dependencies": {

@@ -782,3 +782,24 @@ O que continua bloqueado por `ready_for_frontend: no` é a **cristalização vis
 ready_for_frontend: **no — visual final/mídia**  
 structural_frontend_authorized: **yes**  
 approved_by: **hub/estrutura-base aprovada por Cassiano em 04/10/2026; implementação estrutural sem mídia final autorizada em 05/10/2026**
+
+
+## Atualização visual autorizada — hub com carrossel (12/10/2026)
+
+**Referência:** mock contextual enviado por Cassiano em 12/10: modo Rádio recolhida (mini na navbar), Estúdio ocupando largura, bloco principal fotográfico à esquerda, Orçamento acima de Produtos à direita. Esta referência define composição e identidade, **não comprova fotos, dimensões, materiais ou produtos retratados**.
+
+**Aprovação:** Cassiano pediu explicitamente a implementação da estrutura do mock no hub e a correção das cores. O resultado renderizado ainda exige revisão/aceite.
+
+- Os três pilares permanecem os mesmos: **Impressões**, **Peça um orçamento**, **Produtos**.
+- A superfície dominante de Impressões torna-se um **carrossel de fotos e vídeos reais**, com título fixo, legenda por mídia quando conhecida, contagem, controles anterior/próximo e link para a galeria.
+- A mídia é decorativa no preview e deve começar **sem áudio**, sem tomar controle da CM Rádio.
+- O carrossel pausa com hover/foco, com controle explícito de pausa, parada quando a página está oculta e sem avanço automático em `prefers-reduced-motion`.
+- A entrada em galeria mostra miniaturas por projeto, com abertura ampliada de fotografias/vídeos; projeto não é um item da Shopee por padrão.
+- O CTA **Pedir orçamento** usa a gramática CM de contorno ciano/azul/violeta, **nunca laranja**.
+- **Laranja/coral fica restrito à área Produtos/Shopee** dentro do hub.
+- Fotos de peça impressa, acessórios e equipamentos são dados externos reais. Não gerar dragão, astronauta ou selo novo para simular produção. O mock é diretriz de layout, não fornecimento de fotografias.
+- A Rádio (docked ou lateral), a navegação, o divisor, o áudio único e os modos mobile continuam com seus contratos vigentes, não alterados por esta entrega.
+
+**Mídia:** origem local ignorada pelo Git `output/Fotos Impressoes`; importador `pnpm studio:media` publica cópias em `public/images/studio/impressoes` e gera `src/features/studio/prints-media.json`. O agente não acessa o filesystem do usuário. Nenhuma fotografia nova é alegada como importada até o manifest conter itens verificáveis.
+
+**ready_for_frontend:** sim, **apenas** para a composição do hub referenciada; revisão perceptiva e mídia E3 continuam abertas para conclusão final.

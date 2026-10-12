@@ -3829,8 +3829,13 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 .studioDetailCard[data-studio-card="store"] .studioCardLabel,
-.studioCardAction {
+.studioDetailCard[data-studio-card="products"] .studioCardLabel,
+.studioDetailCard[data-studio-card="products"] .studioCardAction {
   color: #ff8b68;
+}
+
+.studioCardAction {
+  color: #6edcff;
 }
 
 .studioDetailCard strong {
@@ -4192,7 +4197,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     #0a0d11;
 }
 
-.studioDetailCard[data-studio-card="prints"] > :not(.studioCardMediaPlaceholder),
 .studioDetailCard[data-studio-card="products"] > :not(.studioCardMediaPlaceholder) {
   position: relative;
   z-index: 1;
@@ -4479,5 +4483,83 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   .site[data-radio-dock-motion] .siteHeader,
   .radioDockEdge {
     transition: none !important;
+  }
+}
+
+
+/* Approved CM Studio hub (12/10): photographic Print carousel, violet/cyan
+ * custom quote action, Shopee-only orange. Keep Radio/dock rules untouched. */
+.studioDetailCard[data-studio-card="prints"] {
+  display: block;
+  isolation: isolate;
+  padding: 0;
+  background: #060a10;
+  border-color: rgb(130 164 195 / 30%);
+}
+
+.studioDetailCard[data-studio-card="prints"] > [data-studio-prints-carousel="true"] {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.studioDetailCard[data-studio-card="quote"] {
+  background:
+    radial-gradient(ellipse at 96% 16%, rgb(62 45 121 / 10%), transparent 55%),
+    linear-gradient(145deg, #0b0d15 0%, #06090f 72%);
+  border-color: rgb(151 158 206 / 25%);
+}
+
+.studioDetailCard[data-studio-card="quote"] .studioCardAction {
+  width: fit-content;
+  min-height: 2.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: clamp(0.85rem, 1.3cqw, 1.3rem);
+  padding: 0.52rem 1.05rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(#090e19, #090e19) padding-box,
+    linear-gradient(110deg, #00d7f5, #198cff 55%, #a964f5) border-box;
+  color: #f5faff;
+  font-family: var(--font-sans);
+  font-size: clamp(0.74rem, 0.87cqw, 0.86rem);
+  font-weight: 750;
+  letter-spacing: 0;
+  transition: background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.studioDetailCard[data-studio-card="quote"]:hover .studioCardAction,
+.studioDetailCard[data-studio-card="quote"]:focus-visible .studioCardAction {
+  box-shadow: 0 0 1.25rem rgb(74 121 246 / 17%);
+}
+
+.studioDetailCard[data-studio-card="products"] {
+  background:
+    radial-gradient(ellipse at 100% 0%, rgb(122 56 30 / 9%), transparent 58%),
+    linear-gradient(145deg, #0b0d12 0%, #07090d 75%);
+}
+
+.studioDetailCard[data-studio-card="products"] .studioCardAction {
+  color: #ff9569;
+}
+
+.studioDetailCard[data-studio-card="products"]:hover,
+.studioDetailCard[data-studio-card="products"]:focus-visible {
+  border-color: rgb(255 139 104 / 52%);
+}
+
+@media (max-width: 73.74rem) {
+  .studioDetailCard[data-studio-card="prints"] {
+    min-height: clamp(19.5rem, 83vw, 28rem);
+    padding: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studioDetailCard[data-studio-card="quote"] .studioCardAction {
+    transition: none;
   }
 }

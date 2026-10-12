@@ -46,15 +46,19 @@ function mockStorage({mode='normal'}={}) {
       return answer({url:'/object/upload/sign/'+bucket+'/'+object+'?token='+
         (mode==='invalid-signature'?'not-a-jws':TOKEN)});
     }
-    if(path==='/storage/v1/upload/resumable' && method==='POST'){
+    if(path==='/storage/v1/upload/resumable/sign' && method==='POST'){
       assert.equal(opts.headers['x-signature'],TOKEN);
+      assert.equal(opts.headers['x-upsert'],'false');
+      assert.equal(opts.headers.apikey,undefined);
+      assert.equal(opts.headers.authorization,undefined);
       if (mode === 'tus-signature-failure') return answer({code:'AccessDenied'},400);
       data=Buffer.alloc(Number(opts.headers['Upload-Length']));
       assert.ok(Buffer.byteLength(opts.headers['Upload-Metadata'])>0);
       return new Response(null,{status:201,
-        headers:{location:'https://'+REF+'.storage.supabase.co/storage/v1/upload/resumable/upload-fixture'}});
+        headers:{location:'https://'+REF+'.storage.supabase.co/storage/v1/upload/resumable/'+
+          (mode==='unsafe-upload-location'?'upload-fixture':'sign/upload-fixture')}});
     }
-    if(path==='/storage/v1/upload/resumable/upload-fixture'){
+    if(path==='/storage/v1/upload/resumable/sign/upload-fixture'){
       if(method==='HEAD')return new Response(null,{status:200,headers:{'upload-offset':String(tusOffset)}});
       if(method==='PATCH'){
         const offset=Number(opts.headers['Upload-Offset']);
@@ -116,6 +120,11 @@ test('signed TUS -> authenticated byte-range -> anonymous deny -> physical clean
   const steps=mock.calls.map(x=>x.method);
   assert.deepEqual(steps.slice(0,2),['POST','GET']);
   assert.equal(steps.filter(x=>x==='PATCH').length,1);
+  // Every TUS operation (create/HEAD/PATCH) stays on the signed route.
+  const tusRequests = mock.calls.filter(x=>x.path.includes('/upload/resumable'));
+  assert.ok(tusRequests.length >= 4);
+  assert.ok(tusRequests.every(x => x.path.startsWith('/storage/v1/upload/resumable/sign')));
+  assert.equal(tusRequests[0].method,'POST');
   assert.equal(steps.filter(x=>x==='HEAD').length,2);
   assert.deepEqual(steps.slice(-4),['DELETE','POST','DELETE','GET']);
   for(const row of mock.calls){
@@ -134,6 +143,16 @@ test('full 6 MiB + 128 byte binary STL resumes via HEAD and second PATCH',async(
   assert.equal(mock.calls.filter(x=>x.method==='HEAD').length,3);
   assert.equal(mock.clean(),true);
 });
+test('rejects TUS location that downgrades the signed route',async()=>{
+  const mock=mockStorage({mode:'unsafe-upload-location'});
+  await assert.rejects(runStorageSmoke(input(mock)),
+    err=>err instanceof StorageSmokeError && err.stage==='unsafe_upload_location');
+  assert.equal(mock.clean(),true);
+  const requests=mock.calls.filter(x=>x.path.includes('/upload/resumable'));
+  assert.equal(requests.length,1);
+  assert.equal(requests[0].path,'/storage/v1/upload/resumable/sign');
+});
+
 test('cannot contact any project except the explicitly confirmed project',async()=>{
   const mock=mockStorage();
   await assert.rejects(runStorageSmoke(input(mock,false,'bbbbbbbbbbbbbbbbbbbb')),
@@ -173,7 +192,7 @@ test('rejects invalid signed token format before TUS and still cleans test bucke
   const mock=mockStorage({mode:'invalid-signature'});
   await assert.rejects(runStorageSmoke(input(mock)),
     err => err instanceof StorageSmokeError && err.stage==='signed_token_not_compact_jws');
-  assert.equal(mock.calls.some(x=>x.path==='/storage/v1/upload/resumable'),false);
+  assert.equal(mock.calls.some(x=>x.path==='/storage/v1/upload/resumable/sign'),false);
   assert.equal(mock.clean(),true);
 });
 

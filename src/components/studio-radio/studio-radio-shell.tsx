@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  Fragment,
   useEffect,
   useEffectEvent,
   useMemo,
@@ -348,10 +349,12 @@ function revealPhrase(text: string, startDelayMs: number, stepMs: number) {
     const delay = startDelayMs + cursor * stepMs;
     cursor += word.length + 1;
     return (
-      <span key={`${startDelayMs}-word-${index}`} className={styles.studioRevealWord}>
-        {revealChars(word, delay, stepMs)}
-      </span>
-      {index < words.length - 1 ? " " : null}
+      <Fragment key={`${startDelayMs}-word-${index}`}>
+        <span className={styles.studioRevealWord}>
+          {revealChars(word, delay, stepMs)}
+        </span>
+        {index < words.length - 1 ? " " : null}
+      </Fragment>
     );
   });
 }

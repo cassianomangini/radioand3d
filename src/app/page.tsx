@@ -1,9 +1,9 @@
 import { buildPublicMetadata } from "@/lib/site-config";
 
 export const metadata = buildPublicMetadata({
-  title: "CM 3D & Radio | Estúdio de Impressão 3D",
+  title: "Impressão 3D, Orçamentos e Rádio Online | CM 3D & Radio",
   description:
-    "Estúdio de Impressão 3D e CM Rádio em uma experiência integrada.",
+    "Explore o CM 3D & Rádio: estúdio de impressão 3D, produtos, projetos personalizados, orçamentos e rádio online para acompanhar sua visita.",
   pathname: "/"
 });
 

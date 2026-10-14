@@ -1,6 +1,6 @@
 # Copy V1: Estúdio de Impressão 3D + CM Rádio
 
-Status: proposta editorial para aprovação de Cassiano.
+Status: copy da Home **aprovada por Cassiano em 14/10/2026**. A versão inicial abaixo foi substituída na Home; as demais orientações editoriais permanecem como histórico quando não conflitarem com a decisão atual.
 
 A copy deste recorte precisa orientar alguém que chega sem contexto. Ela evita catálogo fictício, linguagem inflada e promessas que dependem de conteúdo ainda não publicado.
 
@@ -8,31 +8,31 @@ A copy deste recorte precisa orientar alguém que chega sem contexto. Ela evita 
 
 ### Eyebrow
 
-**ESTÚDIO DE IMPRESSÃO 3D & MÚSICAS**
+**SEJA MUITO BEM-VINDO!**
 
-Centralizado logo abaixo da imagem do logo, em uma linha quando houver espaço.
+Saudação no lado direito da arte do X1 no desktop; abaixo da arte no mobile.
 
 ### Headline
 
-**Ideias que ganham forma.**
+**Impressão 3D, música e muito mais do que você imagina.**
+
+Título principal de impacto, claro sobre os dois universos do site. Destacar “muito mais” em ciano/violeta, com quebra responsiva por palavras.
 
 ### Lead
 
-Marcador: **ESTÚDIO 3D**
-
-Descubra mais sobre nosso estúdio, peças, materiais, cores e muito mais para voce explorar..
+Um estúdio cheio de possibilidades, produtos para descobrir, seus projetos transformados em peças reais e uma rádio para deixar tudo ainda melhor.
 
 ### CTA principal
 
-**Conheça mais sobre**
+**Quero conhecer tudo →**
 
-O botão permanece visível. Levará à página do Estúdio quando ela existir; até lá, fica desativado.
+Link ativo para `/studio`, preservando a Rádio na navegação.
 
 ### CTA secundário
 
 **Falar sobre uma ideia**
 
-O CTA secundário só entra quando o caminho de contato estiver definido. Não usar “Ver materiais” enquanto a seção de materiais ainda não tiver conteúdo real.
+Não incluir CTA secundário na Home neste recorte. O caminho de orçamento aparece no hub do Estúdio.
 
 ## CM Rádio
 
@@ -56,7 +56,7 @@ A Rádio já fica aberta e utilizável no desktop. Não precisa de CTA separado 
 
 Não renderizar títulos como “Produtos”, “Materiais” ou “Categorias” vazios.
 
-Os blocos “O ESTÚDIO / Do arquivo ao objeto real” e “PRÓXIMAS ENTRADAS” foram retirados da home a pedido de Cassiano. O botão “Conheça mais sobre” e o item “Sobre” permanecem visíveis, desativados até existir a página do Estúdio.
+Os blocos “O ESTÚDIO / Do arquivo ao objeto real” e “PRÓXIMAS ENTRADAS” foram retirados da home a pedido de Cassiano. O botão “Quero conhecer tudo” leva ao hub do Estúdio já publicado; o item “Sobre” permanece desativado enquanto não houver essa página.
 
 ## Estado sem músicas publicadas
 
@@ -80,6 +80,6 @@ Não criar faixas fictícias para preencher a lista.
 - manter títulos curtos e concretos;
 - preservar **Estúdio de Impressão 3D** como orientação explícita.
 
-`approved_by: null`
+`approved_by: Cassiano (copy da Home, 14/10/2026)`
 
 `artifact_ref: docs/design/STUDIO_RADIO_COPY_V1.md`

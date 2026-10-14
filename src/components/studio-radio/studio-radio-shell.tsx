@@ -2125,27 +2125,24 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             data-studio-intro={studioRoute === "home" ? "home" : undefined}
           >
             <div className={styles.studioEyebrowStack} aria-live="off">
-              <span key={studioIntroCycle} aria-hidden={studioRoute !== "home"}>{revealPhrase("ESTÚDIO DE CRIAÇÃO", 0, 24)}</span>
+              <span key={studioIntroCycle} aria-hidden={studioRoute !== "home"}>{revealPhrase("SEJA MUITO BEM-VINDO!", 0, 24)}</span>
               <span aria-hidden={studioRoute !== "detail"}>ESTÚDIO DE IMPRESSÃO 3D</span>
             </div>
 
-            <h1 id="studio-title" aria-label="Ideias que ganham forma.">
+            <h1 id="studio-title" aria-label="Impressão 3D, música e muito mais do que você imagina.">
               <span key={studioIntroCycle}>
-                <span className={styles.studioRevealLine}>{revealPhrase("Ideias que", 120, 36)}</span>
-                <br />
-                <span className={styles.studioRevealLine}>
-                  {revealPhrase("ganham", 120 + 10 * 36, 36)}
-                  {" "}
-                  <span className={styles.studioRevealAccent}>{revealPhrase("forma.", 120 + 17 * 36, 36)}</span>
+                <span className={styles.studioHomeHeadlineLine}>{revealPhrase("Impressão 3D,", 120, 28)}</span>
+                <span className={styles.studioHomeHeadlineLine}>
+                  {revealPhrase("música e", 540, 28)}{" "}
+                  <span className={styles.studioRevealAccent}>{revealPhrase("muito mais", 800, 28)}</span>
                 </span>
+                <span className={styles.studioHomeHeadlineLine}>{revealPhrase("do que você imagina.", 1120, 28)}</span>
               </span>
             </h1>
 
-            <p className={styles.lead} aria-label="Peças, materiais e cores produzidos com precisão, camada por camada.">
+            <p className={styles.lead} aria-label="Um estúdio cheio de possibilidades, produtos para descobrir, seus projetos transformados em peças reais e uma rádio para deixar tudo ainda melhor.">
               <span key={studioIntroCycle}>
-                <span className={styles.studioRevealLine}>{revealPhrase("Peças, materiais e cores produzidos", 420, 14)}</span>
-                <br className={styles.leadBreak} />
-                <span className={styles.studioRevealLine}>{revealPhrase("com precisão, camada por camada.", 420 + 38 * 14, 14)}</span>
+                {revealPhrase("Um estúdio cheio de possibilidades, produtos para descobrir, seus projetos transformados em peças reais e uma rádio para deixar tudo ainda melhor.", 1100, 11)}
               </span>
             </p>
 
@@ -2153,13 +2150,13 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               <Link
                 href="/studio"
                 className={styles.primaryAction}
-                aria-label="Explore o estúdio"
+                aria-label="Quero conhecer tudo"
                 aria-hidden={studioRoute !== "home"}
                 tabIndex={studioRoute === "home" ? 0 : -1}
                 onPointerEnter={() => router.prefetch("/studio")}
                 onClick={(event) => handleStudioRouteLink(event, "/studio")}
               >
-                <span>Explore o estúdio</span>
+                <span>Quero conhecer tudo</span>
                 <span aria-hidden="true">→</span>
               </Link>
 

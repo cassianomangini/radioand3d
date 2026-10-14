@@ -3680,6 +3680,11 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   margin-top: 1.35rem;
 }
 
+/* The highlighted hook is one idea; never orphan "mais" on its own line. */
+.studioIdentity[data-studio-intro="home"] .studioRevealAccent {
+  white-space: nowrap;
+}
+
 .studioRevealAccent,
 .studioRevealAccent .studioRevealChar {
   background: linear-gradient(100deg, #00d7f5 5%, #1398ff 48%, #b82ee9 100%);

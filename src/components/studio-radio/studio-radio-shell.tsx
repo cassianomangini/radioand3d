@@ -350,8 +350,8 @@ function revealPhrase(text: string, startDelayMs: number, stepMs: number) {
     return (
       <span key={`${startDelayMs}-word-${index}`} className={styles.studioRevealWord}>
         {revealChars(word, delay, stepMs)}
-        {index < words.length - 1 ? " " : null}
       </span>
+      {index < words.length - 1 ? " " : null}
     );
   });
 }

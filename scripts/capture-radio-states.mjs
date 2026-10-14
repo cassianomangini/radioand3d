@@ -393,7 +393,7 @@ try {
   const studioRouteClicked = await evaluate(
     client,
     `(() => {
-      const link = document.querySelector('a[aria-label="Explore o estúdio"]');
+      const link = document.querySelector('#studio[data-studio-route="home"] a[href="/studio"][aria-hidden="false"]');
       if (!(link instanceof HTMLElement)) return false;
       link.click();
       return true;
@@ -499,7 +499,7 @@ try {
   const mobileStudioRouteClicked = await evaluate(
     client,
     `(() => {
-      const link = document.querySelector('a[aria-label="Explore o estúdio"]');
+      const link = document.querySelector('#studio[data-studio-route="home"] a[href="/studio"][aria-hidden="false"]');
       if (!(link instanceof HTMLElement)) return false;
       link.click();
       return true;

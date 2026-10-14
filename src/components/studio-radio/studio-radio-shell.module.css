@@ -3642,6 +3642,14 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
 /* Copy aprovada para a Home: titulo de alto impacto sem invadir o X1.
    As linhas se ajustam por palavras quando o Estudio perde largura para a Radio. */
+/* The approved full headline needs a wider right-hand copy lane
+   inside the Studio half without changing the X1 artwork or Radio split. */
+@media (min-width: 73.75rem) {
+  .studioIdentity[data-studio-intro="home"] {
+    right: clamp(1rem, 1.5%, 1.5rem);
+  }
+}
+
 .studioIdentity[data-studio-intro="home"] .studioEyebrowStack {
   margin-bottom: 0.95rem;
   font-size: clamp(0.83rem, 1.35cqw, 1rem);

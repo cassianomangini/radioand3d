@@ -1,5 +1,6 @@
+import styles from "./quote-page.module.css";
 import { QuoteWizard } from "@/components/studio/quote-wizard";
-import { StudioPageShell, StudioSection } from "@/components/studio/studio-content";
+import { StudioPageShell } from "@/components/studio/studio-content";
 import { buildPublicMetadata } from "@/lib/site-config";
 
 export const metadata = buildPublicMetadata({
@@ -35,7 +36,7 @@ export default async function StudioQuotePage({
     <StudioPageShell
       eyebrow="Orçamento"
       title="Conte o que você precisa."
-      lead="O formulário começa pelo projeto, não pelo seu telefone. Você responde somente o que faz sentido para o tipo de peça e revisa tudo antes do envio."
+      lead="Precisamos apenas de algumas informações para avaliar seu projeto e entender como podemos realizá-lo."
       pathname="/studio/orcamento"
       breadcrumbLabel="Orçamento"
     >
@@ -45,13 +46,16 @@ export default async function StudioQuotePage({
         initialOrigin={initialOrigin}
       />
 
-      <StudioSection eyebrow="Como funciona" title="Análise antes de contato">
-        <p>
-          O objetivo é receber contexto suficiente para avaliar o projeto antes de abrir
-          uma conversa manual. Enviar uma solicitação não significa aceite automático,
-          prazo garantido ou produção imediata.
-        </p>
-      </StudioSection>
+      <aside className={styles.processNote} aria-labelledby="quote-process-title">
+        <span className={styles.processEyebrow}>Como funciona</span>
+        <div>
+          <h2 id="quote-process-title">Você conta a ideia. Nós analisamos os detalhes.</h2>
+          <p>
+            Cada projeto é avaliado individualmente para entender as possibilidades de produção.
+            Depois, combinamos os próximos passos — sem prometer aceite ou prazo antes da análise.
+          </p>
+        </div>
+      </aside>
     </StudioPageShell>
   );
 }

@@ -23,6 +23,7 @@ import {
   type QuoteRequestDraft
 } from "@/features/studio/quote-request-contract";
 import { trackPublicEvent } from "@/lib/public-analytics";
+import { motion, useReducedMotion } from "motion/react";
 import styles from "./quote-wizard.module.css";
 
 const labels: Record<ProjectType, string> = {
@@ -30,6 +31,13 @@ const labels: Record<ProjectType, string> = {
   placa: "Criar uma placa personalizada",
   caixa: "Criar uma caixa sob medida",
   outro: "Outro projeto"
+};
+
+const descriptions: Record<ProjectType, string> = {
+  impressao: "Tenho o modelo pronto e preciso produzir a peça.",
+  placa: "Logo, texto, QR Code ou identificação.",
+  caixa: "Para guardar, proteger ou encaixar algo.",
+  outro: "Tem outra ideia? Vamos entender o que você precisa."
 };
 
 const startingPointOptions = [
@@ -211,13 +219,14 @@ export function QuoteWizard({
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [error, setError] = useState("");
+  const reduceMotion = useReducedMotion();
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const analyticsStartedRef = useRef(false);
   const totalSteps = type === "impressao" ? 5 : 6;
 
   const stepTitle = useMemo(() => {
-    if (step === 1) return "O que você precisa?";
+    if (step === 1) return "O que você quer imprimir?";
 
     if (type === "impressao") {
       return [
@@ -585,11 +594,38 @@ export function QuoteWizard({
       data-quote-type={type ?? undefined}
       data-quote-step={step}
     >
-      <div className={styles.progress}>
-        <span>Orçamento</span>
-        <span>Etapa {step} de {totalSteps}</span>
+      <div className={styles.progressBlock}>
+        <div className={styles.progress}>
+          <span>Seu projeto</span>
+          <span>Etapa {String(step).padStart(2, "0")} / {String(totalSteps).padStart(2, "0")}</span>
+        </div>
+        <div
+          className={styles.progressTrack}
+          role="progressbar"
+          aria-label="Progresso do orçamento"
+          aria-valuemin={1}
+          aria-valuemax={totalSteps}
+          aria-valuenow={step}
+          aria-valuetext={`Etapa ${step} de ${totalSteps}`}
+        >
+          {Array.from({ length: totalSteps }, (_, index) => (
+            <span
+              key={index}
+              className={styles.progressSegment}
+              data-done={index < step}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
       </div>
 
+      <motion.div
+        key={`${type ?? "inicio"}-${step}`}
+        className={styles.stepPanel}
+        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduceMotion ? 0 : 0.32, ease: [0.16, 1, 0.3, 1] }}
+      >
       <h2 className={styles.question} id="quote-question" ref={headingRef} tabIndex={-1}>
         {stepTitle}
       </h2>
@@ -608,10 +644,10 @@ export function QuoteWizard({
       {step === 1 ? (
         <>
           <p className={styles.help}>
-            Começamos pela intenção para não fazer você responder perguntas que não têm relação com o projeto.
+            Escolha o caminho que melhor descreve sua ideia.
           </p>
-          <div className={styles.options}>
-            {(Object.keys(labels) as ProjectType[]).map((option) => (
+          <div className={styles.options} role="group" aria-label="Tipo de projeto">
+            {(Object.keys(labels) as ProjectType[]).map((option, index) => (
               <button
                 className={styles.option}
                 key={option}
@@ -630,8 +666,14 @@ export function QuoteWizard({
                   });
                 }}
               >
-                <span>{labels[option]}</span>
-                <span aria-hidden="true">→</span>
+                <span className={styles.optionNumber} aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className={styles.optionCopy}>
+                  <span className={styles.optionTitle}>{labels[option]}</span>
+                  <span className={styles.optionDescription}>{descriptions[option]}</span>
+                </span>
+                <span className={styles.optionMarker} aria-hidden="true" />
               </button>
             ))}
           </div>
@@ -641,7 +683,7 @@ export function QuoteWizard({
       {step === 2 && type === "impressao" ? (
         <>
           <p className={styles.help}>
-            O arquivo é o ponto de partida. A seleção abaixo é somente local até o backend privado estar definido.
+            O arquivo é o ponto de partida. Enquanto o envio não está disponível, o arquivo permanece somente neste dispositivo.
           </p>
           <FilePicker
             files={files}
@@ -823,7 +865,7 @@ export function QuoteWizard({
 
       {step === contactStep ? (
         <>
-          <div className={styles.options} role="group" aria-label="Canal de contato">
+          <div className={`${styles.options} ${styles.contactOptions}`} role="group" aria-label="Canal de contato">
             <button
               className={styles.option}
               type="button"
@@ -969,17 +1011,19 @@ export function QuoteWizard({
           </dl>
 
           <p className={styles.notice}>
-            A interface e a revisão estão prontas, mas o envio permanece desligado até definirmos armazenamento privado,
-            validação de arquivos, retenção e destino da triagem. Nenhum dado desta prévia é enviado.
+            Esta é uma prévia do pedido. O envio permanece indisponível enquanto concluímos a
+            liberação segura do serviço. Nenhuma informação ou arquivo é transmitido nesta etapa.
           </p>
         </>
       ) : null}
+
+      </motion.div>
 
       <div className={styles.actions}>
         <button type="button" onClick={back} disabled={step === 1}>Voltar</button>
         {step < reviewStep ? (
           <button className={styles.primary} type="button" onClick={next}>
-            Continuar →
+            <span>Continuar</span><span aria-hidden="true">→</span>
           </button>
         ) : (
           <button className={styles.primary} type="button" disabled>

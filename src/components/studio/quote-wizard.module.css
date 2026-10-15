@@ -329,3 +329,84 @@
   font-size: 0.7rem;
   line-height: 1.5;
 }
+
+
+/* Quote experience refinement: calm, precise, and consistent with the CM studio. */
+.wizard {
+  width: min(100%, 62rem);
+  gap: 0;
+  padding: 0 0 2rem;
+}
+
+.progressBlock { margin: 0 0 clamp(1.8rem, 3.5vw, 2.55rem); }
+.progress {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #91a4b3;
+}
+.progress > :last-child { color: #d3e0e9; }
+.progressTrack { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.35rem; margin-top: 0.78rem; }
+.progressTrack:has(.progressSegment:nth-child(5):last-child) { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.progressSegment { height: 3px; background: #243340; border-radius: 20px; transition: background 200ms ease; }
+.progressSegment[data-done="true"] { background: #76d1e2; }
+
+.stepPanel { display: grid; gap: clamp(0.85rem, 1.8vw, 1.15rem); min-width: 0; }
+.question { font-size: clamp(1.75rem, 3vw, 2.35rem); line-height: 1.17; font-weight: 600; letter-spacing: -0.047em; }
+.help { max-width: 58ch; font-size: 0.87rem; line-height: 1.55; color: #91a2b0; }
+.options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.option {
+  min-width: 0;
+  min-height: 7.25rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.15rem 1rem;
+  border-radius: 0.88rem;
+  border-color: #23303b;
+  background: #0b1017;
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.option:hover { border-color: #456577; background: #101923; transform: translateY(-1px); }
+.option:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+.option[aria-pressed="true"] { border-color: #5aafc2; background: #0d1a23; box-shadow: inset 0 0 0 1px rgb(99 195 216 / 18%); }
+.optionNumber { padding-top: 0.2rem; color: #85a0b0; font-family: var(--font-ibm-plex-mono); font-size: 0.67rem; }
+.optionCopy { display: grid; gap: 0.43rem; min-width: 0; }
+.optionTitle { font-size: 0.9rem; font-weight: 620; line-height: 1.37; letter-spacing: -0.018em; }
+.optionDescription { font-size: 0.73rem; color: #9caebc; line-height: 1.5; }
+.optionMarker { flex: 0 0 1.05rem; height: 1.05rem; margin-left: auto; margin-top: 0.1rem; border: 1px solid #536879; border-radius: 50%; }
+.option[aria-pressed="true"] .optionMarker { background: #9be6f0; border-color: #9be6f0; box-shadow: inset 0 0 0 4px #0d1a23; }
+.contactOptions .option { min-height: 3.5rem; align-items: center; padding: 0.9rem 1rem; }
+.fieldGroup input, .fieldGroup textarea, .fieldGroup select { border-radius: 0.7rem; background: #0b1119; border-color: #283848; }
+.fieldGroup input:focus-visible, .fieldGroup textarea:focus-visible, .fieldGroup select:focus-visible { border-color: #6bc9df; }
+.fieldGroup label, .fieldGroup legend { font-weight: 600; }
+.checkChoice { border-radius: 0.68rem; background: #0b1119; }
+.fileDrop { border-radius: 0.85rem; background: #0b1119; padding: 1.4rem; }
+.actions { margin-top: 1.55rem; align-items: center; }
+.actions button { min-height: 2.9rem; border-radius: 0.7rem; padding: 0.72rem 1.05rem; }
+.actions button:first-child { border-color: transparent; background: transparent; color: #b3c1cb; }
+.actions button:first-child:disabled { opacity: 0.35; }
+.actions .primary { display: inline-flex; align-items: center; justify-content: space-between; gap: 2.5rem; background: #bcecf5; border-color: #bcecf5; color: #081923; font-weight: 730; }
+.actions .primary:hover:not(:disabled) { background: #d6f5fa; border-color: #d6f5fa; }
+.actions .primary:disabled { background: #14212a; color: #a3b0be; border-color: #273848; }
+@media (max-width: 50rem) {
+  .options { grid-template-columns: 1fr; }
+  .option { min-height: 5.5rem; padding: 0.95rem; }
+  .optionDescription { font-size: 0.75rem; }
+  .contactOptions { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .actions { flex-direction: row; }
+  .actions button { width: auto; }
+}
+@media (max-width: 25rem) {
+  .question { font-size: 1.75rem; }
+  .option { gap: 0.65rem; }
+  .optionTitle { font-size: 0.84rem; }
+  .actions .primary { gap: 1.1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .option, .progressSegment { transition: none; }
+  .option:hover { transform: none; }
+}

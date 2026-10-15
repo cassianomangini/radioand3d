@@ -1,0 +1,35 @@
+.processNote {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.27fr) 1fr;
+  gap: 1.4rem;
+  max-width: 62rem;
+  padding: 1.8rem 0 2.25rem;
+  border-top: 1px solid rgb(151 171 190 / 16%);
+}
+.processEyebrow {
+  padding-top: 0.2rem;
+  color: #94a6b5;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+.processNote h2 {
+  margin: 0 0 0.75rem;
+  color: #eaf2f7;
+  font-weight: 620;
+  font-size: clamp(1.12rem, 1.8vw, 1.35rem);
+  letter-spacing: -0.035em;
+  line-height: 1.35;
+}
+.processNote p {
+  margin: 0;
+  max-width: 63ch;
+  color: #97a8b6;
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+@media (max-width: 42rem) {
+  .processNote { grid-template-columns: 1fr; gap: 0.9rem; }
+}

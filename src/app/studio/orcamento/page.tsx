@@ -33,6 +33,7 @@ export default async function StudioQuotePage({
   const initialOrigin = Array.isArray(params.origem) ? params.origem[0] : params.origem;
 
   return (
+    <div className={styles.quotePage}>
     <StudioPageShell
       eyebrow="Orçamento"
       title="Conte o que você precisa."
@@ -57,5 +58,6 @@ export default async function StudioQuotePage({
         </div>
       </aside>
     </StudioPageShell>
+    </div>
   );
 }

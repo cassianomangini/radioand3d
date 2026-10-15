@@ -620,7 +620,7 @@ export function QuoteWizard({
       </div>
 
       <motion.div
-        key={`${type ?? "inicio"}-${step}`}
+        key={step}
         className={styles.stepPanel}
         initial={reduceMotion ? false : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}

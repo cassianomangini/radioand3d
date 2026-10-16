@@ -2102,6 +2102,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       <div
         ref={shellRef}
         className={styles.desktopShell}
+        role="region"
+        aria-label="Estúdio e Rádio"
         data-dragging={dragging ? "true" : undefined}
       >
         <main
@@ -2118,7 +2120,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             className={styles.studioCatalogHeader}
             aria-hidden={!studioHub}
           >
-            <strong>ESTÚDIO DE IMPRESSÃO 3D</strong>
+            <h1>ESTÚDIO DE IMPRESSÃO 3D</h1>
             <span>PROJETOS PERSONALIZADOS, PEÇAS PRODUZIDAS E PRODUTOS PRONTOS.</span>
           </div>
 
@@ -2243,12 +2245,13 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           ref={resizeHandleRef}
           className={styles.resizeHandle}
           data-resize-hint={showResizeHint && !radioFullscreen ? "true" : undefined}
-          role="separator"
-          aria-label={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Arraste para redimensionar CM Rádio"}
-          aria-orientation="vertical"
+          role={radioFullscreen ? "button" : "separator"}
+          aria-label={radioFullscreen ? "Restaurar o Estúdio" : "Arraste para redimensionar CM Rádio"}
+          aria-orientation={radioFullscreen ? undefined : "vertical"}
           aria-valuemin={radioFullscreen ? undefined : MIN_RADIO_WIDTH}
           aria-valuemax={radioFullscreen ? undefined : MAX_RADIO_WIDTH}
           aria-valuenow={radioFullscreen ? undefined : Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)}
+          aria-controls={radioFullscreen ? undefined : "radio"}
           tabIndex={0}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

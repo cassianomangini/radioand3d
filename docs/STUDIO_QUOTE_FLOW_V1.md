@@ -50,7 +50,7 @@ Esses parâmetros auxiliam preenchimento e analytics. Não criam URLs canônicas
 
 Pergunta:
 
-**O que você precisa?**
+**O que você quer imprimir?**
 
 Opções iniciais:
 
@@ -60,6 +60,8 @@ Opções iniciais:
 - Outro projeto
 
 “Imprimir um arquivo 3D” é um branch próprio. Essa pessoa não deve atravessar perguntas de criação/modelagem que não se aplicam.
+
+Na etapa 1, selecionar qualquer opção avança diretamente para a pergunta seguinte. Os cards são os controles de avanço dessa tela; não há botões separados de “Voltar” ou “Continuar” no rodapé. A partir da etapa 2, a navegação do wizard permanece disponível.
 
 ## Branch — impressão a partir de arquivo pronto
 

@@ -52,7 +52,7 @@ Antes de layout visível substancial:
 - [x] wireframe do hub `/studio` mobile;
 - [x] wireframe da página Placas desktop/mobile;
 - [x] wireframe do fluxo completo de Orçamento;
-- [ ] pelo menos uma etapa do Orçamento com direção visual final;
+- [x] primeira etapa do Orçamento com direção visual fornecida por Cassiano em 16/10; render local ainda aguarda aceite visual final;
 - [x] wireframe da página individual de Produto desktop/mobile;
 - [x] inventário de mídia existente;
 - [x] lista de mídia a fotografar;
@@ -198,6 +198,25 @@ Visitante frio entende em poucos segundos:
 - [ ] execução/persistência da triagem no backend remoto;
 - [x] eventos do funil instrumentados por contrato local sem PII; adaptador para provedor real fica no gate de lançamento;
 - [x] labels, foco por etapa, teclado e composição mobile validados estruturalmente no CI; auditoria final de lançamento continua em S1.8.
+
+### Recorte visual da primeira etapa — 16/10/2026
+
+- **Responsável:** CM Frontend. **Estado:** `in_progress`; implementação e autorrevisão local concluídas, aceite visual de Cassiano e mídia das opções pendentes.
+- **Objetivo e limite:** manter `/studio/orcamento` próximo do mock, com a última direção de Cassiano: título em uma linha e painel logo abaixo, sem explicação nem lista de passos. Não inventar as quatro imagens nem alterar o motor de áudio, o contrato de arquivos ou o envio remoto. Na recuperação da `main`, restabelecer a largura de 30% da Rádio já definida em 15/10.
+- **Contratos lidos:** plano do produto, roadmap, fluxo de Orçamento, handoff e wireframes comerciais, checklist 08 e auditoria visual CM.
+- [x] Remover a abertura em duas colunas, a explicação e os três passos com ícones. Deixar “Conte o que você precisa.” em uma linha, com o painel diretamente abaixo.
+- [x] Fixar a escala do fundo pela altura do viewport, sem ampliá-lo para preencher a largura ou acompanhar o crescimento do conteúdo.
+- [x] Manter camada escura própria atrás do título para preservar contraste sobre o cenário.
+- [x] Manter áreas de mídia neutras nas quatro opções, progresso segmentado, foco e avanço direto ao selecionar o card; remover o rodapé de navegação da etapa 1.
+- [x] Manter 2×2 com Rádio lateral e reduzir escala interna dos cards conforme a largura útil; mudar para cards em lista quando o Estúdio chega a cerca de metade da janela.
+- [x] Preservar o painel mais alto nas janelas comuns e compactar somente a etapa 1 em janela muito curta. Suavizar a borda visível do fundo atual à direita até chegar a nova arte panorâmica.
+- [x] Autorrevisão em Chrome via Playwright sobre build local: capturas `output/playwright/quote-fit-1250x542.png`, `quote-split-1280x605.png`, `quote-fit-1904x1008.png` e `quote-fit-mobile-390.png`. Em 1250 × 542 px, título em uma linha e painel até 508 px, sem rolagem vertical ou horizontal; com Rádio lateral em 1280 × 605 px, opções 2×2 e painel até 591 px; em desktop largo, painel até 942 px de 1008 px; mobile 390 sem overflow horizontal. O teste de clique no card abriu a etapa 2 e “Voltar” retornou à etapa 1. A captura anterior com Estúdio efetivo de 650 px mostrou cards em lista perto da metade da janela.
+- [x] Recuperação na `main`: código e três imagens de fundo/card do Orçamento já estavam no commit `27c374b`; a prévia local na porta 3000 ainda servia build antigo. Rebuild e reinício mostraram a versão atual. Contrato, roadmap e este checklist foram reconciliados com o código.
+- [x] Restaurar a largura padrão e mínima de 30% da Rádio sem perder dock, teclado ou áudio. Em Chrome, 1440 px → 432 px e 1904 px → 571 px; dock por teclado passou. A identidade invisível da Home deixou de acrescentar rolagem à rota estável de detalhe: em 1250 × 542 px com Rádio recolhida, a página mede 1250 × 542 px e o painel cabe inteiro.
+- [x] Após a recuperação, `pnpm build`, `pnpm typecheck`, `pnpm lint`, ESLint dirigido, `pnpm test` (125/125), `git diff --check`, 7 testes visuais de Orçamento/divisor e 2 testes do hub/dock passaram. A primeira execução visual encontrou build antigo; a segunda aguardou a hidratação pelo foco do wizard e passou na build atual.
+- [ ] Cassiano aprovar o render visual após ver a página atualizada no próprio navegador.
+- [ ] Inserir e revisar as quatro imagens quando Cassiano as gerar; não declarar a mídia concluída antes disso.
+- [ ] Substituir o fundo atual pela arte panorâmica após Cassiano gerá-la; revisar `cover`, posição focal e recortes desktop/mobile no navegador.
 
 ## Bloco S1.7 — Produtos
 

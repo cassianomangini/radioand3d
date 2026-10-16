@@ -1,6 +1,6 @@
 .site {
   --header-height: 4.25rem;
-  --radio-width: clamp(400px, 33.333vw, 480px);
+  --radio-width: 30vw;
   --rail-width: clamp(22px, 3dvh, 32px);
   min-height: 100dvh;
   background: var(--surface-page);
@@ -4039,6 +4039,10 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+.studio[data-studio-route="detail"]:not([data-studio-transition]) .studioIdentity {
+  display: none;
 }
 
 /* Extra travel while navigation is active: this is real DOM motion and remains visible in capture. */

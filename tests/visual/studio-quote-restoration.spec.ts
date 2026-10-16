@@ -7,6 +7,7 @@ test("A pagina de orcamento preserva a composicao e a selecao em um clique", asy
   await expect(page.getByRole("heading", { level: 1, name: "Conte o que você precisa." })).toBeVisible();
   const wizard = page.locator('[data-quote-step]');
   await expect(wizard).toHaveAttribute("data-quote-step", "1");
+  await expect(wizard.getByRole("heading", { level: 2, name: "O que você quer imprimir?" })).toBeFocused();
 
   const options = page.getByRole("group", { name: "Tipo de projeto" });
   await expect(options.locator("button")).toHaveCount(4);

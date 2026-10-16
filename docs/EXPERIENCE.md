@@ -20,7 +20,7 @@ Cassiano escolheu `output/dj2.png` como imagem da Rádio. A cópia exata em `pub
 
 O logo e a arte da Rádio devem manter a definição máxima dos PNGs fornecidos. A Home serve os arquivos originais, sem recompressão no carregamento. Isso não cria detalhe além da resolução dos arquivos de origem.
 
-Na mesma revisão, Cassiano pediu que a barra lateral da Rádio tenha proporção e aparência coerentes com o Estúdio. O estado inicial usa 480 px no desktop de 1440 px e reduz até 400 px perto do limite desktop; Expandir/Recolher fica dentro do cabeçalho da Rádio, mostra cursor de mão ao passar o mouse e anima apenas a mudança de largura em 260 ms. O arraste permanece imediato e a preferência por movimento reduzido desativa essa transição.
+Na mesma revisão, Cassiano pediu que a barra lateral da Rádio tenha proporção e aparência coerentes com o Estúdio. Em 15/10/2026 ele definiu que a abertura mínima e o tamanho ao abrir a página são 30% da largura da tela; Expandir/Recolher fica dentro do cabeçalho da Rádio, mostra cursor de mão ao passar o mouse e anima apenas a mudança de largura em 260 ms. O arraste permanece imediato e a preferência por movimento reduzido desativa essa transição.
 
 Na revisão da Rádio de 30/09/2026, Cassiano pediu retirar o slider de volume da faixa abaixo dos controles de transporte. O botão de volume fica depois de Próxima e antes do coração, abrindo o slider e a ação de mudo; a versão mobile da Rádio completa segue essa posição. Título e artista entram sobre a arte grande. A miniatura, o selo “CM RÁDIO” duplicado e o menu de três pontos saem da linha inferior.
 

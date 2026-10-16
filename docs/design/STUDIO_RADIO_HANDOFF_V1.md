@@ -54,7 +54,7 @@ A Rádio começa no topo do viewport, ocupa toda a altura útil e permanece fixa
 Em 1440 px:
 
 - gutter externo: 24-32 px;
-- Rádio padrão: **480 px em 1440 px**, reduzindo proporcionalmente até 400 px perto do limite desktop;
+- Rádio padrão e mínima: **30% da largura da tela**;
 - Estúdio usa todo o restante;
 - divisor visual: 1 px;
 - área interativa do divisor: 16 px.
@@ -63,8 +63,7 @@ O divisor visual é a própria borda da Rádio: não há coluna ou faixa escura 
 
 A largura não deve ser tratada como valor rígido. Usar limites:
 
-- Rádio mínima: **400 px**;
-- Rádio padrão: **min(480 px, 1/3 da largura)**, com mínimo de 400 px e respeitando o espaço do Estúdio;
+- Rádio mínima e padrão: **30% da largura da tela**, respeitando o espaço do Estúdio;
 - Rádio expandida: **clamp(560px, 48vw, 720px)**;
 - o Estúdio nunca pode cair abaixo de aproximadamente **640 px** no modo split.
 
@@ -88,13 +87,13 @@ O estado da largura pertence ao layout. Não altera fila, faixa, posição ou el
 
 Três estados de apresentação:
 
-1. **Padrão**: Rádio em 400-480 px conforme a largura desktop.
+1. **Padrão**: Rádio em 30% da largura da tela. Esse também é o menor tamanho aberto.
 2. **Expandida**: Rádio em aproximadamente 48% da largura, respeitando 720 px.
 3. **Personalizada**: largura deixada pelo usuário dentro dos limites.
 
 O botão expandir alterna entre Padrão e Expandida. Se o usuário arrastar depois, entra em Personalizada.
 
-Na revisão de Cassiano em 29/09/2026, a largura inicial de 390 px foi considerada fina. A Rádio passa a abrir em 480 px em 1440 px, diminuindo proporcionalmente até 400 px perto de 1180 px para preservar o Estúdio. O botão Expandir/Recolher fica visível no próprio cabeçalho. A mudança de largura por botão anima em 260 ms; o arraste responde diretamente ao ponteiro.
+Na revisão de Cassiano em 15/10/2026, a Rádio abre em 30% da largura da tela, e esse passa a ser também o menor tamanho aberto. O botão Expandir/Recolher fica visível no próprio cabeçalho. A mudança de largura por botão anima em 260 ms; o arraste responde diretamente ao ponteiro.
 
 ---
 

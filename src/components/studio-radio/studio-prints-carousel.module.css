@@ -252,16 +252,22 @@
 .timeline {
   display: flex;
   align-items: center;
-  gap: 0.1rem;
+  gap: 0;
   min-width: 0;
+  flex: 1 1 auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
 }
+
+.timeline::-webkit-scrollbar { display: none; }
 
 .timelineStep {
   position: relative;
-  flex: 1 1 0;
-  width: clamp(1.15rem, 1.9cqw, 1.75rem);
-  height: 2.1rem;
-  min-width: 1rem;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 2.75rem;
   display: grid;
   place-items: center;
   padding: 0;
@@ -298,9 +304,9 @@
 }
 
 .pause {
-  flex: 0 0 auto;
-  width: 2rem;
-  height: 2rem;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
   display: grid;
   place-items: center;
   padding: 0;
@@ -331,7 +337,7 @@
   .caption p { font-size: 0.8rem; }
   .kicker { font-size: 0.62rem; letter-spacing: 0.16em; }
   .explore { min-height: 2.55rem; padding-inline: 1rem; font-size: 0.76rem; }
-  .timelineStep { width: 1.2rem; }
+  .timelineStep { width: 2.75rem; }
 }
 
 @media (max-width: 73.74rem) {
@@ -345,14 +351,14 @@
   .bottomLine { flex-wrap: wrap; align-items: center; }
   .transport { margin-left: auto; }
   .arrow { top: 48%; }
-  .timelineStep { width: clamp(1.1rem, 4vw, 1.65rem); }
+  .timelineStep { width: 2.75rem; }
   .counter { font-size: 0.8rem; }
 }
 
 @media (max-width: 380px) {
   .caption { gap: 0.28rem; }
   .explore { padding-inline: 0.94rem; font-size: 0.74rem; }
-  .timelineStep { width: 1.08rem; }
+  .timelineStep { width: 2.75rem; }
   .transport { padding-left: 0.4rem; gap: 0.2rem; }
 }
 

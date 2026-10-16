@@ -260,7 +260,7 @@ try {
   const fullscreenReturnedToFocus = await evaluate(
     client,
     `(() => {
-      const separator = document.querySelector('[role="separator"]');
+      const separator = document.querySelector('[role="button"][aria-label="Restaurar o Estúdio"]');
       if (!(separator instanceof HTMLElement)) return false;
       separator.focus();
       separator.dispatchEvent(new KeyboardEvent("keydown", {

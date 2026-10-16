@@ -2108,6 +2108,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       <div
         ref={shellRef}
         className={styles.desktopShell}
+        role="region"
+        aria-label="Estúdio e Rádio"
         data-dragging={dragging ? "true" : undefined}
       >
         <main
@@ -2125,7 +2127,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             className={styles.studioCatalogHeader}
             aria-hidden={!studioHub}
           >
-            <strong>ESTÚDIO DE IMPRESSÃO 3D</strong>
+            <h1>ESTÚDIO DE IMPRESSÃO 3D</h1>
             <span>PROJETOS PERSONALIZADOS, PEÇAS PRODUZIDAS E PRODUTOS PRONTOS.</span>
           </div>
 
@@ -2279,13 +2281,14 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           ref={resizeHandleRef}
           className={styles.resizeHandle}
           data-resize-hint={showResizeHint && !radioFullscreen ? "true" : undefined}
-          role="separator"
-          aria-label={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Arraste para redimensionar CM Rádio"}
+          role={shellWidth === null ? undefined : radioFullscreen ? "button" : "separator"}
+          aria-label={radioFullscreen ? "Restaurar o Estúdio" : "Arraste para redimensionar CM Rádio"}
           aria-orientation="vertical"
           aria-valuemin={radioFullscreen || shellWidth === null ? undefined : getMinRadioWidth(shellWidth)}
           aria-valuemax={radioFullscreen ? undefined : MAX_RADIO_WIDTH}
-          aria-valuenow={radioFullscreen || radioWidth === null ? undefined : Math.round(radioWidth)}
-          tabIndex={0}
+          aria-valuenow={radioFullscreen || shellWidth === null ? undefined : Math.round(radioWidth ?? getDefaultWidth(shellWidth))}
+          aria-controls={radioFullscreen ? undefined : "radio"}
+          tabIndex={shellWidth === null ? -1 : 0}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={stopDragging}

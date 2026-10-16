@@ -102,7 +102,7 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     await page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link", { name: "Rádio" }).click();
     await expect(root).toHaveAttribute("data-radio-layout-mode", "fullscreen");
     await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
-    const fullDivider = page.getByRole("separator", { name: "Arraste para a direita para mostrar o Estúdio" });
+    const fullDivider = page.getByRole("button", { name: "Restaurar o Estúdio" });
     await expect(fullDivider).toBeVisible();
     await fullDivider.focus();
     await fullDivider.press("Escape");

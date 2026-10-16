@@ -188,3 +188,25 @@ O fechamento técnico exige baseline sincronizada, lint restabelecido, achados a
 - [W3C WCAG 2.2, alvos AA](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum) e [AAA](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced); [WAI-ARIA Window Splitter](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/); [WAI-ARIA range properties](https://www.w3.org/WAI/ARIA/apg/practices/range-related-properties/); [Deque — descrições de regras](https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md); [web.dev — animações](https://web.dev/articles/animations-guide).
 
 **Atualização do documento não equivale a reexecução do Impeccable nem a correção de um único achado.**
+
+## 10. Execução de correções na branch `cmc/feat/impecable` (16/10/2026)
+
+**Estado:** patches versionados; **validação executável e aceite visual ainda não comprovados**. Esta seção atualiza o diagnóstico sem apagar a proveniência do teste local original nem promover um achado a `done` sem seus gates.
+
+| Achado | Patch versionado | Situação verificável |
+| --- | --- | --- |
+| P1-01 lint | `eslint.config.mjs` ignora somente `.agents/skills/impeccable/scripts/**`, mantendo regras do projeto | **Implementado;** `pnpm lint` **não reexecutado** neste ambiente |
+| P1-02 mini-player | `miniStep` e `miniPlay` passam a reservar 44×44 CSS px; grid da linha de controles atualizado | **Implementado;** medir em 360/390 e aprovar aparência |
+| P1-02 carrossel | Timeline com ações 44×44, rolagem horizontal delimitada e marcador selecionado recentrado; Pause 44×44 | **Implementado;** testar composição/toque/scroll em execução real |
+| P2-01 `h1` | Cabeçalho já existente do hub promovido a `h1`, sem inserir conteúdo visual novo | **Implementado;** Axe/árvore acessível pendentes |
+| P2-02 separador | Divisor sob região nomeada; role ajustado para botão em fullscreen; função de separator só fica exposta após geometria conhecida, com fallback coerente para `aria-valuenow` | **Implementado;** reproduzir estados e testar navegação |
+| P2-03 performance | Nenhuma mudança de `will-change` ou assets | **Aguardando profiling**, conforme decisão técnica |
+| I-01 hidratação | Nenhum ajuste especulativo de host/hidratação | **Investigação aberta** em `localhost` vs `127.0.0.1` |
+
+**Regressões adicionadas:** `tests/visual/impeccable-a11y.spec.ts` cobre heading do hub, geometria dos botões do mini-player, controle do carrossel e valores/teclado do separador nas configurações Playwright pertinentes. Testes **adicionados não significam testes aprovados**.
+
+**Limites da execução:** atualizações foram aplicadas por commits remotos através da integração com GitHub. Não houve acesso ao navegador local do usuário, `node_modules`, execução de `pnpm lint`, `pnpm typecheck`, build, servidor HTTP ou Playwright nesta etapa. Também não houve screenshots comparativos nem inspeção de performance. As correções devem ser avaliadas no **HEAD final da branch**, e os testes existentes devem continuar verdes, em particular o fluxo da Rádio split/dock e a continuidade de áudio.
+
+**Próximo gate obrigatório:** no checkout local da branch, preservar alterações locais, executar `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` e `pnpm visual:qa` (Chrome instalado); revisar screenshots e áreas de toque, reproduzir as origens de hidratação e documentar regressões. Os erros encontrados exigem correção antes de merge/release. Para uma avaliação estética, seguir separadamente a seção 7: o `audit` técnico não a substitui.
+
+**Nenhuma alteração desta seção constitui aprovação visual, release, deploy, correção validada de performance ou autorização para mudança adicional do design.**

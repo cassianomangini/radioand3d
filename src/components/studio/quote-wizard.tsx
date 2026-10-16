@@ -23,7 +23,6 @@ import {
   type QuoteRequestDraft
 } from "@/features/studio/quote-request-contract";
 import { trackPublicEvent } from "@/lib/public-analytics";
-import { motion, useReducedMotion } from "motion/react";
 import styles from "./quote-wizard.module.css";
 
 const labels: Record<ProjectType, string> = {
@@ -34,10 +33,10 @@ const labels: Record<ProjectType, string> = {
 };
 
 const descriptions: Record<ProjectType, string> = {
-  impressao: "Tenho o modelo pronto e preciso produzir a peça.",
-  placa: "Logo, texto, QR Code ou identificação.",
-  caixa: "Para guardar, proteger ou encaixar algo.",
-  outro: "Tem outra ideia? Vamos entender o que você precisa."
+  impressao: "Tenho um arquivo pronto e quero apenas a impressão.",
+  placa: "Placas com nomes, logos, números, decoração e muito mais.",
+  caixa: "Caixas personalizadas de qualquer tamanho e função.",
+  outro: "Tem uma ideia diferente? Conte pra gente."
 };
 
 const startingPointOptions = [
@@ -219,7 +218,6 @@ export function QuoteWizard({
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [error, setError] = useState("");
-  const reduceMotion = useReducedMotion();
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const analyticsStartedRef = useRef(false);
@@ -594,10 +592,10 @@ export function QuoteWizard({
       data-quote-type={type ?? undefined}
       data-quote-step={step}
     >
-      <div className={styles.progressBlock}>
-        <div className={styles.progress}>
-          <span>Seu projeto</span>
-          <span>Etapa {String(step).padStart(2, "0")} / {String(totalSteps).padStart(2, "0")}</span>
+      <div className={styles.progress}>
+        <div className={styles.progressMeta}>
+          <span>Orçamento</span>
+          <span>Etapa {step} de {totalSteps}</span>
         </div>
         <div
           className={styles.progressTrack}
@@ -611,21 +609,13 @@ export function QuoteWizard({
           {Array.from({ length: totalSteps }, (_, index) => (
             <span
               key={index}
-              className={styles.progressSegment}
-              data-done={index < step}
+              className={index < step ? styles.progressSegmentActive : undefined}
               aria-hidden="true"
             />
           ))}
         </div>
       </div>
 
-      <motion.div
-        key={step}
-        className={styles.stepPanel}
-        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: reduceMotion ? 0 : 0.32, ease: [0.16, 1, 0.3, 1] }}
-      >
       <h2 className={styles.question} id="quote-question" ref={headingRef} tabIndex={-1}>
         {stepTitle}
       </h2>
@@ -644,12 +634,12 @@ export function QuoteWizard({
       {step === 1 ? (
         <>
           <p className={styles.help}>
-            Escolha o caminho que melhor descreve sua ideia.
+            Escolha abaixo a opção que melhor descreve o seu projeto.
           </p>
-          <div className={styles.options} role="group" aria-label="Tipo de projeto">
-            {(Object.keys(labels) as ProjectType[]).map((option, index) => (
+          <div className={styles.typeOptions} role="group" aria-label="Tipo de projeto">
+            {(Object.keys(labels) as ProjectType[]).map((option) => (
               <button
-                className={styles.option}
+                className={styles.typeOption}
                 key={option}
                 type="button"
                 aria-pressed={type === option}
@@ -661,19 +651,23 @@ export function QuoteWizard({
                     });
                   }
                   setType(option);
+                  setError("");
+                  setStep(2);
                   trackPublicEvent("quote_type_selected", {
                     projectType: option
                   });
                 }}
               >
-                <span className={styles.optionNumber} aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
+                <span className={styles.typeMedia} data-quote-visual={option} aria-hidden="true" />
+                <span className={styles.typeCopy}>
+                  <strong>{labels[option]}</strong>
+                  <small>{descriptions[option]}</small>
                 </span>
-                <span className={styles.optionCopy}>
-                  <span className={styles.optionTitle}>{labels[option]}</span>
-                  <span className={styles.optionDescription}>{descriptions[option]}</span>
+                <span className={styles.typeArrow} aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </span>
-                <span className={styles.optionMarker} aria-hidden="true" />
               </button>
             ))}
           </div>
@@ -865,7 +859,7 @@ export function QuoteWizard({
 
       {step === contactStep ? (
         <>
-          <div className={`${styles.options} ${styles.contactOptions}`} role="group" aria-label="Canal de contato">
+          <div className={styles.options} role="group" aria-label="Canal de contato">
             <button
               className={styles.option}
               type="button"
@@ -1017,20 +1011,20 @@ export function QuoteWizard({
         </>
       ) : null}
 
-      </motion.div>
-
-      <div className={styles.actions}>
-        <button type="button" onClick={back} disabled={step === 1}>Voltar</button>
-        {step < reviewStep ? (
-          <button className={styles.primary} type="button" onClick={next}>
-            <span>Continuar</span><span aria-hidden="true">→</span>
-          </button>
-        ) : (
-          <button className={styles.primary} type="button" disabled>
-            Enviar projeto para análise
-          </button>
-        )}
-      </div>
+      {step > 1 ? (
+        <div className={styles.actions}>
+          <button type="button" onClick={back}>← Voltar</button>
+          {step < reviewStep ? (
+            <button className={styles.primary} type="button" onClick={next}>
+              Continuar →
+            </button>
+          ) : (
+            <button className={styles.primary} type="button" disabled>
+              Enviar projeto para análise
+            </button>
+          )}
+        </div>
+      ) : null}
     </section>
   );
 }

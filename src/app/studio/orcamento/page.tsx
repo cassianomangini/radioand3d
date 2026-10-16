@@ -1,7 +1,6 @@
-import styles from "./quote-page.module.css";
 import { QuoteWizard } from "@/components/studio/quote-wizard";
-import { StudioPageShell } from "@/components/studio/studio-content";
 import { buildPublicMetadata } from "@/lib/site-config";
+import styles from "./quote-page.module.css";
 
 export const metadata = buildPublicMetadata({
   title: "Orçamento de impressão 3D | CM 3D & Radio",
@@ -33,31 +32,22 @@ export default async function StudioQuotePage({
   const initialOrigin = Array.isArray(params.origem) ? params.origem[0] : params.origem;
 
   return (
-    <div className={styles.quotePage}>
-    <StudioPageShell
-      eyebrow="Orçamento"
-      title="Conte o que você precisa."
-      lead="Precisamos apenas de algumas informações para avaliar seu projeto e entender como podemos realizá-lo."
-      pathname="/studio/orcamento"
-      breadcrumbLabel="Orçamento"
-    >
-      <QuoteWizard
-        initialType={initialType}
-        initialReference={initialReference}
-        initialOrigin={initialOrigin}
-      />
+    <article className={styles.quotePage}>
+      <div className={styles.quoteHero}>
+        <header className={styles.quoteIntro}>
+          <h1>
+            Conte o <span>que você precisa.</span>
+          </h1>
+        </header>
 
-      <aside className={styles.processNote} aria-labelledby="quote-process-title">
-        <span className={styles.processEyebrow}>Como funciona</span>
-        <div>
-          <h2 id="quote-process-title">Você conta a ideia. Nós analisamos os detalhes.</h2>
-          <p>
-            Cada projeto é avaliado individualmente para entender as possibilidades de produção.
-            Depois, combinamos os próximos passos — sem prometer aceite ou prazo antes da análise.
-          </p>
+        <div className={styles.quoteForm}>
+          <QuoteWizard
+            initialType={initialType}
+            initialReference={initialReference}
+            initialOrigin={initialOrigin}
+          />
         </div>
-      </aside>
-    </StudioPageShell>
-    </div>
+      </div>
+    </article>
   );
 }

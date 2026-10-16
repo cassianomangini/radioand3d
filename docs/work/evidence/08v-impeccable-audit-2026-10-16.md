@@ -1,90 +1,190 @@
 # 08V — Auditoria técnica Impeccable do site público (16/10/2026)
 
-**Natureza:** autorrevisão técnica, somente leitura, seguindo `.agents/skills/impeccable/reference/audit.md`. O comando `impeccable detect` foi executado; a skill não gera automaticamente este relatório. Nenhuma correção, aprovação visual, publicação ou alteração remota foi realizada.
+**Estado:** diagnóstico técnico documentado; **correções, auditoria perceptual e gate de release pendentes**.  
+**Natureza:** autorrevisão técnica originalmente executada em ambiente local, complementada por revisão crítica **documental e de código remoto** nesta versão. Não é aprovação estética, homologação WCAG, medição de desempenho de produção nem autorização para editar a UI.  
+**Vínculo:** [08V — Evolução visual](../08-visual-quality-evolution.md) e [pipeline render-first](../../design/CM_VISUAL_RENDER_PIPELINE_V1.md). A sequência oficial continua no [roadmap](../../ROADMAP.md).  
+**Escopo desta revisão documental:** somente este relatório. Nenhum componente, estilo, hook, dado remoto, ambiente, publicação ou teste local foi alterado/executado por esta revisão.
 
-**Base local:** `main@4ddd121f018357a97c7dcb8ec340a599b3807302`, quatro commits atrás de `origin/main`, com alterações locais preexistentes. Este relatório descreve o estado local observado, não uma versão publicada.
+## 1. Veredito executivo
 
-## Escopo e método
+**Veredito técnico: PARCIAL / gate aberto.** A evidência disponível sustenta que a linguagem CM foi preservada nas superfícies examinadas e que os cinco avisos do detector não demonstram, isoladamente, perda de identidade. **Não sustenta** afirmar que o design está aprovado, que o site cumpre integralmente WCAG 2.2 AA ou que a performance está validada. O comando `pnpm lint` foi relatado como falho na execução original.
 
-- Oito URLs representativas das superfícies públicas: `/`, `/studio`, impressão sob demanda, placas personalizadas, caixas personalizadas, orçamento, lista de produtos e um produto individual (`porta-curativos-compacto`). A rota `/studio/impressoes` redireciona para `/studio#impressoes`, conforme a implementação atual.
-- 16 varreduras com Axe no Google Chrome: 1440 × 900 desktop e 390 × 844 mobile. Para `/studio`, também foram conferidos 360 × 800, texto a 200%, toque sintetizado e interação por teclado.
-- Inspeção estática de componentes, CSS, tokens, assets e detector Impeccable. Verificações: `pnpm typecheck`, `pnpm lint` e `pnpm exec eslint src`.
-- A primeira tentativa com `127.0.0.1:3001` foi **descartada**: nessa origem, a hidratação não se completou e os cartões ficaram no estado inicial invisível. A varredura válida usou `localhost:3001`, onde a hidratação foi confirmada.
+**Problemas priorizados na amostra: 0 P0; 2 P1; 3 P2; 0 P3.** A classificação é operacional, não uma contagem exaustiva dos defeitos do site. Existem ainda **duas investigações transversais**: diferença de hidratação por origem e defasagem entre código auditado e a branch atual.
 
-O teste de toque foi sintetizado pelo Chrome, não realizado em aparelho físico. O servidor era `next dev`; os números de carregamento e fluidez não representam uma build de produção. Estados como Rádio fullscreen, todos os passos do orçamento e todos os produtos não receberam varredura Axe própria nesta rodada.
+| Frente | Resultado sustentado | Limite / decisão |
+| --- | --- | --- |
+| Identidade e consistência CM | Sem desvio comprovado pelos cinco avisos do detector; composição Estúdio + Rádio, marca e papéis cromáticos permanecem reconhecíveis | **Não equivale a aprovação visual**. Falta comparação crítica do render com referências aprovadas |
+| Acessibilidade | Axe e interações apontaram alvos pequenos, falta de `h1` acessível no hub e alertas de semântica do divisor | Cobertura parcial de rotas e estados; sem declaração de conformidade WCAG |
+| Responsividade | Relatado sem overflow estável nas dimensões testadas | Não cobre todos os estados e breakpoints do contrato |
+| Integridade de desenvolvimento | `typecheck` e `eslint src` relatados como aprovados | `pnpm lint` global relatado como **falho** devido aos scripts do Impeccable |
+| Performance | Suspeita fundamentada de `will-change` excessivo; tamanho de PNGs registrado | Sem perfil de GPU, FPS, INP, LCP ou build de produção comparável |
+| Experiência visual | Identidade de produto descrita e restrições de arte conhecidas | **Auditoria perceptual independente ainda não realizada nesta rodada** |
 
-## Veredito de integridade
+### Sobre a pontuação 14/20
 
-**Passa quanto à identidade do produto, com ressalva no gate técnico.** A composição Estúdio + Rádio, os estados do player, a mídia real e os acentos comerciais formam um sistema específico da CM. O detector encontrou cinco avisos: quatro de texto em gradiente e um de borda lateral. O gradiente faz parte da linguagem documentada; a borda indica a faixa ativa. Esses avisos não foram promovidos a defeitos sem evidência visual ou funcional. O gate `pnpm lint`, porém, falha no estado local pelos scripts distribuídos com a skill.
+A primeira execução registrou **14/20 (“bom”)** pela rubrica de cinco dimensões do `reference/audit.md` do Impeccable: acessibilidade 2, performance 3, temas/tokens 3, responsividade 3, integridade 3. **Preservamos esse número somente como baseline histórico daquela amostra**, não como nota revalidada na branch, selo de UX ou avaliação artística. Em particular, a nota de performance não substitui métricas de produção; “boa” não significa pronta para lançamento. Qualquer comparação futura exige mesma rubrica, rotas, estados, viewport, navegador e commit.
 
-## Pontuação de saúde
+## 2. Proveniência e confiabilidade
 
-| Dimensão | Nota (0–4) | Evidência principal |
-| --- | ---: | --- |
-| Acessibilidade | 2 | Controles abaixo da meta de 44 × 44 px; hub sem `h1` acessível; semântica inicial do divisor incompleta |
-| Desempenho | 3 | Dicas `will-change` permanentes em elementos grandes; desempenho de produção ainda não medido |
-| Temas e tokens | 3 | Tokens globais e identidade escura coerentes; cores locais intencionais coexistem com tokens |
-| Responsividade | 3 | Sem overflow estável nos perfis testados; áreas acionáveis pequenas no mobile |
-| Integridade da implementação | 3 | Detector sem desvio de identidade confirmado; lint global bloqueado por scripts da skill |
-| **Total** | **14/20 — bom** | **0 P0, 2 P1, 3 P2, 0 P3** |
+Não misturar estes três tipos de evidência:
 
-As notas representam esta amostra de rotas e estados. A ausência de alerta Axe não certifica conformidade completa com WCAG.
+- **[EXECUÇÃO LOCAL RELATADA]** Resultados e medições reproduzidos da auditoria enviada em 16/10; seus logs brutos, JSON do Axe, screenshots e traces não foram anexados a este documento. Não foram reexecutados nesta revisão.
+- **[CÓDIGO INSPECIONADO]** Leitura no GitHub dos arquivos existentes em `cmc/feat/impecable`, incluindo ``eslint.config.mjs``, ``studio-radio-shell.tsx``, ``studio-radio-shell.module.css``, ``studio-prints-carousel.module.css`` e os contratos de experiência. Essa inspeção comprova implementações, **não** comportamento renderizado.
+- **[PENDENTE]** Questões que exigem reprodução no navegador, comparação visual ou medições. Ausência de evidência não vira `PASS`.
 
-## Achados por prioridade
+**Base histórica do teste local:** `main@4ddd121f018357a97c7dcb8ec340a599b3807302`, informado como quatro commits atrás de `origin/main` e com alterações locais preexistentes. **Base consultada nesta revisão:** branch `cmc/feat/impecable`, em estado posterior e distinto. A branch já contém arquivos da skill Impeccable versionados; no momento da auditoria local eles haviam sido reportados como não rastreados. Não afirmar que o conteúdo atual da branch é idêntico ao workspace usado no teste.
 
-### P1 — Controles frequentes menores que a meta de toque
+**Divergência de versão que altera a interpretação:** no código histórico `4ddd121f`, o divisor usava fallback `Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)` fora do fullscreen. Na branch `cmc/feat/impecable`, o atributo passa a ser omitido quando `radioWidth === null` ou em fullscreen. Portanto, a hipótese “faltava `aria-valuenow` porque o width era null” **não é explicada pelo código histórico citado**, mas **tem fundamento no código consultado agora**. Reproduzir na branch antes de determinar a causa e a severidade finais.
 
-**Categoria:** acessibilidade e responsividade. **Locais:** [mini player da Rádio](../../../src/components/studio-radio/studio-radio-shell.module.css#L885) e [controles do carrossel](../../../src/components/studio-radio/studio-prints-carousel.module.css#L259).
+## 3. Escopo executado e lacunas
 
-No Chrome mobile, controles da Rádio mediram aproximadamente 30 × 30 px, o Play/Pausa 39 × 39 px, marcadores do carrossel 18 × 34 px e Pausar apresentação 32 × 32 px. A [meta do projeto](../../EXPERIENCE.md) é 44 × 44 CSS px para controles frequentes. Alvos pequenos aumentam o risco de toque errado, especialmente quando se repetem lado a lado. O resultado não foi rotulado automaticamente como violação WCAG: tamanho, espaçamento e exceções precisam ser avaliados juntos.
+### Cobertura relatada da auditoria original
 
-**Ação:** aumentar a área acionável sem precisar ampliar o ícone, preservando a composição e verificando espaçamento entre alvos. **Comando sugerido:** `$impeccable adapt`.
+- **Oito superfícies/URLs:** Home (`/`), hub (`/studio`), impressão sob demanda, placas personalizadas, caixas personalizadas, orçamento, lista de produtos e produto individual `porta-curativos-compacto`. A rota `/studio/impressoes` redireciona para `/studio#impressoes` no comportamento informado.
+- **16 varreduras Axe** em Google Chrome: 8 superfícies × 2 tamanhos, desktop **1440 × 900** e mobile **390 × 844**.
+- **Hub adicional:** 360 × 800, texto ampliado a 200%, gesto de toque sintetizado e operações de teclado.
+- **Verificações informadas:** ``pnpm typecheck`` (passou), ``pnpm lint`` (falhou), ``pnpm exec eslint src`` (passou), inspeção CSS/React/assets, Impeccable `detect`, abertura de galeria, troca de foto e atalho de dock.
+- **Origem válida relatada:** `localhost:3001` com hidratação confirmada. A primeira varredura em `127.0.0.1:3001` foi descartada por falha de hidratação.
 
-### P1 — `pnpm lint` falha ao analisar os scripts da skill
+### Fora da cobertura desta rodada
 
-**Categoria:** integridade da implementação. **Local:** [configuração ESLint](../../../eslint.config.mjs#L7) e `.agents/skills/impeccable/scripts/`.
+Não foram cobertos de forma suficiente: build `next build`/`next start`; 1024 × 768 e desktop curto 1760 × 824 **nessa execução**; fluxo integral de seis etapas e estados de erro do orçamento; Rádio em fullscreen/docked em todas as transições; fila/volume/loading/erro com teclado e leitor de tela; todos os produtos e casos de mídia; usuário com aparelho físico; `prefers-reduced-motion`; perfil de produção; comparação perceptual com mocks aprovados. Testes prévios no repositório **não** convertem automaticamente essas lacunas em provas da execução atual.
 
-`pnpm lint` terminou com 31 erros e 78 avisos. A segunda execução em formato JSON localizou os 31 erros apenas em `live-browser.js` (29) e `modern-screenshot.umd.js` (2), arquivos distribuídos com a skill e ainda não rastreados pelo Git. `pnpm exec eslint src` passou. O gate geral fica vermelho mesmo sem erro detectado no código de `src`, o que reduz sua utilidade antes de uma entrega.
+## 4. Achados — priorizados por impacto e possibilidade de validação
 
-**Ação:** excluir os scripts empacotados da varredura global ou restringir o lint aos arquivos próprios do projeto, mantendo o código do aplicativo coberto. **Comando sugerido:** `$impeccable harden`.
+### P1-01 — Lint global contaminado por scripts distribuídos com a skill
 
-### P2 — Hub `/studio` sem título de nível 1 acessível
+**Categoria:** integridade de engenharia / bloqueio do gate.  
+**Fontes:** [ESLint](../../../eslint.config.mjs); `.agents/skills/impeccable/scripts/`.  
+**Evidência:** [EXECUÇÃO LOCAL RELATADA] `pnpm lint` retornou **31 erros e 78 avisos**; os 31 erros foram atribuídos a `live-browser.js` (29) e `modern-screenshot.umd.js` (2). `pnpm exec eslint src` passou. [CÓDIGO INSPECIONADO] o `globalIgnores` consultado não ignora os scripts empacotados; esses dois arquivos constam na branch atual.
 
-**Categoria:** acessibilidade. **Locais:** [regra que oculta a identidade da Home](../../../src/components/studio-radio/studio-radio-shell.module.css#L4083) e [página do hub](../../../src/app/studio/page.tsx).
+**Impacto:** o gate geral fica vermelho por código de ferramenta terceira, impedindo usar o lint como sinal confiável de regressão do aplicativo.
 
-O Axe encontrou `page-has-heading-one` no hub em desktop e mobile. Há um `h1` no DOM, mas a seção que o contém fica invisível na rota do Estúdio; o hub apresenta seus títulos visíveis como `h2`. Pessoas que navegam por níveis de título perdem o ponto de entrada da página. Esta regra do Axe é uma boa prática estrutural; o relatório não a apresenta como reprovação WCAG AA isolada.
+**Decisão proposta:** ignorar **somente os artefatos distribuídos não mantidos pelo projeto** — por exemplo, o subtree de scripts da skill — preservando cobertura de `src` e de scripts/configurações próprios. Evitar ignorar toda a pasta `.agents` indiscriminadamente: uma skill local também pode conter scripts editados pelo projeto. Revisar o diff e os artefatos instalados antes de versionar/atualizar o hook.
 
-**Ação:** introduzir um `h1` próprio e acessível no hub, integrado à composição aprovada. **Comando sugerido:** `$impeccable harden`.
+**Aceite:** `pnpm lint` passa no mesmo HEAD; `pnpm exec eslint src` continua passando; um defeito deliberado de lint em arquivo próprio continua sendo detectado; a mudança não desativa regras globais. Registrar log e commit. **Comando de apoio:** `$impeccable harden`, com escopo explícito — não executar de modo aberto.
 
-### P2 — Divisor da Rádio fora dos landmarks e com valor inicial ausente
+### P1-02 — Alvos frequentes de toque abaixo da meta CM
 
-**Categoria:** acessibilidade. **Local:** [divisor redimensionável](../../../src/components/studio-radio/studio-radio-shell.tsx#L2282).
+**Categoria:** usabilidade mobile e acessibilidade.  
+**Fontes:** [mini-player](../../../src/components/studio-radio/studio-radio-shell.module.css) (classes `miniStep`/`miniPlay`); [carrossel](../../../src/components/studio-radio/studio-prints-carousel.module.css) (`timelineStep`/`pause`); [experiência](../../EXPERIENCE.md).
 
-O Axe marcou `region` para o divisor nas oito rotas desktop, pois ele fica fora de `header`, `main` e `aside`. Em dois carregamentos diretos, também marcou `aria-required-attr`: o `role="separator"` estava visível sem `aria-valuenow` enquanto `radioWidth` era `null`. Em uma nova visita à Home, o valor apareceu após a inicialização; portanto, o segundo alerta é **transitório**, não uma falha persistente do estado hidratado. A navegação por teclado funcionou: `Home` e `ArrowRight` ativaram o dock.
+**Evidência:** [EXECUÇÃO LOCAL RELATADA] botões de rádio ~30 × 30 CSS px, Play/Pausa ~39 × 39, marcadores da timeline ~18 × 34 e botão Pausar ~32 × 32. [CÓDIGO INSPECIONADO] `miniStep` define `1.9rem`, `miniPlay` usa `2.45rem`, `timelineStep` mantém área estreita, e `pause` usa `2rem`.
 
-**Ação:** fornecer semântica inicial válida ao controle e revisar sua posição em um landmark sem alterar a geometria. **Comando sugerido:** `$impeccable harden`.
+**Impacto:** maior probabilidade de toque errado e dificuldade de uso, especialmente com controles próximos e uso recorrente.
 
-### P2 — Dicas permanentes para propriedades caras de animar
+**Precisão normativa:** WCAG **2.2 AA 2.5.8** estabelece em regra **24 × 24 CSS px**, com exceções, inclusive por espaçamento; **44 × 44 CSS px** corresponde ao critério aprimorado **2.5.5 (AAA)** e também é uma **meta de qualidade explicitamente adotada pela CM**. O relatório **não afirma** que toda medida menor que 44 constitui, isoladamente, violação AA. [W3C 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum) · [W3C 2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced).
 
-**Categoria:** desempenho. **Local:** [camadas da Home](../../../src/components/studio-radio/studio-radio-shell.module.css#L3567) e [cartões do hub](../../../src/components/studio-radio/studio-radio-shell.module.css#L4783).
+**Decisão proposta:** aumentar a **área interativa real** sem tornar todos os ícones grandes ou mudar a composição. Na timeline, não ampliar cegamente cada marcador para 44 px se isso criar alvos sobrepostos, cortar a faixa ou impedir o uso em 360 px; desenhar alternativa acionável acessível e verificar a interação completa.
 
-`will-change` permanece aplicado a `width`, `clip-path`, `top`, `left`, `transform` e `opacity` mesmo em repouso, conforme o seletor. Isso pode manter trabalho e memória gráfica reservados sem benefício contínuo. Nenhuma queda de quadros foi medida nesta auditoria. Os PNGs originais da Home/Rádio também são grandes (`x1_fundo_2.png` 1,84 MiB; arte da Rádio 1,68 MiB; logo 0,55 MiB); o contrato atual pede preservá-los sem recompressão na Home.
+**Aceite:** métricas de `getBoundingClientRect()` e teste com toque sintetizado para controles frequentes nos tamanhos 360/390; sem áreas acionáveis sobrepostas, toques acidentais, overflow, perda de navegação por teclado ou alteração perceptual indesejada. Validar também em aparelho físico quando possível. **Comando de apoio:** `$impeccable adapt`, restrito a esses controles.
 
-**Ação:** fazer perfil em build de produção, então limitar `will-change` às transições que realmente precisem dele. Preservar as decisões aprovadas sobre os assets. **Comando sugerido:** `$impeccable optimize`.
+### P2-01 — Hub `/studio` não expõe título principal de nível 1
 
-## Padrões e pontos positivos
+**Categoria:** semântica e navegação assistiva.  
+**Fontes:** [shell](../../../src/components/studio-radio/studio-radio-shell.tsx), [visibilidade](../../../src/components/studio-radio/studio-radio-shell.module.css), [rota](../../../src/app/studio/page.tsx).
 
-- O problema de alvos pequenos repete-se no mini player e nos controles de apresentação; vale corrigir a regra de área acionável como padrão, não apenas um botão.
-- Após hidratação em `localhost`, as oito rotas retornaram HTTP 200, sem overflow horizontal em 1440/390 px e sem imagens quebradas detectadas. O hub também ficou sem overflow em 360 px e com texto ampliado a 200%.
-- Nos estados iniciais examinados, o Axe não relatou problemas de contraste. `pnpm typecheck` e `pnpm exec eslint src` passaram.
-- Em Chrome com toque sintetizado, Próxima impressão trocou a mídia; a galeria abriu por toque e fechou com Escape. O dock desktop respondeu ao teclado. Essas verificações não substituem teste em aparelho físico.
-- A implementação identifica mídias pendentes como placeholders e mantém os controles do carrossel disponíveis durante a apresentação.
+**Evidência:** [EXECUÇÃO LOCAL RELATADA] Axe registrou `page-has-heading-one` no desktop e mobile do hub. [CÓDIGO INSPECIONADO] existe `h1` na seção `studioIdentity`, porém essa seção recebe `visibility: hidden` no modo `detail`. O cabeçalho específico do hub (`studioCatalogHeader`) utiliza `strong` e ``span``; a página `/studio` retorna `null` porque o shell compartilhado compõe a experiência.
 
-## Próximas ações
+**Impacto:** a hierarquia anunciada por tecnologias assistivas não identifica de maneira adequada a entrada da página. **`page-has-heading-one` é regra de boa prática do Axe**, não reprovação WCAG AA automática. [Deque — regras Axe](https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md).
 
-1. **P1 — `$impeccable adapt`:** corrigir as áreas acionáveis da Rádio mobile e do carrossel.
-2. **P1/P2 — `$impeccable harden`:** restaurar o gate de lint e corrigir títulos e semântica do divisor.
-3. **P2 — `$impeccable optimize`:** medir a build de produção e tratar `will-change` onde houver benefício demonstrado.
-4. **Final — `$impeccable polish`:** revisão final após as correções.
+**Decisão proposta:** aproveitar um título **já existente e semanticamente correto no hub**, dando-lhe nível `h1` sem adicionar heading decorativo ou duplicar visualmente o título da Home; revisar hierarquia `h2`/`h3` e a árvore de acessibilidade após a transição entre rotas. Não inserir um `h1` novo apenas para satisfazer o detector se o título visível pode cumprir essa função.
 
-Reexecutar `$impeccable audit` após as mudanças para comparar os resultados. A avaliação estética e a aprovação visual final continuam com Cassiano.
+**Aceite:** uma entrada `h1` significativa e exposta no hub, navegação de heading coerente, `page-has-heading-one` resolvido nessa rota, Home e rotas filhas sem regressão, aparência aprovada preservada. **Comando de apoio:** `$impeccable harden`, limitado à semântica.
+
+### P2-02 — Divisor da Rádio: landmark e valor ARIA em estados específicos
+
+**Categoria:** acessibilidade de controle redimensionável.  
+**Fonte:** [`resizeHandle` no shell](../../../src/components/studio-radio/studio-radio-shell.tsx).
+
+**Evidência:** [EXECUÇÃO LOCAL RELATADA] Axe marcou `region` nas oito rotas desktop; houve dois registros de `aria-required-attr` em carregamentos diretos, não em todas as visitas. [CÓDIGO INSPECIONADO NA BRANCH] o `role="separator"` permanece com `tabIndex={0}`; `aria-valuenow` é omitido se `radioWidth === null` ou `radioFullscreen`. `aria-valuemin` também é omitido até obter `shellWidth`. A atribuição desse comportamento ao commit histórico é imprecisa: ver `Proveniência`.
+
+**Impacto:** um separador ajustável **exposto e focável** sem valor presente pode comunicar estado incompleto ao leitor de tela; falta de landmark reduz orientação estrutural. A regra Axe `region` é boa prática; a exigência de valor em separador focável é específica de ARIA. [WAI-ARIA — valores de range](https://www.w3.org/WAI/ARIA/apg/practices/range-related-properties/) · [Window Splitter Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/).
+
+**Decisão proposta:** reproduzir com captura da **árvore de acessibilidade** no primeiro render, após hidratação, no modo lateral, no dock e no fullscreen. Se for controle redimensionável ativo, entregar `aria-valuenow` coerente desde o instante em que está acessível, com limites compatíveis; se a função estiver desativada em certo estado, ajustar exposição/foco/semântica sem criar controle “fantasma”. Rever `aria-controls` e a inclusão em landmark apropriado **sem mover visualmente a divisória nem romper eventos de arraste**.
+
+**Aceite:** nenhum alerta `aria-required-attr` nos estados em que o separador está ativo; valor e limites coerentes, teclado e arraste preservados, foco não preso a controle invisível, `region` triado e resolvido sem regressão do split/dock. **Comando de apoio:** `$impeccable harden` após reprodução, não correção especulativa.
+
+### P2-03 — `will-change` persistente e custo potencial de animações
+
+**Categoria:** performance / memória gráfica.  
+**Fontes:** [camadas e transições](../../../src/components/studio-radio/studio-radio-shell.module.css); [galeria/carrossel](../../../src/components/studio-radio/studio-prints-carousel.module.css).
+
+**Evidência:** [CÓDIGO INSPECIONADO] `studioMachine` antecipa `width`, `clip-path` e `transform`; `studioIdentity` antecipa `top`, `left` e `transform` mesmo fora da transição. [EXECUÇÃO LOCAL RELATADA] outras camadas também apresentam pistas persistentes; assets informados: `x1_fundo_2.png` 1,84 MiB, arte Rádio 1,68 MiB, logo 0,55 MiB. **Não foi demonstrada queda de FPS ou gargalo de memória.**
+
+**Impacto potencial:** `will-change` permanente pode reservar recursos desnecessariamente; alterações de geometria e efeitos podem causar layout/paint caros. Isso é **hipótese de custo**, não defeito de fluidez confirmado. [web.dev — animações](https://web.dev/articles/animations-guide).
+
+**Decisão proposta:** medir o **build de produção** nas transições Home → Estúdio, split ↔ dock, fullscreen e carrossel, usando DevTools Performance, repetição em condições controladas e dispositivo mobile representativo. Comparar cenários antes/depois e só então restringir `will-change` aos intervalos necessários ou trocar uma propriedade quando houver ganho mensurável. **Preservar as imagens originais da Home/Rádio**: o contrato proíbe recompressão unilateral; variações de assets são uma decisão de produto separada.
+
+**Aceite:** nenhuma regressão visual/funcional, menos custo de renderização comprovado **ou** decisão registrada de manter implementação se não houver ganho relevante. **Comando de apoio:** `$impeccable optimize` somente depois do perfil.
+
+## 5. Investigações transversais que não devem desaparecer
+
+### I-01 — Diferença de hidratação entre `127.0.0.1` e `localhost`
+
+[EXECUÇÃO LOCAL RELATADA] a primeira origem deixou cartões no estado inicial invisível; a segunda concluiu a hidratação. A origem funcional foi corretamente escolhida para continuar a auditoria, **mas isso não encerra a investigação**. Reproduzir ambas no mesmo HEAD, porta, navegador e variáveis; capturar Console, Network, erros React, bloqueios de recurso, estado de hidratação e diferenças de configuração por host. Repetir em `next start`. Registrar causa e se há impacto em preview/produção. Não classificar como bug público ou detalhe inofensivo sem evidência.
+
+### I-02 — Divergência entre a base auditada e o destino das correções
+
+O relatório original descreve um workspace local com alterações não commitadas, atrás de `origin/main`. Esta branch contém alterações posteriores e os scripts da skill já versionados. **O código que receberá eventual patch deve ser relido**, com `git status`, HEAD, diff, arquivos de terceiro e contratos vigentes. Os locais deste documento são pontos de partida, não autorização para aplicar automaticamente a mesma mudança em código diferente.
+
+## 6. Resultado positivo — o que deve ser preservado
+
+- O mundo visual CM é identificável: Estúdio e Rádio formam uma experiência integrada, e o hub distingue funções comerciais com cores locais intencionais. Não substituir por templates genéricos.
+- Os quatro avisos de texto em gradiente e o aviso da borda lateral do Impeccable **não foram tratados como defeitos sem justificativa**; são escolhas de composição que precisam ser julgadas no contexto da marca.
+- Na execução original em `localhost`: oito respostas HTTP 200, ausência de overflow horizontal estável em 1440/390, e hub sem overflow no teste adicional de 360/200% **nos estados examinados**.
+- O Axe não reportou falha de contraste na amostra inicial; isso **não** cobre textos sobre todas as mídias, foco, hover, loading, overlays e demais estados.
+- Na amostra: troca de mídia pelo controle Próxima, abertura da galeria por toque sintetizado e fechamento com Escape, navegação básica de dock por teclado. Nenhuma dessas provas substitui revisão em dispositivo físico.
+- Placeholders são identificados como tal; eles **não** devem ser confundidos com provas de produtos produzidos ou mídia pronta para lançamento.
+
+## 7. Auditoria visual/perceptual que ainda falta — entrega distinta
+
+**Não chamar o `$impeccable audit` de auditoria estética completa:** a própria skill afirma que `audit.md` é análise técnica de código, **não crítica de design**. Para fechar o 08V com qualidade visual, realizar nova revisão **render-first** com o contrato CM, screenshots atuais e referência aprovada, sem reabrir automaticamente a Rádio.
+
+| Superfície/estado | Verificação perceptual e de experiência | Evidência obrigatória |
+| --- | --- | --- |
+| Home com Rádio lateral | Equilíbrio de proporções; enquadramento X1; hierarquia da chamada; CTA; marca; texto legível com Rádio nas larguras-limite | Capturas desktop/mobile + confronto explícito com referência CM |
+| Transição Home → Estúdio | Continuidade espacial, presença das três entradas, legibilidade durante a animação, sem cartões invisíveis após estabilização | Captura de estado inicial/final e vídeo ou trace de transição |
+| Hub / Impressões e galeria | Escala e aspecto das fotos consistentes, controles do carrossel, ritmo e contraste dos cartões, diferenciação entre peça real e placeholder | Capturas e passos de interação |
+| Rádio: split, dock, fullscreen, mobile | Continuidade do áudio/fila, controles, legibilidade e foco, não duplicar player, barras reais, restauração reversível | Teste funcional + capturas por estado |
+| Orçamento completo | Hierarquia da etapa, feedback de seleção, campos/erros/anexos, teclado/toque, scroll e responsividade de **todas** as etapas | Capturas/roteiro com dados de teste sem PII |
+| Produtos e produto individual | Fotografia fiel, miniaturas, densidade informacional, detalhes/medidas, CTA Shopee único | Capturas em tamanhos críticos; sem produto inventado |
+
+**Dimensões de avaliação**, com achados concretos e prioridade, sem nota artística arbitrária: (1) fidelidade à identidade/mocks aceitos; (2) composição e hierarquia; (3) ritmo de espaçamento e tipografia; (4) tratamento de fotos/artwork, escala e crop; (5) estados, foco, interações, movimento e `reduced-motion`; (6) layout e leitura por breakpoint.
+
+**Viewport mínimo por superfície pertinente:** 1440 × 900, 1024 × 768, desktop curto 1760 × 824, 390 × 844 e 360 × 800. Incluir texto a 200% e estados dinâmicos; reproduzir mídia/fonte/tempo, fixar ou documentar a aleatoriedade do catálogo e não comparar imagens geradas em estados diferentes como se fossem regressão. Em mobile, configurar `isMobile`, `hasTouch` e DPR apropriados — apenas diminuir a janela não prova gesto. O site real, não o antigo `/dev/visual-lab` rejeitado artisticamente, é o alvo.
+
+**Forma do parecer:** até cinco problemas visuais relevantes por rodada, cada um com **tela + viewport + screenshot/estado + referência esperada + causa provável + ação mínima + efeito colateral a evitar**. Não aceitar pareceres vagos como “mais moderno”, nem afirmar aprovação por CI verde. Se um conceito novo for necessário, produzir artefato de experiência separado e obter aceite de Cassiano **antes** do frontend. Vide [auditoria de identidade](../../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md) e [pipeline render-first](../../design/CM_VISUAL_RENDER_PIPELINE_V1.md).
+
+## 8. Ordem de execução proposta e gates de saída
+
+Este quadro **não registra trabalhos executados**. Os comandos Impeccable são auxiliares e **não autorizam mudanças automáticas em lote**.
+
+| Ordem | Intervenção / comando orientador | Prova mínima antes de marcar `done` |
+| --- | --- | --- |
+| 0 | Sincronizar evidência da branch e separar arquivos da skill de código próprio | HEAD, `git status`, diff e origem dos testes registrados, sem sobrescrever modificações locais |
+| 1 | **P1-01**: lint dirigido; `$impeccable harden` | `pnpm lint` e lint próprio verdes; regras continuam ativas |
+| 2 | **P1-02**: alvos de toque; `$impeccable adapt` | Medidas reais e interação em 360/390; zero sobreposição/overflow; composição preservada |
+| 3 | **P2-01/02**: título do hub e separador; `$impeccable harden` | Axe/árvore de acessibilidade/teclado nos estados afetados, com regressão de navegação ausente |
+| 4 | **I-01**: investigar a hidratação por host | Logs comparáveis e causa/risco definidos; resultado em dev e `next start` |
+| 5 | **P2-03**: medir antes de otimizar; `$impeccable optimize` se justificado | Trace e comparação de performance em produção local, sem perda de animação aprovada |
+| 6 | **Avaliação visual real:** `$impeccable critique` + revisão humana e evidência renderizada | Matriz de superfícies/estados acima, capturas comparáveis, divergências concretas e aceite quando aplicável |
+| 7 | Revisão integrada final: `$impeccable polish` restrito aos defeitos encontrados; depois `$impeccable audit` | `lint`/`typecheck`/testes aplicáveis/build e Axe/capturas refeitos no **mesmo commit**; pendências declaradas |
+
+**Gates independentes:** (A) **qualidade do código**: verificações executadas, não inferidas; (B) **funcionalidade/acessibilidade**: navegação e estados comprovados; (C) **fidelidade visual**: comparação de render; (D) **aprovação humana**: somente quando houver alteração de direção/resultado que demande aceite. Um gate não substitui outro.
+
+**Modelo mínimo do registro de prova por correção:** ID do achado · commit/branch · estado/rota · viewport/navegador · screenshot ou trace **antes** · mudança realizada · comando/resultado **depois** · screenshot ou trace **depois** · avaliação visual · pendências reais. Não marcar `done` com base apenas na intenção de rodar um comando.
+
+## 9. Critério de fechamento desta auditoria
+
+A **revisão documental** está concluída com análise adicional do código remoto e explicitação das limitações. A **remediação e a validação** permanecem abertas. Este arquivo pode orientar patches futuros sem autorizar mudanças do layout, nomes, navegação, impressões reais, identidade da Rádio ou contratos já aprovados.
+
+O fechamento técnico exige baseline sincronizada, lint restabelecido, achados acessíveis corrigidos ou justificados por prova, riscos de performance medidos e testes proporcionais no código final. O fechamento **visual** exige render comparável e avaliação de fidelidade; a aprovação de Cassiano é distinta de qualquer execução automatizada. Se faltar uma dessas provas, registrar `PENDENTE` ou `NÃO VERIFICADO`, nunca `CONCLUÍDO`.
+
+### Fontes internas e normas consultadas
+
+- [Impeccable — instrução técnica de audit](../../../.agents/skills/impeccable/reference/audit.md) (limita-se a auditoria técnica, não crítica estética).
+- [Contrato de experiência](../../EXPERIENCE.md) · [evolução 08V](../08-visual-quality-evolution.md) · [pipeline de render](../../design/CM_VISUAL_RENDER_PIPELINE_V1.md) · [auditoria da identidade](../../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md).
+- [W3C WCAG 2.2, alvos AA](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum) e [AAA](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced); [WAI-ARIA Window Splitter](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/); [WAI-ARIA range properties](https://www.w3.org/WAI/ARIA/apg/practices/range-related-properties/); [Deque — descrições de regras](https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md); [web.dev — animações](https://web.dev/articles/animations-guide).
+
+**Atualização do documento não equivale a reexecução do Impeccable nem a correção de um único achado.**

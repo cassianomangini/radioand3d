@@ -63,6 +63,7 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
   const progress = useMotionValue(0);
   const clockRef = useRef<ReturnType<typeof animate> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const total = media.length;
   const currentIndex = total > 0 ? index % total : 0;
@@ -139,6 +140,16 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
     : Array.from({ length: 7 }, (_, offset) =>
         Math.min(Math.max(currentIndex - 3, 0), total - 7) + offset
       );
+
+  useEffect(() => {
+    const rail = timelineRef.current;
+    const selected = rail?.querySelector<HTMLElement>('[data-current="true"]');
+    if (!rail || !selected) return;
+    const selectedBounds = selected.getBoundingClientRect();
+    const railBounds = rail.getBoundingClientRect();
+    const target = rail.scrollLeft + selectedBounds.left - railBounds.left + selectedBounds.width / 2 - rail.clientWidth / 2;
+    rail.scrollTo({ left: Math.max(0, target), behavior: "auto" });
+  }, [currentIndex, total]);
 
   return (
     <div
@@ -292,7 +303,7 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
               onPointerEnter={() => setOverControls(true)}
               onPointerLeave={() => setOverControls(false)}
             >
-              <div className={styles.timeline} role="group" aria-label="Escolher impressão">
+              <div ref={timelineRef} className={styles.timeline} role="group" aria-label="Escolher impressão">
                 {visibleSteps.map((step) => (
                   <button
                     key={step}

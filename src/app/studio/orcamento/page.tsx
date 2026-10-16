@@ -1,6 +1,6 @@
 import { QuoteWizard } from "@/components/studio/quote-wizard";
-import { StudioPageShell, StudioSection } from "@/components/studio/studio-content";
 import { buildPublicMetadata } from "@/lib/site-config";
+import styles from "./quote-page.module.css";
 
 export const metadata = buildPublicMetadata({
   title: "Orçamento de impressão 3D | CM 3D & Radio",
@@ -32,26 +32,22 @@ export default async function StudioQuotePage({
   const initialOrigin = Array.isArray(params.origem) ? params.origem[0] : params.origem;
 
   return (
-    <StudioPageShell
-      eyebrow="Orçamento"
-      title="Conte o que você precisa."
-      lead="O formulário começa pelo projeto, não pelo seu telefone. Você responde somente o que faz sentido para o tipo de peça e revisa tudo antes do envio."
-      pathname="/studio/orcamento"
-      breadcrumbLabel="Orçamento"
-    >
-      <QuoteWizard
-        initialType={initialType}
-        initialReference={initialReference}
-        initialOrigin={initialOrigin}
-      />
+    <article className={styles.quotePage}>
+      <div className={styles.quoteHero}>
+        <header className={styles.quoteIntro}>
+          <h1>
+            Conte o <span>que você precisa.</span>
+          </h1>
+        </header>
 
-      <StudioSection eyebrow="Como funciona" title="Análise antes de contato">
-        <p>
-          O objetivo é receber contexto suficiente para avaliar o projeto antes de abrir
-          uma conversa manual. Enviar uma solicitação não significa aceite automático,
-          prazo garantido ou produção imediata.
-        </p>
-      </StudioSection>
-    </StudioPageShell>
+        <div className={styles.quoteForm}>
+          <QuoteWizard
+            initialType={initialType}
+            initialReference={initialReference}
+            initialOrigin={initialOrigin}
+          />
+        </div>
+      </div>
+    </article>
   );
 }

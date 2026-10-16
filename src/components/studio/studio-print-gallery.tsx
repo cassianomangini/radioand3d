@@ -86,7 +86,7 @@ export function StudioPrintGallery() {
                       src={cover.src}
                       alt={cover.alt}
                       fill
-                      sizes="(max-width: 650px) 100vw, (max-width: 1180px) 48vw, 28vw"
+                      sizes="(max-width: 700px) 30vw, 140px"
                     />
                   ) : (
                     <span className={styles.videoPlaceholder}>VÍDEO · VER PROJETO</span>

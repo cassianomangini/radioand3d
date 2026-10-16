@@ -1,0 +1,32 @@
+---
+description: Propriedade CSS com prefixo de fornecedor também declara o nome padrão
+globs: "**/*.css"
+alwaysApply: false
+---
+
+# CSS sem prefixo órfão
+
+O painel Problems do editor avisa quando uma propriedade prefixada existe e o nome padrão não está no mesmo bloco. Esse aviso é o erro a evitar.
+
+- No mesmo bloco, declare a propriedade padrão junto do prefixo. `-webkit-line-clamp` exige `line-clamp`.
+- Mantenha `display: -webkit-box` e `-webkit-box-orient: vertical` com `line-clamp`. O nome sem prefixo ainda não é Baseline; só ele não corta o texto.
+- `background-clip`, `mask-image` e `appearance` já são o nome padrão. Não acrescente prefixo novo se o padrão já está no bloco.
+- Pseudo de slider (`::-webkit-slider-thumb`, `::-moz-range-thumb`) continua prefixado: não existe seletor padrão equivalente.
+- Não troque isso por prefixos extras (`-moz-background-clip` e similares). O editor não pede a lista completa de fornecedores.
+
+```css
+/* errado: o editor marca -webkit-line-clamp */
+overflow: hidden;
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 2;
+
+/* certo */
+overflow: hidden;
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 2;
+line-clamp: 2;
+```
+
+Depois de editar CSS, rode `node --experimental-strip-types --test tests/css-standard-properties.test.mjs`. O teste falha se o prefixo ficar sem o nome padrão.

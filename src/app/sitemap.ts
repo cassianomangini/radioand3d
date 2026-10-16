@@ -5,7 +5,6 @@ import { studioProducts } from "@/features/studio/catalog";
 const publicRoutes = [
   "/",
   "/studio",
-  "/studio/impressoes",
   "/studio/impressao-3d-sob-demanda",
   "/studio/placas-personalizadas",
   "/studio/caixas-personalizadas",

@@ -427,23 +427,24 @@ try {
   const printsRouteClicked = await evaluate(
     client,
     `(() => {
-      const link = document.querySelector('a[href="/studio/impressoes"]');
+      const link = document.querySelector('a[href="#impressoes"]');
       if (!(link instanceof HTMLElement)) return false;
       link.click();
       return true;
     })()`
   );
-  if (!printsRouteClicked) throw new Error("Studio Prints route link was not found.");
+  if (!printsRouteClicked) throw new Error("Studio Prints explore link was not found.");
   const printsRouteState = await waitForEvaluation(
     client,
     `(() => {
-      const pathOk = window.location.pathname === "/studio/impressoes";
-      const heading = document.querySelector('[data-studio-route-content="true"] h1')?.textContent ?? "";
-      const headingOk = heading.includes("O que já saiu");
+      const pathOk = window.location.pathname === "/studio" && window.location.hash === "#impressoes";
+      const heading = document.getElementById("studio-prints-title")?.textContent ?? "";
+      const headingOk = heading.includes("Peças, detalhes");
       const audioPreserved = document.querySelector("audio") === window.__cmStudioNestedAudioNode;
       return {
         ok: pathOk && headingOk && audioPreserved,
         pathname: window.location.pathname,
+        hash: window.location.hash,
         heading,
         audioPreserved
       };
@@ -451,29 +452,17 @@ try {
   );
   if (!printsRouteState?.ok) {
     throw new Error(
-      `Studio nested-route QA failed: ${JSON.stringify(printsRouteState)}`
+      `Studio prints section QA failed: ${JSON.stringify(printsRouteState)}`
     );
   }
   await screenshot(client, "desktop-studio-prints-1760x824.png");
-
-  const nestedBackClicked = await evaluate(
-    client,
-    `(() => {
-      const link = document.querySelector('nav[aria-label="Caminho da página"] a[href="/studio"]');
-      if (!(link instanceof HTMLElement)) return false;
-      link.click();
-      return true;
-    })()`
-  );
-  if (!nestedBackClicked) throw new Error("Studio breadcrumb back link was not found.");
-  await delay(900);
 
   const studioHubRestored = await evaluate(
     client,
     `window.location.pathname === "/studio" &&
       document.querySelector("audio") === window.__cmStudioNestedAudioNode`
   );
-  if (!studioHubRestored) throw new Error("Studio breadcrumb navigation replaced the Radio audio element.");
+  if (!studioHubRestored) throw new Error("Studio prints scroll replaced the Radio audio element.");
 
   const studioBackClicked = await evaluate(
     client,

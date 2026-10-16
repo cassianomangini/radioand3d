@@ -178,9 +178,11 @@ Depois, explicar em texto simples:
 
 Não transformar a página em tabela técnica extensa nem em feature grid com ícones.
 
-## 7. /studio/impressoes
+## 7. Galeria de impressões em /studio
 
-A página deve ser editorial e principalmente fotográfica.
+Não existe página própria. A prova fotográfica fica em `/studio`, abaixo dos três cards. O controle **Explorar galeria** rola até `#impressoes`. `/studio/impressoes` apenas redireciona para essa seção.
+
+A seção deve ser principalmente fotográfica.
 
 ### Abertura
 
@@ -326,7 +328,11 @@ https://design-system.service.gov.uk/patterns/question-pages/
 
 ## 11. Orçamento — fluxo visual
 
-### Passo 1 — O que você precisa?
+**Direção de composição atualizada por Cassiano em 16/10/2026:** a abertura mostra apenas “Conte o que você precisa.” em uma linha, com o painel de orçamento imediatamente abaixo. Foram removidos a explicação editorial e os três passos com ícones. O cenário CM atual permanece em escala contida, com camada escura própria atrás do título. Dentro do painel ficam progresso segmentado, pergunta e quatro escolhas em grade 2×2 com área reservada para a mídia de cada opção. Ciano e violeta marcam progresso e escolha. Em desktop com Rádio recolhida, toda a primeira etapa deve caber em uma tela, inclusive no viewport efetivo de 1250 × 542 px observado com zoom de 150%. Ao aumentar a largura da Rádio lateral, as quatro escolhas continuam em 2×2, com tipografia, mídia e espaços menores; somente quando o Estúdio chega aproximadamente à metade da largura a página passa para coluna única e cards em lista. Cada card avança diretamente; a etapa 1 não tem “Voltar” nem “Continuar” no rodapé. O mock fornecido orienta geometria e hierarquia; as quatro imagens das opções ainda serão geradas por Cassiano. O render implementado ainda aguarda o aceite visual final dele.
+
+**Orientação técnica para a nova arte de fundo, ainda não aprovada visualmente:** gerar master panorâmica de 3200 × 1600 px (2:1), com impressora no quarto esquerdo, área escura útil à direita e chão iluminado na faixa inferior. O arquivo atual de 1536 × 1024 px (3:2) não preenche o desktop largo sem corte ou ampliação; a composição difusa à direita é transitória. Depois da substituição, ajustar o enquadramento responsivo da arte final no navegador.
+
+### Passo 1 — O que você quer imprimir?
 
 Opções:
 
@@ -337,9 +343,7 @@ Opções:
 
 Se a pessoa escolhe arquivo pronto, o fluxo pula perguntas de criação e vai direto para upload + informações de produção.
 
-Quando houver foto real útil, ela pode apoiar a escolha.
-
-Se não houver asset adequado, preferir escolha textual limpa a um ícone 3D genérico.
+Cada opção reserva uma foto real. Enquanto a imagem não entra, o espaço fica vazio. Não usar ícone 3D genérico no lugar da foto.
 
 ### Branch — arquivo 3D pronto
 

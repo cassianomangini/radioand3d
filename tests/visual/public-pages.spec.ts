@@ -4,7 +4,6 @@ import { expect, test } from "@playwright/test";
 const routes = [
   { name: "home", path: "/" },
   { name: "studio", path: "/studio" },
-  { name: "prints", path: "/studio/impressoes" },
   { name: "quote", path: "/studio/orcamento" },
   { name: "product", path: "/studio/produtos/porta-curativos-compacto" }
 ] as const;
@@ -21,24 +20,6 @@ for (const route of routes) {
       animations: "disabled",
       caret: "hide"
     });
-
-    if (route.name === "prints") {
-      // The Studio route can be taller than one viewport; inspect the complete
-      // editorial sequence and the last service handoff, not just its hero.
-      await page.screenshot({
-        path: testInfo.outputPath("prints-full-page.png"),
-        fullPage: true,
-        animations: "disabled",
-        caret: "hide"
-      });
-      await page.getByRole("heading", { name: "Placas, caixas e outras necessidades" }).scrollIntoViewIfNeeded();
-      await page.screenshot({
-        path: testInfo.outputPath("prints-services-viewport.png"),
-        fullPage: false,
-        animations: "disabled",
-        caret: "hide"
-      });
-    }
 
     const measured = await page.evaluate(() => ({
       viewport: document.documentElement.clientWidth,

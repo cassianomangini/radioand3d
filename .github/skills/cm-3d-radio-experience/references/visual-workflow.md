@@ -37,7 +37,7 @@ The first decision is **not** CSS versus a library: it is which existing **CM pr
 - `CM Radio`: audio-activated blue/cyan/violet/pink artwork and dense controls, not a template for every Studio page.
 - Physical 3D pieces/cases: content photography may have warm or distinct project-owned colors; never recast those as global brand tokens.
 
-Use actual site palette (`#020305`, `#03050A`, `#4E9DFF`, `#52D6FF`, `#8B6DFF`, white text) and the current hero gradient only in its intended accent roles; exact values reside in code. `/studio` is the accepted 3-entry hub, whereas `/studio/impressoes` is an editorial gallery inside the existing shell. The three previously rendered lab variants are **invalid as creative candidates** despite passing tests. No art proposal is eligible without a site-context comparison.
+Use actual site palette (`#020305`, `#03050A`, `#4E9DFF`, `#52D6FF`, `#8B6DFF`, white text) and the current hero gradient only in its intended accent roles; exact values reside in code. `/studio` is the accepted 3-entry hub, and the impressions gallery sits below those cards on the same page. The three previously rendered lab variants are **invalid as creative candidates** despite passing tests. No art proposal is eligible without a site-context comparison.
 
 ## Render-first QA checklist
 

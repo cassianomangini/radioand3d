@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import {
   AnimatePresence,
   animate,
@@ -230,9 +229,9 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
 
       <div className={styles.readability} aria-hidden="true" />
       {current ? (
-        <Link
+        <a
           className={styles.mediaLink}
-          href={`/studio/impressoes#${encodeURIComponent(current.id)}`}
+          href="#impressoes"
           aria-label={`Abrir na galeria: ${current.title}`}
           tabIndex={active ? 0 : -1}
         />
@@ -270,20 +269,23 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
         </>
       ) : null}
 
-      <div className={styles.caption}>
+      <div className={styles.titleBlock}>
         <span className={styles.kicker}>ESTÚDIO DE IMPRESSÃO 3D</span>
         <h2>Impressões</h2>
+      </div>
+
+      <div className={styles.caption}>
         <p>{current ? current.title : "Veja peças que já saíram das impressoras, com contexto real de produção."}</p>
         <div className={styles.bottomLine}>
-          <Link
+          <a
             className={styles.explore}
-            href="/studio/impressoes"
+            href="#impressoes"
             tabIndex={active ? 0 : -1}
             onPointerEnter={() => setOverControls(true)}
             onPointerLeave={() => setOverControls(false)}
           >
             Explorar galeria <span aria-hidden="true">→</span>
-          </Link>
+          </a>
           {canNavigate ? (
             <div
               className={styles.transport}

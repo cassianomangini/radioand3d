@@ -28,8 +28,7 @@ Uma URL pública deve existir porque atende uma intenção distinta e possui con
 
 Arquitetura inicial:
 
-- `/studio`
-- `/studio/impressoes`
+- `/studio` (a galeria de impressões é a seção `#impressoes` desta página)
 - `/studio/impressao-3d-sob-demanda`
 - `/studio/placas-personalizadas`
 - `/studio/caixas-personalizadas`
@@ -71,8 +70,7 @@ Todas as rotas estratégicas precisam ser alcançáveis por links HTML reais.
 
 Exemplo de hierarquia:
 
-`/studio`
-→ `/studio/impressoes`  
+`/studio` (`#impressoes` rola na mesma página)
 → `/studio/impressao-3d-sob-demanda`  
 → `/studio/placas-personalizadas`  
 → `/studio/caixas-personalizadas`  

@@ -1,13 +1,13 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(0.7rem, 1.5vw, 1.3rem);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, max(6rem, 11.4%)), 1fr));
+  gap: 0.45rem;
 }
 
 .tile {
   min-width: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: 0.28rem;
   padding: 0;
   border: 0;
   background: transparent;
@@ -19,11 +19,11 @@
 .tileMedia {
   position: relative;
   display: block;
-  aspect-ratio: 1.45;
+  aspect-ratio: 1;
   overflow: hidden;
   background: #10141b;
   border: 1px solid rgb(143 170 193 / 22%);
-  border-radius: 0.3rem;
+  border-radius: 0.22rem;
 }
 
 .tileMedia img {
@@ -33,37 +33,42 @@
 
 .tile:hover .tileMedia img,
 .tile:focus-visible .tileMedia img { transform: scale(1.035); }
-.tile:focus-visible { outline: 2px solid #8ddbff; outline-offset: 5px; }
+.tile:focus-visible { outline: 2px solid #8ddbff; outline-offset: 2px; }
 
 .tileCaption {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.4rem 0.8rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.05rem;
   color: #f0f4fa;
 }
 
 .tileCaption strong {
-  font-size: clamp(0.94rem, 1.3vw, 1.12rem);
-  line-height: 1.3;
+  overflow: hidden;
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tileCaption > span {
+  overflow: hidden;
   color: #8c9fae;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .videoBadge {
   position: absolute;
-  right: 0.75rem;
-  bottom: 0.75rem;
-  padding: 0.3rem 0.5rem;
+  right: 0.28rem;
+  bottom: 0.28rem;
+  padding: 0.12rem 0.28rem;
   background: rgb(3 6 12 / 78%);
   border: 1px solid rgb(143 170 193 / 32%);
   color: #e4f5ff;
-  font-size: 0.65rem;
+  font-size: 0.55rem;
 }
 
 .videoPlaceholder {
@@ -261,8 +266,6 @@
 }
 
 @media (max-width: 650px) {
-  .grid { grid-template-columns: 1fr; }
-  .tileMedia { aspect-ratio: 1.38; }
   .dialog {
     width: 100vw;
     height: 100dvh;

@@ -21,6 +21,7 @@ import { motion, useReducedMotion, type Variants } from "motion/react";
 import styles from "./studio-radio-shell.module.css";
 import { RadioNavbarDock } from "./radio-navbar-dock";
 import { StudioPrintsCarousel } from "./studio-prints-carousel";
+import { StudioPrintGallery } from "@/components/studio/studio-print-gallery";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
@@ -67,8 +68,7 @@ const studioHubInstantVariants: Variants = {
   shown: { opacity: 1, x: 0, y: 0, scale: 1, transition: { duration: 0 } }
 };
 
-const DEFAULT_RADIO_WIDTH = 480;
-const MIN_RADIO_WIDTH = 400;
+const RADIO_WIDTH_RATIO = 0.3;
 const MAX_RADIO_WIDTH = 1120;
 const MIN_STUDIO_WIDTH = 640;
 const RESIZE_GUTTER = 32;
@@ -285,23 +285,25 @@ function Icon({ name }: { name: IconName }) {
   return <svg {...common}>{paths[name]}</svg>;
 }
 
+function getMinRadioWidth(shellWidth: number) {
+  return Math.round(shellWidth * RADIO_WIDTH_RATIO);
+}
+
 function clampRadioWidth(shellWidth: number, requested: number) {
+  const minimum = getMinRadioWidth(shellWidth);
   const availableMaximum = Math.max(
-    MIN_RADIO_WIDTH,
+    minimum,
     shellWidth - MIN_STUDIO_WIDTH - RESIZE_GUTTER
   );
 
   return Math.min(
-    Math.max(requested, MIN_RADIO_WIDTH),
+    Math.max(requested, minimum),
     Math.min(MAX_RADIO_WIDTH, availableMaximum)
   );
 }
 
 function getDefaultWidth(shellWidth: number) {
-  return clampRadioWidth(
-    shellWidth,
-    Math.min(DEFAULT_RADIO_WIDTH, Math.round(shellWidth / 3))
-  );
+  return clampRadioWidth(shellWidth, getMinRadioWidth(shellWidth));
 }
 
 function getExpandedWidth(shellWidth: number) {
@@ -779,7 +781,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const dockMotionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dockMotionTokenRef = useRef(0);
   const dockedRef = useRef(false);
-  const dockRestoreWidthRef = useRef(DEFAULT_RADIO_WIDTH);
+  const dockRestoreWidthRef = useRef(0);
   const dockRestoreModeRef = useRef<RadioLayoutMode>("split");
   const dockEdgeDragRef = useRef<{ pointerId: number; startX: number } | null>(null);
   const mobileDialogRef = useRef<HTMLDialogElement>(null);
@@ -791,7 +793,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const dragPointerVelocityRef = useRef(0);
   const dragStartDistanceRef = useRef(0);
   const dragOriginRef = useRef<"sidebar" | "fullscreen">("sidebar");
-  const initialRadioWidthRef = useRef(DEFAULT_RADIO_WIDTH);
+  const initialRadioWidthRef = useRef(0);
   const initialRadioLayoutModeRef = useRef<RadioLayoutMode>("split");
   const pointerActiveRef = useRef(false);
   const pointerMovedRef = useRef(false);
@@ -1437,7 +1439,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     if (!fromDrag) {
       initialRadioWidthRef.current = wasDocked
         ? dockRestoreWidthRef.current
-        : radioWidth ?? (shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH);
+        : radioWidth ?? getDefaultWidth(shellWidth ?? window.innerWidth);
       initialRadioLayoutModeRef.current = wasDocked ? "docked" : radioLayoutMode;
     }
 
@@ -1488,7 +1490,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   function dockRadio() {
     if (radioFullscreen) {
       const shell = shellRef.current;
-      const width = shell ? getDefaultWidth(shell.getBoundingClientRect().width) : DEFAULT_RADIO_WIDTH;
+      const width = getDefaultWidth(shell?.getBoundingClientRect().width ?? window.innerWidth);
       runRadioDockTransition(true, width, "split", true);
       return;
     }
@@ -1550,7 +1552,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     }
     clearSignatureStageTimer();
     const shellWidth = shellRef.current?.getBoundingClientRect().width;
-    const initialWidth = shellWidth ? getDefaultWidth(shellWidth) : DEFAULT_RADIO_WIDTH;
+    const initialWidth = getDefaultWidth(shellWidth ?? window.innerWidth);
 
     if (
       !radioFullscreen &&
@@ -1649,7 +1651,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     }
 
     const requested = rect.right - event.clientX - dragOffsetRef.current;
-    const dockIntent = getRadioDockIntent(requested, MIN_RADIO_WIDTH);
+    const minimumWidth = getMinRadioWidth(rect.width);
+    const dockIntent = getRadioDockIntent(requested, minimumWidth);
     if (dockIntent.ready) shell.dataset.radioDockReady = "true";
     else delete shell.dataset.radioDockReady;
     const maximum = clampRadioWidth(rect.width, Number.POSITIVE_INFINITY);
@@ -1674,7 +1677,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
 
     const clampedRequested = clampRadioWidth(rect.width, requested);
     const snapPoints = createRadioSnapPoints(
-      MIN_RADIO_WIDTH,
+      minimumWidth,
       getDefaultWidth(rect.width),
       getExpandedWidth(rect.width)
     );
@@ -1710,10 +1713,12 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       !dragFullscreenRef.current &&
       !dragRestoredRef.current;
     const shellAtRelease = shellRef.current;
+    const releaseWidth = shellAtRelease?.getBoundingClientRect().width ?? window.innerWidth;
+    const releaseMinimum = getMinRadioWidth(releaseWidth);
     const requestedAtRelease = shellAtRelease
       ? shellAtRelease.getBoundingClientRect().right - event.clientX - dragOffsetRef.current
-      : MIN_RADIO_WIDTH;
-    const shouldDock = shouldSettle && getRadioDockIntent(requestedAtRelease, MIN_RADIO_WIDTH).ready;
+      : releaseMinimum;
+    const shouldDock = shouldSettle && getRadioDockIntent(requestedAtRelease, releaseMinimum).ready;
 
     pointerActiveRef.current = false;
     setDragging(false);
@@ -1737,7 +1742,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           rect.right - event.clientX - dragOffsetRef.current
         );
         const snapPoints = createRadioSnapPoints(
-          MIN_RADIO_WIDTH,
+          getMinRadioWidth(rect.width),
           getDefaultWidth(rect.width),
           getExpandedWidth(rect.width)
         );
@@ -1789,8 +1794,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
 
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      const width = radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width);
-      if (width <= MIN_RADIO_WIDTH + 1) {
+      const shellWidth = shell.getBoundingClientRect().width;
+      const width = radioWidth ?? getDefaultWidth(shellWidth);
+      if (width <= getMinRadioWidth(shellWidth) + 1) {
         runRadioDockTransition(true, width, radioLayoutMode);
       } else {
         customWidthRef.current = true;
@@ -1802,7 +1808,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     if (event.key === "Home") {
       event.preventDefault();
       customWidthRef.current = true;
-      updateRadioWidth(MIN_RADIO_WIDTH);
+      updateRadioWidth(getMinRadioWidth(shell.getBoundingClientRect().width));
       setRadioExpanded(false);
     }
 
@@ -2108,6 +2114,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           id="studio"
           className={styles.studio}
           data-studio-route={studioRoute}
+          data-studio-hub={studioHub ? "true" : undefined}
           data-studio-transition={studioRouteMotion ?? undefined}
           inert={radioFullscreen}
         >
@@ -2132,14 +2139,13 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               <span aria-hidden={studioRoute !== "detail"}>ESTÚDIO DE IMPRESSÃO 3D</span>
             </div>
 
-            <h1 id="studio-title" aria-label="Impressão 3D, música e muito mais do que você imagina.">
+            <h1 id="studio-title" aria-label="Impressão 3D, música e muito mais.">
               <span key={studioIntroCycle}>
                 <span className={styles.studioHomeHeadlineLine}>{revealPhrase("Impressão 3D,", 120, 28)}</span>
                 <span className={styles.studioHomeHeadlineLine}>
                   {revealPhrase("música e", 540, 28)}{" "}
-                  <span className={styles.studioRevealAccent}>{revealPhrase("muito mais", 800, 28)}</span>
+                  <span className={styles.studioRevealAccent}>{revealPhrase("muito mais!", 800, 28)}</span>
                 </span>
-                <span className={styles.studioHomeHeadlineLine}>{revealPhrase("do que você imagina.", 1120, 28)}</span>
               </span>
             </h1>
 
@@ -2207,10 +2213,21 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               aria-label="Pedir orçamento"
               tabIndex={studioHub ? 0 : -1}
             >
-              <span className={styles.studioCardLabel}>PROJETO PERSONALIZADO</span>
-              <strong>Peça um orçamento</strong>
-              <p>Conte o que você precisa. O fluxo pergunta somente o que faz sentido para o projeto.</p>
-              <span className={styles.studioCardAction}>Pedir orçamento →</span>
+              <Image
+                className={styles.studioQuotePhoto}
+                src="/images/studio/orcamento-card.png"
+                alt=""
+                fill
+                sizes="(max-width: 1179px) 100vw, 32vw"
+              />
+              <div className={styles.studioCardHead}>
+                <span className={styles.studioCardLabel}>PROJETO PERSONALIZADO</span>
+                <strong>Peça um orçamento</strong>
+              </div>
+              <div className={styles.studioCardFoot}>
+                <p>Conte o que você precisa. O fluxo pergunta somente o que faz sentido para o projeto.</p>
+                <span className={styles.studioCardAction}>Pedir orçamento →</span>
+              </div>
             </StudioMotionLink>
 
             <StudioMotionLink
@@ -2224,15 +2241,34 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               aria-label="Ver produtos do estúdio"
               tabIndex={studioHub ? 0 : -1}
             >
-              <span className={styles.studioCardMediaPlaceholder} aria-hidden="true">
-                FOTO REAL PENDENTE · produto
-              </span>
-              <span className={styles.studioCardLabel}>PRODUTOS</span>
-              <strong>Peças prontas para comprar</strong>
-              <p>Conheça cada produto aqui e finalize a compra na Shopee quando estiver disponível.</p>
-              <span className={styles.studioCardAction}>Ver produtos →</span>
+              <div className={styles.studioCardHead}>
+                <span className={styles.studioCardLabel}>PRODUTOS</span>
+                <strong>Peças prontas para comprar</strong>
+              </div>
+              <div className={styles.studioCardFoot}>
+                <span className={styles.studioCardMediaPlaceholder} aria-hidden="true">
+                  FOTO REAL PENDENTE · produto
+                </span>
+                <p>Conheça cada produto aqui e finalize a compra na Shopee quando estiver disponível.</p>
+                <span className={styles.studioCardAction}>Ver produtos →</span>
+              </div>
             </StudioMotionLink>
           </motion.div>
+
+          {studioHub ? (
+            <>
+              <div className={styles.studioHubStage} aria-hidden="true" />
+              <section
+                id="impressoes"
+                className={styles.studioHubPrints}
+                aria-labelledby="studio-prints-title"
+                tabIndex={-1}
+              >
+                <h2 id="studio-prints-title">Peças, detalhes e projetos reais</h2>
+                <StudioPrintGallery />
+              </section>
+            </>
+          ) : null}
 
           {studioNestedRoute ? (
             <div className={styles.studioRouteContent} data-studio-route-content="true">{children}</div>
@@ -2246,9 +2282,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           role="separator"
           aria-label={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Arraste para redimensionar CM Rádio"}
           aria-orientation="vertical"
-          aria-valuemin={radioFullscreen ? undefined : MIN_RADIO_WIDTH}
+          aria-valuemin={radioFullscreen || shellWidth === null ? undefined : getMinRadioWidth(shellWidth)}
           aria-valuemax={radioFullscreen ? undefined : MAX_RADIO_WIDTH}
-          aria-valuenow={radioFullscreen ? undefined : Math.round(radioWidth ?? DEFAULT_RADIO_WIDTH)}
+          aria-valuenow={radioFullscreen || radioWidth === null ? undefined : Math.round(radioWidth)}
           tabIndex={0}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

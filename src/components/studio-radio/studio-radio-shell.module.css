@@ -1,6 +1,6 @@
 .site {
   --header-height: 4.25rem;
-  --radio-width: clamp(400px, 33.333vw, 480px);
+  --radio-width: 30vw;
   --rail-width: clamp(22px, 3dvh, 32px);
   min-height: 100dvh;
   background: var(--surface-page);
@@ -828,6 +828,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     font-size: 1rem;
     font-weight: 750;
   }
@@ -1348,6 +1349,7 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-size: clamp(0.9rem, 1.4vw, 1.08rem);
   line-height: 1.2;
 }
@@ -2248,7 +2250,7 @@
 .lead {
   max-width: 39ch;
   margin: 0;
-  color: #bec4ce;
+  color: #ffffff;
   font-size: clamp(1.05rem, 2.4cqw, 1.35rem);
   line-height: 1.38;
 }
@@ -3825,6 +3827,50 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   transition-delay: 330ms;
 }
 
+.studio[data-studio-hub="true"] {
+  height: auto;
+  overflow: visible;
+}
+
+.studioHubStage {
+  display: none;
+}
+
+.studioHubPrints {
+  position: relative;
+  z-index: 4;
+  padding: 1.15rem clamp(0.85rem, 2vw, 1.5rem) 2.5rem;
+  background: #05080c;
+  scroll-margin-top: calc(var(--header-height) + 0.35rem);
+}
+
+.studioHubPrints h2 {
+  margin: 0 0 0.85rem;
+  color: #f8fafc;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+@media (min-width: 73.75rem) {
+  .studio[data-studio-hub="true"] {
+    height: 100dvh;
+    overflow: auto;
+  }
+
+  .studioHubStage {
+    display: block;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .studioHubPrints {
+    min-height: 100%;
+    scroll-margin-top: 0.75rem;
+  }
+}
+
 .studioDetailCard {
   position: relative;
   min-width: 0;
@@ -4549,10 +4595,31 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 .studioDetailCard[data-studio-card="quote"] {
-  background:
-    radial-gradient(ellipse at 96% 16%, rgb(62 45 121 / 10%), transparent 55%),
-    linear-gradient(145deg, #0b0d15 0%, #06090f 72%);
+  background: #060910;
   border-color: rgb(151 158 206 / 25%);
+}
+
+.studioQuotePhoto {
+  object-fit: cover;
+  object-position: right center;
+  z-index: 0;
+}
+
+.studioDetailCard[data-studio-card="quote"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(4 6 12 / 78%) 0%, rgb(4 6 12 / 22%) 42%, rgb(4 6 12 / 82%) 100%),
+    linear-gradient(90deg, rgb(4 6 12 / 62%) 0%, rgb(4 6 12 / 8%) 58%);
+}
+
+.studioDetailCard[data-studio-card="quote"] .studioCardHead,
+.studioDetailCard[data-studio-card="quote"] .studioCardFoot {
+  position: relative;
+  z-index: 2;
 }
 
 .studioDetailCard[data-studio-card="quote"] .studioCardAction {
@@ -4596,10 +4663,79 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   border-color: rgb(255 139 104 / 52%);
 }
 
+.studioDetailCard[data-studio-card="quote"],
+.studioDetailCard[data-studio-card="products"] {
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1.2rem, 1.7cqw, 1.65rem);
+}
+
+.studioCardHead {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  max-width: 14ch;
+}
+
+.studioDetailCard[data-studio-card="quote"] .studioCardLabel,
+.studioDetailCard[data-studio-card="products"] .studioCardLabel {
+  margin: 0;
+  font-size: clamp(0.68rem, 0.82cqw, 0.78rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.studioDetailCard[data-studio-card="quote"] strong,
+.studioDetailCard[data-studio-card="products"] strong {
+  max-width: 14ch;
+  font-size: clamp(1.85rem, 2.7cqw, 2.65rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+}
+
+.studioCardFoot {
+  display: grid;
+  align-content: end;
+  gap: 0.7rem;
+}
+
+.studioDetailCard .studioCardFoot .studioCardMediaPlaceholder {
+  position: static;
+  inset: auto;
+  display: block;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  text-align: left;
+}
+
+.studioCardFoot p {
+  margin: 0;
+  font-size: clamp(0.82rem, 0.95cqw, 0.95rem);
+  line-height: 1.4;
+}
+
+.studioDetailCard[data-studio-card="quote"] .studioCardFoot .studioCardAction,
+.studioDetailCard[data-studio-card="products"] .studioCardFoot .studioCardAction {
+  margin-top: 0.15rem;
+}
+
 @media (max-width: 73.74rem) {
   .studioDetailCard[data-studio-card="prints"] {
     min-height: clamp(19.5rem, 83vw, 28rem);
     padding: 0;
+  }
+
+  .studioDetailCard[data-studio-card="quote"],
+  .studioDetailCard[data-studio-card="products"] {
+    min-height: 16.5rem;
+  }
+
+  .studioDetailCard[data-studio-card="quote"] strong,
+  .studioDetailCard[data-studio-card="products"] strong {
+    font-size: clamp(1.9rem, 8.2vw, 2.45rem);
   }
 }
 

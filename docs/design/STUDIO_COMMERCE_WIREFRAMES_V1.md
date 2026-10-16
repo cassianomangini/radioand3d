@@ -247,7 +247,7 @@ URL: `/studio/orcamento`
 
 O fluxo é intencionalmente mais limpo que o restante do Estúdio.
 
-Desktop:
+Desktop — ordem funcional; composição visual vigente no [handoff de experiência](STUDIO_COMMERCE_EXPERIENCE_V1.md#11-orçamento--fluxo-visual):
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
@@ -263,8 +263,6 @@ Desktop:
 │                                      [Continuar →]            │
 └──────────────────────────────────────────────────────────────┘
 ```
-
-Não abrir um card flutuante dentro de outro painel. A página em si é a superfície.
 
 Mobile:
 
@@ -296,6 +294,8 @@ TÍTULO
 - Outro projeto
 
 Se a pessoa escolhe “Imprimir um arquivo 3D que já tenho”, o fluxo pula perguntas de criação e vai direto para arquivo + dados de produção.
+
+Na etapa 1, tocar ou clicar em um card já abre a próxima etapa; não repetir a ação em um botão “Continuar” no rodapé. As etapas seguintes mantêm a navegação do wizard.
 
 Imagem só entra se houver foto real útil. Sem foto, escolha textual é suficiente.
 

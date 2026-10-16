@@ -47,8 +47,7 @@ A arquitetura deve permitir expansão sem criar páginas vazias ou genéricas.
 
 | URL | Papel | Estado pretendido |
 | --- | --- | --- |
-| `/studio` | Hub do Estúdio e distribuição para os três pilares | lançamento |
-| `/studio/impressoes` | Galeria/prova do que saiu das impressoras | lançamento |
+| `/studio` | Hub do Estúdio, com a galeria de impressões abaixo dos três pilares | lançamento |
 | `/studio/impressao-3d-sob-demanda` | Serviço para quem já possui arquivo 3D e quer análise/produção | lançamento |
 | `/studio/placas-personalizadas` | Landing comercial prioritária | lançamento |
 | `/studio/caixas-personalizadas` | Landing comercial prioritária | lançamento |

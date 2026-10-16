@@ -37,8 +37,8 @@ test("Studio carousel navigation and gallery keep the same Radio audio node", as
   }
 
   await page.getByRole("link", { name: /Explorar galeria/i }).click();
-  await expect(page).toHaveURL(/\/studio\/impressoes/);
-  await expect(page.getByRole("heading", { level: 1, name: "O que já saiu das impressoras." })).toBeVisible();
+  await expect(page).toHaveURL(/\/studio#impressoes/);
+  await expect(page.getByRole("heading", { name: "Peças, detalhes e projetos reais" })).toBeInViewport();
   const persisted = await page.evaluate(() => {
     const before = (window as Window & { __radioBefore?: HTMLAudioElement | null }).__radioBefore;
     return before instanceof HTMLAudioElement && before === document.querySelector("audio");

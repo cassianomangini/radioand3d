@@ -178,6 +178,7 @@ Um `[x]` exige um resultado **efetivamente observado** e localização da prova.
 | 09/10/2026 | V4.1–V4.3 | [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229), [evidência V4](evidence/08v-lab-performance-2026-10-09.md) | Rota protegida 404 em produção, 3 estudos × 4 viewports, 16 testes dev sem retry, comparação HTML e inventário de custos. V4.4/V4.5 aguardam escolha/aprovação. |
 
 | 09/10/2026 | A1.1–A1.4 | [Auditoria visual real do site](../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md), seis imagens do usuário, tokens/CSS/TSX e contratos aceitos | Erro de identidade dos 3 conceitos V1 reconhecido; descartados como proposta artística, mantidos somente para QA. A1.5/A1.6 abertos. |
+| 16/10/2026 | Auditoria técnica Impeccable do site público | [Relatório e evidência](evidence/08v-impeccable-audit-2026-10-16.md); oito URLs em desktop/mobile, Axe, detector, tipos, lint e interações locais | 14/20 na autorrevisão; 0 P0, 2 P1, 3 P2. Nenhuma correção ou aprovação visual nesta rodada. |
 
 ## Retomada
 

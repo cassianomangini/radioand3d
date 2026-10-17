@@ -18,6 +18,10 @@ Em 09/10/2026, Cassiano pediu que arrastar a Rádio lateral **para a direita** f
 
 **Estado:** `in_progress`: após D4.1–D4.3 Cassiano **autorizou a integração funcional**, mantendo **D5 visual em aberto** porque o mini ainda não está bem centralizado entre o menu e os botões sociais. O estado `docked`, WAAPI/FLIP, mini com 13 barras reais, overshoot e retorno por botão/edge, navegação e fullscreen foram integrados na Home/Estúdio. [E2E integrado 38141001848](https://github.com/cassianomangini/radioand3d/actions/runs/38141001848): **12 testes passaram**, cobrindo áudio WAV, 13 bandas, cancelamento, interrupção de voo, rotas, fullscreen e `1180→390→1440`. [CI 38141001879](https://github.com/cassianomangini/radioand3d/actions/runs/38141001879): lint/typecheck/unit/build verdes. [Relatório](work/evidence/03c-radio-dock-integrated-2026-10-11.md). **I1–I6 e Q1/Q2/Q4/Q5/Q7 completos funcionalmente; Q3 complementar, D5 e Q6 pendentes.** Não houve deploy manual.
 
+## Evolução planejada — 06c Compartilhar músicas e métricas
+
+**Estado: proposta, não implementada.** [Plano de compartilhamento e audiência](RADIO_SHARING_METRICS_PLAN_V1.md). Criar URL persistente por faixa e compartilhamento nativo/cópia; instrumentar audições qualificadas e agregados por música (7/30 dias e total), sem confundir visualizações com reproduções, nem interromper o player global. Sequência 06c-A identidade editorial compatível com o catálogo R2 → 06c-B rota/preview social/compartilhamento → 06c-C contadores seguros Supabase CM → 06c-D análise privada e ranking por dados reais. Não reabrir a interface aceita da Rádio nem bloquear a frente 08 do Estúdio. Gate: identidade pública e direção visual aprovadas.
+
 ## Próximos passos
 
 1. **Concluído nos PRs #29 e #30:** contrato local/serializável do Orçamento, arquivos reais em memória, política de formatos/limites, payload versionado, validação estrutural compartilhável e triagem inicial backend-neutral.

@@ -19,3 +19,11 @@ O teste Playwright `tests/visual/home-hero-responsive.spec.ts` verifica texto, a
 **Observação:** o código preexistente do divisor limita o Estúdio a cerca de 640 px no desktop; por isso a proporção 30% Estúdio / 70% Rádio pode não ser atingível em algumas larguras. Essa regra foi preservada para não reabrir comportamento já aprovado.
 
 **Estado de aceite estético:** pendente de conferência das capturas reais por Cassiano. Capturas automáticas não constituem aprovação final.
+
+## Correção visual — 17/10/2026 (captura enviada pelo usuário)
+
+A captura evidenciou um erro na primeira implementação: a imagem ficava restrita a uma faixa de aproximadamente 40% do painel e a altura máxima de ~25rem, deixando grandes áreas lisas acima e abaixo.
+
+**Correção:** no desktop, a arte agora ocupa 100% da largura e toda a altura do Estúdio abaixo da navbar, sem `mask` que corte a borda. A legibilidade do texto passa a depender de um gradiente contínuo sobre a cena, não de um card retangular. A posição `object-position` foi ajustada para priorizar X1 e balão; o texto permanece independente da imagem. Em painel estreito (divisor), o fundo continua preenchendo a área e a copy passa a composição vertical. Em laptop, a arte deixa de ficar limitada à faixa central de 36rem.
+
+**Regressão adicionada:** o Playwright verifica largura, topo e base do asset em relação ao painel real do Estúdio, inclusive após a expansão da Rádio. Resultado e aceite visual dependem da CI e inspeção da renderização.

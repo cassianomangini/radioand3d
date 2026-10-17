@@ -4972,45 +4972,76 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   outline-offset: 3px;
 }
 
-/* Studio scroll stays independent of the fixed desktop radio. */
+/* Full-bleed Home artwork: the source image is a layer of the Studio scene,
+   NOT a framed illustration strip. The entire area below the navbar is covered.
+   Text and divider remain independent from this visual-only layer. */
 @media (min-width: 73.75rem) {
   .studio[data-studio-route="home"] {
     height: 100dvh;
     min-height: 100dvh;
+    overflow-x: clip;
     overflow-y: auto;
     overscroll-behavior-y: contain;
   }
 
-  /* A 54rem Studio pane supports independent art/copy columns.
-     When the divider shrinks Studio below that width, stack instead. */
-  @container studio (min-width: 54rem) {
-    .studioHomeArt {
-      position: absolute;
-      top: 52%;
-      left: 0;
-      width: 40%;
-      height: clamp(19rem, 30cqi, 25rem);
-      margin: 0;
-      transform: translateY(-50%);
-      -webkit-mask-image: linear-gradient(to right, #000 0 96%, transparent 100%);
-      mask-image: linear-gradient(to right, #000 0 96%, transparent 100%);
-    }
+  .studio[data-studio-route="home"] .studioHomeArt {
+    position: absolute;
+    inset: var(--header-height) 0 0;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    margin: 0;
+    transform: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 
+  .studio[data-studio-route="home"] .studioHomeArt img {
+    object-fit: cover;
+    object-position: 30% center;
+  }
+
+  /* A continuous scene across the entire Studio; only the right copy
+     lane gets a stronger dark overlay. No rectangular image boundary. */
+  .studio[data-studio-route="home"] .studioHomeArt::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        rgb(3 11 28 / 4%) 0%,
+        rgb(3 11 28 / 6%) 28%,
+        rgb(3 11 28 / 46%) 42%,
+        rgb(3 11 28 / 83%) 59%,
+        rgb(3 11 28 / 96%) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(3 11 28 / 20%) 0%,
+        transparent 16%,
+        transparent 83%,
+        rgb(3 11 28 / 22%) 100%
+      );
+  }
+
+  /* Horizontal composition while Studio has enough actual panel width. */
+  @container studio (min-width: 54rem) {
     .studioIdentity[data-studio-intro="home"] {
       position: absolute;
       top: 52%;
       left: 38%;
       right: clamp(1rem, 2cqi, 2.4rem);
+      min-width: 0;
       margin: 0;
       padding: clamp(1rem, 2cqi, 2rem);
       transform: translateY(-50%);
-      background: linear-gradient(
-        100deg,
-        rgb(3 11 28 / 57%),
-        rgb(3 11 28 / 93%) 24%,
-        rgb(3 11 28 / 97%)
-      );
-      border-color: rgb(83 143 218 / 10%);
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
     }
 
     .studioIdentity[data-studio-intro="home"] h1 {
@@ -5020,6 +5051,51 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     .studioIdentity[data-studio-intro="home"] .lead {
       font-size: clamp(1rem, 1.46cqi, 1.2rem);
     }
+  }
+
+  /* Compact Studio: keep the whole background, but bring text forward
+     below the greeting rather than squeezing two columns during a drag. */
+  @container studio (max-width: 53.999rem) {
+    .studioHomeArt img {
+      object-position: 13% center;
+    }
+
+    .studioHomeArt::after {
+      background:
+        linear-gradient(
+          180deg,
+          rgb(3 11 28 / 8%) 0%,
+          rgb(3 11 28 / 18%) 22%,
+          rgb(3 11 28 / 63%) 44%,
+          rgb(3 11 28 / 93%) 70%,
+          #030b1c 95%
+        );
+    }
+
+    .studioIdentity[data-studio-intro="home"] {
+      margin: clamp(11rem, 30dvh, 16rem) clamp(0.85rem, 2cqi, 1.3rem) 2rem;
+      padding: clamp(1.15rem, 2.6cqi, 1.75rem);
+      background: linear-gradient(180deg, rgb(3 11 28 / 55%), #030b1c 70%);
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+}
+
+/* Laptop vertical composition has artwork across the whole Studio
+   width instead of a centered 36rem strip with empty margins. */
+@media (min-width: 42rem) and (max-width: 73.74rem) {
+  .studio[data-studio-route="home"] .studioHomeArt {
+    width: 100%;
+    max-width: none;
+    height: clamp(19rem, 47dvh, 29rem);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0 83%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0 83%, transparent 100%);
+  }
+
+  .studio[data-studio-route="home"] .studioHomeArt img {
+    object-position: 23% center;
   }
 }
 

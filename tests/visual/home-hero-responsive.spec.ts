@@ -37,7 +37,43 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     expect(metrics.studioScrollWidth, "Studio horizontal scroll").toBeLessThanOrEqual(metrics.studioWidth + 1);
   }
 
+  // Regression: previously art occupied only 40% width and ~25rem height.
+  // A full-bleed background must cover the entire Studio below the navbar.
+  async function verifyArtCoverage() {
+    const m = await page.evaluate(() => {
+      const studio = document.querySelector("#studio") as HTMLElement;
+      const art = document.querySelector('[data-home-art="true"]') as HTMLElement;
+      const img = art.querySelector("img") as HTMLImageElement;
+      const s = studio.getBoundingClientRect();
+      const a = art.getBoundingClientRect();
+      const headerHeight = Number.parseFloat(getComputedStyle(document.querySelector('[class*="site"]') as HTMLElement).getPropertyValue("--header-height")) || 0;
+      return {
+        studioWidth: s.width,
+        studioRight: s.right,
+        studioLeft: s.left,
+        studioBottom: s.bottom,
+        artLeft: a.left,
+        artRight: a.right,
+        artTop: a.top,
+        artBottom: a.bottom,
+        expectedTop: s.top + headerHeight,
+        fit: getComputedStyle(img).objectFit,
+        mask: getComputedStyle(art).maskImage
+      };
+    });
+    expect(m.artLeft).toBeGreaterThanOrEqual(m.studioLeft - 2);
+    expect(m.artLeft).toBeLessThanOrEqual(m.studioLeft + 2);
+    expect(m.artRight).toBeGreaterThanOrEqual(m.studioRight - 2);
+    expect(m.artTop).toBeLessThanOrEqual(m.expectedTop + 2);
+    expect(m.artBottom).toBeGreaterThanOrEqual(m.studioBottom - 2);
+    expect(m.fit).toBe("cover");
+    expect(m.mask).toBe("none");
+  }
+
   await verifyLayout();
+  if (testInfo.project.name === "desktop-1440" || testInfo.project.name === "desktop-short") {
+    await verifyArtCoverage();
+  }
   await page.screenshot({
     path: testInfo.outputPath("home-x1-default.png"),
     fullPage: false,
@@ -50,6 +86,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     await divider.focus();
     await divider.press("End");
     await verifyLayout();
+    await verifyArtCoverage();
     await page.screenshot({
       path: testInfo.outputPath("home-x1-studio-compact.png"),
       fullPage: false,

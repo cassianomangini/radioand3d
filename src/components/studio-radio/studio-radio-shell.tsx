@@ -617,6 +617,7 @@ function RadioContent({
 
       <div
         className={styles.coverArt}
+        data-shareable={radio.currentTrack?.shareSlug ? "true" : undefined}
         data-radio-motion-key="cover"
         data-track-flight-destination={trackFlight?.phase === "destination" ? "true" : undefined}
       >
@@ -635,9 +636,9 @@ function RadioContent({
             className={styles.coverShare}
             onClick={() => void shareTrack(radio.currentTrack!.title, radio.currentTrack!.shareSlug!)}
             aria-label={`Compartilhar ${radio.currentTrack.title}`}
+            title={`Compartilhar ${radio.currentTrack.title}`}
           >
             <Icon name={shareFeedback ? "check" : "share"} />
-            <span>{shareFeedback ? "Link copiado" : "Compartilhar"}</span>
           </button>
         ) : null}
       </div>

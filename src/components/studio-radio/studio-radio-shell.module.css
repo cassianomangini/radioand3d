@@ -4912,7 +4912,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   font-weight: 800;
   line-height: 1.055;
   letter-spacing: -0.028em;
-  text-wrap: balance;
+  text-wrap: pretty;
   overflow-wrap: normal;
 }
 

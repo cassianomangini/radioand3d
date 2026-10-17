@@ -2204,7 +2204,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
                 alt=""
                 fill
                 priority
-                sizes="(max-width: 1179px) 180vw, (max-width: 1650px) 42vw, 38vw"
+                sizes="100vw"
               />
             </div>
           ) : null}

@@ -1,6 +1,6 @@
 import { randomInt } from "node:crypto";
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, Manrope } from "next/font/google";
+import { IBM_Plex_Mono, Manrope, Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import { connection } from "next/server";
 import { getRadioTracks } from "@/features/radio/catalog";
 import { RadioProvider } from "@/features/radio/radio-provider";
@@ -17,6 +17,18 @@ const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-ibm-plex-mono"
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  variable: "--font-outfit"
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-plus-jakarta"
 });
 
 export const viewport: Viewport = {
@@ -61,7 +73,7 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR">
-      <body className={`${manrope.variable} ${plexMono.variable}`}>
+      <body className={`${manrope.variable} ${plexMono.variable} ${outfit.variable} ${jakarta.variable}`}>
         <RadioProvider tracks={tracks} playlistSeed={playlistSeed}>
           <PublicExperience>{children}</PublicExperience>
         </RadioProvider>

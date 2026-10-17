@@ -4838,3 +4838,220 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     will-change: auto;
   }
 }
+
+/* 17/10/2026: Approved X1 home artwork. Keep the radio's control grammar unchanged.
+ * The picture carries the visible greeting; assistive technology gets HTML text.
+ * The container is the actual Studio width, including divider-drag states. */
+.studio[data-studio-route="home"] {
+  min-width: 0;
+  overflow-x: clip;
+  background: #030b1c;
+}
+
+.studio[data-studio-route="home"] .studioMachine {
+  background:
+    radial-gradient(ellipse at 18% 38%, rgb(24 80 153 / 17%), transparent 36rem),
+    #030b1c;
+}
+
+.studio[data-studio-route="home"] .studioStageShade {
+  background: linear-gradient(
+    90deg,
+    transparent 0 36%,
+    rgb(3 11 28 / 14%) 52%,
+    rgb(3 11 28 / 44%) 100%
+  );
+}
+
+.studioHomeArt {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  width: min(100%, 36rem);
+  height: clamp(14rem, 50cqi, 24rem);
+  margin-inline: auto;
+  overflow: hidden;
+  pointer-events: none;
+  background: #030b1c;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 87%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0 87%, transparent 100%);
+}
+
+.studioHomeArt img {
+  object-fit: cover;
+  object-position: left center;
+}
+
+.studioIdentity[data-studio-intro="home"] {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  min-width: 0;
+  width: auto;
+  min-height: 0;
+  margin: -0.75rem clamp(0.85rem, 2.4cqi, 1.5rem) 2.5rem;
+  padding: clamp(1.2rem, 3cqi, 2.2rem);
+  transform: none;
+  background: linear-gradient(112deg, rgb(3 11 28 / 88%), rgb(3 11 28 / 97%));
+  border: 1px solid rgb(83 143 218 / 12%);
+  border-radius: 1.15rem;
+  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 14%);
+}
+
+.studioIdentity[data-studio-intro="home"] .studioEyebrowStack {
+  display: none;
+}
+
+.studioIdentity[data-studio-intro="home"] h1 {
+  max-width: none;
+  margin: 0;
+  color: #f8fbff;
+  font-family: var(--font-outfit), var(--font-sans), sans-serif;
+  font-size: clamp(2.15rem, 6.1cqi, 3.6rem);
+  font-weight: 800;
+  line-height: 1.055;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+  overflow-wrap: normal;
+}
+
+.studioIdentity[data-studio-intro="home"] .studioRevealAccent {
+  color: #78d7f9;
+  white-space: nowrap;
+}
+
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .studioIdentity[data-studio-intro="home"] .studioRevealAccent {
+    background: linear-gradient(95deg, #16d5f7 0%, #337dfc 45%, #c43af7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+.studioIdentity[data-studio-intro="home"] .lead {
+  max-width: 55ch;
+  margin: clamp(1rem, 2.2cqi, 1.5rem) 0 0;
+  color: #e9eff8;
+  font-family: var(--font-plus-jakarta), var(--font-sans), sans-serif;
+  font-size: clamp(1rem, 1.7cqi, 1.24rem);
+  font-weight: 600;
+  line-height: 1.53;
+  text-wrap: pretty;
+}
+
+.studioIdentity[data-studio-intro="home"] .studioRouteActions {
+  width: min(100%, 17.8rem);
+  min-height: 3.2rem;
+  margin-top: clamp(1.25rem, 2.5cqi, 1.8rem);
+}
+
+.studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction {
+  min-height: 3.15rem;
+  padding: 0.65rem 1.1rem;
+  background:
+    linear-gradient(#070e1c, #070e1c) padding-box,
+    linear-gradient(115deg, #16d5f7, #428cff 50%, #c43af7) border-box;
+  border: 1px solid transparent;
+  border-radius: 0.85rem;
+  color: #fff;
+  font-family: var(--font-outfit), var(--font-sans), sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  box-shadow: 0 0.4rem 1.5rem rgb(0 0 0 / 15%);
+}
+
+.studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction:hover {
+  box-shadow: 0 0.5rem 1.7rem rgb(38 126 242 / 22%);
+}
+
+.studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction:focus-visible {
+  outline: 2px solid #7ce4ff;
+  outline-offset: 3px;
+}
+
+/* Studio scroll stays independent of the fixed desktop radio. */
+@media (min-width: 73.75rem) {
+  .studio[data-studio-route="home"] {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+
+  /* A 54rem Studio pane supports independent art/copy columns.
+     When the divider shrinks Studio below that width, stack instead. */
+  @container studio (min-width: 54rem) {
+    .studioHomeArt {
+      position: absolute;
+      top: 52%;
+      left: 0;
+      width: 40%;
+      height: clamp(19rem, 30cqi, 25rem);
+      margin: 0;
+      transform: translateY(-50%);
+      -webkit-mask-image: linear-gradient(to right, #000 0 96%, transparent 100%);
+      mask-image: linear-gradient(to right, #000 0 96%, transparent 100%);
+    }
+
+    .studioIdentity[data-studio-intro="home"] {
+      position: absolute;
+      top: 52%;
+      left: 38%;
+      right: clamp(1rem, 2cqi, 2.4rem);
+      margin: 0;
+      padding: clamp(1rem, 2cqi, 2rem);
+      transform: translateY(-50%);
+      background: linear-gradient(
+        100deg,
+        rgb(3 11 28 / 57%),
+        rgb(3 11 28 / 93%) 24%,
+        rgb(3 11 28 / 97%)
+      );
+      border-color: rgb(83 143 218 / 10%);
+    }
+
+    .studioIdentity[data-studio-intro="home"] h1 {
+      font-size: clamp(2.35rem, 4.3cqi, 4.35rem);
+    }
+
+    .studioIdentity[data-studio-intro="home"] .lead {
+      font-size: clamp(1rem, 1.46cqi, 1.2rem);
+    }
+  }
+}
+
+/* Mobile retains the already-approved mini player before Studio content. */
+@media (max-width: 73.74rem) {
+  .studioHomeArt {
+    height: clamp(12.5rem, 53vw, 22rem);
+  }
+
+  .studioIdentity[data-studio-intro="home"] {
+    margin: -0.4rem clamp(0.65rem, 2.5vw, 1.4rem) 2rem;
+    padding: clamp(1.15rem, 4.6vw, 1.8rem);
+  }
+
+  .studioIdentity[data-studio-intro="home"] h1 {
+    font-size: clamp(2.08rem, 7.7vw, 3.6rem);
+  }
+
+  .studioIdentity[data-studio-intro="home"] .lead {
+    font-size: clamp(1rem, 3.2vw, 1.13rem);
+  }
+}
+
+@media (max-width: 26rem) {
+  .studioIdentity[data-studio-intro="home"] h1 {
+    font-size: clamp(2rem, 8.1vw, 2.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studioHomeArt,
+  .studioIdentity[data-studio-intro="home"] {
+    transition: none;
+  }
+}

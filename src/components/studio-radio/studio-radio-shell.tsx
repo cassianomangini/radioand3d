@@ -2197,6 +2197,18 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <div className={styles.studioMachine} aria-hidden="true" />
           <div className={styles.studioStageShade} aria-hidden="true" />
 
+          {studioRoute === "home" ? (
+            <div className={styles.studioHomeArt} data-home-art="true" aria-hidden="true">
+              <Image
+                src="/images/studio/cm-home-x1.png"
+                alt=""
+                fill
+                priority
+                sizes="(max-width: 1179px) 180vw, (max-width: 1650px) 42vw, 38vw"
+              />
+            </div>
+          ) : null}
+
           <div
             className={styles.studioCatalogHeader}
             aria-hidden={!studioHub}
@@ -2210,19 +2222,16 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             aria-labelledby="studio-title"
             data-studio-intro={studioRoute === "home" ? "home" : undefined}
           >
+            {studioRoute === "home" ? <span className={styles.srOnly}>Seja muito bem-vindo!</span> : null}
             <div className={styles.studioEyebrowStack} aria-live="off">
-              <span key={studioIntroCycle} aria-hidden={studioRoute !== "home"}>{revealPhrase("SEJA MUITO BEM-VINDO!", 0, 24)}</span>
               <span aria-hidden={studioRoute !== "detail"}>ESTÚDIO DE IMPRESSÃO 3D</span>
             </div>
 
             <h1 id="studio-title" aria-label="Impressão 3D, música e muito mais do que você imagina.">
               <span key={studioIntroCycle}>
-                <span className={styles.studioHomeHeadlineLine}>{revealPhrase("Impressão 3D,", 120, 28)}</span>
-                <span className={styles.studioHomeHeadlineLine}>
-                  {revealPhrase("música e", 540, 28)}{" "}
-                  <span className={styles.studioRevealAccent}>{revealPhrase("muito mais", 800, 28)}</span>
-                </span>
-                <span className={styles.studioHomeHeadlineLine}>{revealPhrase("do que você imagina.", 1120, 28)}</span>
+                {revealPhrase("Impressão 3D, música e", 120, 22)}{" "}
+                <span className={styles.studioRevealAccent}>muito mais</span>{" "}
+                {revealPhrase("do que você imagina.", 880, 22)}
               </span>
             </h1>
 

@@ -30,7 +30,7 @@ test("Studio carousel navigation and gallery keep the same Radio audio node", as
 
   const next = page.getByRole("button", { name: "Próxima impressão" });
   if (await next.count()) {
-    const indicator = page.locator('[data-studio-prints-carousel] [class*="counter"]');
+    const indicator = page.locator('[data-studio-prints-carousel] span[aria-hidden="true"][class*="__counter"]');
     const previous = await indicator.textContent();
     await next.click();
     await expect(indicator).not.toHaveText(previous ?? "");

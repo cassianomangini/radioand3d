@@ -27,3 +27,13 @@ A captura evidenciou um erro na primeira implementação: a imagem ficava restri
 **Correção:** no desktop, a arte agora ocupa 100% da largura e toda a altura do Estúdio abaixo da navbar, sem `mask` que corte a borda. A legibilidade do texto passa a depender de um gradiente contínuo sobre a cena, não de um card retangular. A posição `object-position` foi ajustada para priorizar X1 e balão; o texto permanece independente da imagem. Em painel estreito (divisor), o fundo continua preenchendo a área e a copy passa a composição vertical. Em laptop, a arte deixa de ficar limitada à faixa central de 36rem.
 
 **Regressão adicionada:** o Playwright verifica largura, topo e base do asset em relação ao painel real do Estúdio, inclusive após a expansão da Rádio. Resultado e aceite visual dependem da CI e inspeção da renderização.
+
+## Posicionamento responsivo revisado — 17/10/2026
+
+As três capturas fornecidas mostram colisões concretas: balão atrás do H1 no dock, balão/braços atrás do título na posição padrão e X1 inteiro sob a copy quando a Rádio é expandida. A causa é a coluna começar aos 38% e mudar bruscamente para layout vertical já aos 54rem de largura **do Estúdio**.
+
+A correção reserva os 54% esquerdos do Estúdio ao X1 e balão nos painéis a partir de 43rem, usando fonte dimensionada pela largura real do painel (container query). O gradiente protege a leitura sem criar um card. Somente abaixo de 43rem a composição fica vertical; nesse limite o balão é preservado em cima e a copy vem abaixo da área fotográfica, com degradê escuro. Em alturas muito curtas, a copy se alinha abaixo da navbar para não ficar cortada.
+
+QA adicionada: testes de geometria da copy e capturas de split padrão, Rádio intermediária, Rádio máxima e dock. A revisão visual final continua dependendo de inspeção da captura renderizada e aceite do usuário; testes isolados não representam aprovação estética.
+
+Escopo preservado: nenhuma alteração na Rádio, player, comportamento de arraste, navegação, produção musical ou roteamento.

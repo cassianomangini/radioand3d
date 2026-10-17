@@ -5034,7 +5034,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     padding: clamp(1.15rem, 4.6vw, 1.8rem);
   }
 
-  .studioIdentity[data-studio-intro="home"] h1 {
+  .studio[data-studio-route="home"] .studioIdentity[data-studio-intro="home"] h1 {
     font-size: clamp(2.08rem, 7.7vw, 3.6rem);
   }
 
@@ -5044,7 +5044,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 @media (max-width: 26rem) {
-  .studioIdentity[data-studio-intro="home"] h1 {
+  .studio[data-studio-route="home"] .studioIdentity[data-studio-intro="home"] h1 {
     font-size: clamp(2rem, 8.1vw, 2.5rem);
   }
 }

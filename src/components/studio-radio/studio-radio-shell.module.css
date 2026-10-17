@@ -5025,7 +5025,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
       position: absolute;
       top: 53%;
       right: clamp(1rem, 1.8cqi, 2.4rem);
-      left: 54%;
+      left: 58%;
       width: auto;
       min-width: 0;
       max-width: none;

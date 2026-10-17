@@ -46,7 +46,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
       const img = art.querySelector("img") as HTMLImageElement;
       const s = studio.getBoundingClientRect();
       const a = art.getBoundingClientRect();
-      const headerHeight = Number.parseFloat(getComputedStyle(document.querySelector('[class*="site"]') as HTMLElement).getPropertyValue("--header-height")) || 0;
+      const navbar = document.querySelector("header") as HTMLElement;
       return {
         studioWidth: s.width,
         studioRight: s.right,
@@ -56,7 +56,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
         artRight: a.right,
         artTop: a.top,
         artBottom: a.bottom,
-        expectedTop: s.top + headerHeight,
+        expectedTop: navbar.getBoundingClientRect().bottom,
         fit: getComputedStyle(img).objectFit,
         mask: getComputedStyle(art).maskImage
       };

@@ -66,7 +66,8 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
         ctaRight: a.right,
         headerBottom: nav.getBoundingClientRect().bottom,
         fontSize: getComputedStyle(heading).fontSize,
-        copyLayout: getComputedStyle(copy).position
+        copyLayout: getComputedStyle(copy).position,
+        artGradient: getComputedStyle(studio.querySelector('[data-home-art="true"]') as HTMLElement, "::after").backgroundImage
       };
     });
     await testInfo.attach(`home-position-${state}.json`, {
@@ -85,6 +86,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     }
     if (geometry.viewportWidth >= 1180 && geometry.studioWidth < 43 * 16) {
       expect(geometry.copyLayout, `${state}: compact Studio should stack`).toBe("relative");
+      expect(geometry.artGradient, `${state}: the compact vertical fade is not active`).not.toContain("90deg");
       expect(geometry.copyTop, `${state}: title overlays the illustrated greeting`)
         .toBeGreaterThan(geometry.headerBottom + 170);
     }

@@ -1,12 +1,12 @@
 # CM Rádio — links por música, compartilhamento e audiência
 
-**Estado:** proposta de produto/arquitetura, registrada em 17/10/2026. **Sem autorização de implementação ou publicação.**
+**Estado:** direção funcional de 06c-A/B aprovada por Cassiano em 17/10/2026; execução, QA e aprovação visual final ainda pendentes. 06c-C/D seguem planejadas, sem autorização de ativação remota.
 **Escopo:** Rádio pública do `radioand3d`; não modifica Estúdio, Artesopolis Admin ou layout aceito da Rádio.
 **Fontes relacionadas:** [Rádio](RADIO.md), [Biblioteca](MUSIC_PIPELINE.md), [Experiência](EXPERIENCE.md), [Roadmap](ROADMAP.md).
 
 ## Objetivo
 
-Permitir que alguém compartilhe **uma música específica** (não apenas a Home), que o destinatário a encontre e a reproduza em um clique consciente, e que Cassiano acompanhe quais faixas são mais ouvidas. Separar métricas de reprodução real de cliques, aberturas e tentativas de compartilhamento. Sem cadastro de ouvintes na V1.
+Permitir que alguém compartilhe **uma música específica** (não apenas a Home), que o destinatário chegue à **Home real do CM 3D & Radio com a Rádio contextualizada pela faixa** e consiga ouvi-la, e que Cassiano acompanhe quais faixas são mais ouvidas. Separar métricas de reprodução real de cliques, aberturas e tentativas de compartilhamento. Sem cadastro de ouvintes na V1.
 
 ## Estado verificado no código (17/10/2026)
 
@@ -15,21 +15,33 @@ Permitir que alguém compartilhe **uma música específica** (não apenas a Home
 - `src/lib/public-analytics.ts` apenas emite eventos no navegador para orçamento/produtos; **não envia métricas a backend** e não mede audições da Rádio.
 - O catálogo editorial `tracks`/`track_versions` e o Music Inbox ainda não são a fonte da Rádio; a evolução não pode fingir que já existem em produção.
 
-## 1. Compartilhamento e destino do link
+## 1. Decisão funcional aprovada — link abre a Home contextualizada
 
-1. URL pública individual canônica: `/musica/[slug]`, com slug legível e **identificador editorial persistente**, imune a mudanças de nome/objeto. Colisões de títulos têm sufixo estável. Alterações futuras de slug mantêm redirecionamento.
-2. A página tem título, artista, capa real ou fallback CM, botão **Ouvir esta música**, botão **Compartilhar**, retorno à Rádio e metadados server-side (`title`, descrição, canonical, Open Graph e imagem social). Respeitar o `noindex` global antes do lançamento.
-3. Recebedor do link: o servidor identifica a faixa publicada e renderiza a página corretamente mesmo sem JavaScript para bots de prévia. A reprodução **não começa automaticamente**; tocar no CTA seleciona a faixa pelo provider existente.
-4. Navegação interna: abrir uma página de música **não troca ou reinicia automaticamente** o que já estiver tocando. Só a ação explícita `Ouvir` seleciona/toca a faixa do link. Não criar segundo `audio`.
-5. Música arquivada/retirada: nunca tocar arquivo retirado. Apresentar indisponibilidade clara e link à Rádio; retirar também a fonte pública conforme o contrato editorial. Não deixar link quebrado retornar outra faixa aleatória.
-6. Botão de compartilhar: no mobile usar `navigator.share` com gesto do usuário quando suportado; nos demais casos oferecer **Copiar link** com confirmação, e eventualmente atalhos de WhatsApp/Telegram se agregarem valor. Não presumir que chamar o share sheet prova envio concluído.
-7. Desktop: ação discreta junto a título/Now Playing e, depois, no menu contextual de cada faixa da playlist. Mobile: ação dentro da Rádio expandida/detalhe, sem aumentar a altura do mini-player persistente. Não alterar a ordem de controles de transporte aprovada.
+**A rota individual existe para metadados e compartilhamento, mas a página VISÍVEL é a Home original, não uma landing de música nem um redirecionamento para `/`.** Exemplo: `/musica/limite-elastico` renderiza a mesma experiência Estúdio + Rádio da Home, reutilizando seu shell e player. Não duplicar o markup visual da Home, o provider, o elemento `audio` nem manter segunda implementação de controles.
+
+1. **Identidade/estado editorial (06c-A):** cada faixa publicada tem ID editorial estável, slug canônico criado uma vez e mapeamento para a versão principal e chave atual do R2. As chaves R2 permanecem operacionais para áudio, letras e sidecars de análise; a fila não deve quebrar com a identidade pública. Música retirada/rascunho não gera página pública. Publicação é a **mesma fonte de verdade** do catálogo, links e sitemap; não expor automaticamente todos os objetos do bucket.
+2. **URL estável:** manter o primeiro slug publicado como canônico, mesmo se o título mudar. Músicas homônimas recebem slugs únicos. Se a versão principal for substituída intencionalmente, o mesmo link reproduz a nova principal. Aliases/redirecionamentos são evolução opcional apenas quando se decidir alterar um slug já distribuído.
+3. **Entrada externa / nova aba sem sessão tocando na mesma instância:** carregar a Home; selecionar a faixa compartilhada; colocá-la **na primeira posição da ordem REAL da fila e da playlist visível**, com as restantes embaralhadas sem duplicatas; tentar `play()` apenas uma vez como melhor esforço. Se o navegador bloquear autoplay, deixar faixa selecionada e mostrar o CTA `▶ Ouvir [Título]`; mostrar `playing` apenas quando o motor confirmar. Depois do fim, continuar na fila embaralhada normalmente.
+4. **Navegação interna com B já tocando e link para A:** **não interromper B, nem reordenar a fila na chegada**. Apresentar A como contexto de compartilhamento, com CTA `Ouvir A`, sem falsificar o Now Playing. Somente após o clique selecionar A, colocá-la em primeiro na sequência ativa e iniciar a reprodução. Preservar áudio, progresso e modos até essa ação. Isso vale também se B estiver pausada com contexto de escuta ativo; decidir pela ação explícita para evitar substituição inesperada.
+5. **Desktop:** abrir Home com Rádio lateral visível quando a sessão for nova; não forçar alterações destrutivas de layout durante uma navegação interna. **Mobile:** na chegada externa abrir Rádio completa/expandida mostrando a faixa; ao fechar, voltar à Home com o mini-player persistente. Não introduzir mini-player duplicado no desktop nem aumentar indevidamente o dock na navbar.
+6. **Compartilhamento:** botão discreto junto à faixa atual/playlist completa e acesso na página contextual. Usar `navigator.share` após gesto quando disponível e fallback `Copiar link` com feedback. Não assumir que abrir share sheet prova envio concluído. Sem alterar a ordem aprovada do transporte.
+7. **Metadados do link:** `/musica/[slug]` tem `title`, descrição, canonical, Open Graph/Twitter e imagem social apropriados, gerados no servidor para prévia sem executar JS. Antes do lançamento respeitar `noindex`/robots; testar a prévia novamente em domínio público liberado. Sitemap apenas para músicas explicitamente publicadas.
+8. **Desempenho:** manifesto/editorial estável ou catálogo cacheado, com estratégia de invalidação na publicação/retirada; **não listar todas as páginas do R2 em cada acesso ao link**. Compartilhar não grava no Supabase e música permanece no R2.
+
+### Aceite mínimo da fila e da navegação
+
+- URL externa de A → A visível em primeiro **tanto na playlist quanto na ordem de próximos avanços**; B/C/... embaralhadas; A não se repete por acidente; após fim de A vem a próxima faixa elegível.
+- URL de A aberta internamente enquanto B toca → B continua, controles mostram B, A é apresentada como seleção opcional; somente o CTA muda para A.
+- Bloqueio de autoplay → CTA visível, nenhuma indicação falsa de som, reprodução após clique sem montar outro áudio.
+- Abertura, refresh e mudança rápida de rota não repetem inicialização, não recompõem a fila por `useEffect`/Strict Mode em loop, não desmontam o provider nem deixam controles ocultos na rota `/musica/...`.
+- Título alterado e versão principal substituída preservam URL; rascunho/retirada dão estado indisponível sem selecionar outra música silenciosamente.
+- Render igual à Home aprovada, em desktop e mobile; nova rota não duplica a Home nem interrompe a experiência de Estúdio.
 
 ## 2. Significado dos contadores
 
-**Reprodução qualificada (`qualified_play`)** é a métrica principal: uma tentativa da mesma faixa que acumulou ao menos **30 segundos de reprodução efetiva**; para áudios abaixo de 30 s, ao menos **50% da duração**. Somar intervalos reais em estado `playing`, sem transformar saltos de `seek` ou carregamento em tempo ouvido. Uma tentativa gera **no máximo um** evento qualificado. Pausa e retomada mantêm a tentativa; troca de música inicia outra; repetir a faixa só pode contar novo evento quando houver nova execução efetiva.
+**Reprodução qualificada observada pelo player (`qualified_play`)** é a única métrica de reprodução da V1: uma tentativa da mesma faixa que acumulou ao menos **o menor valor entre 30 segundos e 50% da duração** de reprodução efetiva. Somar intervalos reais em estado `playing`, sem transformar saltos de `seek` ou carregamento em tempo ouvido. Uma tentativa gera **no máximo um** evento qualificado. Pausa e retomada mantêm a tentativa; troca de música inicia outra; repetir a faixa só pode contar novo evento quando houver nova execução efetiva.
 
-Medidas separadas, sem misturar conceitos:
+Métricas conceitualmente separadas (na **V1 somente `qualified_plays`** e relatório privado; demais indicadores são evoluções que exigem especificação/controle adicional):
 
 | Métrica | Interpretação |
 | --- | --- |
@@ -40,9 +52,9 @@ Medidas separadas, sem misturar conceitos:
 | `track_page_opens` | Aberturas da página da faixa; não equivalem a plays |
 | `plays_from_track_page` | Execuções qualificadas iniciadas pelo CTA da página compartilhável |
 
-**Não declarar ouvintes únicos, envios concluídos nem alcance em WhatsApp** sem uma medição realmente capaz de prová-los. `play()`, `timeupdate` e carregamento de URL de áudio não devem incrementar contador indiscriminadamente.
+**Sem login, os eventos são declarações do navegador, não prova independente de escuta humana.** Não declarar ouvintes únicos, envios concluídos nem alcance em WhatsApp sem medição adequada. `play()`, `timeupdate` e carregamento de URL de áudio não devem incrementar contador indiscriminadamente.
 
-Visões desejadas: **últimos 7 dias, 30 dias e total histórico**, ranking por reproduções qualificadas, tendência por dia, relação abertura do link → audição, e compartilhamentos por faixa. A contagem pública poderá aparecer discretamente ao lado da faixa em destaque; ranking público `Mais ouvidas` é expansão posterior, com dados reais e sem reordenar a playlist aleatória por padrão.
+**V1:** relatório privado por faixa com reproduções qualificadas observadas pelo player nos **últimos 7 dias, 30 dias e total histórico**. **Depois:** tendência por dia, aberturas e compartilhamentos e relação agregada de abertura → reprodução, sem apresentar essa razão como conversão comprovada de pessoas. A contagem pública poderá aparecer discretamente ao lado da faixa em destaque; ranking público `Mais ouvidas` é expansão posterior, com dados reais e sem reordenar a playlist aleatória por padrão.
 
 ## 3. Identidade, persistência e segurança
 
@@ -62,7 +74,7 @@ Limites oficiais consultados em 17/10/2026: Supabase Free oferece **500 MB de Da
 ### Arquitetura econômica obrigatória
 
 1. **Primeiro entregar o link compartilhável sem depender de analytics:** IDs e slugs permanentes podem começar em manifesto pequeno, versionado e reconciliável com a futura biblioteca editorial. **Compartilhar links não escreve no banco**. As músicas continuam sendo servidas pelo Cloudflare R2, nunca copiadas ao Supabase Storage.
-2. **No máximo um envio por reprodução qualificada**, nunca um request por segundo, barra do visualizador, `timeupdate`, render de componente ou mero play/pause. Eventos de link/cópia são opcionais e de baixa prioridade; usar agregados, não tabelas de clicks individuais.
+2. **V1: no máximo um envio por tentativa de reprodução qualificada**, nunca um request por segundo, barra do visualizador, `timeupdate`, render de componente ou mero play/pause. **Não instrumentar `completion` nesta versão:** seria impossível inferir conclusão a partir do evento dos 30 segundos. Eventos de link/cópia são posteriores e opcionais; usar agregados, não tabelas de clicks individuais.
 3. Persistir **1 linha por faixa para contadores totais** e **no máximo 1 linha por faixa/dia** para estatísticas recentes. Conservar **até 90 dias** de agregados diários para 7d/30d; expurgar os mais antigos e preservar o total histórico. Para 343 faixas, o teto lógico teórico dos últimos 90 dias é **30.870 linhas diárias**, mesmo com muitos plays por faixa. Isso não equivale a uma medida real de bytes; índices, vacuum e tabelas já existentes consomem espaço adicional.
 4. Tokens temporários de idempotência em tabela separada (por exemplo, prazo de **até 24 horas**), expurgados em lote. **Jamais reter um registro de cada play permanentemente**, IP ou fingerprint do visitante. Carga anormal: aplicar rate limit e suspender *apenas* os contadores opcionais para proteger orçamento e áudio.
 5. **Leitura em cache** (por exemplo, 5–15 minutos) e recuperação em lote; nada de Supabase Realtime, polling por segundo, uma consulta para cada item da playlist, Edge Function por interação ou dashboard sempre conectado. Preferir API Next.js atual + operação atômica no Postgres com privilégios internos restritos.
@@ -70,27 +82,27 @@ Limites oficiais consultados em 17/10/2026: Supabase Free oferece **500 MB de Da
 7. **Proteger o projeto inteiro:** medir `Database Size`, `Storage` e `Egress` reais antes de ativar. Alerta operacional quando Database Size chegar a **350 MB**; **bloquear novos writes de analytics** perto de **400 MB** para preservar margem das funcionalidades essenciais. O orçamento de Orçamento/anexos continua independente das métricas de Rádio. A API deve falhar aberta para o usuário: música e compartilhamento continuam funcionando quando estatísticas estiverem desativadas.
 8. Quotas Free **não devem disparar upgrade automático** no produto. Ao exceder limites, o Supabase pode restringir serviço; aceitar perda temporária das métricas é melhor que comprometer orçamento, armazenamento ou reprodução. Revisar consumo real mensalmente e sempre após pico de tráfego.
 
-**Gate de aceite financeiro:** nenhuma tabela/evento de analytics em produção sem observação do projeto CM, teste de carga/rotinas de expurgo, cálculo medido do espaço e chave de desligamento independente das demais funcionalidades. Todo limite no código deve ser configurável e testado; não prometer 0 MB exatos de overhead.
+**Gate de aceite financeiro:** nenhuma tabela/evento de analytics em produção sem observação do projeto CM, teste de carga/rotinas de expurgo, cálculo medido do espaço, rotina de exportação/recuperação dos totais e chave de desligamento independente das demais funcionalidades. Projeto Free não substitui backup próprio para histórico relevante. Todo limite no código deve ser configurável e testado; não prometer 0 MB exatos de overhead.
 
 ## 5. Sequência de execução proposta (frente independente)
 
 | Bloco | Entrega | Dependência | Aceite verificável |
 | --- | --- | --- | --- |
-| **06c-A** | Identidade pública persistente + mapeamento seguro do catálogo R2 | Definição de IDs/versões e domínio público | Faixas com títulos iguais têm URLs distintas; renomear objeto ou título não quebra URL; retirada tratada |
-| **06c-B** | Rota individual, SEO/OG e ações Compartilhar/Copiar link | A | Link enviado abre a música correta; prévia social correta; play só com gesto; áudio atual preservado na navegação |
-| **06c-C** | Evento de reprodução qualificada, deduplicação, agregação e contadores | A + banco CM e endpoint com proteção | Cliques, seeks, autoplay bloqueado e retry não inflam plays; repetição legítima contada por nova execução; erro de API não interfere na Rádio |
-| **06c-D** | Visão das músicas mais ouvidas e do desempenho dos links | C, período suficiente de dados reais | Ranking 7d/30d/total, auditoria de agregados e distinção entre compartilhamentos e plays |
+| **06c-A** | Identidade pública persistente + catálogo de publicação explícito + mapeamento de ID editorial para R2/sidecars | Definição de IDs/versões e política editorial | Homônimas possuem URLs distintas; mudança de título/versão não quebra link; rascunho e retirada não aparecem no catálogo público |
+| **06c-B** | Rota individual com **Home real contextualizada**, SEO/OG e Compartilhar/Copiar link, adaptação pontual do controlador de fila | A | Entrada externa põe A na primeira posição e tenta tocar; autoplay bloqueado mostra CTA; mobile expande Rádio; navegação interna preserva B até seleção; um só player |
+| **06c-C** | Apenas reproduções qualificadas observadas e relatório privado, com deduplicação, agregados e baixo custo | A + banco CM e endpoint com proteção | Cliques, seeks, autoplay bloqueado e retry não inflam plays; repetição legítima contada por nova execução; falha de API não interfere na Rádio; orçamento Free respeitado |
+| **06c-D** | Ranking público e métricas extras de links somente após dados reais | C, período suficiente de dados reais | Ranking coerente; métricas de link separadas das reproduções; custo e privacidade auditados |
 
 **Não bloquear o Estúdio atual nem exigir todo o Music Inbox antes de 06c-A**, mas fazer a identidade já compatível com o contrato editorial 04. Não promover uma decisão de design final sem validação do layout/fluxo.
 
 ## 6. Handoff de experiência e QA
 
-**Superfícies:** player completo desktop e mobile, playlist, página individual da faixa. Mini-player mobile/dock desktop mantêm sua altura e função atuais. **Variação 4/10; movimento 3/10; densidade 7/10** para esta adição localizada.
+**Superfícies:** Home reaproveitada pela rota individual, player completo desktop e mobile, playlist e CTA contextual. Mini-player mobile/dock desktop mantêm sua altura e função atuais. **Variação 4/10; movimento 3/10; densidade 7/10** para esta adição localizada.
 
-**Verificar:** desktop amplo/estreito; mobile 390px; músicas curtas e títulos longos; 0/1/muitas faixas; aba nova com link; refresh; mudanças de rota; faixa removida; URL desconhecida; navegador sem Web Share; fallback de clipboard; teclado e leitor de tela; `prefers-reduced-motion`; Open Graph em HTML sem executar JS; métricas com seek, pause, repetição, buffering e abas simultâneas; sem dupla reprodução ou rerender contínuo.
+**Verificar:** desktop amplo/estreito; mobile 390px; músicas curtas e títulos longos; 0/1/muitas faixas; link externo e navegação interna com B tocando; refresh; rota nova e troca rápida; fila real e playlist sincronizadas; faixa removida; URL desconhecida; navegador sem Web Share; fallback de clipboard; teclado e leitor de tela; `prefers-reduced-motion`; Open Graph em HTML sem executar JS; métricas com seek, pause, repetição, buffering e abas simultâneas; sem dupla reprodução ou rerender contínuo.
 
 **Não inventar:** números iniciais de plays, curtidas do coração (hoje indisponível), origem de ouvintes, prova de envio no WhatsApp, artwork não autorizado ou ranking automático baseado em cargas de página.
 
-`ready_for_frontend: no` — requer decisão sobre identidade/página e aceite visual antes da alteração da interface.
-`approved_by: pendente` — proposta em discussão, não decisão final de Cassiano.
+`ready_for_frontend: yes (apenas 06c-A/B, reaproveitando Home aprovada; qualquer redesign substancial exige aceite visual específico)`.
+`approved_by: Cassiano — comportamento funcional Home contextualizada e fila compartilhada, 17/10/2026; QA visual final pendente`.
 `artifact_ref: docs/RADIO_SHARING_METRICS_PLAN_V1.md`

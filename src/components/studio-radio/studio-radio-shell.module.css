@@ -5018,19 +5018,21 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
         rgb(3 11 28 / 18%), transparent 18% 81%, rgb(3 11 28 / 25%));
   }
 
-  /* Docked and split: a true right-hand column, never over the speech bubble.
-     Keep this layout through intermediate Radio expansions. */
-  @container studio (min-width: 43rem) {
+  /* Home: the mock has a large, vertically centered editorial block at the
+     right of X1. The copy lane moves fluidly with the Studio pane, not the
+     viewport or radio width. At full-width Studio it begins near 50%; at a
+     narrow split it stays safely past the illustrated greeting and robot. */
+  @container studio (min-width: 52rem) {
     .studioIdentity[data-studio-intro="home"] {
       position: absolute;
       top: 53%;
-      right: clamp(1rem, 1.8cqi, 2.4rem);
-      left: 58%;
+      right: clamp(1rem, 1.5cqi, 2.3rem);
+      left: calc(40% + 10rem);
       width: auto;
       min-width: 0;
       max-width: none;
       margin: 0;
-      padding: clamp(0.75rem, 1.3cqi, 1.4rem);
+      padding: clamp(0.6rem, 0.9cqi, 1rem);
       transform: translateY(-50%);
       background: transparent;
       border: 0;
@@ -5039,25 +5041,53 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     }
 
     .studioIdentity[data-studio-intro="home"] h1 {
-      font-size: clamp(2.1rem, 4.25cqi, 4.2rem);
-      line-height: 1.075;
-      letter-spacing: -0.028em;
+      font-size: clamp(2.1rem, 5.1cqi, min(5.4rem, 9.25dvh));
+      line-height: 1.025;
+      letter-spacing: -0.045em;
+      text-wrap: balance;
     }
 
     .studioIdentity[data-studio-intro="home"] .lead {
-      max-width: 48ch;
-      font-size: clamp(0.94rem, 1.23cqi, 1.15rem);
-      line-height: 1.53;
+      max-width: 52ch;
+      margin-top: clamp(1rem, 2.2cqi, 1.85rem);
+      font-size: clamp(1.05rem, 1.85cqi, min(1.95rem, 3.35dvh));
+      line-height: 1.43;
     }
 
     .studioIdentity[data-studio-intro="home"] .studioRouteActions {
-      margin-top: clamp(1rem, 1.9cqi, 1.55rem);
+      width: min(100%, clamp(17.8rem, 32.3cqi, 36rem));
+      min-height: clamp(3.2rem, 5cqi, min(4.8rem, 8.4dvh));
+      margin-top: clamp(1rem, 2.1cqi, 2.2rem);
+    }
+
+    .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction {
+      min-height: clamp(3.2rem, 5cqi, min(4.8rem, 8.4dvh));
+      padding: 0.55rem clamp(1rem, 1.5cqi, 1.75rem);
+      border-radius: 999px;
+      font-size: clamp(1rem, 1.6cqi, min(1.8rem, 3.1dvh));
+    }
+
+    .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction span:last-child {
+      font-size: clamp(1.4rem, 2.15cqi, 2.15rem);
+    }
+  }
+
+  /* Only when the Studio is wide enough, reproduce the four typographic
+     lines of the approved mock. In split mode allow natural word wrapping. */
+  @container studio (min-width: 94rem) {
+    .studioIdentity[data-studio-intro="home"] .studioHomePhrase {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .studioIdentity[data-studio-intro="home"] .studioHomePhrase.studioRevealAccent {
+      width: fit-content;
     }
   }
 
   /* Studio at its physical minimum: switch to an intentional vertical
      composition. The full-height scene fades before the copy starts. */
-  @container studio (max-width: 42.999rem) {
+  @container studio (max-width: 51.999rem) {
     .studio[data-studio-route="home"] .studioHomeArt img {
       object-position: 14% 22%;
     }
@@ -5100,7 +5130,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 /* On short desktop screens the copy stays below the header instead
    of being vertically centered outside the viewport. */
 @media (min-width: 73.75rem) and (max-height: 44rem) {
-  @container studio (min-width: 43rem) {
+  @container studio (min-width: 52rem) {
     .studioIdentity[data-studio-intro="home"] {
       top: calc(var(--header-height) + 0.75rem);
       transform: none;

@@ -44,6 +44,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
       const studio = document.querySelector("#studio") as HTMLElement;
       const copy = studio.querySelector('section[data-studio-intro="home"]') as HTMLElement;
       const heading = studio.querySelector("#studio-title") as HTMLElement;
+      const artwork = studio.querySelector('[data-home-art="true"]') as HTMLElement;
       const cta = copy.querySelector('a[href="/studio"]') as HTMLAnchorElement;
       const s = studio.getBoundingClientRect();
       const c = copy.getBoundingClientRect();
@@ -59,6 +60,10 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
         studioRight: s.right,
         copyLeft: c.left,
         copyTop: c.top,
+        artBottom: artwork.getBoundingClientRect().bottom,
+        titleBottom: h.bottom,
+        ctaBottom: a.bottom,
+        viewportHeight: window.innerHeight,
         titleLeft: h.left,
         titleRight: h.right,
         titleTop: h.top,
@@ -70,6 +75,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
         artGradient: getComputedStyle(studio.querySelector('[data-home-art="true"]') as HTMLElement, "::after").backgroundImage
       };
     });
+    console.warn("[home-hero-layout]", state, JSON.stringify(geometry));
     await testInfo.attach(`home-position-${state}.json`, {
       body: Buffer.from(JSON.stringify(geometry, null, 2), "utf8"),
       contentType: "application/json"
@@ -78,13 +84,27 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     expect(geometry.studioScrollWidth, `${state}: Studio overflow`).toBeLessThanOrEqual(geometry.studioWidth + 1);
     expect(geometry.titleRight, `${state}: title hits divider`).toBeLessThanOrEqual(geometry.studioRight + 1);
     expect(geometry.ctaRight, `${state}: CTA hits divider`).toBeLessThanOrEqual(geometry.studioRight + 1);
-    if (geometry.viewportWidth >= 1180 && geometry.studioWidth >= 52 * 16) {
+    if (geometry.viewportWidth >= 1180) {
+      expect(geometry.titleTop, `${state}: heading starts too far down the page`)
+        .toBeLessThan(geometry.viewportHeight * 0.66);
+    }
+    if (geometry.viewportWidth < 1180) {
+      expect(geometry.copyTop - geometry.artBottom,
+        `${state}: hidden Studio catalogue leaves blank space between art and copy`)
+        .toBeLessThanOrEqual(42);
+    }
+    if (geometry.viewportWidth >= 1180 && geometry.studioWidth < 56 * 16) {
+      expect(geometry.copyTop - geometry.artBottom,
+        `${state}: compact Studio has unnecessary blank space`)
+        .toBeLessThanOrEqual(42);
+    }
+    if (geometry.viewportWidth >= 1180 && geometry.studioWidth >= 56 * 16) {
       expect(geometry.titleLeft, `${state}: title invades the X1 speech-bubble lane`)
         .toBeGreaterThanOrEqual(geometry.studioLeft + geometry.studioWidth * 0.4 + 160 - 2);
       expect(geometry.copyTop, `${state}: title sits behind the navbar`)
         .toBeGreaterThanOrEqual(geometry.headerBottom - 2);
     }
-    if (geometry.viewportWidth >= 1180 && geometry.studioWidth < 52 * 16) {
+    if (geometry.viewportWidth >= 1180 && geometry.studioWidth < 56 * 16) {
       expect(geometry.copyLayout, `${state}: compact Studio should stack`).toBe("relative");
       expect(geometry.artGradient, `${state}: the compact vertical fade is not active`).not.toContain("90deg");
       expect(geometry.copyTop, `${state}: title overlays the illustrated greeting`)
@@ -113,16 +133,28 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
         artBottom: a.bottom,
         expectedTop: navbar.getBoundingClientRect().bottom,
         fit: getComputedStyle(img).objectFit,
-        mask: getComputedStyle(art).maskImage
+        mask: getComputedStyle(art).maskImage,
+        naturalWidth: img.naturalWidth,
+        naturalHeight: img.naturalHeight,
+        resource: img.currentSrc
       };
     });
     expect(m.artLeft).toBeGreaterThanOrEqual(m.studioLeft - 2);
     expect(m.artLeft).toBeLessThanOrEqual(m.studioLeft + 2);
     expect(m.artRight).toBeGreaterThanOrEqual(m.studioRight - 2);
     expect(m.artTop).toBeLessThanOrEqual(m.expectedTop + 2);
-    expect(m.artBottom).toBeGreaterThanOrEqual(m.studioBottom - 2);
+    if (m.studioWidth >= 56 * 16) {
+      expect(m.artBottom, "full-size Studio artwork must reach the bottom").toBeGreaterThanOrEqual(m.studioBottom - 2);
+    } else {
+      expect(m.artBottom - m.artTop, "compact artwork should leave room for copy").toBeGreaterThan(190);
+      expect(m.artBottom, "compact image should not occupy all Studio height")
+        .toBeLessThan(m.studioBottom - 140);
+    }
     expect(m.fit).toBe("cover");
     expect(m.mask).toBe("none");
+    console.warn("[home-asset]", JSON.stringify(m));
+    expect(m.naturalWidth).toBeGreaterThan(0);
+    expect(m.resource).toContain("/images/studio/cm-home-x1.png");
   }
 
   await verifyLayout();

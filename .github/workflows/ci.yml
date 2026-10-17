@@ -19,6 +19,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Snapshot source for hands-on visual audit
+        shell: bash
+        run: tar --exclude=.git -czf "$RUNNER_TEMP/radioand3d-source.tar.gz" .
+
+      - name: Upload local QA source
+        uses: actions/upload-artifact@v4
+        with:
+          name: radioand3d-qa-source
+          path: ${{ runner.temp }}/radioand3d-source.tar.gz
+          retention-days: 1
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -60,6 +71,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p visual-review
+          cp public/images/studio/cm-home-x1.png visual-review/home-source.png
           pnpm start > /tmp/cm-radioand3d-next.log 2>&1 &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
@@ -162,7 +174,7 @@ jobs:
           retention-days: 7
 
       - name: Upload visual review
-        if: (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')) && success()
+        if: always() && (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]'))
         uses: actions/upload-artifact@v4
         with:
           name: studio-radio-visual-review

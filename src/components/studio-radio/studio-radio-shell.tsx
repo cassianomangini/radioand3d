@@ -261,7 +261,7 @@ function SocialIcons() {
   );
 }
 
-type IconName = "expand" | "minimize" | "medium" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute";
+type IconName = "expand" | "minimize" | "medium" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute" | "share" | "link" | "check";
 
 function Icon({ name }: { name: IconName }) {
   const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
@@ -279,7 +279,10 @@ function Icon({ name }: { name: IconName }) {
     next: <><path d="M19 5v14" /><path d="m5 5 11 7-11 7V5Z" fill="currentColor" stroke="none" /></>,
     search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></>,
     volume: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12" /></>,
-    volumeMute: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="m16 9 5 6m0-6-5 6" /></>
+    volumeMute: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="m16 9 5 6m0-6-5 6" /></>,
+    share: <><circle cx="18" cy="5" r="2" /><circle cx="6" cy="12" r="2" /><circle cx="18" cy="19" r="2" /><path d="m8 11 8-5M8 13l8 5" /></>,
+    link: <><path d="M10 13a5 5 0 0 0 7.1 0l2-2A5 5 0 0 0 12 3.9l-1.2 1.2" /><path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.2-1.2" /></>,
+    check: <path d="m4 12 5 5L20 6" />
   };
   return <svg {...common}>{paths[name]}</svg>;
 }
@@ -454,6 +457,12 @@ function RadioContent({
   }
 
   useEffect(() => {
+    if (!shareFeedback) return;
+    const timeout = window.setTimeout(() => setShareFeedback(""), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [shareFeedback]);
+
+  useEffect(() => {
     const list = trackListRef.current;
     if (!list || !currentTrackId) return;
 
@@ -620,15 +629,19 @@ function RadioContent({
           <span>{displayTrack.artist}</span>
         </div>
         {!radio.currentTrack || radio.currentTrack.fixture ? <span className={styles.coverBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span> : null}
+        {radio.currentTrack?.shareSlug ? (
+          <button
+            type="button"
+            className={styles.coverShare}
+            onClick={() => void shareTrack(radio.currentTrack!.title, radio.currentTrack!.shareSlug!)}
+            aria-label={`Compartilhar ${radio.currentTrack.title}`}
+          >
+            <Icon name={shareFeedback ? "check" : "share"} />
+            <span>{shareFeedback ? "Link copiado" : "Compartilhar"}</span>
+          </button>
+        ) : null}
       </div>
-
-      {radio.currentTrack?.shareSlug ? (
-        <div className={styles.sharingActions}>
-          <button type="button" onClick={() => void shareTrack(radio.currentTrack!.title, radio.currentTrack!.shareSlug!)}>Compartilhar esta música</button>
-          <button type="button" onClick={() => void copyTrackLink(radio.currentTrack!.shareSlug!)}>Copiar link</button>
-          <span role="status">{shareFeedback}</span>
-        </div>
-      ) : null}
+      <span className={styles.srOnly} role="status">{shareFeedback}</span>
 
       <div
         className={styles.progressBlock}
@@ -794,7 +807,7 @@ function RadioContent({
               <span className={styles.duration}>{formatTrackDuration(track.durationSeconds ?? (track.id === radio.currentTrack?.id ? radio.duration : undefined))}</span>
             </button>
             {track.shareSlug ? (
-              <Link href={`/musica/${track.shareSlug}`} prefetch={false} className={styles.trackShareButton} aria-label={`Abrir link de ${track.title}`} title="Abrir link da música">↗</Link>
+              <Link href={`/musica/${track.shareSlug}`} prefetch={false} className={styles.trackShareButton} aria-label={`Abrir link de ${track.title}`} title="Abrir link da música"><Icon name="link" /></Link>
             ) : null}
           </li>
         ))}

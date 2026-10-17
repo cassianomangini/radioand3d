@@ -1372,6 +1372,48 @@
   letter-spacing: 0.06em;
 }
 
+.coverShare {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid rgb(137 234 249 / 54%);
+  border-radius: 999px;
+  background: rgb(3 12 25 / 76%);
+  box-shadow: 0 0.35rem 1rem rgb(1 5 15 / 26%);
+  backdrop-filter: blur(12px);
+  color: #eefcff;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.coverShare svg {
+  width: 1rem;
+  height: 1rem;
+  color: #78eaf6;
+}
+
+.coverShare:hover {
+  transform: translateY(-1px);
+  border-color: #9bf5ff;
+  background: rgb(8 39 57 / 90%);
+}
+
+.coverShare:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 .trackThumb {
   position: relative;
   width: 2.75rem;
@@ -1759,36 +1801,26 @@
 }
 .sharedTrackPlaying { color: #83e7d1; }
 
-.sharingActions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.71rem;
-}
-.sharingActions button,
-.trackShareButton {
-  min-height: 2rem;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid rgb(102 142 193 / 35%);
-  border-radius: 0.3rem;
-  background: #0b1829;
-  color: #c3eaf1;
-  font: inherit;
-  cursor: pointer;
-}
-.sharingActions button:hover,
-.trackShareButton:hover { border-color: #78eaf6; }
-.sharingActions [role="status"] { color: #83e7d1; }
 .shareableTrackRow {
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
 .shareableTrackRow .trackRow { flex: 1; min-width: 0; }
-.trackShareButton { flex: none; width: 2.25rem; display: grid; place-items: center; text-decoration: none; }
+.trackShareButton {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  min-height: 2.75rem;
+  border-radius: 50%;
+  color: #819db7;
+  text-decoration: none;
+  transition: color 180ms ease, background 180ms ease;
+}
+.trackShareButton svg { width: 1rem; height: 1rem; }
+.trackShareButton:hover { color: #b6f7ff; background: rgb(82 214 255 / 9%); }
 .sharedTrackPrompt button:focus-visible,
-.sharingActions button:focus-visible,
 .trackShareButton:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
 .trackState {

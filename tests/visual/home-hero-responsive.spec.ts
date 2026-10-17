@@ -44,6 +44,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
       const studio = document.querySelector("#studio") as HTMLElement;
       const copy = studio.querySelector('section[data-studio-intro="home"]') as HTMLElement;
       const heading = studio.querySelector("#studio-title") as HTMLElement;
+      const artwork = studio.querySelector('[data-home-art="true"]') as HTMLElement;
       const cta = copy.querySelector('a[href="/studio"]') as HTMLAnchorElement;
       const s = studio.getBoundingClientRect();
       const c = copy.getBoundingClientRect();
@@ -59,6 +60,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
         studioRight: s.right,
         copyLeft: c.left,
         copyTop: c.top,
+        artBottom: artwork.getBoundingClientRect().bottom,
         titleBottom: h.bottom,
         ctaBottom: a.bottom,
         viewportHeight: window.innerHeight,
@@ -85,6 +87,16 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     if (geometry.viewportWidth >= 1180) {
       expect(geometry.titleTop, `${state}: heading starts too far down the page`)
         .toBeLessThan(geometry.viewportHeight * 0.66);
+    }
+    if (geometry.viewportWidth < 1180) {
+      expect(geometry.copyTop - geometry.artBottom,
+        `${state}: hidden Studio catalogue leaves blank space between art and copy`)
+        .toBeLessThanOrEqual(42);
+    }
+    if (geometry.viewportWidth >= 1180 && geometry.studioWidth < 56 * 16) {
+      expect(geometry.copyTop - geometry.artBottom,
+        `${state}: compact Studio has unnecessary blank space`)
+        .toBeLessThanOrEqual(42);
     }
     if (geometry.viewportWidth >= 1180 && geometry.studioWidth >= 56 * 16) {
       expect(geometry.titleLeft, `${state}: title invades the X1 speech-bubble lane`)

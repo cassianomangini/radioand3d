@@ -37,6 +37,59 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     expect(metrics.studioScrollWidth, "Studio horizontal scroll").toBeLessThanOrEqual(metrics.studioWidth + 1);
   }
 
+  // These are measurements in the *Studio pane* rather than the viewport:
+  // the old 54rem breakpoint dropped the title on top of the robot.
+  async function inspectHomeState(state: string) {
+    const geometry = await page.evaluate(() => {
+      const studio = document.querySelector("#studio") as HTMLElement;
+      const copy = studio.querySelector('section[data-studio-intro="home"]') as HTMLElement;
+      const heading = studio.querySelector("#studio-title") as HTMLElement;
+      const cta = copy.querySelector('a[href="/studio"]') as HTMLAnchorElement;
+      const s = studio.getBoundingClientRect();
+      const c = copy.getBoundingClientRect();
+      const h = heading.getBoundingClientRect();
+      const a = cta.getBoundingClientRect();
+      const nav = document.querySelector("header") as HTMLElement;
+      return {
+        pageWidth: document.documentElement.scrollWidth,
+        viewportWidth: document.documentElement.clientWidth,
+        studioWidth: s.width,
+        studioScrollWidth: studio.scrollWidth,
+        studioLeft: s.left,
+        studioRight: s.right,
+        copyLeft: c.left,
+        copyTop: c.top,
+        titleLeft: h.left,
+        titleRight: h.right,
+        titleTop: h.top,
+        ctaLeft: a.left,
+        ctaRight: a.right,
+        headerBottom: nav.getBoundingClientRect().bottom,
+        fontSize: getComputedStyle(heading).fontSize,
+        copyLayout: getComputedStyle(copy).position
+      };
+    });
+    await testInfo.attach(`home-position-${state}.json`, {
+      body: Buffer.from(JSON.stringify(geometry, null, 2), "utf8"),
+      contentType: "application/json"
+    });
+    expect(geometry.pageWidth, `${state}: page overflow`).toBeLessThanOrEqual(geometry.viewportWidth + 1);
+    expect(geometry.studioScrollWidth, `${state}: Studio overflow`).toBeLessThanOrEqual(geometry.studioWidth + 1);
+    expect(geometry.titleRight, `${state}: title hits divider`).toBeLessThanOrEqual(geometry.studioRight + 1);
+    expect(geometry.ctaRight, `${state}: CTA hits divider`).toBeLessThanOrEqual(geometry.studioRight + 1);
+    if (geometry.viewportWidth >= 1180 && geometry.studioWidth >= 43 * 16) {
+      expect(geometry.titleLeft, `${state}: title invades the X1 speech-bubble lane`)
+        .toBeGreaterThanOrEqual(geometry.studioLeft + geometry.studioWidth * 0.54 - 2);
+      expect(geometry.copyTop, `${state}: title sits behind the navbar`)
+        .toBeGreaterThanOrEqual(geometry.headerBottom - 2);
+    }
+    if (geometry.viewportWidth >= 1180 && geometry.studioWidth < 43 * 16) {
+      expect(geometry.copyLayout, `${state}: compact Studio should stack`).toBe("relative");
+      expect(geometry.copyTop, `${state}: title overlays the illustrated greeting`)
+        .toBeGreaterThan(geometry.headerBottom + 170);
+    }
+  }
+
   // Regression: previously art occupied only 40% width and ~25rem height.
   // A full-bleed background must cover the entire Studio below the navbar.
   async function verifyArtCoverage() {
@@ -71,6 +124,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
   }
 
   await verifyLayout();
+  await inspectHomeState("split-default");
   if (testInfo.project.name === "desktop-1440" || testInfo.project.name === "desktop-short") {
     await verifyArtCoverage();
   }
@@ -84,11 +138,42 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
     await expect(divider).toBeVisible();
     await divider.focus();
+    await divider.press("Home");
+
+    // An intermediate divider state must stay side-by-side, not place text
+    // over the robot and speech bubble.
+    for (let index = 0; index < 4; index += 1) {
+      await divider.press("Shift+ArrowLeft");
+    }
+    await expect.poll(async () =>
+      page.locator("#studio").evaluate((node) => node.getBoundingClientRect().width)
+    ).toBeLessThan(850);
+    await inspectHomeState("radio-medium");
+    await verifyLayout();
+    await page.screenshot({
+      path: testInfo.outputPath("home-x1-radio-medium.png"),
+      fullPage: false,
+      animations: "disabled"
+    });
+
+    // At the physical minimum Studio width, copy appears BELOW art instead.
     await divider.press("End");
     await verifyLayout();
     await verifyArtCoverage();
+    await inspectHomeState("radio-maximum");
     await page.screenshot({
       path: testInfo.outputPath("home-x1-studio-compact.png"),
+      fullPage: false,
+      animations: "disabled"
+    });
+
+    await divider.press("Home");
+    await divider.press("ArrowRight");
+    await expect(page.locator('[data-radio-layout-mode]')).toHaveAttribute("data-radio-layout-mode", "docked");
+    await inspectHomeState("radio-docked");
+    await verifyArtCoverage();
+    await page.screenshot({
+      path: testInfo.outputPath("home-x1-radio-docked.png"),
       fullPage: false,
       animations: "disabled"
     });

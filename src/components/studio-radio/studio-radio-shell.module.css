@@ -5077,7 +5077,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
       right: auto;
       left: auto;
       width: auto;
-      margin: clamp(16rem, 43dvh, 21rem) clamp(1rem, 3cqi, 1.5rem) 2rem;
+      margin: clamp(23rem, 49dvh, 27rem) clamp(1rem, 3cqi, 1.5rem) 2rem;
       padding: clamp(1rem, 2cqi, 1.35rem);
       transform: none;
       background: transparent;

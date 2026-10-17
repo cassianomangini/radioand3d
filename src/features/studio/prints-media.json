@@ -1,3 +1,108 @@
 {
-  "items": []
+  "items": [
+    {
+      "id": "autisticamente-autisticamente",
+      "project": "autisticamente",
+      "kind": "image",
+      "src": "/images/studio/impressoes/autisticamente/autisticamente.jpg",
+      "title": "autisticamente",
+      "alt": "Foto de autisticamente"
+    },
+    {
+      "id": "familia-familia",
+      "project": "familia",
+      "kind": "image",
+      "src": "/images/studio/impressoes/familia/familia.jpg",
+      "title": "familia",
+      "alt": "Foto de familia"
+    },
+    {
+      "id": "img-20250112-131114-img-20250112-131114",
+      "project": "img-20250112-131114",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20250112-131114/img-20250112-131114.jpg",
+      "title": "IMG 20250112 131114",
+      "alt": "Foto de IMG 20250112 131114"
+    },
+    {
+      "id": "img-20250112-131254-img-20250112-131254",
+      "project": "img-20250112-131254",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20250112-131254/img-20250112-131254.jpg",
+      "title": "IMG 20250112 131254",
+      "alt": "Foto de IMG 20250112 131254"
+    },
+    {
+      "id": "img-20250112-131427-img-20250112-131427",
+      "project": "img-20250112-131427",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20250112-131427/img-20250112-131427.jpg",
+      "title": "IMG 20250112 131427",
+      "alt": "Foto de IMG 20250112 131427"
+    },
+    {
+      "id": "img-20250112-131557-img-20250112-131557",
+      "project": "img-20250112-131557",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20250112-131557/img-20250112-131557.jpg",
+      "title": "IMG 20250112 131557",
+      "alt": "Foto de IMG 20250112 131557"
+    },
+    {
+      "id": "img-20250413-075911-img-20250413-075911",
+      "project": "img-20250413-075911",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20250413-075911/img-20250413-075911.jpg",
+      "title": "IMG 20250413 075911",
+      "alt": "Foto de IMG 20250413 075911"
+    },
+    {
+      "id": "img-20251022-151343-img-20251022-151343",
+      "project": "img-20251022-151343",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20251022-151343/img-20251022-151343.jpg",
+      "title": "IMG 20251022 151343",
+      "alt": "Foto de IMG 20251022 151343"
+    },
+    {
+      "id": "img-20260717-094222-img-20260717-094222",
+      "project": "img-20260717-094222",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20260717-094222/img-20260717-094222.jpg",
+      "title": "IMG 20260717 094222",
+      "alt": "Foto de IMG 20260717 094222"
+    },
+    {
+      "id": "img-20250415-wa0027-img-20250415-wa0027",
+      "project": "img-20250415-wa0027",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20250415-wa0027/img-20250415-wa0027.jpg",
+      "title": "IMG 20250415 WA0027",
+      "alt": "Foto de IMG 20250415 WA0027"
+    },
+    {
+      "id": "img-20250415-wa0031-img-20250415-wa0031",
+      "project": "img-20250415-wa0031",
+      "kind": "image",
+      "src": "/images/studio/impressoes/img-20250415-wa0031/img-20250415-wa0031.jpg",
+      "title": "IMG 20250415 WA0031",
+      "alt": "Foto de IMG 20250415 WA0031"
+    },
+    {
+      "id": "jota-placa-jota-placa",
+      "project": "jota-placa",
+      "kind": "image",
+      "src": "/images/studio/impressoes/jota-placa/jota-placa.png",
+      "title": "Jota Placa",
+      "alt": "Foto de Jota Placa"
+    },
+    {
+      "id": "soldados-soldados",
+      "project": "soldados",
+      "kind": "image",
+      "src": "/images/studio/impressoes/soldados/soldados.jpg",
+      "title": "soldados",
+      "alt": "Foto de soldados"
+    }
+  ]
 }

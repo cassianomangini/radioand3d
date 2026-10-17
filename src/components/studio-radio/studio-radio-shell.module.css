@@ -4554,10 +4554,31 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 .studioDetailCard[data-studio-card="quote"] {
-  background:
-    radial-gradient(ellipse at 96% 16%, rgb(62 45 121 / 10%), transparent 55%),
-    linear-gradient(145deg, #0b0d15 0%, #06090f 72%);
+  background: #060910;
   border-color: rgb(151 158 206 / 25%);
+}
+
+.studioQuotePhoto {
+  z-index: 0;
+  object-fit: cover;
+  object-position: right center;
+}
+
+.studioDetailCard[data-studio-card="quote"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(4 6 12 / 78%) 0%, rgb(4 6 12 / 22%) 42%, rgb(4 6 12 / 82%) 100%),
+    linear-gradient(90deg, rgb(4 6 12 / 62%) 0%, rgb(4 6 12 / 8%) 58%);
+}
+
+.studioDetailCard[data-studio-card="quote"] .studioCardHead,
+.studioDetailCard[data-studio-card="quote"] .studioCardFoot {
+  position: relative;
+  z-index: 2;
 }
 
 .studioDetailCard[data-studio-card="quote"] .studioCardAction {
@@ -4601,10 +4622,79 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   border-color: rgb(255 139 104 / 52%);
 }
 
+.studioDetailCard[data-studio-card="quote"],
+.studioDetailCard[data-studio-card="products"] {
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1.2rem, 1.7cqw, 1.65rem);
+}
+
+.studioCardHead {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  max-width: 14ch;
+}
+
+.studioDetailCard[data-studio-card="quote"] .studioCardLabel,
+.studioDetailCard[data-studio-card="products"] .studioCardLabel {
+  margin: 0;
+  font-size: clamp(0.68rem, 0.82cqw, 0.78rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.studioDetailCard[data-studio-card="quote"] strong,
+.studioDetailCard[data-studio-card="products"] strong {
+  max-width: 14ch;
+  font-size: clamp(1.85rem, 2.7cqw, 2.65rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+}
+
+.studioCardFoot {
+  display: grid;
+  align-content: end;
+  gap: 0.7rem;
+}
+
+.studioDetailCard .studioCardFoot .studioCardMediaPlaceholder {
+  position: static;
+  inset: auto;
+  display: block;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  text-align: left;
+}
+
+.studioCardFoot p {
+  margin: 0;
+  font-size: clamp(0.82rem, 0.95cqw, 0.95rem);
+  line-height: 1.4;
+}
+
+.studioDetailCard[data-studio-card="quote"] .studioCardFoot .studioCardAction,
+.studioDetailCard[data-studio-card="products"] .studioCardFoot .studioCardAction {
+  margin-top: 0.15rem;
+}
+
 @media (max-width: 73.74rem) {
   .studioDetailCard[data-studio-card="prints"] {
     min-height: clamp(19.5rem, 83vw, 28rem);
     padding: 0;
+  }
+
+  .studioDetailCard[data-studio-card="quote"],
+  .studioDetailCard[data-studio-card="products"] {
+    min-height: 16.5rem;
+  }
+
+  .studioDetailCard[data-studio-card="quote"] strong,
+  .studioDetailCard[data-studio-card="products"] strong {
+    font-size: clamp(1.9rem, 8.2vw, 2.45rem);
   }
 }
 

@@ -219,6 +219,18 @@ Visitante frio entende em poucos segundos:
 - [ ] Inserir e revisar as quatro imagens quando Cassiano as gerar; não declarar a mídia concluída antes disso.
 - [ ] Substituir o fundo atual pela arte panorâmica após Cassiano gerá-la; revisar `cover`, posição focal e recortes desktop/mobile no navegador.
 
+### Recuperação do hub do Estúdio — 17/10/2026
+
+- **Responsável:** CM Frontend. **Estado:** `in_progress`.
+- **Objetivo e limite:** recuperar na `main` a imagem do card de Orçamento, a composição dos cards e a legibilidade do carrossel de Impressões que ficaram na branch anterior. Manter o hub com três entradas e a galeria na rota própria `/studio/impressoes`, conforme o wireframe aprovado; não incorporar a segunda seção de galeria proposta na branch.
+- **Contratos lidos:** plano, roadmap, wireframes e experiência comercial do Estúdio, checklist 08.
+- [x] Cassiano autorizou em 17/10/2026 reativar as 13 fotos de Impressões na `main` pública.
+- [x] Recuperar `orcamento-card.png` no card do hub com camada de contraste; restabelecer cabeçalho/rodapé dos cards e título superior do carrossel.
+- [x] Trazer as 13 fotos e o manifesto da branch anterior sem inventar títulos, materiais ou medidas.
+- [x] `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (125/125) e `git diff --check` passaram. Chrome em build local confirmou carregamento das imagens, três cards, sem overflow horizontal em 1440 × 900, 1904 × 1008 e 390 × 844; capturas `output/playwright/studio-restored-final-desktop.png` e `studio-restored-final-mobile.png` inspecionadas pelo agente.
+- [ ] Conferir a CI após sincronizar com `origin/main`.
+- [ ] Cassiano aprovar o resultado visual final; nomes genéricos do manifesto ainda exigem revisão editorial antes de representar um portfólio final.
+
 ## Bloco S1.7 — Produtos
 
 - [x] contrato de catálogo interno criado e deliberadamente vazio até existirem itens reais;

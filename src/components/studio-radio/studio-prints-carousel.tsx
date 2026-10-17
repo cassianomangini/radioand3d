@@ -281,9 +281,12 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
         </>
       ) : null}
 
-      <div className={styles.caption}>
+      <div className={styles.titleBlock}>
         <span className={styles.kicker}>ESTÚDIO DE IMPRESSÃO 3D</span>
         <h2>Impressões</h2>
+      </div>
+
+      <div className={styles.caption}>
         <p>{current ? current.title : "Veja peças que já saíram das impressoras, com contexto real de produção."}</p>
         <div className={styles.bottomLine}>
           <Link

@@ -2214,10 +2214,21 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               aria-label="Pedir orçamento"
               tabIndex={studioHub ? 0 : -1}
             >
-              <span className={styles.studioCardLabel}>PROJETO PERSONALIZADO</span>
-              <strong>Peça um orçamento</strong>
-              <p>Conte o que você precisa. O fluxo pergunta somente o que faz sentido para o projeto.</p>
-              <span className={styles.studioCardAction}>Pedir orçamento →</span>
+              <Image
+                className={styles.studioQuotePhoto}
+                src="/images/studio/orcamento-card.png"
+                alt=""
+                fill
+                sizes="(max-width: 1179px) 100vw, 32vw"
+              />
+              <div className={styles.studioCardHead}>
+                <span className={styles.studioCardLabel}>PROJETO PERSONALIZADO</span>
+                <strong>Peça um orçamento</strong>
+              </div>
+              <div className={styles.studioCardFoot}>
+                <p>Conte o que você precisa. O fluxo pergunta somente o que faz sentido para o projeto.</p>
+                <span className={styles.studioCardAction}>Pedir orçamento →</span>
+              </div>
             </StudioMotionLink>
 
             <StudioMotionLink
@@ -2231,13 +2242,17 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               aria-label="Ver produtos do estúdio"
               tabIndex={studioHub ? 0 : -1}
             >
-              <span className={styles.studioCardMediaPlaceholder} aria-hidden="true">
-                FOTO REAL PENDENTE · produto
-              </span>
-              <span className={styles.studioCardLabel}>PRODUTOS</span>
-              <strong>Peças prontas para comprar</strong>
-              <p>Conheça cada produto aqui e finalize a compra na Shopee quando estiver disponível.</p>
-              <span className={styles.studioCardAction}>Ver produtos →</span>
+              <div className={styles.studioCardHead}>
+                <span className={styles.studioCardLabel}>PRODUTOS</span>
+                <strong>Peças prontas para comprar</strong>
+              </div>
+              <div className={styles.studioCardFoot}>
+                <span className={styles.studioCardMediaPlaceholder} aria-hidden="true">
+                  FOTO REAL PENDENTE · produto
+                </span>
+                <p>Conheça cada produto aqui e finalize a compra na Shopee quando estiver disponível.</p>
+                <span className={styles.studioCardAction}>Ver produtos →</span>
+              </div>
             </StudioMotionLink>
           </motion.div>
 

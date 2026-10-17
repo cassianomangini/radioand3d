@@ -2204,6 +2204,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
                 alt=""
                 fill
                 priority
+                unoptimized
                 sizes="100vw"
               />
             </div>

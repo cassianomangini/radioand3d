@@ -4839,64 +4839,61 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 }
 
-/* 17/10/2026: Approved X1 home artwork. Keep the radio's control grammar unchanged.
- * The picture carries the visible greeting; assistive technology gets HTML text.
- * The container is the actual Studio width, including divider-drag states. */
+/* Home X1 — one continuous scene, with typography attached to the Studio
+   container rather than the browser viewport. The original artwork carries
+   the greeting; HTML remains the only source of the headline and CTA. */
 .studio[data-studio-route="home"] {
   min-width: 0;
   overflow-x: clip;
   background: #030b1c;
 }
 
+/* Old X1 background would otherwise remain underneath the new artwork,
+   especially noticeable where the mobile image ends. Keep motion nodes,
+   but render the Home artwork only once. */
 .studio[data-studio-route="home"] .studioMachine {
-  background:
-    radial-gradient(ellipse at 18% 38%, rgb(24 80 153 / 17%), transparent 36rem),
-    #030b1c;
+  background: #030b1c;
 }
 
 .studio[data-studio-route="home"] .studioStageShade {
-  background: linear-gradient(
-    90deg,
-    transparent 0 36%,
-    rgb(3 11 28 / 14%) 52%,
-    rgb(3 11 28 / 44%) 100%
-  );
+  background: none;
 }
 
 .studioHomeArt {
   position: relative;
   z-index: 2;
   isolation: isolate;
-  width: min(100%, 36rem);
-  height: clamp(14rem, 50cqi, 24rem);
-  margin-inline: auto;
+  width: 100%;
+  height: clamp(14rem, 60vw, 25rem);
+  margin: 0;
   overflow: hidden;
   pointer-events: none;
   background: #030b1c;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0 87%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0 87%, transparent 100%);
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 .studioHomeArt img {
   object-fit: cover;
-  object-position: left center;
+  object-position: 25% center;
 }
 
 .studioIdentity[data-studio-intro="home"] {
   position: relative;
+  z-index: 3;
   top: auto;
   right: auto;
   left: auto;
   min-width: 0;
   width: auto;
   min-height: 0;
-  margin: -0.75rem clamp(0.85rem, 2.4cqi, 1.5rem) 2.5rem;
-  padding: clamp(1.2rem, 3cqi, 2.2rem);
+  margin: -0.6rem clamp(0.85rem, 4vw, 1.6rem) 2.5rem;
+  padding: clamp(0.6rem, 2.4vw, 1.3rem);
   transform: none;
-  background: linear-gradient(112deg, rgb(3 11 28 / 88%), rgb(3 11 28 / 97%));
-  border: 1px solid rgb(83 143 218 / 12%);
-  border-radius: 1.15rem;
-  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 14%);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .studioIdentity[data-studio-intro="home"] .studioEyebrowStack {
@@ -4908,15 +4905,16 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   margin: 0;
   color: #f8fbff;
   font-family: var(--font-outfit), var(--font-sans), sans-serif;
-  font-size: clamp(2.15rem, 6.1cqi, 3.6rem);
+  font-size: clamp(2.05rem, 7.7vw, 3.6rem);
   font-weight: 800;
   line-height: 1.055;
-  letter-spacing: -0.028em;
-  text-wrap: pretty;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
   overflow-wrap: normal;
 }
 
 .studioIdentity[data-studio-intro="home"] .studioRevealAccent {
+  display: inline;
   color: #78d7f9;
   white-space: nowrap;
 }
@@ -4931,40 +4929,40 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 .studioIdentity[data-studio-intro="home"] .lead {
-  max-width: 55ch;
-  margin: clamp(1rem, 2.2cqi, 1.5rem) 0 0;
+  max-width: 53ch;
+  margin: clamp(0.9rem, 2.2vw, 1.5rem) 0 0;
   color: #e9eff8;
   font-family: var(--font-plus-jakarta), var(--font-sans), sans-serif;
-  font-size: clamp(1rem, 1.7cqi, 1.24rem);
+  font-size: clamp(1rem, 3.15vw, 1.15rem);
   font-weight: 600;
-  line-height: 1.53;
+  line-height: 1.48;
   text-wrap: pretty;
 }
 
 .studioIdentity[data-studio-intro="home"] .studioRouteActions {
-  width: min(100%, 17.8rem);
-  min-height: 3.2rem;
-  margin-top: clamp(1.25rem, 2.5cqi, 1.8rem);
+  width: min(100%, 25rem);
+  min-height: 3.25rem;
+  margin-top: clamp(1rem, 2.5vw, 1.5rem);
 }
 
 .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction {
-  min-height: 3.15rem;
-  padding: 0.65rem 1.1rem;
+  min-height: 3.25rem;
+  padding: 0.6rem 1.25rem;
   background:
     linear-gradient(#070e1c, #070e1c) padding-box,
     linear-gradient(115deg, #16d5f7, #428cff 50%, #c43af7) border-box;
   border: 1px solid transparent;
-  border-radius: 0.85rem;
+  border-radius: 999px;
   color: #fff;
   font-family: var(--font-outfit), var(--font-sans), sans-serif;
-  font-size: 0.98rem;
+  font-size: clamp(0.98rem, 1.05vw, 1.5rem);
   font-weight: 700;
   letter-spacing: 0;
-  box-shadow: 0 0.4rem 1.5rem rgb(0 0 0 / 15%);
+  box-shadow: none;
 }
 
 .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction:hover {
-  box-shadow: 0 0.5rem 1.7rem rgb(38 126 242 / 22%);
+  box-shadow: 0 0.5rem 1.7rem rgb(38 126 242 / 20%);
 }
 
 .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction:focus-visible {
@@ -4972,18 +4970,16 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   outline-offset: 3px;
 }
 
-/* Full-bleed Home artwork: the source image is a layer of the Studio scene,
-   NOT a framed illustration strip. The entire area below the navbar is covered.
-   Text and divider remain independent from this visual-only layer. */
 @media (min-width: 73.75rem) {
   .studio[data-studio-route="home"] {
     height: 100dvh;
     min-height: 100dvh;
-    overflow-x: clip;
     overflow-y: auto;
     overscroll-behavior-y: contain;
   }
 
+  /* Fill the complete Studio below its fixed navigation bar. Do not scale
+     an image into a 36rem decorative strip or mask off its edges. */
   .studio[data-studio-route="home"] .studioHomeArt {
     position: absolute;
     inset: var(--header-height) 0 0;
@@ -4991,18 +4987,12 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     max-width: none;
     height: auto;
     margin: 0;
-    transform: none;
-    -webkit-mask-image: none;
-    mask-image: none;
   }
 
   .studio[data-studio-route="home"] .studioHomeArt img {
-    object-fit: cover;
-    object-position: 30% center;
+    object-position: 28% center;
   }
 
-  /* One X1 art lane and one copy lane. Resolve against Studio width,
-     which changes with dock and split drag, not the browser viewport. */
   .studio[data-studio-route="home"] .studioHomeArt::after {
     content: "";
     position: absolute;
@@ -5011,70 +5001,62 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     pointer-events: none;
     background:
       linear-gradient(90deg,
-        rgb(3 11 28 / 2%) 0%, rgb(3 11 28 / 6%) 30%,
-        rgb(3 11 28 / 46%) 43%, rgb(3 11 28 / 87%) 55%,
-        rgb(3 11 28 / 97%) 95%),
+        rgb(3 11 28 / 0%) 0%, rgb(3 11 28 / 4%) 34%,
+        rgb(3 11 28 / 42%) 44%, rgb(3 11 28 / 82%) 57%,
+        rgb(3 11 28 / 92%) 100%),
       linear-gradient(180deg,
-        rgb(3 11 28 / 18%), transparent 18% 81%, rgb(3 11 28 / 25%));
+        rgb(3 11 28 / 6%) 0%, transparent 18% 84%, rgb(3 11 28 / 15%) 100%);
   }
 
-  /* Home: the mock has a large, vertically centered editorial block at the
-     right of X1. The copy lane moves fluidly with the Studio pane, not the
-     viewport or radio width. At full-width Studio it begins near 50%; at a
-     narrow split it stays safely past the illustrated greeting and robot. */
-  @container studio (min-width: 52rem) {
+  /* Split and dock: preserve a 40-45% visual lane for X1. Content is
+     centered VERTICALLY and grows continuously with Studio width. */
+  @container studio (min-width: 56rem) {
     .studioIdentity[data-studio-intro="home"] {
       position: absolute;
       top: 53%;
-      right: clamp(1rem, 1.5cqi, 2.3rem);
+      right: clamp(1rem, 1.7cqi, 2.35rem);
       left: calc(40% + 10rem);
       width: auto;
       min-width: 0;
       max-width: none;
       margin: 0;
-      padding: clamp(0.6rem, 0.9cqi, 1rem);
+      padding: 0;
       transform: translateY(-50%);
-      background: transparent;
-      border: 0;
-      border-radius: 0;
-      box-shadow: none;
     }
 
     .studioIdentity[data-studio-intro="home"] h1 {
-      font-size: clamp(2.1rem, 5.1cqi, min(5.4rem, 9.25dvh));
-      line-height: 1.025;
-      letter-spacing: -0.045em;
-      text-wrap: balance;
+      font-size: clamp(2.15rem, 4.45cqi, 5.25rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
     }
 
     .studioIdentity[data-studio-intro="home"] .lead {
-      max-width: 52ch;
-      margin-top: clamp(1rem, 2.2cqi, 1.85rem);
-      font-size: clamp(1.05rem, 1.85cqi, min(1.95rem, 3.35dvh));
-      line-height: 1.43;
+      max-width: 48ch;
+      margin-top: clamp(1rem, 2.05cqi, 1.85rem);
+      font-size: clamp(1rem, 1.52cqi, 1.8rem);
+      line-height: 1.47;
     }
 
     .studioIdentity[data-studio-intro="home"] .studioRouteActions {
-      width: min(100%, clamp(17.8rem, 32.3cqi, 36rem));
-      min-height: clamp(3.2rem, 5cqi, min(4.8rem, 8.4dvh));
-      margin-top: clamp(1rem, 2.1cqi, 2.2rem);
+      width: min(100%, clamp(17.8rem, 33cqi, 35rem));
+      min-height: clamp(3.05rem, 4.65cqi, 4.4rem);
+      margin-top: clamp(1rem, 2.15cqi, 2rem);
     }
 
     .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction {
-      min-height: clamp(3.2rem, 5cqi, min(4.8rem, 8.4dvh));
-      padding: 0.55rem clamp(1rem, 1.5cqi, 1.75rem);
-      border-radius: 999px;
-      font-size: clamp(1rem, 1.6cqi, min(1.8rem, 3.1dvh));
+      min-height: clamp(3.05rem, 4.65cqi, 4.4rem);
+      padding: 0.6rem clamp(1.1rem, 1.7cqi, 1.8rem);
+      font-size: clamp(1.05rem, 1.4cqi, 1.65rem);
     }
 
     .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction span:last-child {
-      font-size: clamp(1.4rem, 2.15cqi, 2.15rem);
+      font-size: clamp(1.4rem, 2.1cqi, 2.2rem);
     }
   }
 
-  /* Only when the Studio is wide enough, reproduce the four typographic
-     lines of the approved mock. In split mode allow natural word wrapping. */
-  @container studio (min-width: 94rem) {
+  /* Wide dock: exactly the four editorial lines from the approved mock.
+     Do not force these breaks in the smaller Studio half. */
+  @container studio (min-width: 80rem) {
     .studioIdentity[data-studio-intro="home"] .studioHomePhrase {
       display: block;
       white-space: nowrap;
@@ -5085,20 +5067,25 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     }
   }
 
-  /* Studio at its physical minimum: switch to an intentional vertical
-     composition. The full-height scene fades before the copy starts. */
-  @container studio (max-width: 51.999rem) {
-    .studio[data-studio-route="home"] .studioHomeArt img {
-      object-position: 14% 22%;
+  /* When Radio occupies most of the window, stacking is more readable
+     than trying to squeeze text over the X1/greeting. Keep the title
+     above the fold rather than pushing it below a 49dvh margin. */
+  @container studio (max-width: 55.999rem) {
+    .studio[data-studio-route="home"] .studioHomeArt {
+      height: clamp(15rem, 38dvh, 22.5rem);
+      bottom: auto;
     }
 
-    /* Match the selector weight of the desktop 90deg gradient; otherwise
-       it wins the cascade and the robot remains behind compact copy. */
+    .studio[data-studio-route="home"] .studioHomeArt img {
+      object-position: 20% 36%;
+    }
+
     .studio[data-studio-route="home"] .studioHomeArt::after {
       background: linear-gradient(180deg,
-        rgb(3 11 28 / 0%) 0%, rgb(3 11 28 / 10%) 22%,
-        rgb(3 11 28 / 28%) 31%, rgb(3 11 28 / 80%) 43%,
-        #030b1c 55%);
+        transparent 0%,
+        rgb(3 11 28 / 5%) 40%,
+        rgb(3 11 28 / 30%) 70%,
+        #030b1c 100%);
     }
 
     .studioIdentity[data-studio-intro="home"] {
@@ -5107,74 +5094,91 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
       right: auto;
       left: auto;
       width: auto;
-      margin: clamp(23rem, 49dvh, 27rem) clamp(1rem, 3cqi, 1.5rem) 2rem;
-      padding: clamp(1rem, 2cqi, 1.35rem);
+      margin: clamp(15rem, 38dvh, 22.5rem)
+        clamp(1rem, 3cqi, 1.7rem) 1.8rem;
+      padding: clamp(0.6rem, 1.7cqi, 1rem);
       transform: none;
-      background: transparent;
-      border: 0;
-      border-radius: 0;
-      box-shadow: none;
     }
 
     .studioIdentity[data-studio-intro="home"] h1 {
-      font-size: clamp(2.1rem, 6.3cqi, 2.75rem);
-      line-height: 1.1;
+      font-size: clamp(2rem, 5cqi, 2.8rem);
+      line-height: 1.07;
     }
 
     .studioIdentity[data-studio-intro="home"] .lead {
-      font-size: clamp(0.98rem, 2.3cqi, 1.1rem);
+      max-width: 62ch;
+      font-size: clamp(0.98rem, 2.1cqi, 1.13rem);
+      margin-top: clamp(0.8rem, 1.6cqi, 1.2rem);
+    }
+
+    .studioIdentity[data-studio-intro="home"] .studioRouteActions {
+      margin-top: clamp(0.8rem, 1.7cqi, 1.3rem);
     }
   }
 }
 
-/* On short desktop screens the copy stays below the header instead
-   of being vertically centered outside the viewport. */
-@media (min-width: 73.75rem) and (max-height: 44rem) {
-  @container studio (min-width: 52rem) {
+/* For genuinely short desktop windows, use top alignment so an unusually
+   long localized heading cannot appear behind the fixed navigation. */
+@media (min-width: 73.75rem) and (max-height: 40rem) {
+  @container studio (min-width: 56rem) {
     .studioIdentity[data-studio-intro="home"] {
       top: calc(var(--header-height) + 0.75rem);
       transform: none;
     }
 
     .studioIdentity[data-studio-intro="home"] h1 {
-      font-size: clamp(1.85rem, 3.2cqi, 3.15rem);
+      font-size: clamp(2rem, 3.6cqi, 4rem);
     }
   }
 }
 
-/* Laptop vertical composition has artwork across the whole Studio
-   width instead of a centered 36rem strip with empty margins. */
-@media (min-width: 42rem) and (max-width: 73.74rem) {
+@media (max-width: 73.74rem) {
   .studio[data-studio-route="home"] .studioHomeArt {
+    position: relative;
     width: 100%;
-    max-width: none;
-    height: clamp(19rem, 47dvh, 29rem);
-    -webkit-mask-image: linear-gradient(to bottom, #000 0 83%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 0 83%, transparent 100%);
+    height: clamp(13.5rem, 60vw, 24rem);
+    overflow: hidden;
+    margin: 0;
   }
 
   .studio[data-studio-route="home"] .studioHomeArt img {
-    object-position: 23% center;
-  }
-}
-
-/* Mobile retains the already-approved mini player before Studio content. */
-@media (max-width: 73.74rem) {
-  .studioHomeArt {
-    height: clamp(12.5rem, 53vw, 22rem);
+    object-position: 25% center;
   }
 
-  .studioIdentity[data-studio-intro="home"] {
-    margin: -0.4rem clamp(0.65rem, 2.5vw, 1.4rem) 2rem;
-    padding: clamp(1.15rem, 4.6vw, 1.8rem);
+  .studio[data-studio-route="home"] .studioHomeArt::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgb(3 11 28 / 0%) 72%,
+      #030b1c 100%);
+    pointer-events: none;
+  }
+
+  .studio[data-studio-route="home"] .studioIdentity[data-studio-intro="home"] {
+    min-height: 0;
+    margin: -0.25rem clamp(0.75rem, 3.5vw, 1.6rem) 1.5rem;
+    padding: clamp(0.6rem, 2.4vw, 1.2rem);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .studio[data-studio-route="home"] .studioIdentity[data-studio-intro="home"] h1 {
-    font-size: clamp(2.08rem, 7.7vw, 3.6rem);
+    font-size: clamp(2.05rem, 7.7vw, 3.55rem);
+    line-height: 1.06;
   }
 
-  .studioIdentity[data-studio-intro="home"] .lead {
-    font-size: clamp(1rem, 3.2vw, 1.13rem);
+  .studio[data-studio-route="home"] .studioIdentity[data-studio-intro="home"] .lead {
+    font-size: clamp(0.99rem, 3.1vw, 1.1rem);
+    line-height: 1.53;
+  }
+
+  .studio[data-studio-route="home"] .studioRouteActions {
+    width: 100%;
+    max-width: 25rem;
   }
 }
 

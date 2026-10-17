@@ -73,7 +73,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
         artGradient: getComputedStyle(studio.querySelector('[data-home-art="true"]') as HTMLElement, "::after").backgroundImage
       };
     });
-    console.log("[home-hero-layout]", state, JSON.stringify(geometry));
+    console.warn("[home-hero-layout]", state, JSON.stringify(geometry));
     await testInfo.attach(`home-position-${state}.json`, {
       body: Buffer.from(JSON.stringify(geometry, null, 2), "utf8"),
       contentType: "application/json"
@@ -140,7 +140,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     }
     expect(m.fit).toBe("cover");
     expect(m.mask).toBe("none");
-    console.log("[home-asset]", JSON.stringify(m));
+    console.warn("[home-asset]", JSON.stringify(m));
     expect(m.naturalWidth).toBeGreaterThan(0);
     expect(m.resource).toContain("/images/studio/cm-home-x1.png");
   }

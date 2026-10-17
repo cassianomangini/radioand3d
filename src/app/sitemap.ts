@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { absoluteSiteUrl, siteIndexable } from "@/lib/site-config";
 import { studioProducts } from "@/features/studio/catalog";
+import { publishedRadioPublications } from "@/features/radio/publications";
 
 const publicRoutes = [
   "/",
@@ -31,5 +32,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       : [];
   });
 
-  return [...publicEntries, ...productEntries];
+  const musicEntries = publishedRadioPublications.flatMap((publication) => {
+    const url = absoluteSiteUrl(`/musica/${publication.slug}`);
+    return url ? [{ url }] : [];
+  });
+
+  return [...publicEntries, ...productEntries, ...musicEntries];
 }

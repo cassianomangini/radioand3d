@@ -1732,6 +1732,65 @@
   background: rgb(35 113 222 / 20%);
 }
 
+.sharedTrackPrompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgb(82 214 255 / 35%);
+  border-radius: 0.4rem;
+  background: rgb(29 96 155 / 22%);
+  font-size: 0.78rem;
+}
+
+.sharedTrackPrompt strong { color: #fff; }
+.sharedTrackPrompt button {
+  min-height: 2.3rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #6ce8f5;
+  border-radius: 0.3rem;
+  background: #78eaf6;
+  color: #071728;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+.sharedTrackPlaying { color: #83e7d1; }
+
+.sharingActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.71rem;
+}
+.sharingActions button,
+.trackShareButton {
+  min-height: 2rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid rgb(102 142 193 / 35%);
+  border-radius: 0.3rem;
+  background: #0b1829;
+  color: #c3eaf1;
+  font: inherit;
+  cursor: pointer;
+}
+.sharingActions button:hover,
+.trackShareButton:hover { border-color: #78eaf6; }
+.sharingActions [role="status"] { color: #83e7d1; }
+.shareableTrackRow {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.shareableTrackRow .trackRow { flex: 1; min-width: 0; }
+.trackShareButton { flex: none; width: 2.25rem; display: grid; place-items: center; text-decoration: none; }
+.sharedTrackPrompt button:focus-visible,
+.sharingActions button:focus-visible,
+.trackShareButton:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
 .trackState {
   font-family: var(--font-mono);
   font-size: 0.68rem;

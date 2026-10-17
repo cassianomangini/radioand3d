@@ -33,11 +33,13 @@ export function buildPublicMetadata({
   title,
   description,
   pathname,
-  image
+  image,
+  baseUrl
 }: {
   title: string;
   description: string;
   pathname: string;
+  baseUrl?: URL;
   image?: {
     url: string;
     alt: string;
@@ -45,11 +47,12 @@ export function buildPublicMetadata({
     height?: number;
   };
 }): Metadata {
-  const canonical = absoluteSiteUrl(pathname);
+  const canonical = baseUrl ? new URL(pathname, baseUrl).toString() : absoluteSiteUrl(pathname);
+  const imageUrl = image && baseUrl ? new URL(image.url, baseUrl).toString() : image?.url;
   const openGraphImages = image
     ? [
         {
-          url: image.url,
+          url: imageUrl!,
           alt: image.alt,
           width: image.width,
           height: image.height
@@ -58,6 +61,7 @@ export function buildPublicMetadata({
     : undefined;
 
   return {
+    metadataBase: baseUrl ?? siteUrl ?? undefined,
     title: { absolute: title },
     description,
     robots: {
@@ -78,7 +82,7 @@ export function buildPublicMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: image ? [image.url] : undefined
+      images: imageUrl ? [imageUrl] : undefined
     }
   };
 }

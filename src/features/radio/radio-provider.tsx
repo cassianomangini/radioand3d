@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -14,6 +15,8 @@ import { createShuffledQueue } from "./queue";
 
 export interface RadioTrack {
   id: string;
+  publicId?: string;
+  shareSlug?: string;
   title: string;
   artist: string;
   src: string;
@@ -52,6 +55,7 @@ interface RadioContextValue {
   pause: () => void;
   toggle: () => void;
   select: (id: string) => void;
+  selectShared: (id: string) => void;
   next: () => void;
   previous: () => void;
   seek: (seconds: number) => void;
@@ -74,11 +78,18 @@ function mediaErrorMessage(error: unknown) {
 }
 
 export function RadioProvider({ children, tracks, playlistSeed }: { children: ReactNode; tracks: RadioTrack[]; playlistSeed: number }) {
-  const [queue] = useState(() => createShuffledQueue(tracks.map((track) => track.id), playlistSeed));
+  const pathname = usePathname();
+  const [initialSharedId] = useState(() => {
+    const slug = pathname?.startsWith("/musica/") ? pathname.slice("/musica/".length) : null;
+    return tracks.find((track) => track.shareSlug === slug)?.id ?? null;
+  });
+  const [queue] = useState(() => createShuffledQueue(tracks.map((track) => track.id), playlistSeed, initialSharedId ?? undefined));
+  const lastPathnameRef = useRef(pathname);
   const audioRef = useRef<HTMLAudioElement>(null);
   const graphRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const requestRef = useRef(0);
+  const sharedAutoplayAttemptedRef = useRef(false);
   const [currentId, setCurrentId] = useState(queue.currentId);
   const [upcomingIds, setUpcomingIds] = useState(() => queue.following());
   const [playlistIds, setPlaylistIds] = useState(() => queue.currentId ? [queue.currentId, ...queue.following()] : []);
@@ -215,6 +226,12 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
     switchToCurrent();
   }, [queue, switchToCurrent]);
 
+  const selectShared = useCallback((id: string) => {
+    if (!queue.select(id)) return;
+    setPlaylistIds([id, ...queue.following()]);
+    switchToCurrent();
+  }, [queue, switchToCurrent]);
+
   const advance = useCallback((manual: boolean) => {
     const nextId = queue.next(manual);
     if (!nextId) {
@@ -297,6 +314,35 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
   const getCurrentTime = useCallback(() => audioRef.current?.currentTime ?? 0, []);
 
   useEffect(() => {
+    if (!initialSharedId) return;
+    const timer = window.setTimeout(() => {
+      if (sharedAutoplayAttemptedRef.current) return;
+      sharedAutoplayAttemptedRef.current = true;
+      play();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [initialSharedId, play]);
+
+  useEffect(() => {
+    if (lastPathnameRef.current === pathname) return;
+    if (status !== "idle" && status !== "ended") {
+      lastPathnameRef.current = pathname;
+      return;
+    }
+    const slug = pathname?.startsWith("/musica/") ? pathname.slice("/musica/".length) : null;
+    const sharedId = tracks.find((track) => track.shareSlug === slug)?.id;
+    if (!sharedId) {
+      lastPathnameRef.current = pathname;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      lastPathnameRef.current = pathname;
+      selectShared(sharedId);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [pathname, selectShared, status, tracks]);
+
+  useEffect(() => {
     const audio = audioRef.current;
     return () => {
       requestRef.current += 1;
@@ -309,7 +355,7 @@ export function RadioProvider({ children, tracks, playlistSeed }: { children: Re
 
   const value: RadioContextValue = {
     tracks, playlistTracks, currentTrack, upcomingTracks, status, error, position, duration, volume, repeatOne, canSkipNext,
-    hasPrevious, analyserReady, analyserUnavailable, play, pause, toggle, select, next, previous,
+    hasPrevious, analyserReady, analyserUnavailable, play, pause, toggle, select, selectShared, next, previous,
     seek, setVolume, toggleMute, toggleRepeatOne, reshuffle, retry, getAnalyser, getCurrentTime
   };
 

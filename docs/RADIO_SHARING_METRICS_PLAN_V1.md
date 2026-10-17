@@ -1,6 +1,6 @@
 # CM Rádio — links por música, compartilhamento e audiência
 
-**Estado:** direção funcional de 06c-A/B aprovada por Cassiano em 17/10/2026; execução, QA e aprovação visual final ainda pendentes. 06c-C/D seguem planejadas, sem autorização de ativação remota.
+**Estado:** direção funcional de 06c-A/B aprovada por Cassiano em 17/10/2026; implementação local e QA técnico/visual do agente realizados em 17/10/2026. Aprovação visual final de Cassiano e publicação remota pendentes. 06c-C/D seguem planejadas, sem autorização de ativação remota. [Evidências](work/06c-radio-sharing-links.md).
 **Escopo:** Rádio pública do `radioand3d`; não modifica Estúdio, Artesopolis Admin ou layout aceito da Rádio.
 **Fontes relacionadas:** [Rádio](RADIO.md), [Biblioteca](MUSIC_PIPELINE.md), [Experiência](EXPERIENCE.md), [Roadmap](ROADMAP.md).
 
@@ -11,7 +11,8 @@ Permitir que alguém compartilhe **uma música específica** (não apenas a Home
 ## Estado verificado no código (17/10/2026)
 
 - O player usa `RadioProvider` global e um único `audio`; qualquer nova rota deve preservar áudio/fila/volume e a continuidade nas transições.
-- O catálogo de teste em R2 usa **a chave do objeto como ID de faixa** (`r2-catalog-core.ts`). Não usar essa chave nem um slug derivado apenas do nome do arquivo como identidade pública permanente.
+- O manifesto 06c-A contém **343 gravações atuais aprovadas por Cassiano**, cada uma com ID editorial, slug permanente, versão principal e chave R2. O motor mantém a chave do objeto como ID interno (`r2-catalog-core.ts`); novas chaves do bucket não entram automaticamente no catálogo. Homônimas permanecem faixas distintas até decisão editorial de agrupamento.
+- `/musica/[slug]` reutiliza a Home e o player existentes. O catálogo em memória evita listagem S3 por abertura e o compartilhamento não consulta Supabase. Metadados canônicos usam `SITE_URL` quando configurada; na ausência dela, usam a origem da requisição. `SITE_INDEXABLE` permanece desativado antes do lançamento.
 - `src/lib/public-analytics.ts` apenas emite eventos no navegador para orçamento/produtos; **não envia métricas a backend** e não mede audições da Rádio.
 - O catálogo editorial `tracks`/`track_versions` e o Music Inbox ainda não são a fonte da Rádio; a evolução não pode fingir que já existem em produção.
 
@@ -23,6 +24,7 @@ Permitir que alguém compartilhe **uma música específica** (não apenas a Home
 2. **URL estável:** manter o primeiro slug publicado como canônico, mesmo se o título mudar. Músicas homônimas recebem slugs únicos. Se a versão principal for substituída intencionalmente, o mesmo link reproduz a nova principal. Aliases/redirecionamentos são evolução opcional apenas quando se decidir alterar um slug já distribuído.
 3. **Entrada externa / nova aba sem sessão tocando na mesma instância:** carregar a Home; selecionar a faixa compartilhada; colocá-la **na primeira posição da ordem REAL da fila e da playlist visível**, com as restantes embaralhadas sem duplicatas; tentar `play()` apenas uma vez como melhor esforço. Se o navegador bloquear autoplay, deixar faixa selecionada e mostrar o CTA `▶ Ouvir [Título]`; mostrar `playing` apenas quando o motor confirmar. Depois do fim, continuar na fila embaralhada normalmente.
 4. **Navegação interna com B já tocando e link para A:** **não interromper B, nem reordenar a fila na chegada**. Apresentar A como contexto de compartilhamento, com CTA `Ouvir A`, sem falsificar o Now Playing. Somente após o clique selecionar A, colocá-la em primeiro na sequência ativa e iniciar a reprodução. Preservar áudio, progresso e modos até essa ação. Isso vale também se B estiver pausada com contexto de escuta ativo; decidir pela ação explícita para evitar substituição inesperada.
+   Quando a navegação interna parte da Home com o player `idle` ou `ended`, tratar o link como entrada sem sessão ativa: selecionar A, colocá-la no topo e tentar reproduzir.
 5. **Desktop:** abrir Home com Rádio lateral visível quando a sessão for nova; não forçar alterações destrutivas de layout durante uma navegação interna. **Mobile:** na chegada externa abrir Rádio completa/expandida mostrando a faixa; ao fechar, voltar à Home com o mini-player persistente. Não introduzir mini-player duplicado no desktop nem aumentar indevidamente o dock na navbar.
 6. **Compartilhamento:** botão discreto junto à faixa atual/playlist completa e acesso na página contextual. Usar `navigator.share` após gesto quando disponível e fallback `Copiar link` com feedback. Não assumir que abrir share sheet prova envio concluído. Sem alterar a ordem aprovada do transporte.
 7. **Metadados do link:** `/musica/[slug]` tem `title`, descrição, canonical, Open Graph/Twitter e imagem social apropriados, gerados no servidor para prévia sem executar JS. Antes do lançamento respeitar `noindex`/robots; testar a prévia novamente em domínio público liberado. Sitemap apenas para músicas explicitamente publicadas.

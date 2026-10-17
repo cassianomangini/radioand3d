@@ -21,7 +21,7 @@ Rádio completa: no desktop fica acoplada à composição e pode ser redimension
 
 O botão de volume fica depois de Próxima no transporte, abre um slider e uma ação de mudo. Ao sair do mudo, restaura o último volume audível; mover o slider para acima de zero também reativa o som. Desktop e Rádio completa mobile compartilham o mesmo volume do motor. Fechar o controle não altera o volume nem a reprodução.
 
-A **Playlist** tem rolagem própria, abre em ordem aleatória e mantém essa ordem ao tocar ou avançar. A faixa atual fica identificada. O botão Embaralhar cria uma nova ordem visível, troca imediatamente a faixa atual por outra quando há pelo menos duas e reinicia o ciclo sem repetição automática. Se estava tocando, a nova faixa toca; se estava pausada, permanece pausada na nova faixa. Embaralhar desliga Repetir faixa. A UI não inventa títulos nem repete itens só para preencher a lista. A rolagem não desloca os controles ou a Rádio inteira. No mobile, playlist e letra alternam o espaço principal com setas; a letra pode ser fechada.
+A **Playlist** tem rolagem própria, abre em ordem aleatória e mantém essa ordem ao tocar ou avançar. A faixa atual fica identificada. O botão Embaralhar cria uma nova ordem visível, troca imediatamente a faixa atual por outra quando há pelo menos duas e reinicia o ciclo sem repetição automática. Se estava tocando, a nova faixa toca; se estava pausada, permanece pausada na nova faixa. Embaralhar desliga Repetir faixa. A UI não inventa títulos nem repete itens só para preencher a lista. A rolagem não desloca os controles ou a Rádio inteira. No mobile, playlist e letra alternam o espaço principal com setas; a letra pode ser fechada. A entrada por link individual e seu CTA têm a exceção de ordenação definida no [contrato 06c](RADIO_SHARING_METRICS_PLAN_V1.md).
 
 Na Rádio completa, o título **Playlist** e o campo de busca ocupam a mesma linha quando há espaço. Não exibir contador de faixas; o espaço inicial da lista deve comportar três músicas completas em alturas de tela comuns, preservando rolagem para as demais.
 
@@ -43,7 +43,7 @@ Validar estes padrões operacionais na entrega 01:
 
 Faixa, versão publicada e playlist seguem [MUSIC_PIPELINE.md](MUSIC_PIPELINE.md). Não inferir identidade ou versão por regex no motor.
 
-Para a prova com o acervo R2 indicado por Cassiano, o servidor lista todas as páginas do bucket `musicas` e entrega ao motor todas as chaves de áudio, inclusive variantes com `(1)`. A chave do objeto serve como ID estável apenas nesta ponte de leitura; a identidade editorial definitiva pertence à biblioteca. Nomes da pasta local não substituem o inventário do bucket. O endpoint S3 fica no servidor com credencial de leitura; o player usa a URL pública do objeto.
+O inventário R2 foi reconciliado com o manifesto editorial versionado da entrega 06c-A. A Rádio pública recebe somente as faixas com estado `published` nesse manifesto, inclusive variantes aprovadas com `(1)`; objetos novos no bucket não são publicados automaticamente. A chave R2 continua sendo o ID interno do motor, das letras e do visualizador; ID editorial e slug permanente identificam a música publicamente. A página e o catálogo são montados do manifesto em memória, sem listagem S3 ou consulta Supabase por visita. A publicação de novas músicas, retirada ou troca de versão principal exige alteração editorial explícita no manifesto e verificação da chave no R2. O player usa a URL pública do objeto.
 
 ## Separação técnica
 

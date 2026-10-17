@@ -1,0 +1,5150 @@
+{
+  "schemaVersion": 1,
+  "tracks": [
+    {
+      "id": "4bd8cb0d-7c83-4b6f-87b4-5769dac5802d",
+      "slug": "2-17-am-v2",
+      "title": "2-17 AM (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "57145a4d-9987-4e5e-bdcd-f3e3307ea46e",
+      "versions": [
+        {
+          "id": "57145a4d-9987-4e5e-bdcd-f3e3307ea46e",
+          "r2Key": "CMangic - 2-17 AM (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "02f6614a-f028-401a-8559-e8bc3b26ad7a",
+      "slug": "2-17-am",
+      "title": "2-17 AM",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8ea1a084-6578-40e4-8c58-57b571a3d539",
+      "versions": [
+        {
+          "id": "8ea1a084-6578-40e4-8c58-57b571a3d539",
+          "r2Key": "CMangic - 2-17 AM.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5bcd6cd5-b5d1-4206-afc9-ec4e416744a7",
+      "slug": "across-the-line",
+      "title": "Across the line",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1891952d-c775-44e3-9ee9-9adb58df1850",
+      "versions": [
+        {
+          "id": "1891952d-c775-44e3-9ee9-9adb58df1850",
+          "r2Key": "CMangic - Across the line.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "dc95e227-7d43-42a8-8556-18ccdb36be67",
+      "slug": "ainda-acendo-a-luz",
+      "title": "Ainda Acendo a Luz",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c253986a-5aae-423e-9da7-94cf906b5987",
+      "versions": [
+        {
+          "id": "c253986a-5aae-423e-9da7-94cf906b5987",
+          "r2Key": "CMangic - Ainda Acendo a Luz.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9b649a1b-fb2d-446c-89f7-fe6c552d4911",
+      "slug": "ainda-da",
+      "title": "Ainda Dá",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e8946128-978e-4c49-9f3e-5b98be4d10d1",
+      "versions": [
+        {
+          "id": "e8946128-978e-4c49-9f3e-5b98be4d10d1",
+          "r2Key": "CMangic - Ainda Dá.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5384c485-f241-49c9-bf75-3e93ad85c9ca",
+      "slug": "ainda-to-de-pe",
+      "title": "Ainda Tô de Pé",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9814d001-01b4-43e9-94a2-d0e656355122",
+      "versions": [
+        {
+          "id": "9814d001-01b4-43e9-94a2-d0e656355122",
+          "r2Key": "CMangic - Ainda Tô de Pé.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f2c2f9fd-b6e4-444a-8ea8-ab8c9c89e698",
+      "slug": "alem-do-ceu-v3",
+      "title": "Além do Céu (v3)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "798b45c6-e420-4124-a450-1a0198d0dc71",
+      "versions": [
+        {
+          "id": "798b45c6-e420-4124-a450-1a0198d0dc71",
+          "r2Key": "CMangic - Além do Céu (v3).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ea770303-8524-439c-8ba7-fc58716b64c6",
+      "slug": "alem-do-ceu",
+      "title": "Além do céu",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2c7a59b7-ba1c-452c-9809-a1e1a32d400d",
+      "versions": [
+        {
+          "id": "2c7a59b7-ba1c-452c-9809-a1e1a32d400d",
+          "r2Key": "CMangic - Além do céu.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e6109060-9dbb-4ec1-a043-355ba4b4156f",
+      "slug": "almost-ours-v2",
+      "title": "Almost Ours (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d5d81e13-d1e2-4d33-8cb6-cd85fe1f36f5",
+      "versions": [
+        {
+          "id": "d5d81e13-d1e2-4d33-8cb6-cd85fe1f36f5",
+          "r2Key": "CMangic - Almost Ours (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a64f0d0a-1683-4974-b8d4-d4abfb58f033",
+      "slug": "almost-ours",
+      "title": "Almost Ours",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "17d7ce00-74fc-4d69-b347-13cc27263053",
+      "versions": [
+        {
+          "id": "17d7ce00-74fc-4d69-b347-13cc27263053",
+          "r2Key": "CMangic - Almost Ours.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "49ed223f-c8c4-4132-8088-72e77f616dbf",
+      "slug": "ambitious-dreams-remix",
+      "title": "Ambitious Dreams (Remix)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "24cc358b-2aff-4470-a1d8-be592bdd09f6",
+      "versions": [
+        {
+          "id": "24cc358b-2aff-4470-a1d8-be592bdd09f6",
+          "r2Key": "CMangic - Ambitious Dreams (Remix).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "44e9db22-0011-4d15-8bad-fb38a7bd5969",
+      "slug": "ambitious-dreams",
+      "title": "Ambitious Dreams",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2efb17d1-d888-4418-989c-2dae8d528114",
+      "versions": [
+        {
+          "id": "2efb17d1-d888-4418-989c-2dae8d528114",
+          "r2Key": "CMangic - Ambitious Dreams.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b0bfbe1e-427d-458b-bd0d-90e03c2f3f52",
+      "slug": "antes-que-acabe",
+      "title": "Antes Que Acabe",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "966c8c4b-574b-4a4a-a1b1-da846280b154",
+      "versions": [
+        {
+          "id": "966c8c4b-574b-4a4a-a1b1-da846280b154",
+          "r2Key": "CMangic - Antes Que Acabe.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "79d77295-9c30-4022-bc8e-562d70c01ac8",
+      "slug": "ashes-in-the-rain",
+      "title": "Ashes in the Rain",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "70f7041a-5581-42d1-aae7-d4e88f93aeb5",
+      "versions": [
+        {
+          "id": "70f7041a-5581-42d1-aae7-d4e88f93aeb5",
+          "r2Key": "CMangic - Ashes in the Rain.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f41447f4-ac60-490b-b1be-4bf6ecca56e1",
+      "slug": "bad-idea-looks-good",
+      "title": "Bad Idea Looks Good",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b298f6f5-946f-4d61-a325-30b5d0b15c84",
+      "versions": [
+        {
+          "id": "b298f6f5-946f-4d61-a325-30b5d0b15c84",
+          "r2Key": "CMangic - Bad Idea Looks Good.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "904ceac4-b47a-4ffb-b99e-8c1981849f47",
+      "slug": "before-the-sun-goes-down",
+      "title": "Before the Sun Goes Down",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3025cc79-7a19-46c5-bb6d-293224e9b02f",
+      "versions": [
+        {
+          "id": "3025cc79-7a19-46c5-bb6d-293224e9b02f",
+          "r2Key": "CMangic - Before the Sun Goes Down.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "8667af56-1dbe-4e02-99ef-c325f0c69b9d",
+      "slug": "better-together",
+      "title": "Better Together",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "78f3a82d-a05d-4dc3-b5fc-26e65c224063",
+      "versions": [
+        {
+          "id": "78f3a82d-a05d-4dc3-b5fc-26e65c224063",
+          "r2Key": "CMangic - Better Together.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9bd647a9-312f-4fb2-becf-5968c0c57bdd",
+      "slug": "between-the-static-v2",
+      "title": "Between The Static (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "5a947d6c-8f3a-4d86-a4e0-9b5d90070a07",
+      "versions": [
+        {
+          "id": "5a947d6c-8f3a-4d86-a4e0-9b5d90070a07",
+          "r2Key": "CMangic - Between The Static (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b135d7aa-e567-4e83-aacc-78c398434d90",
+      "slug": "between-the-static",
+      "title": "Between The Static",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b991e201-3790-4fa7-bf99-693494b45362",
+      "versions": [
+        {
+          "id": "b991e201-3790-4fa7-bf99-693494b45362",
+          "r2Key": "CMangic - Between The Static.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "2fd5b616-6a96-4bd5-bc94-7b3486721500",
+      "slug": "beyond-the-stars-mille",
+      "title": "Beyond the Stars Mille",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a75ecbdd-5205-457a-b386-e9975431f622",
+      "versions": [
+        {
+          "id": "a75ecbdd-5205-457a-b386-e9975431f622",
+          "r2Key": "CMangic - Beyond the Stars Mille.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "20b50cac-15d0-4b3e-9e4f-3f07cf395353",
+      "slug": "beyond-the-stars-snowp",
+      "title": "Beyond the Stars SnowP",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b6c2d3b0-8c47-456e-aaec-324a66218870",
+      "versions": [
+        {
+          "id": "b6c2d3b0-8c47-456e-aaec-324a66218870",
+          "r2Key": "CMangic - Beyond the Stars SnowP.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "526e12f5-af63-4142-8e13-e6ab4a8a39e8",
+      "slug": "beyond-the-stars",
+      "title": "Beyond the Stars",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "be039f6f-304f-49fa-87d4-45341e5813b2",
+      "versions": [
+        {
+          "id": "be039f6f-304f-49fa-87d4-45341e5813b2",
+          "r2Key": "CMangic - Beyond the Stars.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e46de057-ce47-49cf-bb98-01e4363a91c1",
+      "slug": "black-ribbon-sky-v2",
+      "title": "Black Ribbon Sky (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "866b5207-8366-484a-90bb-804a0ea75af2",
+      "versions": [
+        {
+          "id": "866b5207-8366-484a-90bb-804a0ea75af2",
+          "r2Key": "CMangic - Black Ribbon Sky (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "2002f418-027a-4ddf-8e45-a32dfdc314c2",
+      "slug": "black-ribbon-sky",
+      "title": "Black Ribbon Sky",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "69eaa822-b061-49bb-93e9-d9ddf2a7c643",
+      "versions": [
+        {
+          "id": "69eaa822-b061-49bb-93e9-d9ddf2a7c643",
+          "r2Key": "CMangic - Black Ribbon Sky.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "4a185f76-1068-4ec5-9428-d723de7d0e64",
+      "slug": "blue-light-heaven-1",
+      "title": "Blue Light Heaven (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c428f074-9863-4570-9634-2d23927b6b5e",
+      "versions": [
+        {
+          "id": "c428f074-9863-4570-9634-2d23927b6b5e",
+          "r2Key": "CMangic - Blue Light Heaven (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "495d0341-1b17-45db-b7e9-09817cdac2be",
+      "slug": "blue-light-heaven",
+      "title": "Blue Light Heaven",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f3711d52-fe19-440a-8804-bf4424a2a8a6",
+      "versions": [
+        {
+          "id": "f3711d52-fe19-440a-8804-bf4424a2a8a6",
+          "r2Key": "CMangic - Blue Light Heaven.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1cb21ac4-b1cd-490d-a839-11f9eb65b8b9",
+      "slug": "blueprint-door",
+      "title": "Blueprint Door",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f2f34044-df37-4a76-8067-3ac73ef05ef3",
+      "versions": [
+        {
+          "id": "f2f34044-df37-4a76-8067-3ac73ef05ef3",
+          "r2Key": "CMangic - Blueprint Door.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ac462d9a-5663-46a5-ba5e-e1d4fa35bf2b",
+      "slug": "blueprint-midnight",
+      "title": "Blueprint Midnight",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b8601d0f-3325-4415-bfed-a77622f87a3a",
+      "versions": [
+        {
+          "id": "b8601d0f-3325-4415-bfed-a77622f87a3a",
+          "r2Key": "CMangic - Blueprint Midnight.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b79ae2a8-32a7-40de-8fef-0b68e4738aca",
+      "slug": "borrow-my-courage-1",
+      "title": "Borrow My Courage (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "87825766-110f-4f60-8c14-d63673ba88db",
+      "versions": [
+        {
+          "id": "87825766-110f-4f60-8c14-d63673ba88db",
+          "r2Key": "CMangic - Borrow My Courage (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "826130f9-d3b4-4930-9d6d-e50248e5e31b",
+      "slug": "borrow-my-courage",
+      "title": "Borrow My Courage",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "7a39ca29-15f0-471a-b11b-7bafcba136da",
+      "versions": [
+        {
+          "id": "7a39ca29-15f0-471a-b11b-7bafcba136da",
+          "r2Key": "CMangic - Borrow My Courage.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "95ae3ab1-c459-499f-8808-cb52c296b80c",
+      "slug": "borrowed-light",
+      "title": "Borrowed Light",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e47de58f-29a3-4a6a-9d38-92922600d7f9",
+      "versions": [
+        {
+          "id": "e47de58f-29a3-4a6a-9d38-92922600d7f9",
+          "r2Key": "CMangic - Borrowed Light.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "91ceae45-da82-4062-ba18-12fdaf667ecf",
+      "slug": "breathen",
+      "title": "Breathen",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f898ce84-554e-4fb7-b916-3b18deaa5749",
+      "versions": [
+        {
+          "id": "f898ce84-554e-4fb7-b916-3b18deaa5749",
+          "r2Key": "CMangic - Breathen.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6661c4a4-ceed-4ed3-a1d5-b5fce2d4c436",
+      "slug": "building-the-world",
+      "title": "Building the world",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2ae06706-5376-4320-8507-0b8e91f0fcd4",
+      "versions": [
+        {
+          "id": "2ae06706-5376-4320-8507-0b8e91f0fcd4",
+          "r2Key": "CMangic - Building the world.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "76155f9e-3e2d-4b22-925a-05c282f8e195",
+      "slug": "built-from-maybe",
+      "title": "Built From Maybe",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f0e25267-c94a-49e8-a04f-7c48d99a6862",
+      "versions": [
+        {
+          "id": "f0e25267-c94a-49e8-a04f-7c48d99a6862",
+          "r2Key": "CMangic - Built From Maybe.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "44f51740-56f8-4cbb-af00-0f9d50a8929c",
+      "slug": "burning-anyway-v2",
+      "title": "Burning Anyway (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "175e291f-8f5d-48e2-a169-371076cfc0ff",
+      "versions": [
+        {
+          "id": "175e291f-8f5d-48e2-a169-371076cfc0ff",
+          "r2Key": "CMangic - Burning Anyway (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0d9e5c06-9599-4e12-bb4e-b3f7d1ec9751",
+      "slug": "burning-anyway",
+      "title": "Burning Anyway",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2ddf13e4-b853-427f-9c28-f1284cea0397",
+      "versions": [
+        {
+          "id": "2ddf13e4-b853-427f-9c28-f1284cea0397",
+          "r2Key": "CMangic - Burning Anyway.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7b2e3908-39b0-4549-9cd6-9d495671ecd5",
+      "slug": "bursting-ideas",
+      "title": "Bursting Ideas",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "fb03e271-f5fd-44db-b96e-e877054686d8",
+      "versions": [
+        {
+          "id": "fb03e271-f5fd-44db-b96e-e877054686d8",
+          "r2Key": "CMangic - Bursting Ideas.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "8e9ca094-103f-42cc-a30a-f72e7b18955b",
+      "slug": "camada-por-camada",
+      "title": "Camada por camada",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c3de0dc3-132a-4261-8c4b-7d40e1992520",
+      "versions": [
+        {
+          "id": "c3de0dc3-132a-4261-8c4b-7d40e1992520",
+          "r2Key": "CMangic - Camada por camada.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "c892dc3b-b3a8-4689-8ff1-5842c6291747",
+      "slug": "celestial-drift-v2",
+      "title": "Celestial Drift (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3e4ea719-a6f7-4cc3-908a-de2cb55aa353",
+      "versions": [
+        {
+          "id": "3e4ea719-a6f7-4cc3-908a-de2cb55aa353",
+          "r2Key": "CMangic - Celestial Drift (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e512db8d-fd99-40e9-9da6-df4a9bb28c99",
+      "slug": "celestial-drift",
+      "title": "Celestial Drift",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9e51a9be-02ed-4640-89f6-e57be3722d78",
+      "versions": [
+        {
+          "id": "9e51a9be-02ed-4640-89f6-e57be3722d78",
+          "r2Key": "CMangic - Celestial Drift.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d6db286a-9826-452d-a794-98e694c68019",
+      "slug": "celestial-throne-v2",
+      "title": "Celestial Throne (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "fe8655e7-2ffe-4bfa-b435-d3d56a6a3fcd",
+      "versions": [
+        {
+          "id": "fe8655e7-2ffe-4bfa-b435-d3d56a6a3fcd",
+          "r2Key": "CMangic - Celestial Throne (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1669424a-9121-45c4-b130-483597080d83",
+      "slug": "celestial-throne",
+      "title": "Celestial Throne",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "22069f2b-74a6-4ff4-a75b-7729af258868",
+      "versions": [
+        {
+          "id": "22069f2b-74a6-4ff4-a75b-7729af258868",
+          "r2Key": "CMangic - Celestial Throne.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7e305f29-b2d5-45ca-901b-f544b04b745e",
+      "slug": "celestial-voyage",
+      "title": "Celestial Voyage",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ae9551e1-7f1f-4967-bb59-6aa5c78a9e19",
+      "versions": [
+        {
+          "id": "ae9551e1-7f1f-4967-bb59-6aa5c78a9e19",
+          "r2Key": "CMangic - Celestial Voyage.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b4c6bde5-1934-49ce-9aa0-34add3452efa",
+      "slug": "chasing-the-flame",
+      "title": "Chasing the Flame",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "60c894d2-b1cb-4ab9-a73f-3a43494f02f0",
+      "versions": [
+        {
+          "id": "60c894d2-b1cb-4ab9-a73f-3a43494f02f0",
+          "r2Key": "CMangic - Chasing the Flame.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e749934a-ad8b-4106-95d0-567cef9de953",
+      "slug": "chasing-the-horizon",
+      "title": "Chasing the Horizon",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c4f21090-c7f5-43b2-ae2b-6cead15bdba0",
+      "versions": [
+        {
+          "id": "c4f21090-c7f5-43b2-ae2b-6cead15bdba0",
+          "r2Key": "CMangic - Chasing the Horizon.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6a0dca25-c6aa-4677-9e57-f650923146b4",
+      "slug": "cheap-thrills-bad-advice",
+      "title": "Cheap Thrills & Bad Advice",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "cb86fae4-ce03-4c7a-a6db-d4f56aeb7bf8",
+      "versions": [
+        {
+          "id": "cb86fae4-ce03-4c7a-a6db-d4f56aeb7bf8",
+          "r2Key": "CMangic - Cheap Thrills & Bad Advice.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6283ce65-2425-4336-bf6a-6b9576a7f37e",
+      "slug": "cheap-thrills-bad-advice-2",
+      "title": "Cheap Thrills & Bad Advice",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "05426b81-a549-4c7f-9628-233980ccc822",
+      "versions": [
+        {
+          "id": "05426b81-a549-4c7f-9628-233980ccc822",
+          "r2Key": "CMangic - Cheap Thrills & Bad Advice.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f77bb993-5617-4b7c-b4da-7d1eda2727e9",
+      "slug": "choose-again-1",
+      "title": "Choose Again (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2650233a-636b-4a23-b7dc-44b65020db4f",
+      "versions": [
+        {
+          "id": "2650233a-636b-4a23-b7dc-44b65020db4f",
+          "r2Key": "CMangic - Choose Again (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "46524704-3be8-44ca-87b2-15ee51664354",
+      "slug": "choose-again",
+      "title": "Choose Again",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c23d044b-85f6-41af-b488-81f29cc0e365",
+      "versions": [
+        {
+          "id": "c23d044b-85f6-41af-b488-81f29cc0e365",
+          "r2Key": "CMangic - Choose Again.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b81ccf75-8b4a-4ae0-a2c8-c71817661e6e",
+      "slug": "chrome-heart",
+      "title": "Chrome Heart",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b2b8618d-071e-4cab-9f30-9fe3bec2735d",
+      "versions": [
+        {
+          "id": "b2b8618d-071e-4cab-9f30-9fe3bec2735d",
+          "r2Key": "CMangic - Chrome Heart.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5907f72d-e59d-4b75-992c-6d278bd89b92",
+      "slug": "cinco-e-vinte-1",
+      "title": "Cinco e Vinte (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "530b9911-cbac-4d48-af53-6262d69e5493",
+      "versions": [
+        {
+          "id": "530b9911-cbac-4d48-af53-6262d69e5493",
+          "r2Key": "CMangic - Cinco e Vinte (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "15ec47ec-ed4b-4b87-9cfd-215b7e8a1727",
+      "slug": "cinco-e-vinte",
+      "title": "Cinco e Vinte",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "fe71d73f-8464-4dc2-a297-6dbaf1e7b514",
+      "versions": [
+        {
+          "id": "fe71d73f-8464-4dc2-a297-6dbaf1e7b514",
+          "r2Key": "CMangic - Cinco e Vinte.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "101a6702-c4ee-4944-abd9-1a7010b5be21",
+      "slug": "coisa-boa",
+      "title": "Coisa Boa",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "20e731fe-c742-431f-96c9-5a61a6484765",
+      "versions": [
+        {
+          "id": "20e731fe-c742-431f-96c9-5a61a6484765",
+          "r2Key": "CMangic - Coisa Boa.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "050dade3-27ad-4c59-b7cd-82f3aa2b90f6",
+      "slug": "com-voce",
+      "title": "Com Você",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "643cf362-8ae5-4056-8fa1-8fbe76e6a175",
+      "versions": [
+        {
+          "id": "643cf362-8ae5-4056-8fa1-8fbe76e6a175",
+          "r2Key": "CMangic - Com Você.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ae06bb8f-15d2-4963-b20e-06995b133e24",
+      "slug": "concrete-constellations",
+      "title": "Concrete Constellations",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "cfde00af-a844-4b06-9b51-1cff467543ee",
+      "versions": [
+        {
+          "id": "cfde00af-a844-4b06-9b51-1cff467543ee",
+          "r2Key": "CMangic - Concrete Constellations.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "fca9b9a9-b822-44c4-9049-d8314ea9a89f",
+      "slug": "concrete-constellations-2",
+      "title": "Concrete Constellations",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "49a63879-968a-4502-aa97-a0fc12344436",
+      "versions": [
+        {
+          "id": "49a63879-968a-4502-aa97-a0fc12344436",
+          "r2Key": "CMangic - Concrete Constellations.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7937aac9-e5e7-4dd4-973c-c2a75de5d81e",
+      "slug": "cosmic-battlecry",
+      "title": "Cosmic Battlecry",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "57025f67-83d2-4383-9679-2c989c18bb2b",
+      "versions": [
+        {
+          "id": "57025f67-83d2-4383-9679-2c989c18bb2b",
+          "r2Key": "CMangic - Cosmic Battlecry.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1b12c563-8589-49f0-b43f-941ca71eff8b",
+      "slug": "cosmic-bullseye",
+      "title": "Cosmic Bullseye",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e654a5a0-9b92-4580-a4e4-8b179f1bab76",
+      "versions": [
+        {
+          "id": "e654a5a0-9b92-4580-a4e4-8b179f1bab76",
+          "r2Key": "CMangic - Cosmic Bullseye.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "dabc498d-e35c-407a-a2f3-e8db7f3cf23c",
+      "slug": "cosmic-castaways",
+      "title": "Cosmic Castaways",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d16c144a-0e78-4f89-bab2-dbe2a4efd6c5",
+      "versions": [
+        {
+          "id": "d16c144a-0e78-4f89-bab2-dbe2a4efd6c5",
+          "r2Key": "CMangic - Cosmic Castaways.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cea83c52-c7fd-4313-95c2-d9cd8e746c91",
+      "slug": "cut-the-wire",
+      "title": "Cut The Wire",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b6ae6d37-6989-4d56-8642-cdff5a0066b7",
+      "versions": [
+        {
+          "id": "b6ae6d37-6989-4d56-8642-cdff5a0066b7",
+          "r2Key": "CMangic - Cut The Wire.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "c81e84a9-ad3f-4443-a143-26ed5657c904",
+      "slug": "da-pra-andar-1",
+      "title": "Dá Pra Andar (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2bd719a4-96df-4365-a90a-8b5f61531590",
+      "versions": [
+        {
+          "id": "2bd719a4-96df-4365-a90a-8b5f61531590",
+          "r2Key": "CMangic - Dá Pra Andar (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "338e9d82-12b0-4ade-b597-d3891b36095f",
+      "slug": "da-pra-andar",
+      "title": "Dá Pra Andar",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "cc34dc3a-315c-4853-8c89-1855ae086cb4",
+      "versions": [
+        {
+          "id": "cc34dc3a-315c-4853-8c89-1855ae086cb4",
+          "r2Key": "CMangic - Dá Pra Andar.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "bf018982-3f3c-48a1-9d82-ac83cd0f4742",
+      "slug": "deixa-o-som-responder",
+      "title": "Deixa o som responder",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "214ff10c-8927-47d6-a347-5bd65a6e76f6",
+      "versions": [
+        {
+          "id": "214ff10c-8927-47d6-a347-5bd65a6e76f6",
+          "r2Key": "CMangic - Deixa o som responder.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "60074b98-1924-4d53-852c-d16eecf77cae",
+      "slug": "dentro-de-nos",
+      "title": "Dentro de Nós",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ab7e5fda-b867-4103-a595-d349c79081be",
+      "versions": [
+        {
+          "id": "ab7e5fda-b867-4103-a595-d349c79081be",
+          "r2Key": "CMangic - Dentro de Nós.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f455d255-1482-4fb4-82f5-7194c27f6824",
+      "slug": "depois-do-barulho-1",
+      "title": "Depois do Barulho (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1293bad3-b131-4d88-bb48-a29c5b82d13e",
+      "versions": [
+        {
+          "id": "1293bad3-b131-4d88-bb48-a29c5b82d13e",
+          "r2Key": "CMangic - Depois do Barulho (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "22f94616-ffa1-4872-8038-f9cb4503e087",
+      "slug": "depois-do-barulho",
+      "title": "Depois do Barulho",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "864b364c-e990-456b-9894-67358195c5b6",
+      "versions": [
+        {
+          "id": "864b364c-e990-456b-9894-67358195c5b6",
+          "r2Key": "CMangic - Depois do Barulho.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b262831c-251d-4206-85f7-487a0ec79279",
+      "slug": "do-lado-de-fora",
+      "title": "Do lado de fora",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "819d222c-489d-4d10-9395-586090952f36",
+      "versions": [
+        {
+          "id": "819d222c-489d-4d10-9395-586090952f36",
+          "r2Key": "CMangic - Do lado de fora.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "92e4cb3f-123f-417a-9641-236d57343b55",
+      "slug": "don-t-wait-for-someday",
+      "title": "Don’t Wait for Someday",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c918b3f2-62e1-4b0a-a26e-940bb2f9e044",
+      "versions": [
+        {
+          "id": "c918b3f2-62e1-4b0a-a26e-940bb2f9e044",
+          "r2Key": "CMangic - Don’t Wait for Someday.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "25748ebe-4281-41b3-a042-f13b66ec0360",
+      "slug": "efeito-domino",
+      "title": "Efeito Dominó",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "0501cbb8-2cb9-4f3c-b3c6-5ded60162a76",
+      "versions": [
+        {
+          "id": "0501cbb8-2cb9-4f3c-b3c6-5ded60162a76",
+          "r2Key": "CMangic - Efeito Dominó.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3ccac9ab-156e-4273-8f88-517609530494",
+      "slug": "ei-deixa-eu-falar",
+      "title": "Ei, deixa eu falar",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ec4560f9-1e36-4abc-9f5e-5e1f5b6157f6",
+      "versions": [
+        {
+          "id": "ec4560f9-1e36-4abc-9f5e-5e1f5b6157f6",
+          "r2Key": "CMangic - Ei, deixa eu falar.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "931693b7-dff6-47ee-8e02-02b3f78a7851",
+      "slug": "electric-between-us-v2",
+      "title": "Electric Between Us (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a923f52f-e21d-4c6b-acf1-1a51f30cc574",
+      "versions": [
+        {
+          "id": "a923f52f-e21d-4c6b-acf1-1a51f30cc574",
+          "r2Key": "CMangic - Electric Between Us (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "4ca39983-95a9-4224-a019-5bb186f74dd0",
+      "slug": "electric-between-us",
+      "title": "Electric Between Us",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a30cdbab-d0b3-4571-9121-da12ac42a3a1",
+      "versions": [
+        {
+          "id": "a30cdbab-d0b3-4571-9121-da12ac42a3a1",
+          "r2Key": "CMangic - Electric Between Us.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ad7f079e-b8b6-4cd2-ada2-1be37181020d",
+      "slug": "electric-sonnet-v2",
+      "title": "Electric Sonnet (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "82601ab1-c4f8-4d40-8351-6db69e3f3962",
+      "versions": [
+        {
+          "id": "82601ab1-c4f8-4d40-8351-6db69e3f3962",
+          "r2Key": "CMangic - Electric Sonnet (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7ae97288-64d4-46de-af2e-f20a5c30b6eb",
+      "slug": "electric-sonnet",
+      "title": "Electric Sonnet",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "91011146-d9e0-49da-a379-a2749bdae2f3",
+      "versions": [
+        {
+          "id": "91011146-d9e0-49da-a379-a2749bdae2f3",
+          "r2Key": "CMangic - Electric Sonnet.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3a6d88c1-4083-4515-89c5-0cb872d926c8",
+      "slug": "entre-nos-dois",
+      "title": "Entre Nós Dois",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "81258c2f-f798-497f-8cbe-0ab37fbe5c57",
+      "versions": [
+        {
+          "id": "81258c2f-f798-497f-8cbe-0ab37fbe5c57",
+          "r2Key": "CMangic - Entre Nós Dois.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "dad9d050-0fb0-448b-bbef-183106f0e3e2",
+      "slug": "equal-and-opposite",
+      "title": "Equal And Opposite",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "7bfec4c7-603b-458f-9c3f-f25339ec8a45",
+      "versions": [
+        {
+          "id": "7bfec4c7-603b-458f-9c3f-f25339ec8a45",
+          "r2Key": "CMangic - Equal And Opposite.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f25607f6-ebe1-489a-b412-fc3c6c793016",
+      "slug": "eu-fico-1",
+      "title": "Eu Fico (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "00a33827-214e-49bd-9f43-b5f39763e450",
+      "versions": [
+        {
+          "id": "00a33827-214e-49bd-9f43-b5f39763e450",
+          "r2Key": "CMangic - Eu Fico (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5fe268d0-317b-4185-9fd2-977add7303a4",
+      "slug": "eu-fico",
+      "title": "Eu Fico",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "71b06743-bbca-4e0a-aefe-f2a1fc5cd75f",
+      "versions": [
+        {
+          "id": "71b06743-bbca-4e0a-aefe-f2a1fc5cd75f",
+          "r2Key": "CMangic - Eu Fico.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "c03570a6-28ea-490e-9018-5339b8cc510b",
+      "slug": "eu-nao-sou-um-npc",
+      "title": "Eu Não Sou um NPC",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f8ec7948-b1e7-45be-a04e-bdd185a7e706",
+      "versions": [
+        {
+          "id": "f8ec7948-b1e7-45be-a04e-bdd185a7e706",
+          "r2Key": "CMangic - Eu Não Sou um NPC.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cced15d5-bff8-4673-af30-289553cf461d",
+      "slug": "eu-sigo",
+      "title": "Eu Sigo",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "69efd967-520f-40cd-a462-6eb1c4167280",
+      "versions": [
+        {
+          "id": "69efd967-520f-40cd-a462-6eb1c4167280",
+          "r2Key": "CMangic - Eu Sigo.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a0ee46e7-df71-40f9-b1dc-88b8f98d7b77",
+      "slug": "eu-tava-la-1",
+      "title": "Eu Tava Lá (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4b7a909e-191b-47ad-8cd5-2bf2561f59a0",
+      "versions": [
+        {
+          "id": "4b7a909e-191b-47ad-8cd5-2bf2561f59a0",
+          "r2Key": "CMangic - Eu Tava Lá (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1419ce66-eb8e-4e2f-b825-b5958ab2e5e8",
+      "slug": "eu-tava-la",
+      "title": "Eu Tava Lá",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e174aa43-3e85-4e96-a142-519b0af3a6bf",
+      "versions": [
+        {
+          "id": "e174aa43-3e85-4e96-a142-519b0af3a6bf",
+          "r2Key": "CMangic - Eu Tava Lá.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "dea4483f-f82e-4259-836b-4eafcd461efb",
+      "slug": "eu-vou-conseguir",
+      "title": "Eu Vou Conseguir",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "6246e3f9-7bb5-43b5-bf53-6e0287532875",
+      "versions": [
+        {
+          "id": "6246e3f9-7bb5-43b5-bf53-6e0287532875",
+          "r2Key": "CMangic - Eu Vou Conseguir.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b6ed6771-6447-45e6-ad0d-0d0a8aa311fc",
+      "slug": "fair-doesn-t-mean-easy-1",
+      "title": "Fair Doesn’t Mean Easy (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "bf896c71-9b52-4440-a4a1-5cb7505f7aa5",
+      "versions": [
+        {
+          "id": "bf896c71-9b52-4440-a4a1-5cb7505f7aa5",
+          "r2Key": "CMangic - Fair Doesn’t Mean Easy (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "11cb3031-e56c-4db1-99df-4a15fb0865e5",
+      "slug": "fair-doesn-t-mean-easy",
+      "title": "Fair Doesn’t Mean Easy",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1685adc7-b159-4a98-aa2f-b6d504e3f33a",
+      "versions": [
+        {
+          "id": "1685adc7-b159-4a98-aa2f-b6d504e3f33a",
+          "r2Key": "CMangic - Fair Doesn’t Mean Easy.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "2496a122-6bf8-4b3e-aa76-15253e1c4ac1",
+      "slug": "feel-the-fire",
+      "title": "Feel the fire",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e1734c45-71d0-45a3-a304-044ccf0462f0",
+      "versions": [
+        {
+          "id": "e1734c45-71d0-45a3-a304-044ccf0462f0",
+          "r2Key": "CMangic - Feel the fire.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "71c5f0a1-35b1-4521-93f8-d5edec006cd7",
+      "slug": "feito-pra-voar",
+      "title": "Feito Pra Voar",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4ae48022-9613-49d5-b7fd-23c814e2891d",
+      "versions": [
+        {
+          "id": "4ae48022-9613-49d5-b7fd-23c814e2891d",
+          "r2Key": "CMangic - Feito Pra Voar.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "bce58759-61c1-4eff-b26c-57560a6cea85",
+      "slug": "fire-in-the-ashes-1",
+      "title": "Fire In The Ashes (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "75a592be-ef23-4cbc-996c-f26f919578ad",
+      "versions": [
+        {
+          "id": "75a592be-ef23-4cbc-996c-f26f919578ad",
+          "r2Key": "CMangic - Fire In The Ashes (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "717b30b9-467b-49b3-a933-ceb3a475c1d9",
+      "slug": "fire-in-the-ashes",
+      "title": "Fire In The Ashes",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1b9de5cd-7502-4bde-a6f2-5bf27264c998",
+      "versions": [
+        {
+          "id": "1b9de5cd-7502-4bde-a6f2-5bf27264c998",
+          "r2Key": "CMangic - Fire In The Ashes.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "29437ba6-291b-43f4-8fc3-1a342dc9f5ad",
+      "slug": "fold-in-the-night",
+      "title": "Fold in the night",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "7642e6fb-31a1-4156-967a-06577038c292",
+      "versions": [
+        {
+          "id": "7642e6fb-31a1-4156-967a-06577038c292",
+          "r2Key": "CMangic - Fold in the night.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "799b2bb3-641f-4ce1-9b52-bd6d7a147719",
+      "slug": "further-than-fear",
+      "title": "Further Than Fear",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3dfede7f-47cd-417b-b200-4842a3c6966e",
+      "versions": [
+        {
+          "id": "3dfede7f-47cd-417b-b200-4842a3c6966e",
+          "r2Key": "CMangic - Further Than Fear.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "dcb5dbe8-f33e-4a56-97c2-b3352937d107",
+      "slug": "galactic-focus-v2",
+      "title": "Galactic Focus (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a1c1e907-5efa-4df5-bf51-18b1f06c0a1c",
+      "versions": [
+        {
+          "id": "a1c1e907-5efa-4df5-bf51-18b1f06c0a1c",
+          "r2Key": "CMangic - Galactic Focus (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "48142d46-19ff-4d9a-bb9a-8f1efa3fe0b3",
+      "slug": "galactic-focus-v3",
+      "title": "Galactic Focus (v3)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d18bcdb7-fec0-457f-83a1-c9ef36d1ec8e",
+      "versions": [
+        {
+          "id": "d18bcdb7-fec0-457f-83a1-c9ef36d1ec8e",
+          "r2Key": "CMangic - Galactic Focus (v3).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7a5846e4-4b43-4fb4-b11e-937cbcbea731",
+      "slug": "galactic-focus",
+      "title": "Galactic Focus",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e32b8637-f240-457b-a7c4-c1fe99076500",
+      "versions": [
+        {
+          "id": "e32b8637-f240-457b-a7c4-c1fe99076500",
+          "r2Key": "CMangic - Galactic Focus.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f0d8e659-8084-4e86-ace9-fe66dd4c304b",
+      "slug": "galactic-pulse",
+      "title": "Galactic Pulse",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "7009b800-8a26-4354-b8d5-63db752d611f",
+      "versions": [
+        {
+          "id": "7009b800-8a26-4354-b8d5-63db752d611f",
+          "r2Key": "CMangic - Galactic Pulse.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "950a12d1-b7a9-44d0-b393-b928d169f01b",
+      "slug": "galactic-rise",
+      "title": "Galactic Rise",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "31dd74b0-6f3d-4e9b-9f2d-06448c2995ad",
+      "versions": [
+        {
+          "id": "31dd74b0-6f3d-4e9b-9f2d-06448c2995ad",
+          "r2Key": "CMangic - Galactic Rise.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "bed18524-d53d-4e37-99e4-507c8be7427c",
+      "slug": "ghost",
+      "title": "Ghost",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2f3b08c1-6233-4dc9-b949-88eabc352b48",
+      "versions": [
+        {
+          "id": "2f3b08c1-6233-4dc9-b949-88eabc352b48",
+          "r2Key": "CMangic - Ghost.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "38053e2c-6122-427b-bd6b-5ce2eaa49a11",
+      "slug": "glass-house-weather",
+      "title": "Glass House Weather",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "da750524-c6dc-499c-a5e7-335fc6e9136d",
+      "versions": [
+        {
+          "id": "da750524-c6dc-499c-a5e7-335fc6e9136d",
+          "r2Key": "CMangic - Glass House Weather.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ef7e7bca-abc5-4d04-be93-f1e2d875a12f",
+      "slug": "glass-orbit-1",
+      "title": "Glass Orbit (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1f6e3b3a-a54a-46b6-ba68-af7f3f2f76bf",
+      "versions": [
+        {
+          "id": "1f6e3b3a-a54a-46b6-ba68-af7f3f2f76bf",
+          "r2Key": "CMangic - Glass Orbit (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e7721b91-a238-486a-9f4b-2d2611e0002b",
+      "slug": "glass-orbit",
+      "title": "Glass Orbit",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1ff2d505-cc3d-465a-adee-9bdc0c4a1581",
+      "versions": [
+        {
+          "id": "1ff2d505-cc3d-465a-adee-9bdc0c4a1581",
+          "r2Key": "CMangic - Glass Orbit.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "006a14cf-4423-4d56-a2e3-44ccf7cac951",
+      "slug": "go-scared-1",
+      "title": "Go Scared (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "14b360a8-eef3-42c1-afa4-e3f555a1596c",
+      "versions": [
+        {
+          "id": "14b360a8-eef3-42c1-afa4-e3f555a1596c",
+          "r2Key": "CMangic - Go Scared (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9a24cefa-acf1-4006-9459-0f8803a49293",
+      "slug": "go-scared",
+      "title": "Go Scared",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "89deee71-1ce0-4930-8ce6-a0501fcb06ca",
+      "versions": [
+        {
+          "id": "89deee71-1ce0-4930-8ce6-a0501fcb06ca",
+          "r2Key": "CMangic - Go Scared.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a56525fc-9a05-4730-9166-ad2a7a9f0d5d",
+      "slug": "good-people-still-exist",
+      "title": "Good People Still Exist",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "64cdb359-fd17-41b0-8935-b3d0752e11ef",
+      "versions": [
+        {
+          "id": "64cdb359-fd17-41b0-8935-b3d0752e11ef",
+          "r2Key": "CMangic - Good People Still Exist.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "00069edc-c8b6-4624-b6c6-2692ca528db7",
+      "slug": "gravity-for-the-dreamers-1",
+      "title": "Gravity for the Dreamers (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b7c605b1-06cc-49dd-89e6-25bdb4a7c74e",
+      "versions": [
+        {
+          "id": "b7c605b1-06cc-49dd-89e6-25bdb4a7c74e",
+          "r2Key": "CMangic - Gravity for the Dreamers (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "427edfd7-ea62-4ab1-bfa7-5afeeea0f040",
+      "slug": "gravity-for-the-dreamers-1-2",
+      "title": "Gravity for the Dreamers (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c30e1f71-f2d0-44d5-b850-820cae7231cb",
+      "versions": [
+        {
+          "id": "c30e1f71-f2d0-44d5-b850-820cae7231cb",
+          "r2Key": "CMangic - Gravity for the Dreamers (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "952304e1-4da4-440d-9483-fb7ff60fd271",
+      "slug": "gravity-for-the-dreamers",
+      "title": "Gravity for the Dreamers",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "842682ad-17ab-462b-91d6-23016869e35b",
+      "versions": [
+        {
+          "id": "842682ad-17ab-462b-91d6-23016869e35b",
+          "r2Key": "CMangic - Gravity for the Dreamers.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "4f7bc110-23e8-4bae-9eeb-fcf100686a7f",
+      "slug": "gravity-for-the-dreamers-2",
+      "title": "Gravity for the Dreamers",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "12687160-e97c-41b9-b923-f1f583f741ab",
+      "versions": [
+        {
+          "id": "12687160-e97c-41b9-b923-f1f583f741ab",
+          "r2Key": "CMangic - Gravity for the Dreamers.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e00262ac-aa04-411c-85d4-2382fe0f76b8",
+      "slug": "half-a-second-late-1",
+      "title": "Half A Second Late (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "596cb29e-2271-46f2-ac9a-1416b15f6c3f",
+      "versions": [
+        {
+          "id": "596cb29e-2271-46f2-ac9a-1416b15f6c3f",
+          "r2Key": "CMangic - Half A Second Late (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a664e988-4c12-4bfb-9692-ee1b0f15fda2",
+      "slug": "half-a-second-late",
+      "title": "Half A Second Late",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "7f277f0e-4a4c-4985-a5c4-8619150cfc32",
+      "versions": [
+        {
+          "id": "7f277f0e-4a4c-4985-a5c4-8619150cfc32",
+          "r2Key": "CMangic - Half A Second Late.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9a5d8ea7-788c-498c-9e59-a991a2cb5b77",
+      "slug": "half-a-second-late-2",
+      "title": "Half A Second Late",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "eb9014a0-5edc-47b2-b2e7-0a315447cbc1",
+      "versions": [
+        {
+          "id": "eb9014a0-5edc-47b2-b2e7-0a315447cbc1",
+          "r2Key": "CMangic - Half A Second Late.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "87bb52b2-ab65-4231-b3c6-16b541ba27fa",
+      "slug": "halfway-to-becoming-v2",
+      "title": "Halfway To Becoming (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "44592e8c-8370-46c4-bbb7-32998d330b1c",
+      "versions": [
+        {
+          "id": "44592e8c-8370-46c4-bbb7-32998d330b1c",
+          "r2Key": "CMangic - Halfway To Becoming (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "05d34f8a-55b4-496a-a979-4293a47e170f",
+      "slug": "halfway-to-becoming",
+      "title": "Halfway To Becoming",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f202c557-a4d5-4240-8277-c53f2e7064c6",
+      "versions": [
+        {
+          "id": "f202c557-a4d5-4240-8277-c53f2e7064c6",
+          "r2Key": "CMangic - Halfway To Becoming.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0ee35044-6c4d-4a05-8aab-fbd7ffc0033a",
+      "slug": "heaven-in-the-fire",
+      "title": "Heaven in the Fire",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ba09958c-9052-4689-b3dd-9e6f999d3c6c",
+      "versions": [
+        {
+          "id": "ba09958c-9052-4689-b3dd-9e6f999d3c6c",
+          "r2Key": "CMangic - Heaven in the Fire.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "45d7eb95-c582-4697-bc0a-d56b73e3a5c6",
+      "slug": "heaven-in-the-fire-2",
+      "title": "Heaven in the Fire",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1b68a2d1-dd2e-47b2-a2d8-2df23d7514ee",
+      "versions": [
+        {
+          "id": "1b68a2d1-dd2e-47b2-a2d8-2df23d7514ee",
+          "r2Key": "CMangic - Heaven in the Fire.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5feed480-3805-48ea-b673-9309cbbae98d",
+      "slug": "hold-in-me-silence",
+      "title": "Hold in me silence",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c61734b4-2ce5-4710-86d1-b07445630141",
+      "versions": [
+        {
+          "id": "c61734b4-2ce5-4710-86d1-b07445630141",
+          "r2Key": "CMangic - Hold in me silence.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "eaa6fbc5-6a98-4a16-8210-e3b380e10c4d",
+      "slug": "hold-time",
+      "title": "Hold time",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8d70d1f5-2041-466d-8306-5b7cc1d042c8",
+      "versions": [
+        {
+          "id": "8d70d1f5-2041-466d-8306-5b7cc1d042c8",
+          "r2Key": "CMangic - Hold time.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "47a11a5a-8b51-4c13-af87-1b0f82b1ccc7",
+      "slug": "hypnotized-waves",
+      "title": "Hypnotized Waves",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "997ce082-5b02-452b-96da-614525fd948c",
+      "versions": [
+        {
+          "id": "997ce082-5b02-452b-96da-614525fd948c",
+          "r2Key": "CMangic - Hypnotized Waves.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0c11cedf-3747-4401-82be-a3987c024488",
+      "slug": "i-fade",
+      "title": "I fade",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4c09cb82-8c41-4005-9641-7c6e198ede7b",
+      "versions": [
+        {
+          "id": "4c09cb82-8c41-4005-9641-7c6e198ede7b",
+          "r2Key": "CMangic - I fade.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cba07a82-e8d3-4e9a-bf77-ccabb65c1e9a",
+      "slug": "i-fault-but-never-fade",
+      "title": "I fault but never fade",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "11316d54-0084-4ac2-8dd1-d8d83fd924b7",
+      "versions": [
+        {
+          "id": "11316d54-0084-4ac2-8dd1-d8d83fd924b7",
+          "r2Key": "CMangic - I fault but never fade.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "2680b2a3-e849-45a2-bf90-6c1ef705812a",
+      "slug": "i-have-to-show-my-soul-v2",
+      "title": "I have to show my soul (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "33038b7c-25c5-4a94-a51a-0a9f079fb0cc",
+      "versions": [
+        {
+          "id": "33038b7c-25c5-4a94-a51a-0a9f079fb0cc",
+          "r2Key": "CMangic - I have to show my soul (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b24b0e58-5f8a-4420-8f4e-de39cf8b38f8",
+      "slug": "i-have-to-show-my-soul-to-the-world",
+      "title": "I have to show my soul to the world",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c8ead06c-5073-4873-a6be-d9bd878145b1",
+      "versions": [
+        {
+          "id": "c8ead06c-5073-4873-a6be-d9bd878145b1",
+          "r2Key": "CMangic - I have to show my soul to the world.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "c2387a5c-be89-4a8b-af56-90b4985c0d0c",
+      "slug": "i-have-to-show-my-soul",
+      "title": "I have to show my soul",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "dc7d6611-6bd1-48e8-a0d3-179c89fdf1aa",
+      "versions": [
+        {
+          "id": "dc7d6611-6bd1-48e8-a0d3-179c89fdf1aa",
+          "r2Key": "CMangic - I have to show my soul.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "aa2cadae-897b-4f54-a48a-c2aee3892203",
+      "slug": "i-like-to-make-myself-believe",
+      "title": "I Like to Make Myself Believe",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "969c7670-c368-418c-b623-3d3dfb9ad34c",
+      "versions": [
+        {
+          "id": "969c7670-c368-418c-b623-3d3dfb9ad34c",
+          "r2Key": "CMangic - I Like to Make Myself Believe.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "516136ce-1fed-411b-8741-d470c3fe095d",
+      "slug": "i-opened-anyway-1",
+      "title": "I Opened Anyway (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "11351909-ea63-43ab-bc35-00e086cf2b1b",
+      "versions": [
+        {
+          "id": "11351909-ea63-43ab-bc35-00e086cf2b1b",
+          "r2Key": "CMangic - I Opened Anyway (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a5b06deb-3ec9-4bb5-8847-a5c8b4e2f3a8",
+      "slug": "i-opened-anyway",
+      "title": "I Opened Anyway",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "cb0a1dbd-d33c-4ab1-ae47-fc5b1b8b20e8",
+      "versions": [
+        {
+          "id": "cb0a1dbd-d33c-4ab1-ae47-fc5b1b8b20e8",
+          "r2Key": "CMangic - I Opened Anyway.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cbbc9e66-4c98-4f44-b07d-db18660e5d53",
+      "slug": "i-will-rise-again-1",
+      "title": "I Will Rise Again (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c6da233d-e657-441d-88f8-8f2a063267c9",
+      "versions": [
+        {
+          "id": "c6da233d-e657-441d-88f8-8f2a063267c9",
+          "r2Key": "CMangic - I Will Rise Again (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "8fca0b4b-4f21-4539-bfb3-761384a05409",
+      "slug": "i-will-rise-again-2",
+      "title": "I Will Rise Again (2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "73596dcf-3652-4f16-9b81-66ce29693f14",
+      "versions": [
+        {
+          "id": "73596dcf-3652-4f16-9b81-66ce29693f14",
+          "r2Key": "CMangic - I Will Rise Again (2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a9b68b1b-57e5-4faf-8126-de7b07f674e9",
+      "slug": "i-will-rise-again",
+      "title": "I Will Rise Again",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "0f9afac0-39de-4f93-b005-a4c66ed85425",
+      "versions": [
+        {
+          "id": "0f9afac0-39de-4f93-b005-a4c66ed85425",
+          "r2Key": "CMangic - I Will Rise Again.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "316698f8-e225-449d-be29-fc8ac4103284",
+      "slug": "i-m-a-survivor-copy-of-v9",
+      "title": "I'm a Survivor (copy of v9)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8dbe7201-a4dc-46f2-9994-55fb87e7abf6",
+      "versions": [
+        {
+          "id": "8dbe7201-a4dc-46f2-9994-55fb87e7abf6",
+          "r2Key": "CMangic - I'm a Survivor (copy of v9).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0cda0741-a911-4539-b50c-be3e5d1799b0",
+      "slug": "i-m-a-survivor-v6",
+      "title": "I'm a Survivor (v6)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d2d7d7b6-da13-421f-9f58-63694b54092e",
+      "versions": [
+        {
+          "id": "d2d7d7b6-da13-421f-9f58-63694b54092e",
+          "r2Key": "CMangic - I'm a Survivor (v6).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ed02c0c5-08b2-4f04-a0bd-d16932cbf42f",
+      "slug": "i-m-a-survivor-v8",
+      "title": "I'm a Survivor (v8)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "bbb4ffef-723c-4b12-a430-6dc134e77f3d",
+      "versions": [
+        {
+          "id": "bbb4ffef-723c-4b12-a430-6dc134e77f3d",
+          "r2Key": "CMangic - I'm a Survivor (v8).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6e804a9b-36bb-498d-bf84-4cd181b4e86b",
+      "slug": "i-m-a-survivor",
+      "title": "I'm a Survivor",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3c61f4b9-6a7b-49ec-9b05-ebd3c09c7362",
+      "versions": [
+        {
+          "id": "3c61f4b9-6a7b-49ec-9b05-ebd3c09c7362",
+          "r2Key": "CMangic - I'm a Survivor.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0f7ea1ce-037c-492a-8fce-e9ebcceddef2",
+      "slug": "i-m-still-choosing-you",
+      "title": "I'm Still Choosing You",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "17b0c40d-8092-44b1-82b8-3917f3f3b7ac",
+      "versions": [
+        {
+          "id": "17b0c40d-8092-44b1-82b8-3917f3f3b7ac",
+          "r2Key": "CMangic - I'm Still Choosing You.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6e3a36b2-f09b-48da-b31c-a96d62e42538",
+      "slug": "in-the-quiet-years-v2",
+      "title": "In The Quiet Years (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8ad98307-d493-4b39-baba-89b6a6f12c61",
+      "versions": [
+        {
+          "id": "8ad98307-d493-4b39-baba-89b6a6f12c61",
+          "r2Key": "CMangic - In The Quiet Years (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "826afc3d-bd67-454d-b94b-8901301693f4",
+      "slug": "in-the-quiet-years",
+      "title": "In The Quiet Years",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "94c15d64-893e-4a7e-bf01-97c691bb5db6",
+      "versions": [
+        {
+          "id": "94c15d64-893e-4a7e-bf01-97c691bb5db6",
+          "r2Key": "CMangic - In The Quiet Years.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d5e07a74-c362-4a94-a4b8-a6bf5348325b",
+      "slug": "in-times-like-these-v2",
+      "title": "In Times Like These (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c8258e3f-29e2-4961-89e9-e6bb5901b86d",
+      "versions": [
+        {
+          "id": "c8258e3f-29e2-4961-89e9-e6bb5901b86d",
+          "r2Key": "CMangic - In Times Like These (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6a66febe-71fd-44b8-8f88-3da42e130b47",
+      "slug": "in-times-like-these",
+      "title": "In Times Like These",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "bef7cce8-3fed-4fc0-92ab-64675f9ff93f",
+      "versions": [
+        {
+          "id": "bef7cce8-3fed-4fc0-92ab-64675f9ff93f",
+          "r2Key": "CMangic - In Times Like These.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f03c4c0b-acaa-435d-af40-51975f15a42e",
+      "slug": "inside-the-loop-1",
+      "title": "Inside The Loop (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8da6ac28-3a53-4c64-8d10-dc7efee2bca6",
+      "versions": [
+        {
+          "id": "8da6ac28-3a53-4c64-8d10-dc7efee2bca6",
+          "r2Key": "CMangic - Inside The Loop (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a941b98b-eebe-42ae-87a2-24c5f91cb963",
+      "slug": "inside-the-loop-alt",
+      "title": "Inside The Loop (alt)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8b88946b-6fdd-414d-945b-430d627f66f3",
+      "versions": [
+        {
+          "id": "8b88946b-6fdd-414d-945b-430d627f66f3",
+          "r2Key": "CMangic - Inside The Loop (alt).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e1ae6637-914d-4c22-bbf4-fb20cbd032ca",
+      "slug": "inside-the-loop",
+      "title": "Inside The Loop",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9474c0e9-881d-4519-abb3-b8c4ef777726",
+      "versions": [
+        {
+          "id": "9474c0e9-881d-4519-abb3-b8c4ef777726",
+          "r2Key": "CMangic - Inside The Loop.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7979ee6c-d232-4f64-8b42-341e579550d8",
+      "slug": "invisivel",
+      "title": "Invisível",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a7ded563-9bfb-4428-b431-663176bd84cc",
+      "versions": [
+        {
+          "id": "a7ded563-9bfb-4428-b431-663176bd84cc",
+          "r2Key": "CMangic - Invisível.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "22481d89-3c4c-4971-a25e-8c461e5e1469",
+      "slug": "it-doesn-t-have-to-be-today-1",
+      "title": "It Doesn’t Have to Be Today (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a5e2cc2e-ce16-4c7b-9995-593d21ca7d29",
+      "versions": [
+        {
+          "id": "a5e2cc2e-ce16-4c7b-9995-593d21ca7d29",
+          "r2Key": "CMangic - It Doesn’t Have to Be Today (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a27b130f-fd3a-4323-b8ed-cfae22dc6d1b",
+      "slug": "it-doesn-t-have-to-be-today",
+      "title": "It Doesn’t Have to Be Today",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "efc75001-c07f-49fd-87b1-71f5a5568b84",
+      "versions": [
+        {
+          "id": "efc75001-c07f-49fd-87b1-71f5a5568b84",
+          "r2Key": "CMangic - It Doesn’t Have to Be Today.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "fb432c71-23bb-4e80-92b1-e63ab1dffb6a",
+      "slug": "it-s-your-time",
+      "title": "It's Your Time",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "af751dc2-a844-4d25-9626-7e7f3fd6a9cc",
+      "versions": [
+        {
+          "id": "af751dc2-a844-4d25-9626-7e7f3fd6a9cc",
+          "r2Key": "CMangic - It's Your Time.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9d54b023-c34b-42e7-9082-8c433486707f",
+      "slug": "keep-alive",
+      "title": "Keep alive",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c9b99cfd-63aa-4897-a665-7c5ad28dc897",
+      "versions": [
+        {
+          "id": "c9b99cfd-63aa-4897-a665-7c5ad28dc897",
+          "r2Key": "CMangic - Keep alive.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a8e75098-3db0-4874-b698-1d9413cdfc3b",
+      "slug": "keep-moving-it-ll-find-you",
+      "title": "Keep Moving, It’ll Find You",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "54899ba2-5504-4b86-86ad-5293312c5a88",
+      "versions": [
+        {
+          "id": "54899ba2-5504-4b86-86ad-5293312c5a88",
+          "r2Key": "CMangic - Keep Moving, It’ll Find You.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "98e79e88-c73c-4d00-a0c8-45ce273547cd",
+      "slug": "keeps-me-alive",
+      "title": "Keeps me alive",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c0de1426-1150-49e0-965c-2b2b4c8664aa",
+      "versions": [
+        {
+          "id": "c0de1426-1150-49e0-965c-2b2b4c8664aa",
+          "r2Key": "CMangic - Keeps me alive.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "32990d7f-6474-4283-97fd-599689339182",
+      "slug": "la-paz-despues",
+      "title": "La Paz Después",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ff236d24-b156-4b36-9b00-58c45a2f21d9",
+      "versions": [
+        {
+          "id": "ff236d24-b156-4b36-9b00-58c45a2f21d9",
+          "r2Key": "CMangic - La Paz Después.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "271ac525-2bea-4e43-abf0-ffb34d4580bd",
+      "slug": "last-honest-mile",
+      "title": "Last Honest Mile",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "755ccf33-3790-42a5-92a8-666f50876b05",
+      "versions": [
+        {
+          "id": "755ccf33-3790-42a5-92a8-666f50876b05",
+          "r2Key": "CMangic - Last Honest Mile.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "17599952-e0c3-4d21-9099-93a2d23dd309",
+      "slug": "layer-by-layer",
+      "title": "Layer by layer",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "647dbcb6-2975-458d-92c4-db205ce35fef",
+      "versions": [
+        {
+          "id": "647dbcb6-2975-458d-92c4-db205ce35fef",
+          "r2Key": "CMangic - Layer by layer.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5da4cb3c-87a1-4a42-8da3-b49a78e70eb8",
+      "slug": "learn-the-hard-way",
+      "title": "Learn The Hard Way",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "15985766-0ae7-4d26-866e-10f83b0afb35",
+      "versions": [
+        {
+          "id": "15985766-0ae7-4d26-866e-10f83b0afb35",
+          "r2Key": "CMangic - Learn The Hard Way.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "eb3a7b9d-3b2d-4289-91e9-bba451b2fa68",
+      "slug": "leave-something-better",
+      "title": "Leave Something Better",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "97ba668c-8d8c-4f85-a05a-ccf7ddfcf44e",
+      "versions": [
+        {
+          "id": "97ba668c-8d8c-4f85-a05a-ccf7ddfcf44e",
+          "r2Key": "CMangic - Leave Something Better.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d4da0335-8be9-43f6-8f05-c5e7ca5619bf",
+      "slug": "let-me-fly",
+      "title": "Let me fly",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e7f5fed0-1c8f-4218-8b87-e9757f522b3b",
+      "versions": [
+        {
+          "id": "e7f5fed0-1c8f-4218-8b87-e9757f522b3b",
+          "r2Key": "CMangic - Let me fly.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1d81ac2b-6d2f-454d-acbb-5fa33aa4a73b",
+      "slug": "let-time-do-its-work",
+      "title": "Let Time Do Its Work",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f6d33f0f-6e22-487d-9e6e-5a979e13f7b4",
+      "versions": [
+        {
+          "id": "f6d33f0f-6e22-487d-9e6e-5a979e13f7b4",
+          "r2Key": "CMangic - Let Time Do Its Work.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "fc92d630-916f-43f3-aae5-5978ce4bb434",
+      "slug": "letter-to-the-younger-me-1",
+      "title": "Letter To The Younger Me (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e824106d-17e2-485a-bb35-87dafc1867e0",
+      "versions": [
+        {
+          "id": "e824106d-17e2-485a-bb35-87dafc1867e0",
+          "r2Key": "CMangic - Letter To The Younger Me (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d2356542-f8bf-4ff8-9459-c46e633f04cd",
+      "slug": "letter-to-the-younger-me",
+      "title": "Letter To The Younger Me",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c2bd1e67-a6e4-4ae4-8286-8501415976cb",
+      "versions": [
+        {
+          "id": "c2bd1e67-a6e4-4ae4-8286-8501415976cb",
+          "r2Key": "CMangic - Letter To The Younger Me.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a8bae54c-965a-463e-9060-314c16473113",
+      "slug": "lift-on-two-1",
+      "title": "Lift On Two (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4fd9f70f-2990-4760-b005-951c45cdb9de",
+      "versions": [
+        {
+          "id": "4fd9f70f-2990-4760-b005-951c45cdb9de",
+          "r2Key": "CMangic - Lift On Two (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d6046ebb-6bf8-456a-9008-77d942977fdf",
+      "slug": "lift-on-two",
+      "title": "Lift On Two",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e22c3242-ef13-45d1-9244-60221d0c97a2",
+      "versions": [
+        {
+          "id": "e22c3242-ef13-45d1-9244-60221d0c97a2",
+          "r2Key": "CMangic - Lift On Two.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7d8d0fe4-8af0-47c6-91f7-15d8bc98f258",
+      "slug": "light-beneath-the-rain-v2",
+      "title": "Light Beneath the Rain (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d56fdf81-99ac-498a-9259-e00d4c89b60d",
+      "versions": [
+        {
+          "id": "d56fdf81-99ac-498a-9259-e00d4c89b60d",
+          "r2Key": "CMangic - Light Beneath the Rain (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5e82517a-7358-41a8-abd5-ee31475dd147",
+      "slug": "light-beneath-the-rain",
+      "title": "Light Beneath the Rain",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "090f6c4b-68ab-4e44-9eaf-b19f3ce15bf0",
+      "versions": [
+        {
+          "id": "090f6c4b-68ab-4e44-9eaf-b19f3ce15bf0",
+          "r2Key": "CMangic - Light Beneath the Rain.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "20c297d8-8058-4799-bd6a-ebc6e7f171ae",
+      "slug": "limite-elastico",
+      "title": "Limite Elástico",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "25a26914-a393-4240-a2a2-5c7fb73aa244",
+      "versions": [
+        {
+          "id": "25a26914-a393-4240-a2a2-5c7fb73aa244",
+          "r2Key": "CMangic - Limite Elástico.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7cdb655e-17f2-4c65-811d-5c2f90b30c6d",
+      "slug": "little-fire",
+      "title": "Little Fire",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "5e1e62d0-43b0-4c38-bd98-3156180b48c6",
+      "versions": [
+        {
+          "id": "5e1e62d0-43b0-4c38-bd98-3156180b48c6",
+          "r2Key": "CMangic - Little Fire.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "74d6c0d4-ac73-4478-81e5-1557329d4c40",
+      "slug": "little-fire-2",
+      "title": "Little Fire",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b8b2f366-b6ca-481e-9bfb-f88c85cbcd73",
+      "versions": [
+        {
+          "id": "b8b2f366-b6ca-481e-9bfb-f88c85cbcd73",
+          "r2Key": "CMangic - Little Fire.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6289b4a1-b6c7-4081-ae58-8fdc7ac49b28",
+      "slug": "love-is-not-perfect",
+      "title": "Love is not perfect",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a0725332-397d-4ecb-89d4-a0e78312b2ef",
+      "versions": [
+        {
+          "id": "a0725332-397d-4ecb-89d4-a0e78312b2ef",
+          "r2Key": "CMangic - Love is not perfect.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6c8bb1e5-eff3-4198-a09b-057b7a12f500",
+      "slug": "magic",
+      "title": "Magic",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d0081924-70a7-4b5a-becf-5b058627b66b",
+      "versions": [
+        {
+          "id": "d0081924-70a7-4b5a-becf-5b058627b66b",
+          "r2Key": "CMangic - Magic.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6947dd7a-8cbf-467d-a514-9b3b07fc0c83",
+      "slug": "me-deixa-sentir",
+      "title": "Me Deixa Sentir",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "117f02a9-1168-4a5f-937d-7584fbbb6d64",
+      "versions": [
+        {
+          "id": "117f02a9-1168-4a5f-937d-7584fbbb6d64",
+          "r2Key": "CMangic - Me Deixa Sentir.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1fc82ef0-596c-44a5-82a2-a1b0b1384d7b",
+      "slug": "melhora-ao-teu-lado",
+      "title": "Melhora ao Teu Lado",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "11fa0c7b-6bd6-4d1f-98a8-19d23f697eff",
+      "versions": [
+        {
+          "id": "11fa0c7b-6bd6-4d1f-98a8-19d23f697eff",
+          "r2Key": "CMangic - Melhora ao Teu Lado.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f48c4847-0d2b-4e5e-bd1c-b89a22a09b4f",
+      "slug": "midnight-algorithm",
+      "title": "Midnight Algorithm",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "6af193ab-c2f7-4dc6-a005-4703936a390f",
+      "versions": [
+        {
+          "id": "6af193ab-c2f7-4dc6-a005-4703936a390f",
+          "r2Key": "CMangic - Midnight Algorithm.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ca50badf-822b-462d-9c42-6a3d4f906a8c",
+      "slug": "midnight-arcade-v2",
+      "title": "Midnight Arcade (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "daeae37e-2566-4906-867b-9b777db39f80",
+      "versions": [
+        {
+          "id": "daeae37e-2566-4906-867b-9b777db39f80",
+          "r2Key": "CMangic - Midnight Arcade (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "c6437c9b-fa24-4b95-9f72-cf3c79f100ce",
+      "slug": "midnight-arcade",
+      "title": "Midnight Arcade",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3973622d-c821-484f-997c-b48aa51b9f82",
+      "versions": [
+        {
+          "id": "3973622d-c821-484f-997c-b48aa51b9f82",
+          "r2Key": "CMangic - Midnight Arcade.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b0a5f376-c47a-4c2d-b7a2-7707c9e44113",
+      "slug": "midnight-fever",
+      "title": "Midnight Fever",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "00b71e90-2237-45c6-9f0f-185fa7f23904",
+      "versions": [
+        {
+          "id": "00b71e90-2237-45c6-9f0f-185fa7f23904",
+          "r2Key": "CMangic - Midnight Fever.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7a7e46c8-2787-4180-bebf-579aee9716af",
+      "slug": "midnight-version-1",
+      "title": "Midnight Version (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "191ccfb8-555b-42d5-98e6-bebb930dbc50",
+      "versions": [
+        {
+          "id": "191ccfb8-555b-42d5-98e6-bebb930dbc50",
+          "r2Key": "CMangic - Midnight Version (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "2ebeec8e-cb6f-4762-8907-c1d77ce5d449",
+      "slug": "midnight-version-1-2",
+      "title": "Midnight Version (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "09aec628-f590-44f4-aaae-5691bdaf1f0c",
+      "versions": [
+        {
+          "id": "09aec628-f590-44f4-aaae-5691bdaf1f0c",
+          "r2Key": "CMangic - Midnight Version (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "8ef030b0-2115-4d6f-9cde-24597e535e1b",
+      "slug": "midnight-version",
+      "title": "Midnight Version",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1eacdc39-55b7-4cf4-97d9-dfb8c75d1273",
+      "versions": [
+        {
+          "id": "1eacdc39-55b7-4cf4-97d9-dfb8c75d1273",
+          "r2Key": "CMangic - Midnight Version.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7d195db5-9db9-4cac-a112-b4f4ebb1bc7b",
+      "slug": "midnight-version-2",
+      "title": "Midnight Version",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ea1f44b4-2363-43e3-ae24-0b6b2142993f",
+      "versions": [
+        {
+          "id": "ea1f44b4-2363-43e3-ae24-0b6b2142993f",
+          "r2Key": "CMangic - Midnight Version.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ca700d1a-7778-474b-9a91-92616a3920b9",
+      "slug": "minutes-we-lose-1",
+      "title": "Minutes We Lose (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1215f862-2474-4e0d-960a-80cde522f3df",
+      "versions": [
+        {
+          "id": "1215f862-2474-4e0d-960a-80cde522f3df",
+          "r2Key": "CMangic - Minutes We Lose (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "bd5a2313-519e-41c0-9774-1984d41fdc33",
+      "slug": "minutes-we-lose-1-2",
+      "title": "Minutes We Lose (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2f5d3f3e-eab2-4b24-a884-bc3aafdb0670",
+      "versions": [
+        {
+          "id": "2f5d3f3e-eab2-4b24-a884-bc3aafdb0670",
+          "r2Key": "CMangic - Minutes We Lose (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "046f56fc-d57b-444b-8dab-9545425815d8",
+      "slug": "minutes-we-lose-2",
+      "title": "Minutes We Lose (2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1ff114a6-3a66-400f-9ffb-c4f448e383fd",
+      "versions": [
+        {
+          "id": "1ff114a6-3a66-400f-9ffb-c4f448e383fd",
+          "r2Key": "CMangic - Minutes We Lose (2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "97448f37-5b32-49bf-88cd-c96fd2eda231",
+      "slug": "minutes-we-lose",
+      "title": "Minutes We Lose",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "fbbeb4bb-08fb-47c8-919f-1a4a72094171",
+      "versions": [
+        {
+          "id": "fbbeb4bb-08fb-47c8-919f-1a4a72094171",
+          "r2Key": "CMangic - Minutes We Lose.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "dd1cfb94-341c-4f2a-8a29-8b4df0e01871",
+      "slug": "minutes-we-lose-3",
+      "title": "Minutes We Lose",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ec55da76-73e7-4586-8e5f-111fd5b19b53",
+      "versions": [
+        {
+          "id": "ec55da76-73e7-4586-8e5f-111fd5b19b53",
+          "r2Key": "CMangic - Minutes We Lose.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e90c06d8-6523-4402-9540-b85f75ea9395",
+      "slug": "more-time-v2",
+      "title": "More Time (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "04d21b45-7bb6-4384-b49f-3dd3e0944e4e",
+      "versions": [
+        {
+          "id": "04d21b45-7bb6-4384-b49f-3dd3e0944e4e",
+          "r2Key": "CMangic - More Time (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "c85af313-8092-4130-9171-afb97a8d8a68",
+      "slug": "more-time",
+      "title": "More Time",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e5d237e1-0834-4c4b-a86f-34e43088329b",
+      "versions": [
+        {
+          "id": "e5d237e1-0834-4c4b-a86f-34e43088329b",
+          "r2Key": "CMangic - More Time.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "94ffe89c-f67d-498f-8529-d7c093fdd38e",
+      "slug": "muscle-memory",
+      "title": "Muscle Memory",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "29590bcc-12d1-468b-a1ca-5fa40e7ef9bf",
+      "versions": [
+        {
+          "id": "29590bcc-12d1-468b-a1ca-5fa40e7ef9bf",
+          "r2Key": "CMangic - Muscle Memory.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3fa40987-29ea-4e2d-8396-92775d91b2e2",
+      "slug": "nada-e-igual",
+      "title": "Nada É Igual",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "fbf18ca2-2c25-435a-a5eb-e67e5151fe17",
+      "versions": [
+        {
+          "id": "fbf18ca2-2c25-435a-a5eb-e67e5151fe17",
+          "r2Key": "CMangic - Nada É Igual.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a5c17be7-15fa-4aa0-aa44-86b23056ff6d",
+      "slug": "neon-daydream-v2",
+      "title": "Neon Daydream (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f42920e7-ac74-42b9-8283-dfcab8ad891a",
+      "versions": [
+        {
+          "id": "f42920e7-ac74-42b9-8283-dfcab8ad891a",
+          "r2Key": "CMangic - Neon Daydream (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d51d6f32-61eb-4191-b48d-249d5c598195",
+      "slug": "neon-daydream",
+      "title": "Neon Daydream",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "99528b4f-946c-4da5-ae2f-073c8f774a2d",
+      "versions": [
+        {
+          "id": "99528b4f-946c-4da5-ae2f-073c8f774a2d",
+          "r2Key": "CMangic - Neon Daydream.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "43432860-21b3-49b0-9c75-47155e6c7852",
+      "slug": "neon-saints",
+      "title": "Neon Saints",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ef971fb7-22d8-4047-a45d-49b888089b99",
+      "versions": [
+        {
+          "id": "ef971fb7-22d8-4047-a45d-49b888089b99",
+          "r2Key": "CMangic - Neon Saints.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "58297459-e7e9-44ff-8211-efc2055c13f1",
+      "slug": "never-give-up-v2",
+      "title": "Never Give Up (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "badbca15-c466-4d56-9d93-ebd6d83cdf72",
+      "versions": [
+        {
+          "id": "badbca15-c466-4d56-9d93-ebd6d83cdf72",
+          "r2Key": "CMangic - Never Give Up (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "91510dc0-0d2f-4d6d-978a-a6edf7a31d92",
+      "slug": "never-give-up-v5",
+      "title": "Never Give Up (v5)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "6da437ed-4b54-4a23-b06c-8d6b1bd67cd8",
+      "versions": [
+        {
+          "id": "6da437ed-4b54-4a23-b06c-8d6b1bd67cd8",
+          "r2Key": "CMangic - Never Give Up (v5).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d0f60ded-0205-4aa8-bd76-90f8859e7f47",
+      "slug": "never-give-up",
+      "title": "Never Give Up",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c561ed54-5437-4808-a046-151bc726144b",
+      "versions": [
+        {
+          "id": "c561ed54-5437-4808-a046-151bc726144b",
+          "r2Key": "CMangic - Never Give Up.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "10a0efd0-f95b-4194-a210-fefab3dcd52b",
+      "slug": "never-let-me-fade-v2",
+      "title": "Never let me fade (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9236cd74-d0b6-4ec5-879c-537d821f4395",
+      "versions": [
+        {
+          "id": "9236cd74-d0b6-4ec5-879c-537d821f4395",
+          "r2Key": "CMangic - Never let me fade (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "261c8dda-d854-4314-b3ba-0690a1bc1051",
+      "slug": "never-let-me-fade",
+      "title": "Never let me fade",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c78f3479-0ac1-4f57-8314-580022c25752",
+      "versions": [
+        {
+          "id": "c78f3479-0ac1-4f57-8314-580022c25752",
+          "r2Key": "CMangic - Never let me fade.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5553b7c4-d490-4930-bf50-6e46c46f7d28",
+      "slug": "new-blueprint",
+      "title": "New Blueprint",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ad69ee15-e909-448b-912e-7e93d6f1ea33",
+      "versions": [
+        {
+          "id": "ad69ee15-e909-448b-912e-7e93d6f1ea33",
+          "r2Key": "CMangic - New Blueprint.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "273112ed-68f3-4605-9ec9-d7931b6c38d2",
+      "slug": "next-hinge-1",
+      "title": "Next Hinge (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b1f96890-8f13-452a-bd16-7994fc1ded74",
+      "versions": [
+        {
+          "id": "b1f96890-8f13-452a-bd16-7994fc1ded74",
+          "r2Key": "CMangic - Next Hinge (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9dd51ced-b1e3-4a51-bc2c-49a0ed1d305c",
+      "slug": "next-hinge",
+      "title": "Next Hinge",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9dcdcb3d-0865-4138-a795-9f497f40a99f",
+      "versions": [
+        {
+          "id": "9dcdcb3d-0865-4138-a795-9f497f40a99f",
+          "r2Key": "CMangic - Next Hinge.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "dc49525f-fb04-4a48-978f-25ea1228700e",
+      "slug": "night-falls-slow-v2",
+      "title": "Night falls slow (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "90f94c57-d21b-4f8d-bb48-fa5d4aeb8de5",
+      "versions": [
+        {
+          "id": "90f94c57-d21b-4f8d-bb48-fa5d4aeb8de5",
+          "r2Key": "CMangic - Night falls slow (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "82333c57-ab16-48bf-ad8f-c31b1907702f",
+      "slug": "night-falls-slow",
+      "title": "Night falls slow",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "35fb6883-6abc-47b9-afb4-0df3d9823f0e",
+      "versions": [
+        {
+          "id": "35fb6883-6abc-47b9-afb4-0df3d9823f0e",
+          "r2Key": "CMangic - Night falls slow.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "58a68546-40a7-4734-a0a6-8479b3000a1e",
+      "slug": "no-one-gonna-silence-me",
+      "title": "No One Gonna Silence Me",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ef825e77-a178-4fdc-b1fe-f3e09152fd35",
+      "versions": [
+        {
+          "id": "ef825e77-a178-4fdc-b1fe-f3e09152fd35",
+          "r2Key": "CMangic - No One Gonna Silence Me.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0f471292-7f42-498c-8859-8e8e108cc223",
+      "slug": "no-safe-shore",
+      "title": "No Safe Shore",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c283609c-01cb-4ef7-9b7c-0353e2156164",
+      "versions": [
+        {
+          "id": "c283609c-01cb-4ef7-9b7c-0353e2156164",
+          "r2Key": "CMangic - No Safe Shore.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5c9101db-c6ec-40e4-937e-5073f841aa12",
+      "slug": "no-villains",
+      "title": "No Villains",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "efb7fc88-0c2e-417d-b4d7-b31f12603bc7",
+      "versions": [
+        {
+          "id": "efb7fc88-0c2e-417d-b4d7-b31f12603bc7",
+          "r2Key": "CMangic - No Villains.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "07469853-01a7-4b88-b18a-be35d377f176",
+      "slug": "non-e-impossibile",
+      "title": "Non È Impossibile",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c6218fe0-139c-4401-97d6-23dfda9bf679",
+      "versions": [
+        {
+          "id": "c6218fe0-139c-4401-97d6-23dfda9bf679",
+          "r2Key": "CMangic - Non È Impossibile.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "4475a394-be71-497b-bcba-fe1aefc623e7",
+      "slug": "not-done-yet",
+      "title": "Not Done Yet",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "0188e12d-005f-4354-a5e2-bcc1643d374f",
+      "versions": [
+        {
+          "id": "0188e12d-005f-4354-a5e2-bcc1643d374f",
+          "r2Key": "CMangic - Not Done Yet.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "be7f9264-780a-488f-b01d-ecdcc5215852",
+      "slug": "not-the-end-of-me",
+      "title": "Not the End of Me",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8930ab14-0f2f-4612-b434-21e48d87da1b",
+      "versions": [
+        {
+          "id": "8930ab14-0f2f-4612-b434-21e48d87da1b",
+          "r2Key": "CMangic - Not the End of Me.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "45f418b6-06d0-4973-8454-a39b86b71d0a",
+      "slug": "o-que-e-normal",
+      "title": "O que é normal",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e374eb99-e232-46ca-a8a3-4f96c43be108",
+      "versions": [
+        {
+          "id": "e374eb99-e232-46ca-a8a3-4f96c43be108",
+          "r2Key": "CMangic - O que é normal.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e8872ea3-d357-4cb4-91de-70cc83df3b80",
+      "slug": "one-last-return-v2",
+      "title": "One Last Return (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "588ed7c6-7ede-4ac7-9767-bd6e15bf4eb1",
+      "versions": [
+        {
+          "id": "588ed7c6-7ede-4ac7-9767-bd6e15bf4eb1",
+          "r2Key": "CMangic - One Last Return (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ac792cd6-8838-4b17-acd2-3b287c8b0da9",
+      "slug": "one-last-return",
+      "title": "One Last Return",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "44b0b97a-01d3-4859-9b22-04e767d6e42a",
+      "versions": [
+        {
+          "id": "44b0b97a-01d3-4859-9b22-04e767d6e42a",
+          "r2Key": "CMangic - One Last Return.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "94a5a7e4-6e76-4f12-b2cb-5bb092e13a57",
+      "slug": "one-seat-for-good-news-1",
+      "title": "One Seat for Good News (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d6454ffc-9419-46c2-b63b-e6da0eefeecd",
+      "versions": [
+        {
+          "id": "d6454ffc-9419-46c2-b63b-e6da0eefeecd",
+          "r2Key": "CMangic - One Seat for Good News (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cd8db006-004a-4ced-b6f2-d2215e695337",
+      "slug": "one-seat-for-good-news",
+      "title": "One Seat for Good News",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "cad0b9e3-dab8-42ff-aae4-5ffb4c363517",
+      "versions": [
+        {
+          "id": "cad0b9e3-dab8-42ff-aae4-5ffb4c363517",
+          "r2Key": "CMangic - One Seat for Good News.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "4d1c304d-9f14-421f-a235-190df33930c0",
+      "slug": "open-wide",
+      "title": "Open Wide",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9bb5bfee-40fe-4866-b4ce-b5d7c57663a0",
+      "versions": [
+        {
+          "id": "9bb5bfee-40fe-4866-b4ce-b5d7c57663a0",
+          "r2Key": "CMangic - Open Wide.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "35721d45-f190-4844-8e18-c2a1ff7cd39f",
+      "slug": "paciencia",
+      "title": "Paciência",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "bd12a63d-dbbd-4466-9ff5-fb85acd3ce73",
+      "versions": [
+        {
+          "id": "bd12a63d-dbbd-4466-9ff5-fb85acd3ce73",
+          "r2Key": "CMangic - Paciência.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7dfa9d7d-e408-477f-8e14-a1c09c8e7d1e",
+      "slug": "paper-crown",
+      "title": "Paper Crown",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a7d6c110-f8b2-426a-9a1d-edeef56701a4",
+      "versions": [
+        {
+          "id": "a7d6c110-f8b2-426a-9a1d-edeef56701a4",
+          "r2Key": "CMangic - Paper Crown.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "c4341e52-809f-48fd-8cdc-91ff78568acf",
+      "slug": "persistence-dreams-galaxy-v2",
+      "title": "Persistence Dreams Galaxy (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "955e5304-76ad-47cf-aed8-901b7d23d098",
+      "versions": [
+        {
+          "id": "955e5304-76ad-47cf-aed8-901b7d23d098",
+          "r2Key": "CMangic - Persistence Dreams Galaxy (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cc798dad-1bcc-493d-b81e-91a2bad83ed5",
+      "slug": "persistence-dreams-galaxy",
+      "title": "Persistence Dreams Galaxy",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c335cf44-3454-4657-97ad-6d54e12ea19b",
+      "versions": [
+        {
+          "id": "c335cf44-3454-4657-97ad-6d54e12ea19b",
+          "r2Key": "CMangic - Persistence Dreams Galaxy.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b20a5e5d-a560-4490-b6de-b426bbf9d3b5",
+      "slug": "persistence",
+      "title": "Persistence",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ba143990-b0c5-49a3-bafb-54a6e6c8f9d5",
+      "versions": [
+        {
+          "id": "ba143990-b0c5-49a3-bafb-54a6e6c8f9d5",
+          "r2Key": "CMangic - Persistence.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "62660d77-e44f-4890-9a17-b7e98f2f0b31",
+      "slug": "powerful",
+      "title": "Powerful",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b0f90f40-8678-40ec-8a08-d8b489e6bc03",
+      "versions": [
+        {
+          "id": "b0f90f40-8678-40ec-8a08-d8b489e6bc03",
+          "r2Key": "CMangic - Powerful.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "83e1cc69-1156-4669-a8ea-bd904b772708",
+      "slug": "pra-onde-vai",
+      "title": "Pra Onde Vai",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d3a5a63c-b6b0-4d7b-9e62-56e0417c7060",
+      "versions": [
+        {
+          "id": "d3a5a63c-b6b0-4d7b-9e62-56e0417c7060",
+          "r2Key": "CMangic - Pra Onde Vai.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "4054666b-16e1-49d9-8819-5d035569145d",
+      "slug": "put-it-on-paper-1",
+      "title": "Put It On Paper (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "954584c8-3aa6-4998-b18f-cbfd4b6deda2",
+      "versions": [
+        {
+          "id": "954584c8-3aa6-4998-b18f-cbfd4b6deda2",
+          "r2Key": "CMangic - Put It On Paper (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "62d197c5-74e1-4ca4-92cc-98335167bcac",
+      "slug": "put-it-on-paper",
+      "title": "Put It On Paper",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ef49d4d5-be79-4fe1-b7a8-83fe50033e76",
+      "versions": [
+        {
+          "id": "ef49d4d5-be79-4fe1-b7a8-83fe50033e76",
+          "r2Key": "CMangic - Put It On Paper.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f2a378dc-46cf-4003-bf72-bc595a70c6dd",
+      "slug": "quando-a-casa-silencia",
+      "title": "Quando a Casa Silencia",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8d0b72e7-c880-4e1b-a15d-036567315472",
+      "versions": [
+        {
+          "id": "8d0b72e7-c880-4e1b-a15d-036567315472",
+          "r2Key": "CMangic - Quando a Casa Silencia.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "2f05fad4-a243-4a4e-afef-d7749ac49a67",
+      "slug": "quando-a-cidade-dorme",
+      "title": "Quando A Cidade Dorme",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1a8a9d6d-23af-4eae-80bd-20f64173e9c3",
+      "versions": [
+        {
+          "id": "1a8a9d6d-23af-4eae-80bd-20f64173e9c3",
+          "r2Key": "CMangic - Quando A Cidade Dorme.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "13bd4abc-6059-4619-9a2a-ffd14805ef12",
+      "slug": "quando-eu-lembro-de-voce",
+      "title": "Quando eu lembro de você",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "577ab72e-4228-4054-886e-949321293428",
+      "versions": [
+        {
+          "id": "577ab72e-4228-4054-886e-949321293428",
+          "r2Key": "CMangic - Quando eu lembro de você.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "81256aec-47c1-462b-83cc-360e6415ba8f",
+      "slug": "quase-fica",
+      "title": "Quase Fica",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "0173ba3f-d33d-44a3-8747-57d050697204",
+      "versions": [
+        {
+          "id": "0173ba3f-d33d-44a3-8747-57d050697204",
+          "r2Key": "CMangic - Quase Fica.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "72184a6e-f726-4d19-b7e2-250028d52653",
+      "slug": "quase-la",
+      "title": "Quase Lá",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "7f3807be-e082-4720-b5cc-eabf30101a4c",
+      "versions": [
+        {
+          "id": "7f3807be-e082-4720-b5cc-eabf30101a4c",
+          "r2Key": "CMangic - Quase Lá.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "05c56181-89dd-4775-9a95-9e6e534ae762",
+      "slug": "quiet-enough-1",
+      "title": "Quiet Enough (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "85b671ef-8931-4af1-a5a5-78fcce8424fa",
+      "versions": [
+        {
+          "id": "85b671ef-8931-4af1-a5a5-78fcce8424fa",
+          "r2Key": "CMangic - Quiet Enough (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7985bbca-2c57-4a90-9d90-0cc0a5bd40d0",
+      "slug": "quiet-enough-2",
+      "title": "Quiet Enough (2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "6db1f081-1dba-41c9-ac32-21d47b71dad1",
+      "versions": [
+        {
+          "id": "6db1f081-1dba-41c9-ac32-21d47b71dad1",
+          "r2Key": "CMangic - Quiet Enough (2).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "11642d41-c9b1-4c3c-8273-077201645d99",
+      "slug": "quiet-enough",
+      "title": "Quiet Enough",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9510bfd1-36b8-4b8d-a36b-bb3648ff38d0",
+      "versions": [
+        {
+          "id": "9510bfd1-36b8-4b8d-a36b-bb3648ff38d0",
+          "r2Key": "CMangic - Quiet Enough.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1432cbdd-726d-4ea4-84f8-481381d05c81",
+      "slug": "quiet-iron-1",
+      "title": "Quiet Iron (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "92674a44-e254-47f7-9610-ca8eb3b7efbc",
+      "versions": [
+        {
+          "id": "92674a44-e254-47f7-9610-ca8eb3b7efbc",
+          "r2Key": "CMangic - Quiet Iron (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b3c6a7da-6484-4299-b9f1-3d83792494ee",
+      "slug": "quiet-iron",
+      "title": "Quiet Iron",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3f040650-d126-4dc2-ae7b-1e502ac7c989",
+      "versions": [
+        {
+          "id": "3f040650-d126-4dc2-ae7b-1e502ac7c989",
+          "r2Key": "CMangic - Quiet Iron.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5074e953-c482-4dbc-ad6d-d000dd51c1c8",
+      "slug": "respira",
+      "title": "Respira",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "081d8034-d1c4-4762-9d6e-9a951988c65e",
+      "versions": [
+        {
+          "id": "081d8034-d1c4-4762-9d6e-9a951988c65e",
+          "r2Key": "CMangic - Respira.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9001b762-c3d7-432f-925a-b1269f38fd75",
+      "slug": "road-trip",
+      "title": "Road Trip",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "96595185-3b3f-4b77-a350-dd4520496bba",
+      "versions": [
+        {
+          "id": "96595185-3b3f-4b77-a350-dd4520496bba",
+          "r2Key": "CMangic - Road Trip.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d34dca6b-db68-41e8-9fa3-4eeb46ff83a5",
+      "slug": "run-it-into-light-1",
+      "title": "Run It Into Light (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "35806a26-05ae-4167-9351-f40c86fd2ccb",
+      "versions": [
+        {
+          "id": "35806a26-05ae-4167-9351-f40c86fd2ccb",
+          "r2Key": "CMangic - Run It Into Light (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "4dcf8c8c-70cf-496f-a45d-14b8a649d9bb",
+      "slug": "run-it-into-light",
+      "title": "Run It Into Light",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "5cf08c4a-2a48-4921-910e-89ab618a6c16",
+      "versions": [
+        {
+          "id": "5cf08c4a-2a48-4921-910e-89ab618a6c16",
+          "r2Key": "CMangic - Run It Into Light.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f6ef331e-7554-45cb-b114-cff975aab5a0",
+      "slug": "run-it-into-light-2",
+      "title": "Run It Into Light",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8e0aec8e-0fd9-4da0-91f1-bc1c0e71bc6f",
+      "versions": [
+        {
+          "id": "8e0aec8e-0fd9-4da0-91f1-bc1c0e71bc6f",
+          "r2Key": "CMangic - Run It Into Light.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a28e04ee-bc52-433c-b8e7-c875385f00dc",
+      "slug": "run-through-the-night",
+      "title": "Run Through the Night",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4e01f5b9-c687-4e1b-b189-a7c1ce6c8205",
+      "versions": [
+        {
+          "id": "4e01f5b9-c687-4e1b-b189-a7c1ce6c8205",
+          "r2Key": "CMangic - Run Through the Night.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "22370490-95f8-469c-9231-2947e4aab637",
+      "slug": "running-in-circles",
+      "title": "Running In Circles",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f0a34200-0e83-446b-ab6f-01cddce03b02",
+      "versions": [
+        {
+          "id": "f0a34200-0e83-446b-ab6f-01cddce03b02",
+          "r2Key": "CMangic - Running In Circles.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7f769f1f-4e28-451b-a2bb-3e28682d004a",
+      "slug": "salt-and-satellite-1",
+      "title": "Salt And Satellite (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3f7a3222-8d76-4a88-8434-e4e69298bc07",
+      "versions": [
+        {
+          "id": "3f7a3222-8d76-4a88-8434-e4e69298bc07",
+          "r2Key": "CMangic - Salt And Satellite (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "86d2c630-50de-461c-a143-7517141d88a5",
+      "slug": "salt-and-satellite",
+      "title": "Salt And Satellite",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a1ee7053-440b-4d67-9a9e-05c07288e408",
+      "versions": [
+        {
+          "id": "a1ee7053-440b-4d67-9a9e-05c07288e408",
+          "r2Key": "CMangic - Salt And Satellite.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e959f002-772f-4d2c-8a13-9af4cd8ec3e2",
+      "slug": "satellite-heart",
+      "title": "Satellite Heart",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4996f877-cdcc-4928-a5c0-2f4d601ab830",
+      "versions": [
+        {
+          "id": "4996f877-cdcc-4928-a5c0-2f4d601ab830",
+          "r2Key": "CMangic - Satellite Heart.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b7c4bd40-81a4-4ec9-aae3-3b6b2b13d3b3",
+      "slug": "satellite-heart-2",
+      "title": "Satellite Heart",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e8b8aab4-6d24-44a3-9543-e83c6964375c",
+      "versions": [
+        {
+          "id": "e8b8aab4-6d24-44a3-9543-e83c6964375c",
+          "r2Key": "CMangic - Satellite Heart.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5b15abe5-f3c3-4134-8da1-5421ef886fb9",
+      "slug": "second-lung-1",
+      "title": "Second Lung (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f0fcfe3c-ba4f-4301-b5f2-db4504d1a6dc",
+      "versions": [
+        {
+          "id": "f0fcfe3c-ba4f-4301-b5f2-db4504d1a6dc",
+          "r2Key": "CMangic - Second Lung (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "630e257f-2682-44e9-8a10-f8fe624dbbc9",
+      "slug": "second-lung",
+      "title": "Second Lung",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "5ed83d12-55ec-4fbb-929c-638e86be858a",
+      "versions": [
+        {
+          "id": "5ed83d12-55ec-4fbb-929c-638e86be858a",
+          "r2Key": "CMangic - Second Lung.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "96026cc1-e8e7-49c0-8b16-05b578cf774c",
+      "slug": "secondhand-light",
+      "title": "Secondhand Light",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "77e704a6-86eb-4bbb-90bc-4f8f30083163",
+      "versions": [
+        {
+          "id": "77e704a6-86eb-4bbb-90bc-4f8f30083163",
+          "r2Key": "CMangic - Secondhand Light.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6225b893-429c-4b33-b73e-321a3e1fb115",
+      "slug": "sem-manual",
+      "title": "Sem Manual",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4045ae7e-9763-4ba0-94ba-ba1c2a3f1251",
+      "versions": [
+        {
+          "id": "4045ae7e-9763-4ba0-94ba-ba1c2a3f1251",
+          "r2Key": "CMangic - Sem Manual.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "952127fb-6054-4b93-b56b-f720a8ec62a1",
+      "slug": "sidewalks-of-tomorrow-1",
+      "title": "Sidewalks of Tomorrow (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "1cc14678-5e56-4da3-be6c-45e196122d62",
+      "versions": [
+        {
+          "id": "1cc14678-5e56-4da3-be6c-45e196122d62",
+          "r2Key": "CMangic - Sidewalks of Tomorrow (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "31b709ce-29ac-4484-b7ea-d4618b818487",
+      "slug": "sidewalks-of-tomorrow",
+      "title": "Sidewalks of Tomorrow",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3a0f5ed6-fec0-4e43-ac4c-cd137a9bf1a0",
+      "versions": [
+        {
+          "id": "3a0f5ed6-fec0-4e43-ac4c-cd137a9bf1a0",
+          "r2Key": "CMangic - Sidewalks of Tomorrow.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "35e28b38-5d60-4a19-aac9-726b6f4a61af",
+      "slug": "sidewalks-of-tomorrow-2",
+      "title": "Sidewalks of Tomorrow",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "83e79ddf-1ad8-4f0f-9006-1cbaf6c7699d",
+      "versions": [
+        {
+          "id": "83e79ddf-1ad8-4f0f-9006-1cbaf6c7699d",
+          "r2Key": "CMangic - Sidewalks of Tomorrow.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9463e297-2be4-4d84-9f6c-8efbda06a5d4",
+      "slug": "silent-horizon",
+      "title": "Silent Horizon",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e6fd442e-700f-4c47-8b48-036e5293d1bc",
+      "versions": [
+        {
+          "id": "e6fd442e-700f-4c47-8b48-036e5293d1bc",
+          "r2Key": "CMangic - Silent Horizon.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "56803ec0-149e-454f-bbc9-448da46353a8",
+      "slug": "silk-and-circuits-v2",
+      "title": "Silk and Circuits (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c22800f3-984c-4b99-b450-be36ff0b1fcf",
+      "versions": [
+        {
+          "id": "c22800f3-984c-4b99-b450-be36ff0b1fcf",
+          "r2Key": "CMangic - Silk and Circuits (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3e885c13-56fd-47f9-9767-380cddcdefe9",
+      "slug": "silk-and-circuits",
+      "title": "Silk and Circuits",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "94023bf9-de00-4f8d-a473-d64199c61e5e",
+      "versions": [
+        {
+          "id": "94023bf9-de00-4f8d-a473-d64199c61e5e",
+          "r2Key": "CMangic - Silk and Circuits.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "43afd96c-dd0d-4093-9880-a7f233a3f629",
+      "slug": "simple-things",
+      "title": "Simple Things",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "99fe6178-b2ed-4a56-8ab1-7897a40a5661",
+      "versions": [
+        {
+          "id": "99fe6178-b2ed-4a56-8ab1-7897a40a5661",
+          "r2Key": "CMangic - Simple Things.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "363d2ec7-6223-4a65-b401-81d772d4c637",
+      "slug": "sin-pedir-permiso",
+      "title": "Sin Pedir Permiso",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a17c8dfe-5cb7-4d9b-b30c-ae91528add10",
+      "versions": [
+        {
+          "id": "a17c8dfe-5cb7-4d9b-b30c-ae91528add10",
+          "r2Key": "CMangic - Sin Pedir Permiso.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9f2f2765-5b17-4559-8adb-16f01e5c8065",
+      "slug": "slow-honey",
+      "title": "Slow Honey",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "a618df96-d226-4d5b-b5d4-f2b67ba75dbb",
+      "versions": [
+        {
+          "id": "a618df96-d226-4d5b-b5d4-f2b67ba75dbb",
+          "r2Key": "CMangic - Slow Honey.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "88a5ec95-789d-4602-8fec-e95d5e642a8d",
+      "slug": "soft-like-the-night-v2",
+      "title": "Soft Like The Night (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b6bd3bdc-fcf2-4edf-8883-a71a8e2332d3",
+      "versions": [
+        {
+          "id": "b6bd3bdc-fcf2-4edf-8883-a71a8e2332d3",
+          "r2Key": "CMangic - Soft Like The Night (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d9a9c34a-ec72-40c2-91c3-e33c70f71c8d",
+      "slug": "soft-like-the-night",
+      "title": "Soft Like The Night",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "c3240c8d-d392-4e9b-a2ef-0112c4af1bd1",
+      "versions": [
+        {
+          "id": "c3240c8d-d392-4e9b-a2ef-0112c4af1bd1",
+          "r2Key": "CMangic - Soft Like The Night.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1c4e3440-3cd8-46b0-9667-2e4539710be3",
+      "slug": "sol-na-contramao",
+      "title": "Sol Na Contramão",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "82ad5c60-c700-4e93-855b-d945670ad7ad",
+      "versions": [
+        {
+          "id": "82ad5c60-c700-4e93-855b-d945670ad7ad",
+          "r2Key": "CMangic - Sol Na Contramão.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5957f7e8-afa3-4ced-9a50-a58dc840a5d0",
+      "slug": "someday-they-ll-know",
+      "title": "Someday They'll Know",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "48863a18-7db8-4415-a379-8577f31bcb19",
+      "versions": [
+        {
+          "id": "48863a18-7db8-4415-a379-8577f31bcb19",
+          "r2Key": "CMangic - Someday They'll Know.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3c14395a-03d2-40bb-95ff-b0a64902d746",
+      "slug": "space-between-us",
+      "title": "Space Between Us",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "62658d07-4836-4079-8aef-aeb97009c26e",
+      "versions": [
+        {
+          "id": "62658d07-4836-4079-8aef-aeb97009c26e",
+          "r2Key": "CMangic - Space Between Us.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "07f97998-646b-482c-b0c8-de73d533580c",
+      "slug": "starborn-drift",
+      "title": "Starborn Drift",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8badc7bc-cf58-4427-bf13-38b325facf30",
+      "versions": [
+        {
+          "id": "8badc7bc-cf58-4427-bf13-38b325facf30",
+          "r2Key": "CMangic - Starborn Drift.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a24d3fb9-a0b0-4e52-9d23-b1b831b1ebf7",
+      "slug": "starlight-carousel",
+      "title": "Starlight Carousel",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f43b0633-2410-4f2c-a4ec-05835d5e1cde",
+      "versions": [
+        {
+          "id": "f43b0633-2410-4f2c-a4ec-05835d5e1cde",
+          "r2Key": "CMangic - Starlight Carousel.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6dfa3d2c-1efb-444a-a23a-5447ecbb9134",
+      "slug": "starlight-sovereign",
+      "title": "Starlight Sovereign",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "baceb872-aaf8-49d4-84e7-4fdd8ac574a8",
+      "versions": [
+        {
+          "id": "baceb872-aaf8-49d4-84e7-4fdd8ac574a8",
+          "r2Key": "CMangic - Starlight Sovereign.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "084f4a36-bd7b-4c2d-96c6-2956147d6d4b",
+      "slug": "starlight-voyage",
+      "title": "Starlight Voyage",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "55b3ef51-1bdc-419f-98fd-49e98dc2ff29",
+      "versions": [
+        {
+          "id": "55b3ef51-1bdc-419f-98fd-49e98dc2ff29",
+          "r2Key": "CMangic - Starlight Voyage.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "41308632-8092-42d0-aa49-701b3f736d52",
+      "slug": "starlight-whispers",
+      "title": "Starlight Whispers",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "5a9b1ea3-10a6-4afb-a14e-3d94925d46e8",
+      "versions": [
+        {
+          "id": "5a9b1ea3-10a6-4afb-a14e-3d94925d46e8",
+          "r2Key": "CMangic - Starlight Whispers.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "8448bd44-c001-4ed4-989b-f5b52f52d0e9",
+      "slug": "starlit-factory",
+      "title": "Starlit Factory",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "13c85252-7c88-469e-a5e1-12a225c88be8",
+      "versions": [
+        {
+          "id": "13c85252-7c88-469e-a5e1-12a225c88be8",
+          "r2Key": "CMangic - Starlit Factory.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e9524a6b-fd39-4d2d-97c2-5855a91240bc",
+      "slug": "stars-collide",
+      "title": "Stars Collide",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "655d2acc-efaa-47ba-a00c-a12ec4770042",
+      "versions": [
+        {
+          "id": "655d2acc-efaa-47ba-a00c-a12ec4770042",
+          "r2Key": "CMangic - Stars Collide.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9beeec8f-001a-40dd-9f43-802cab9b1aaf",
+      "slug": "start-again-in-fire-v2",
+      "title": "Start Again In Fire (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3ddbecbc-aa67-4a0b-b510-f5f82a587039",
+      "versions": [
+        {
+          "id": "3ddbecbc-aa67-4a0b-b510-f5f82a587039",
+          "r2Key": "CMangic - Start Again In Fire (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a7d531e5-5b90-43f0-8ffa-d0fa7ef2028c",
+      "slug": "start-again-in-fire",
+      "title": "Start Again In Fire",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "676a3c72-5c4f-4382-8e82-c290119cda92",
+      "versions": [
+        {
+          "id": "676a3c72-5c4f-4382-8e82-c290119cda92",
+          "r2Key": "CMangic - Start Again In Fire.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9c0d672d-ddb6-4657-805f-6394366ef786",
+      "slug": "stay-a-little-longer-v2",
+      "title": "Stay A Little Longer (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "524c23e4-0ee9-4995-b114-3e6508df4c99",
+      "versions": [
+        {
+          "id": "524c23e4-0ee9-4995-b114-3e6508df4c99",
+          "r2Key": "CMangic - Stay A Little Longer (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "2f92c1ab-7f03-4f1b-a590-3d1bb8bece6b",
+      "slug": "stay-a-little-longer",
+      "title": "Stay A Little Longer",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "77a1d7c4-c1f8-4b73-bc58-87c07063ca16",
+      "versions": [
+        {
+          "id": "77a1d7c4-c1f8-4b73-bc58-87c07063ca16",
+          "r2Key": "CMangic - Stay A Little Longer.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "031f83f5-a6c3-4bc7-b3c6-8483b168efa6",
+      "slug": "stay-soft-stay-strong",
+      "title": "Stay Soft, Stay Strong",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8c83cbda-26bf-47bf-a506-27efbd35645c",
+      "versions": [
+        {
+          "id": "8c83cbda-26bf-47bf-a506-27efbd35645c",
+          "r2Key": "CMangic - Stay Soft, Stay Strong.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a2bccd02-197f-4c1c-b9df-0a0ea927238a",
+      "slug": "stellar-echoes",
+      "title": "Stellar Echoes",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "58940437-941d-456f-9447-eebd75d6ea74",
+      "versions": [
+        {
+          "id": "58940437-941d-456f-9447-eebd75d6ea74",
+          "r2Key": "CMangic - Stellar Echoes.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ec569067-9abe-450f-8515-51070fbab0b7",
+      "slug": "still",
+      "title": "Still",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "5019dced-9ae6-4eee-8499-792f0bf08be9",
+      "versions": [
+        {
+          "id": "5019dced-9ae6-4eee-8499-792f0bf08be9",
+          "r2Key": "CMangic - Still.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "78c5fa7e-403d-457e-8c4d-399e241f2839",
+      "slug": "street-serenade",
+      "title": "Street Serenade",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3ce56d12-dc95-492d-a588-58e6e84181df",
+      "versions": [
+        {
+          "id": "3ce56d12-dc95-492d-a588-58e6e84181df",
+          "r2Key": "CMangic - Street Serenade.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d6da012d-0f41-4caf-8fe2-c6476cb132e0",
+      "slug": "the-hard-way",
+      "title": "The Hard Way",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8396dfab-4a59-45a5-af1e-c502b8c70b11",
+      "versions": [
+        {
+          "id": "8396dfab-4a59-45a5-af1e-c502b8c70b11",
+          "r2Key": "CMangic - The Hard Way.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "95ccc286-1b43-49b4-8a0a-44deb0888598",
+      "slug": "the-journey",
+      "title": "The journey",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "871e8e26-fd71-4b61-b483-cb813e51e6c1",
+      "versions": [
+        {
+          "id": "871e8e26-fd71-4b61-b483-cb813e51e6c1",
+          "r2Key": "CMangic - The journey.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cd4ebd24-c408-45c0-a8bb-23cfee20ca51",
+      "slug": "the-last-good-radio",
+      "title": "The Last Good Radio",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9a03bba0-3600-4a6e-b7d9-d4aef22b6d3f",
+      "versions": [
+        {
+          "id": "9a03bba0-3600-4a6e-b7d9-d4aef22b6d3f",
+          "r2Key": "CMangic - The Last Good Radio.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "87750a43-cffb-402f-b6fe-0f60634a3d9f",
+      "slug": "the-last-good-radio-2",
+      "title": "The Last Good Radio",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "bc07f635-0031-42ef-ae16-41195d0701a3",
+      "versions": [
+        {
+          "id": "bc07f635-0031-42ef-ae16-41195d0701a3",
+          "r2Key": "CMangic - The Last Good Radio.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3a790826-8369-45d2-8c72-d4be3e488569",
+      "slug": "the-long-game",
+      "title": "The Long Game",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f5a48c2a-6d4c-43fc-a8f4-f6265a2fe18f",
+      "versions": [
+        {
+          "id": "f5a48c2a-6d4c-43fc-a8f4-f6265a2fe18f",
+          "r2Key": "CMangic - The Long Game.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "9ab057d9-30f4-46a3-b89d-0a93a25b9175",
+      "slug": "the-long-way-1",
+      "title": "The Long Way (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "2f749763-27d3-48b2-8c75-9ad03fff8afe",
+      "versions": [
+        {
+          "id": "2f749763-27d3-48b2-8c75-9ad03fff8afe",
+          "r2Key": "CMangic - The Long Way (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "2b52e551-816b-4a16-86d9-ee79cfaf54b6",
+      "slug": "the-long-way",
+      "title": "The Long Way",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "29f64c4a-6c6c-41c9-972a-ca538e96af14",
+      "versions": [
+        {
+          "id": "29f64c4a-6c6c-41c9-972a-ca538e96af14",
+          "r2Key": "CMangic - The Long Way.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0c62c9f4-f837-4b2f-aeb7-9fbae2c3a5fa",
+      "slug": "the-ones-who-stay",
+      "title": "The Ones Who Stay",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e0ecd75a-34e6-4888-ab24-46050f09228a",
+      "versions": [
+        {
+          "id": "e0ecd75a-34e6-4888-ab24-46050f09228a",
+          "r2Key": "CMangic - The Ones Who Stay.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cc6bde3c-f72d-4ef5-93bb-b95440bb68ab",
+      "slug": "the-shape-i-kept-1",
+      "title": "The Shape I Kept (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8744accc-6284-44ef-ada2-42d1e5a9b5ab",
+      "versions": [
+        {
+          "id": "8744accc-6284-44ef-ada2-42d1e5a9b5ab",
+          "r2Key": "CMangic - The Shape I Kept (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cfb8b65c-d813-4b3c-a6bd-a4f2793b006c",
+      "slug": "the-shape-i-kept-1-2",
+      "title": "The Shape I Kept (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "97056159-06a4-482a-9c5f-5e5614c081e9",
+      "versions": [
+        {
+          "id": "97056159-06a4-482a-9c5f-5e5614c081e9",
+          "r2Key": "CMangic - The Shape I Kept (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a3331115-e4c2-4fd9-a679-52efddaa7c92",
+      "slug": "the-shape-i-kept-2",
+      "title": "The Shape I Kept (2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "64956799-8422-45f7-b01d-c9f0ff0450ea",
+      "versions": [
+        {
+          "id": "64956799-8422-45f7-b01d-c9f0ff0450ea",
+          "r2Key": "CMangic - The Shape I Kept (2).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b811287e-00e2-469c-afcb-84d57b1c6939",
+      "slug": "the-things-we-keep",
+      "title": "The Things We Keep",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "73d3ce00-2635-410e-b28a-38c5de28d2be",
+      "versions": [
+        {
+          "id": "73d3ce00-2635-410e-b28a-38c5de28d2be",
+          "r2Key": "CMangic - The Things We Keep.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "434e2d28-22ec-404f-bc8d-567ae92f10f4",
+      "slug": "the-things-we-keep-2",
+      "title": "The Things We Keep",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "98d359a8-016d-4bd4-b0ca-db54a47f8023",
+      "versions": [
+        {
+          "id": "98d359a8-016d-4bd4-b0ca-db54a47f8023",
+          "r2Key": "CMangic - The Things We Keep.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "16221a0e-8c8a-4032-bbb6-f581b320cf73",
+      "slug": "the-world-still-hurts-v2",
+      "title": "The world still hurts (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8b01e1bd-9ae7-44be-95a8-94b7dc8625a0",
+      "versions": [
+        {
+          "id": "8b01e1bd-9ae7-44be-95a8-94b7dc8625a0",
+          "r2Key": "CMangic - The world still hurts (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d892e92f-8a3f-4ac1-849e-90ff33422ca0",
+      "slug": "the-world-still-hurts",
+      "title": "The world still hurts",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "eaeca5b8-5006-4ddb-bed1-302e2cdb465a",
+      "versions": [
+        {
+          "id": "eaeca5b8-5006-4ddb-bed1-302e2cdb465a",
+          "r2Key": "CMangic - The world still hurts.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0f400668-612d-429d-8f81-bcca4b53a9b1",
+      "slug": "they-are-right-v3",
+      "title": "They Are Right (v3)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4d8e6325-8116-45e8-8426-487e3a3e772e",
+      "versions": [
+        {
+          "id": "4d8e6325-8116-45e8-8426-487e3a3e772e",
+          "r2Key": "CMangic - They Are Right (v3).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "416839a5-1583-419e-a6dc-9fdfea6c62a5",
+      "slug": "they-are-right",
+      "title": "They Are Right",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d1ab2461-acea-447e-a728-5d3cfabf16ca",
+      "versions": [
+        {
+          "id": "d1ab2461-acea-447e-a728-5d3cfabf16ca",
+          "r2Key": "CMangic - They Are Right.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a207188b-8ad3-446f-9c35-c04f15319e00",
+      "slug": "they-think-i-m-lost-v2",
+      "title": "They think I’m lost (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d614f33b-693d-492b-ab5f-8f4922097517",
+      "versions": [
+        {
+          "id": "d614f33b-693d-492b-ab5f-8f4922097517",
+          "r2Key": "CMangic - They think I’m lost (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "6b51c851-ff94-4096-8fce-49fb3c0ac607",
+      "slug": "they-think-i-m-lost",
+      "title": "They think I’m lost",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e92e10ed-57a1-498f-9aeb-65719da9da2f",
+      "versions": [
+        {
+          "id": "e92e10ed-57a1-498f-9aeb-65719da9da2f",
+          "r2Key": "CMangic - They think I’m lost.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a3dc9244-4e1e-47aa-a471-b827ce0b6785",
+      "slug": "this-is-my-world",
+      "title": "This is my world",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b6f0ff77-fd55-4d0d-9817-86ab45eb1d6b",
+      "versions": [
+        {
+          "id": "b6f0ff77-fd55-4d0d-9817-86ab45eb1d6b",
+          "r2Key": "CMangic - This is my world.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d82b3bd8-5c46-4a1d-ac1a-f220b14c8474",
+      "slug": "this-is-our-time",
+      "title": "This is our time",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "5ef803eb-0586-468d-9f7d-df061cd2bb17",
+      "versions": [
+        {
+          "id": "5ef803eb-0586-468d-9f7d-df061cd2bb17",
+          "r2Key": "CMangic - This is our time.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7ff5266f-f82d-42f4-9474-be277a9c6abc",
+      "slug": "this-precious-time-1",
+      "title": "This Precious Time (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "5473ca0d-ab28-425f-896f-77e0fd759a44",
+      "versions": [
+        {
+          "id": "5473ca0d-ab28-425f-896f-77e0fd759a44",
+          "r2Key": "CMangic - This Precious Time (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "efa841b4-ce8f-43a7-88d8-eb04e64f996d",
+      "slug": "this-precious-time",
+      "title": "This Precious Time",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "b7eb96ff-e9a8-4ee4-9520-1ed474ffd343",
+      "versions": [
+        {
+          "id": "b7eb96ff-e9a8-4ee4-9520-1ed474ffd343",
+          "r2Key": "CMangic - This Precious Time.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f536cc6b-9367-429f-b410-103207459bef",
+      "slug": "time-keeps-moving",
+      "title": "Time Keeps Moving",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d3d06755-a24f-46d6-8d84-6b9dcf7c3b4e",
+      "versions": [
+        {
+          "id": "d3d06755-a24f-46d6-8d84-6b9dcf7c3b4e",
+          "r2Key": "CMangic - Time Keeps Moving.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a9a4942d-bc37-44ac-bfa1-8b2b45a82c24",
+      "slug": "time-keeps-moving-2",
+      "title": "Time Keeps Moving",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f7362a01-6c1b-4b30-912f-ddab0e79e579",
+      "versions": [
+        {
+          "id": "f7362a01-6c1b-4b30-912f-ddab0e79e579",
+          "r2Key": "CMangic - Time Keeps Moving.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "450219ed-425c-4027-acc9-63f7234beeb9",
+      "slug": "too-small-for-you-v2",
+      "title": "Too Small For You (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "93188101-2626-4abe-9172-a2a2ccd115b2",
+      "versions": [
+        {
+          "id": "93188101-2626-4abe-9172-a2a2ccd115b2",
+          "r2Key": "CMangic - Too Small For You (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "cad31325-a12a-4d59-9064-07bf577c5965",
+      "slug": "too-small-for-you",
+      "title": "Too Small For You",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "98afcc6a-4a80-469c-a122-05b1bc94d7aa",
+      "versions": [
+        {
+          "id": "98afcc6a-4a80-469c-a122-05b1bc94d7aa",
+          "r2Key": "CMangic - Too Small For You.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b2474b21-0311-45f7-b73a-9aa64ff0c873",
+      "slug": "travel-through-the-universe-of-your-creativity",
+      "title": "Travel through the Universe of your creativity",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "14dc4f7d-7a6a-4c53-a2a4-a53ba0d09b23",
+      "versions": [
+        {
+          "id": "14dc4f7d-7a6a-4c53-a2a4-a53ba0d09b23",
+          "r2Key": "CMangic - Travel through the Universe of your creativity.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "85cdb2d3-daae-497c-adde-6eb39dee62b5",
+      "slug": "travel-to-university-v2",
+      "title": "Travel to university (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "7ea354b4-86ac-4cb0-b304-689d02058b95",
+      "versions": [
+        {
+          "id": "7ea354b4-86ac-4cb0-b304-689d02058b95",
+          "r2Key": "CMangic - Travel to university (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "05757887-c042-4f7d-9313-c7935b79478d",
+      "slug": "travel-to-university-v3",
+      "title": "Travel to university (v3)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "82da091f-c395-426c-8c23-0c34caa4a4bc",
+      "versions": [
+        {
+          "id": "82da091f-c395-426c-8c23-0c34caa4a4bc",
+          "r2Key": "CMangic - Travel to university (v3).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5616d652-7a62-49ff-b069-f4a57021202d",
+      "slug": "travel-to-university-v4",
+      "title": "Travel to university (v4)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "bc9e72f5-6dc6-4a3d-b84d-524e7536fa48",
+      "versions": [
+        {
+          "id": "bc9e72f5-6dc6-4a3d-b84d-524e7536fa48",
+          "r2Key": "CMangic - Travel to university (v4).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "14df7019-e00f-453e-aa71-58c2b9e98180",
+      "slug": "travel-to-university-v5",
+      "title": "Travel to university (v5)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "55cc0624-be8c-4be0-b88d-7039d69ba780",
+      "versions": [
+        {
+          "id": "55cc0624-be8c-4be0-b88d-7039d69ba780",
+          "r2Key": "CMangic - Travel to university (v5).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a9989c70-79f9-4d4b-856f-a1e24371ea5a",
+      "slug": "travel-to-university",
+      "title": "Travel to university",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9a9bf225-bce4-4e08-b84a-430b48be48b4",
+      "versions": [
+        {
+          "id": "9a9bf225-bce4-4e08-b84a-430b48be48b4",
+          "r2Key": "CMangic - Travel to university.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3c2b25b4-ea27-4d1d-801c-206ea2c6e37c",
+      "slug": "tudo-e-luz",
+      "title": "Tudo é Luz",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "9d7c646d-25a9-4d7e-9587-e14e14c1a464",
+      "versions": [
+        {
+          "id": "9d7c646d-25a9-4d7e-9587-e14e14c1a464",
+          "r2Key": "CMangic - Tudo é Luz.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a38ddb2a-0f14-406c-b62d-5da1f0326864",
+      "slug": "tudo-que-eu-preciso",
+      "title": "Tudo Que Eu Preciso",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ad7eb0c4-51d0-4afb-814c-be6d846426aa",
+      "versions": [
+        {
+          "id": "ad7eb0c4-51d0-4afb-814c-be6d846426aa",
+          "r2Key": "CMangic - Tudo Que Eu Preciso.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a1c94d58-7c20-4d6e-bb10-861f24017a05",
+      "slug": "um-grande-dia",
+      "title": "Um Grande Dia",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ee63f497-2bc9-4978-8d1f-d12cd4852619",
+      "versions": [
+        {
+          "id": "ee63f497-2bc9-4978-8d1f-d12cd4852619",
+          "r2Key": "CMangic - Um Grande Dia.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "63b31bc2-4065-4433-8d11-42f35dce259a",
+      "slug": "unbreak-my-name",
+      "title": "Unbreak My Name",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "eac57149-b190-44b7-a092-bf57d76b88af",
+      "versions": [
+        {
+          "id": "eac57149-b190-44b7-a092-bf57d76b88af",
+          "r2Key": "CMangic - Unbreak My Name.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ff573f70-33c2-453b-8a81-b1d938c226bd",
+      "slug": "universo-em-expansao",
+      "title": "Universo Em Expansão",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "abf88c95-d944-4030-aade-aa9039d2a642",
+      "versions": [
+        {
+          "id": "abf88c95-d944-4030-aade-aa9039d2a642",
+          "r2Key": "CMangic - Universo Em Expansão.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3f77ebfc-c98c-495f-809f-ab4e0b75264b",
+      "slug": "unmade-bed",
+      "title": "Unmade Bed",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ea5c89af-8ead-4464-a8f4-8019567fc1cf",
+      "versions": [
+        {
+          "id": "ea5c89af-8ead-4464-a8f4-8019567fc1cf",
+          "r2Key": "CMangic - Unmade Bed.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "07dc40ba-90cc-4a12-8141-b19fa194f258",
+      "slug": "unstoppable-fire-v2",
+      "title": "Unstoppable Fire (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "cc9004ea-8ea5-4e3a-a450-06ed814abf7b",
+      "versions": [
+        {
+          "id": "cc9004ea-8ea5-4e3a-a450-06ed814abf7b",
+          "r2Key": "CMangic - Unstoppable Fire (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d41e00ab-85cb-45a1-9de8-35284b774efd",
+      "slug": "unstoppable-fire-v3",
+      "title": "Unstoppable Fire (v3)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "6e66b656-2e31-42a8-889b-925846baa195",
+      "versions": [
+        {
+          "id": "6e66b656-2e31-42a8-889b-925846baa195",
+          "r2Key": "CMangic - Unstoppable Fire (v3).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "d519860b-3cdb-4b4c-8027-4284a954c172",
+      "slug": "unstoppable-fire",
+      "title": "Unstoppable Fire",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "0023a413-e9b7-43e3-882c-de3aaa5d771e",
+      "versions": [
+        {
+          "id": "0023a413-e9b7-43e3-882c-de3aaa5d771e",
+          "r2Key": "CMangic - Unstoppable Fire.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "817df28d-1c55-4529-9e22-6e901c48c075",
+      "slug": "until-the-walls-give-in",
+      "title": "Until the Walls Give In",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d9ee065c-66a3-4caa-b454-1d0fd78f21d4",
+      "versions": [
+        {
+          "id": "d9ee065c-66a3-4caa-b454-1d0fd78f21d4",
+          "r2Key": "CMangic - Until the Walls Give In.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "bdcb59bc-35dc-4bd0-bf6d-88a6ead0f334",
+      "slug": "velvet-knife",
+      "title": "Velvet Knife",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "065a9d99-73d6-4069-ad6c-afe21215c5af",
+      "versions": [
+        {
+          "id": "065a9d99-73d6-4069-ad6c-afe21215c5af",
+          "r2Key": "CMangic - Velvet Knife.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ae5412e3-c26f-4096-a15c-a08791a6848a",
+      "slug": "velvet-knife-2",
+      "title": "Velvet Knife",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f818d467-2444-4c2f-bb99-d9cb6a88b27a",
+      "versions": [
+        {
+          "id": "f818d467-2444-4c2f-bb99-d9cb6a88b27a",
+          "r2Key": "CMangic - Velvet Knife.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "36cbf216-8ee6-4e7a-8b64-da9cdf5e39ab",
+      "slug": "velvet-static-v2",
+      "title": "Velvet Static (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e7aa738d-53fe-44fe-82ca-589c874fab3d",
+      "versions": [
+        {
+          "id": "e7aa738d-53fe-44fe-82ca-589c874fab3d",
+          "r2Key": "CMangic - Velvet Static (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "bfb6c9f4-34f6-4610-b3f3-1b1ddbbbff6f",
+      "slug": "velvet-static",
+      "title": "Velvet Static",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f3b5e9c8-9350-4cd4-b2ae-fc556fd27bb5",
+      "versions": [
+        {
+          "id": "f3b5e9c8-9350-4cd4-b2ae-fc556fd27bb5",
+          "r2Key": "CMangic - Velvet Static.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5fb34748-7956-4514-8f28-083465359834",
+      "slug": "velvet-storm",
+      "title": "Velvet Storm",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "3b7d73b0-20fa-4928-81be-221469402776",
+      "versions": [
+        {
+          "id": "3b7d73b0-20fa-4928-81be-221469402776",
+          "r2Key": "CMangic - Velvet Storm.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3bea61dd-085b-46dc-bc8d-954fb5135d14",
+      "slug": "viaje-no-universo-da-sua-criatividade-v2",
+      "title": "Viaje no Universo da sua Criatividade (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "eefc298b-4041-4a2c-8838-4ffd6d8bda0c",
+      "versions": [
+        {
+          "id": "eefc298b-4041-4a2c-8838-4ffd6d8bda0c",
+          "r2Key": "CMangic - Viaje no Universo da sua Criatividade (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f3d3e951-a8e4-4423-8d25-fc4260107aca",
+      "slug": "viaje-no-universo-da-sua-criatividade",
+      "title": "Viaje no Universo da sua Criatividade",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "391d381a-b55e-4564-a028-acee4a0c6ba7",
+      "versions": [
+        {
+          "id": "391d381a-b55e-4564-a028-acee4a0c6ba7",
+          "r2Key": "CMangic - Viaje no Universo da sua Criatividade.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "774f5354-3cc2-4bf8-87a9-ad9ec5fe9e2d",
+      "slug": "viaje-no-universo-da-sua-realidade-v2",
+      "title": "Viaje no Universo da sua Realidade (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "6b8b74ea-c3ff-42db-9fa2-17f48738ec72",
+      "versions": [
+        {
+          "id": "6b8b74ea-c3ff-42db-9fa2-17f48738ec72",
+          "r2Key": "CMangic - Viaje no Universo da sua Realidade (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "75b1f63d-2b07-4ab0-be7c-d20eeeb898f7",
+      "slug": "visible-at-last-1",
+      "title": "Visible at Last (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "22cb84b4-bfc7-4a5f-97cf-432a1ac38d24",
+      "versions": [
+        {
+          "id": "22cb84b4-bfc7-4a5f-97cf-432a1ac38d24",
+          "r2Key": "CMangic - Visible at Last (1).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ce88818a-7709-4eae-9db1-21d4bc5afedb",
+      "slug": "visible-at-last",
+      "title": "Visible at Last",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "7a987284-d202-4b39-aa21-59d0a05f8a03",
+      "versions": [
+        {
+          "id": "7a987284-d202-4b39-aa21-59d0a05f8a03",
+          "r2Key": "CMangic - Visible at Last.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "3468924f-582c-43bb-a1db-78297d6c4b7d",
+      "slug": "visible-at-last-2",
+      "title": "Visible at Last",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "623fa332-23fa-4309-9ba3-55bd1f64d6a3",
+      "versions": [
+        {
+          "id": "623fa332-23fa-4309-9ba3-55bd1f64d6a3",
+          "r2Key": "CMangic - Visible at Last.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "5f85dee2-8a15-41a1-bed1-6d2196f65500",
+      "slug": "walk-it-through",
+      "title": "Walk It Through",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "465e473a-4c1d-4339-980a-5a7b6c1f3b80",
+      "versions": [
+        {
+          "id": "465e473a-4c1d-4339-980a-5a7b6c1f3b80",
+          "r2Key": "CMangic - Walk It Through.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "f8e8a0e6-1c7b-4b1d-8bfc-2d8a0beb7f52",
+      "slug": "walls-and-wounds",
+      "title": "Walls and Wounds",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "ca5b9bdb-94fd-4954-96a0-32988bd48685",
+      "versions": [
+        {
+          "id": "ca5b9bdb-94fd-4954-96a0-32988bd48685",
+          "r2Key": "CMangic - Walls and Wounds.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "43b46add-22c3-4687-abe8-13d6b4ee3c4b",
+      "slug": "we-shine",
+      "title": "We Shine",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4733c481-10b4-464f-a8b2-7c2f5ac76d80",
+      "versions": [
+        {
+          "id": "4733c481-10b4-464f-a8b2-7c2f5ac76d80",
+          "r2Key": "CMangic - We Shine.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "1aa90723-947c-4fec-96c2-990b9bf7ce4b",
+      "slug": "when-nobody-claps",
+      "title": "When Nobody Claps",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "91c9a599-26f9-4ad5-bbc7-f431ad4ea537",
+      "versions": [
+        {
+          "id": "91c9a599-26f9-4ad5-bbc7-f431ad4ea537",
+          "r2Key": "CMangic - When Nobody Claps.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "32ea1bfe-e8cc-43dd-a00c-f6d17861e71b",
+      "slug": "when-nobody-s-watching",
+      "title": "When Nobody’s Watching",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d96c2bb2-821e-42de-a9c5-18467fe5a47a",
+      "versions": [
+        {
+          "id": "d96c2bb2-821e-42de-a9c5-18467fe5a47a",
+          "r2Key": "CMangic - When Nobody’s Watching.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a735c5c5-7d77-47f4-9ec8-a683226da9fd",
+      "slug": "when-the-walls-start-to-shake-v2",
+      "title": "When the Walls Start to Shake (v2)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "4f61e5c3-a56e-4a95-93d6-ebd8c10ceb38",
+      "versions": [
+        {
+          "id": "4f61e5c3-a56e-4a95-93d6-ebd8c10ceb38",
+          "r2Key": "CMangic - When the Walls Start to Shake (v2).mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "b93026f2-b514-4ec5-bbaa-82c046dd98cb",
+      "slug": "when-the-walls-start-to-shake",
+      "title": "When the Walls Start to Shake",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "d4398e5f-3a7c-49fb-b3ee-71cd12305753",
+      "versions": [
+        {
+          "id": "d4398e5f-3a7c-49fb-b3ee-71cd12305753",
+          "r2Key": "CMangic - When the Walls Start to Shake.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "98eaf6e7-1a33-4ea5-b7d8-71d6b22284e8",
+      "slug": "while-i-m-still-scared-1",
+      "title": "While I'm Still Scared (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "16d7d5a2-37b5-444f-ab07-0a363525b53d",
+      "versions": [
+        {
+          "id": "16d7d5a2-37b5-444f-ab07-0a363525b53d",
+          "r2Key": "CMangic - While I'm Still Scared (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "4c8f8f42-5878-4793-aa8c-adde85db2c2f",
+      "slug": "while-i-m-still-scared",
+      "title": "While I'm Still Scared",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "34c9b7ec-7b9b-4e21-ad40-3386ae52a891",
+      "versions": [
+        {
+          "id": "34c9b7ec-7b9b-4e21-ad40-3386ae52a891",
+          "r2Key": "CMangic - While I'm Still Scared.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ca3e60cd-5156-469a-a70c-64600e334557",
+      "slug": "world-boring",
+      "title": "World boring",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "363fdd98-7e98-4804-af04-b8c60ae36a3c",
+      "versions": [
+        {
+          "id": "363fdd98-7e98-4804-af04-b8c60ae36a3c",
+          "r2Key": "CMangic - World boring.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e3fbe9d6-aed2-4590-b230-1a5f9a8978fa",
+      "slug": "worth-the-risk-1",
+      "title": "Worth the Risk (1)",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "f0abc88c-4480-4881-a8a1-52213f0b0338",
+      "versions": [
+        {
+          "id": "f0abc88c-4480-4881-a8a1-52213f0b0338",
+          "r2Key": "CMangic - Worth the Risk (1).m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "e4e647fb-7c59-44cb-aa12-fe593310a4ba",
+      "slug": "worth-the-risk",
+      "title": "Worth the Risk",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "93b678fa-fbf6-4ab2-8f41-99aebccd81e1",
+      "versions": [
+        {
+          "id": "93b678fa-fbf6-4ab2-8f41-99aebccd81e1",
+          "r2Key": "CMangic - Worth the Risk.m4a",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "7a7ab39c-143a-4727-bc43-1e598dc42cf8",
+      "slug": "you-are-right",
+      "title": "You Are Right",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "e0dcafe2-0101-4639-a10d-6e915eadc385",
+      "versions": [
+        {
+          "id": "e0dcafe2-0101-4639-a10d-6e915eadc385",
+          "r2Key": "CMangic - You Are Right.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "0fc3ebf3-ebba-4593-92b6-1efe7406bc66",
+      "slug": "t-desk-brasil-by-cmangini-entre-o-ceu-e-o-chao",
+      "title": "T_Desk_Brasil_by_Cmangini-Entre_o_Céu_e_o_Chão",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "db056612-28be-4043-872a-4c9a27403376",
+      "versions": [
+        {
+          "id": "db056612-28be-4043-872a-4c9a27403376",
+          "r2Key": "T_Desk_Brasil_by_Cmangini-Entre_o_Céu_e_o_Chão.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "a263b3e7-ef34-49e7-9bee-d4382c25ec89",
+      "slug": "t-desk-brasil-by-cmangini-me-deixa-sentir",
+      "title": "T_Desk_Brasil_by_Cmangini-Me_Deixa_Sentir",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "6d90d89f-9b01-406e-9132-59d0a902b89c",
+      "versions": [
+        {
+          "id": "6d90d89f-9b01-406e-9132-59d0a902b89c",
+          "r2Key": "T_Desk_Brasil_by_Cmangini-Me_Deixa_Sentir.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "bcb97991-b79b-4251-a8db-8b6ba8ee9dba",
+      "slug": "t-desk-brasil-by-cmangini-melhora-ao-teu-lado",
+      "title": "T_Desk_Brasil_by_Cmangini-Melhora_ao_Teu_Lado",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "58da6b0b-ca1a-48ee-9281-a50e4d62ea56",
+      "versions": [
+        {
+          "id": "58da6b0b-ca1a-48ee-9281-a50e4d62ea56",
+          "r2Key": "T_Desk_Brasil_by_Cmangini-Melhora_ao_Teu_Lado.mp3",
+          "state": "published"
+        }
+      ]
+    },
+    {
+      "id": "ae5998fe-979c-4022-98a0-02ef9d829b98",
+      "slug": "t-desk-brasil-by-cmangini-o-som-da-paz",
+      "title": "T_Desk_Brasil_by_Cmangini-O_Som_da_Paz",
+      "artist": "CMangic",
+      "state": "published",
+      "primaryVersionId": "8682a318-83fc-4185-83c6-71a972107895",
+      "versions": [
+        {
+          "id": "8682a318-83fc-4185-83c6-71a972107895",
+          "r2Key": "T_Desk_Brasil_by_Cmangini-O_Som_da_Paz.mp3",
+          "state": "published"
+        }
+      ]
+    }
+  ]
+}

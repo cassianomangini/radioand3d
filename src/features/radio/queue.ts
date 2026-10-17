@@ -205,7 +205,7 @@ export class RadioQueue {
   }
 }
 
-export function createShuffledQueue(ids: string[], seed: number) {
+export function createShuffledQueue(ids: string[], seed: number, initialId?: string) {
   let state = seed >>> 0;
   const random = () => {
     state += 0x6D2B79F5;
@@ -215,7 +215,9 @@ export function createShuffledQueue(ids: string[], seed: number) {
     return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
   const uniqueIds = [...new Set(ids)];
-  const currentId = uniqueIds[Math.floor(random() * uniqueIds.length)] ?? null;
+  const currentId = initialId && uniqueIds.includes(initialId)
+    ? initialId
+    : uniqueIds[Math.floor(random() * uniqueIds.length)] ?? null;
   const queue = new RadioQueue(uniqueIds, currentId, random);
   queue.setShuffle(true);
   return queue;

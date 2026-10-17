@@ -18,9 +18,9 @@ Em 09/10/2026, Cassiano pediu que arrastar a Rádio lateral **para a direita** f
 
 **Estado:** `in_progress`: após D4.1–D4.3 Cassiano **autorizou a integração funcional**, mantendo **D5 visual em aberto** porque o mini ainda não está bem centralizado entre o menu e os botões sociais. O estado `docked`, WAAPI/FLIP, mini com 13 barras reais, overshoot e retorno por botão/edge, navegação e fullscreen foram integrados na Home/Estúdio. [E2E integrado 38141001848](https://github.com/cassianomangini/radioand3d/actions/runs/38141001848): **12 testes passaram**, cobrindo áudio WAV, 13 bandas, cancelamento, interrupção de voo, rotas, fullscreen e `1180→390→1440`. [CI 38141001879](https://github.com/cassianomangini/radioand3d/actions/runs/38141001879): lint/typecheck/unit/build verdes. [Relatório](work/evidence/03c-radio-dock-integrated-2026-10-11.md). **I1–I6 e Q1/Q2/Q4/Q5/Q7 completos funcionalmente; Q3 complementar, D5 e Q6 pendentes.** Não houve deploy manual.
 
-## Evolução planejada — 06c Compartilhar músicas e métricas
+## Evolução — 06c Compartilhar músicas e métricas
 
-**Estado: proposta, não implementada.** [Plano de compartilhamento e audiência](RADIO_SHARING_METRICS_PLAN_V1.md). Criar URL persistente por faixa e compartilhamento nativo/cópia; instrumentar audições qualificadas e agregados por música (7/30 dias e total), sem confundir visualizações com reproduções, nem interromper o player global. Sequência 06c-A identidade editorial compatível com o catálogo R2 → 06c-B rota/preview social/compartilhamento → 06c-C contadores seguros Supabase CM → 06c-D análise privada e ranking por dados reais. Não reabrir a interface aceita da Rádio nem bloquear a frente 08 do Estúdio. Gate: identidade pública e direção visual aprovadas.
+**Estado: 06c-A/B implementadas e verificadas localmente; revisão visual final de Cassiano e publicação remota pendentes.** [Plano de compartilhamento e audiência](RADIO_SHARING_METRICS_PLAN_V1.md) e [checklist/evidências](work/06c-radio-sharing-links.md). As 343 gravações atuais aprovadas têm ID, slug e versão principal explícitos; `/musica/[slug]` reutiliza a Home, mantém o player único, prioriza a faixa na fila e gera prévia social. 06c-C contadores econômicos e 06c-D análise/ranking continuam posteriores, sem implementação de Supabase nesta entrega. Não reabrir a interface aceita da Rádio nem bloquear a frente 08 do Estúdio.
 
 ## Próximos passos
 
@@ -45,6 +45,7 @@ Letras, Inbox, biblioteca editorial e C2–C8 continuam fora da fila. O Estúdio
 | 04 | Biblioteca e ingestão | blocked | Fora do caminho atual |
 | 05 | Music Inbox | blocked | Fora do caminho atual |
 | 06 | Motor de rádio e visualizador | done | Cassiano aceitou as barras em 05/10/2026; [checklist](work/06-radio-engine.md) |
+| 06c-A/B | Identidade e links individuais da Rádio | in_progress | Implementação e QA local concluídos; aceite visual final de Cassiano e publicação remota pendentes. [Checklist](work/06c-radio-sharing-links.md) |
 | 06b | Letras sincronizadas | blocked | Painel e pipeline existem. Uma faixa real só quando Cassiano pedir; [checklist](work/06b-synced-lyrics.md) |
 | 07 | Rádio pronta na interface | dropped | A Rádio visível é a da Home, nas entregas 03b e 06. Não há uma segunda construção |
 | 08 | Estúdio público: aquisição, orçamento e produtos | in_progress | Hub, orçamento, produtos, impressão sob demanda, Placas, Caixas e Search. [checklist](work/08-studio-growth.md) |

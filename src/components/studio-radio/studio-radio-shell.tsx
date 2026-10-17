@@ -390,7 +390,9 @@ function RadioContent({
   visualizerActive?: boolean;
 }) {
   const radio = useRadio();
+  const pathname = usePathname();
   const [query, setQuery] = useState("");
+  const [shareFeedback, setShareFeedback] = useState("");
   const [mobilePanel, setMobilePanel] = useState<"playlist" | "lyrics">("playlist");
   const [volumeOpen, setVolumeOpen] = useState(false);
   const [scrubbing, setScrubbing] = useState(false);
@@ -401,6 +403,12 @@ function RadioContent({
   const volumeMenuRef = useRef<HTMLDivElement>(null);
   const volumeButtonRef = useRef<HTMLButtonElement>(null);
   const currentTrackId = radio.currentTrack?.id;
+  const sharedSlug = pathname.startsWith("/musica/") ? pathname.slice("/musica/".length) : null;
+  const sharedTrack = sharedSlug ? radio.tracks.find((track) => track.shareSlug === sharedSlug) : null;
+  const sharedTrackNeedsPlay = Boolean(sharedTrack && (
+    radio.currentTrack?.id !== sharedTrack.id ||
+    !["playing", "loading", "buffering"].includes(radio.status)
+  ));
   const volumePanelId = mobile ? "mobile-radio-volume" : "desktop-radio-volume";
   const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
   const listTracks = radio.playlistTracks
@@ -418,6 +426,32 @@ function RadioContent({
   const transportPrevious = onPrevious ?? radio.previous;
   const transportNext = onNext ?? radio.next;
   const transportReshuffle = onReshuffle ?? radio.reshuffle;
+
+  function trackLink(slug: string) {
+    return new URL(`/musica/${slug}`, window.location.origin).toString();
+  }
+
+  async function copyTrackLink(slug: string) {
+    const url = trackLink(slug);
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareFeedback("Link da música copiado.");
+    } catch {
+      window.prompt("Copie o link da música:", url);
+    }
+  }
+
+  async function shareTrack(title: string, slug: string) {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${title} — CM Rádio`, url: trackLink(slug) });
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+    await copyTrackLink(slug);
+  }
 
   useEffect(() => {
     const list = trackListRef.current;
@@ -561,6 +595,17 @@ function RadioContent({
         ) : null}
       </div>
 
+      {sharedTrack ? (
+        <div className={styles.sharedTrackPrompt} role="region" aria-label="Música compartilhada">
+          <span>Recebeu esta música: <strong>{sharedTrack.title}</strong></span>
+          {sharedTrackNeedsPlay ? (
+            <button type="button" onClick={() => radio.selectShared(sharedTrack.id)}>
+              ▶ Ouvir {sharedTrack.title}
+            </button>
+          ) : <span className={styles.sharedTrackPlaying}>Tocando agora</span>}
+        </div>
+      ) : null}
+
       <div
         className={styles.coverArt}
         data-radio-motion-key="cover"
@@ -576,6 +621,14 @@ function RadioContent({
         </div>
         {!radio.currentTrack || radio.currentTrack.fixture ? <span className={styles.coverBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span> : null}
       </div>
+
+      {radio.currentTrack?.shareSlug ? (
+        <div className={styles.sharingActions}>
+          <button type="button" onClick={() => void shareTrack(radio.currentTrack!.title, radio.currentTrack!.shareSlug!)}>Compartilhar esta música</button>
+          <button type="button" onClick={() => void copyTrackLink(radio.currentTrack!.shareSlug!)}>Copiar link</button>
+          <span role="status">{shareFeedback}</span>
+        </div>
+      ) : null}
 
       <div
         className={styles.progressBlock}
@@ -721,7 +774,7 @@ function RadioContent({
         data-radio-motion-key="queue-list"
       >
         {listTracks.map(({ track, position }) => (
-          <li key={track.id} data-track-id={track.id}>
+          <li key={track.id} data-track-id={track.id} className={styles.shareableTrackRow}>
             <button
               type="button"
               className={styles.trackRow}
@@ -740,6 +793,9 @@ function RadioContent({
               <span className={styles.trackState}>{String(position).padStart(2, "0")}</span>
               <span className={styles.duration}>{formatTrackDuration(track.durationSeconds ?? (track.id === radio.currentTrack?.id ? radio.duration : undefined))}</span>
             </button>
+            {track.shareSlug ? (
+              <Link href={`/musica/${track.shareSlug}`} prefetch={false} className={styles.trackShareButton} aria-label={`Abrir link de ${track.title}`} title="Abrir link da música">↗</Link>
+            ) : null}
           </li>
         ))}
         {listTracks.length === 0 ? (
@@ -858,6 +914,12 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     router.prefetch("/");
     router.prefetch("/studio");
   }, [router]);
+
+  useEffect(() => {
+    if (!pathname.startsWith("/musica/") || !window.matchMedia("(max-width: 73.74rem)").matches) return;
+    const timer = window.setTimeout(() => setMobileRadioOpen(true), 0);
+    return () => window.clearTimeout(timer);
+  }, [pathname]);
 
   useEffect(() => {
     if (studioRoute !== "home") return;

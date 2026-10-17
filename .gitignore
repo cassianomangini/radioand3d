@@ -30,4 +30,5 @@ next-env.d.ts
 
 # local visual review artifacts
 /.playwright-cli/
+/.playwright-mcp/
 /output/

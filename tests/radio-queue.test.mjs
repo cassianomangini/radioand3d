@@ -17,6 +17,18 @@ test("new radio playlist starts randomly and plays every entry once", () => {
   assert.equal(first.next(), null);
 });
 
+test("shared entry starts first and the announced shuffled remainder is the real queue", () => {
+  const ids = ["a", "b", "c", "d", "e"];
+  const queue = createShuffledQueue(ids, 123, "a");
+  const announced = [queue.currentId, ...queue.following()];
+
+  assert.equal(announced[0], "a");
+  assert.equal(announced.length, ids.length);
+  assert.deepEqual(new Set(announced), new Set(ids));
+  assert.deepEqual(Array.from({ length: ids.length - 1 }, () => queue.next()), announced.slice(1));
+  assert.equal(queue.next(), null);
+});
+
 test("manual selection does not put previously visited entries back into the automatic queue", () => {
   const queue = createShuffledQueue(["a", "b", "c", "d", "e"], 9);
   const order = [queue.currentId, ...queue.upcoming(5)];

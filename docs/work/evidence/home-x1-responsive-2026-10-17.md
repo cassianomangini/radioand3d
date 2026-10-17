@@ -37,3 +37,7 @@ A correção reserva os 54% esquerdos do Estúdio ao X1 e balão nos painéis a 
 QA adicionada: testes de geometria da copy e capturas de split padrão, Rádio intermediária, Rádio máxima e dock. A revisão visual final continua dependendo de inspeção da captura renderizada e aceite do usuário; testes isolados não representam aprovação estética.
 
 Escopo preservado: nenhuma alteração na Rádio, player, comportamento de arraste, navegação, produção musical ou roteamento.
+
+### Acabamento do Estúdio no limite mínimo
+
+A captura posterior da CI mostrou que, embora o degradê já escurecesse o rosto do X1, o H1 ainda começava sobre a figura no limite de 640px. A copy foi deslocada mais abaixo (margem fluida com altura limitada) para começar depois da área da imagem; o teste agora exige separação vertical mínima de 350px a partir do rodapé da navbar. A rolagem **interna ao Estúdio**, e não a rolagem da página inteira, pode ocorrer nesse extremo. Para os estados das três capturas originais (dock, split e Rádio intermediária), permanece a composição lado a lado sem sobreposição.

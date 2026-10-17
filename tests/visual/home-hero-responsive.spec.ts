@@ -88,7 +88,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
       expect(geometry.copyLayout, `${state}: compact Studio should stack`).toBe("relative");
       expect(geometry.artGradient, `${state}: the compact vertical fade is not active`).not.toContain("90deg");
       expect(geometry.copyTop, `${state}: title overlays the illustrated greeting`)
-        .toBeGreaterThan(geometry.headerBottom + 170);
+        .toBeGreaterThan(geometry.headerBottom + 350);
     }
   }
 

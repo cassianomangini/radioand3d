@@ -5039,7 +5039,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     }
 
     .studioIdentity[data-studio-intro="home"] h1 {
-      font-size: clamp(2rem, 3.8cqi, 3.7rem);
+      font-size: clamp(2.1rem, 4.25cqi, 4.2rem);
       line-height: 1.075;
       letter-spacing: -0.028em;
     }
@@ -5058,15 +5058,17 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   /* Studio at its physical minimum: switch to an intentional vertical
      composition. The full-height scene fades before the copy starts. */
   @container studio (max-width: 42.999rem) {
-    .studioHomeArt img {
+    .studio[data-studio-route="home"] .studioHomeArt img {
       object-position: 14% 22%;
     }
 
-    .studioHomeArt::after {
+    /* Match the selector weight of the desktop 90deg gradient; otherwise
+       it wins the cascade and the robot remains behind compact copy. */
+    .studio[data-studio-route="home"] .studioHomeArt::after {
       background: linear-gradient(180deg,
-        rgb(3 11 28 / 5%) 0%, rgb(3 11 28 / 10%) 25%,
-        rgb(3 11 28 / 66%) 41%, rgb(3 11 28 / 96%) 56%,
-        #030b1c 75%);
+        rgb(3 11 28 / 0%) 0%, rgb(3 11 28 / 10%) 22%,
+        rgb(3 11 28 / 28%) 31%, rgb(3 11 28 / 80%) 43%,
+        #030b1c 55%);
     }
 
     .studioIdentity[data-studio-intro="home"] {

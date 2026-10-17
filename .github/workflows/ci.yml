@@ -19,6 +19,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Snapshot source for hands-on visual audit
+        shell: bash
+        run: tar --exclude=.git -czf "$RUNNER_TEMP/radioand3d-source.tar.gz" .
+
+      - name: Upload local QA source
+        uses: actions/upload-artifact@v4
+        with:
+          name: radioand3d-qa-source
+          path: ${{ runner.temp }}/radioand3d-source.tar.gz
+          retention-days: 1
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:

@@ -80,7 +80,7 @@ test("Home X1 and copy remain usable at actual Studio widths", async ({ page }, 
     expect(geometry.ctaRight, `${state}: CTA hits divider`).toBeLessThanOrEqual(geometry.studioRight + 1);
     if (geometry.viewportWidth >= 1180 && geometry.studioWidth >= 43 * 16) {
       expect(geometry.titleLeft, `${state}: title invades the X1 speech-bubble lane`)
-        .toBeGreaterThanOrEqual(geometry.studioLeft + geometry.studioWidth * 0.54 - 2);
+        .toBeGreaterThanOrEqual(geometry.studioLeft + geometry.studioWidth * 0.58 - 2);
       expect(geometry.copyTop, `${state}: title sits behind the navbar`)
         .toBeGreaterThanOrEqual(geometry.headerBottom - 2);
     }

@@ -2229,9 +2229,10 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
 
             <h1 id="studio-title" aria-label="Impressão 3D, música e muito mais do que você imagina.">
               <span key={studioIntroCycle}>
-                {revealPhrase("Impressão 3D, música e", 120, 22)}{" "}
-                <span className={styles.studioRevealAccent}>muito mais</span>{" "}
-                {revealPhrase("do que você imagina.", 880, 22)}
+                <span className={styles.studioHomePhrase}>{revealPhrase("Impressão 3D,", 120, 22)}</span>{" "}
+                <span className={styles.studioHomePhrase}>{revealPhrase("música e", 380, 22)}</span>{" "}
+                <span className={`${styles.studioHomePhrase} ${styles.studioRevealAccent}`}>muito mais</span>{" "}
+                <span className={styles.studioHomePhrase}>{revealPhrase("do que você imagina.", 880, 22)}</span>
               </span>
             </h1>
 

@@ -5014,12 +5014,13 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
         rgb(3 11 28 / 6%) 0%, transparent 18% 84%, rgb(3 11 28 / 15%) 100%);
   }
 
-  /* Split and dock: preserve a 40-45% visual lane for X1. Content is
-     centered VERTICALLY and grows continuously with Studio width. */
+  /* Split and dock: reserve the X1 art lane and anchor the copy from
+     the top as in the approved mock. Centering a variable-height title
+     pushed narrower splits much too low and hid important content. */
   @container studio (min-width: 56rem) {
     .studioIdentity[data-studio-intro="home"] {
       position: absolute;
-      top: 53%;
+      top: clamp(8rem, 18dvh, 11rem);
       right: clamp(1rem, 1.7cqi, 2.35rem);
       left: calc(40% + 10rem);
       width: auto;
@@ -5027,11 +5028,11 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
       max-width: none;
       margin: 0;
       padding: 0;
-      transform: translateY(-50%);
+      transform: none;
     }
 
     .studioIdentity[data-studio-intro="home"] h1 {
-      font-size: clamp(2.4rem, calc(5.35cqi - 0.8rem), 5.3rem);
+      font-size: clamp(2.4rem, calc(5.35cqi - 0.8rem), min(5.3rem, 8.8dvh));
       line-height: 1.02;
       letter-spacing: -0.04em;
     }

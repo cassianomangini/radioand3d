@@ -4859,6 +4859,12 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   background: none;
 }
 
+/* The hidden Studio-hub heading switches to normal flow at laptop/mobile
+   widths; aria-hidden alone does NOT remove its blank height. */
+.studio[data-studio-route="home"] .studioCatalogHeader {
+  display: none;
+}
+
 .studioHomeArt {
   position: relative;
   z-index: 2;
@@ -5025,7 +5031,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     }
 
     .studioIdentity[data-studio-intro="home"] h1 {
-      font-size: clamp(2.15rem, 4.45cqi, 5.25rem);
+      font-size: clamp(2.4rem, calc(5.35cqi - 0.8rem), 5.3rem);
       line-height: 1.02;
       letter-spacing: -0.04em;
     }
@@ -5072,7 +5078,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
      above the fold rather than pushing it below a 49dvh margin. */
   @container studio (max-width: 55.999rem) {
     .studio[data-studio-route="home"] .studioHomeArt {
-      height: clamp(15rem, 38dvh, 22.5rem);
+      height: clamp(15rem, 39dvh, 22.5rem);
       bottom: auto;
     }
 
@@ -5094,7 +5100,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
       right: auto;
       left: auto;
       width: auto;
-      margin: clamp(15rem, 38dvh, 22.5rem)
+      margin: clamp(15rem, 39dvh, 22.5rem)
         clamp(1rem, 3cqi, 1.7rem) 1.8rem;
       padding: clamp(0.6rem, 1.7cqi, 1rem);
       transform: none;

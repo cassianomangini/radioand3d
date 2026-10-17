@@ -60,6 +60,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p visual-review
+          cp public/images/studio/cm-home-x1.png visual-review/home-source.png
           pnpm start > /tmp/cm-radioand3d-next.log 2>&1 &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT

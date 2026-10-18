@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Fragment,
   useEffect,
   useEffectEvent,
   useMemo,
@@ -17,14 +16,15 @@ import {
   type PointerEvent as ReactPointerEvent
 } from "react";
 import { flushSync } from "react-dom";
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import styles from "./studio-radio-shell.module.css";
+import { StudioWelcome } from "./studio-welcome";
+import { StudioHub } from "./studio-hub";
 import { StudioHomeArt } from "./studio-home-art";
 import { Icon, RadioContent, previewTrack, type TrackStepKind } from "./radio-content";
 import type { DocumentWithViewTransition } from "./radio-view-transition";
 import { RadioNavbarDock } from "./radio-navbar-dock";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
-import { StudioPrintsCarousel } from "./studio-prints-carousel";
 import { useRadio } from "@/features/radio/radio-provider";
 import { resolveRadioKeyboardCommand } from "@/features/radio/radio-keyboard";
 import {
@@ -39,35 +39,6 @@ import {
   resolveRadioLayoutMode,
   type RadioLayoutMode
 } from "./radio-motion-spine";
-
-const StudioMotionLink = motion.create(Link);
-
-const studioHubRailVariants: Variants = {
-  hidden: {},
-  shown: { transition: { staggerChildren: 0.16, delayChildren: 0.12 } }
-};
-
-const studioHubCardVariants: Variants = {
-  hidden: (side: "left" | "right") => ({
-    opacity: 0,
-    x: side === "left" ? -48 : 42,
-    y: 22,
-    scale: 0.975,
-    transition: { duration: 0.24 }
-  }),
-  shown: {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.82, ease: [0.16, 1, 0.3, 1] }
-  }
-};
-
-const studioHubInstantVariants: Variants = {
-  hidden: { opacity: 0, x: 0, y: 0, scale: 1 },
-  shown: { opacity: 1, x: 0, y: 0, scale: 1, transition: { duration: 0 } }
-};
 
 const RADIO_WIDTH_RATIO = 0.3;
 const MAX_RADIO_WIDTH = 1120;
@@ -284,34 +255,6 @@ function shouldIgnoreRadioShortcutTarget(target: EventTarget | null) {
     return true;
   }
   return target !== document.body && target.tabIndex >= 0;
-}
-
-function revealChars(text: string, startDelayMs: number, stepMs: number) {
-  return [...text].map((char, index) => (
-    <span
-      key={`${startDelayMs}-${index}`}
-      className={styles.studioRevealChar}
-      style={{ animationDelay: `${startDelayMs + index * stepMs}ms` }}
-    >
-      {char}
-    </span>
-  ));
-}
-
-function revealPhrase(text: string, startDelayMs: number, stepMs: number) {
-  let cursor = 0;
-  return text.split(" ").map((word, index, words) => {
-    const delay = startDelayMs + cursor * stepMs;
-    cursor += word.length + 1;
-    return (
-      <Fragment key={`${startDelayMs}-word-${index}`}>
-        <span className={styles.studioRevealWord}>
-          {revealChars(word, delay, stepMs)}
-        </span>
-        {index < words.length - 1 ? " " : null}
-      </Fragment>
-    );
-  });
 }
 
 export function StudioRadioShell({ children }: { children?: ReactNode }) {
@@ -1690,130 +1633,18 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             <span>PROJETOS PERSONALIZADOS, PEÇAS PRODUZIDAS E PRODUTOS PRONTOS.</span>
           </div>
 
-          <section
-            className={styles.studioIdentity}
-            aria-labelledby="studio-title"
-            data-studio-intro={studioRoute === "home" ? "home" : undefined}
-          >
-            {studioRoute === "home" ? <span className={styles.srOnly}>Seja muito bem-vindo!</span> : null}
-            <div className={styles.studioEyebrowStack} aria-live="off">
-              <span aria-hidden={studioRoute !== "detail"}>ESTÚDIO DE IMPRESSÃO 3D</span>
-            </div>
+          <StudioWelcome
+            route={studioRoute}
+            introCycle={studioIntroCycle}
+            onNavigate={handleStudioRouteLink}
+            onPrefetchStudio={() => router.prefetch("/studio")}
+          />
 
-            <h1 id="studio-title" aria-label="Impressão 3D, música e muito mais do que você imagina.">
-              <span key={studioIntroCycle}>
-                <span className={styles.studioHomePhrase}>{revealPhrase("Impressão 3D,", 120, 22)}</span>{" "}
-                <span className={styles.studioHomePhrase}>{revealPhrase("música e", 380, 22)}</span>{" "}
-                <span className={`${styles.studioHomePhrase} ${styles.studioRevealAccent}`}>muito mais</span>{" "}
-                <span className={styles.studioHomePhrase}>{revealPhrase("do que você imagina.", 880, 22)}</span>
-              </span>
-            </h1>
-
-            <p className={styles.lead} aria-label="Um estúdio cheio de possibilidades, produtos para descobrir, seus projetos transformados em peças reais e uma rádio para deixar tudo ainda melhor.">
-              <span key={studioIntroCycle}>
-                {revealPhrase("Um estúdio cheio de possibilidades, produtos para descobrir, seus projetos transformados em peças reais e uma rádio para deixar tudo ainda melhor.", 1100, 11)}
-              </span>
-            </p>
-
-            <div className={styles.studioRouteActions}>
-              <Link
-                href="/studio"
-                className={styles.primaryAction}
-                aria-label="Quero conhecer tudo"
-                aria-hidden={studioRoute !== "home"}
-                tabIndex={studioRoute === "home" ? 0 : -1}
-                onPointerEnter={() => router.prefetch("/studio")}
-                onClick={(event) => handleStudioRouteLink(event, "/studio")}
-              >
-                <span>Quero conhecer tudo</span>
-                <span aria-hidden="true">→</span>
-              </Link>
-
-              <Link
-                href="/"
-                className={styles.primaryAction}
-                aria-label="Voltar ao início"
-                aria-hidden={studioRoute !== "detail"}
-                tabIndex={studioRoute === "detail" ? 0 : -1}
-                onClick={(event) => handleStudioRouteLink(event, "/")}
-              >
-                <span>Voltar ao início</span>
-                <span aria-hidden="true">←</span>
-              </Link>
-            </div>
-          </section>
-
-          <motion.div
-            className={styles.studioDetailRail}
-            aria-hidden={!studioHub}
-            inert={!studioHub}
-            data-studio-motion-owner="motion"
-            initial={reduceStudioMotion ? false : "hidden"}
-            animate={studioHub ? "shown" : "hidden"}
-            variants={reduceStudioMotion ? undefined : studioHubRailVariants}
-          >
-            <motion.section
-              className={styles.studioDetailCard}
-              data-studio-card="prints"
-              aria-label="Impressões em destaque"
-              custom="left"
-              variants={reduceStudioMotion ? studioHubInstantVariants : studioHubCardVariants}
-            >
-              <StudioPrintsCarousel active={studioHub && !radioFullscreen} />
-            </motion.section>
-
-            <StudioMotionLink
-              className={styles.studioDetailCard}
-              data-studio-card="quote"
-              custom="right"
-              variants={reduceStudioMotion ? studioHubInstantVariants : studioHubCardVariants}
-              whileHover={reduceStudioMotion ? undefined : { y: -3 }}
-              whileTap={reduceStudioMotion ? undefined : { scale: 0.992 }}
-              href="/studio/orcamento"
-              aria-label="Pedir orçamento"
-              tabIndex={studioHub ? 0 : -1}
-            >
-              <Image
-                className={styles.studioQuotePhoto}
-                src="/images/studio/orcamento-card.png"
-                alt=""
-                fill
-                sizes="(max-width: 1179px) 100vw, 32vw"
-              />
-              <div className={styles.studioCardHead}>
-                <span className={styles.studioCardLabel}>PROJETO PERSONALIZADO</span>
-                <strong>Peça um orçamento</strong>
-              </div>
-              <div className={styles.studioCardFoot}>
-                <p>Conte o que você precisa. O fluxo pergunta somente o que faz sentido para o projeto.</p>
-                <span className={styles.studioCardAction}>Pedir orçamento →</span>
-              </div>
-            </StudioMotionLink>
-
-            <StudioMotionLink
-              className={styles.studioDetailCard}
-              data-studio-card="products"
-              custom="right"
-              variants={reduceStudioMotion ? studioHubInstantVariants : studioHubCardVariants}
-              whileHover={reduceStudioMotion ? undefined : { y: -3 }}
-              whileTap={reduceStudioMotion ? undefined : { scale: 0.992 }}
-              href="/studio/produtos"
-              aria-label="Ver produtos do estúdio"
-              tabIndex={studioHub ? 0 : -1}
-            >
-              <div className={styles.studioCardHead}>
-                <span className={styles.studioCardLabel}>PRODUTOS</span>
-                <strong>Peças prontas para comprar</strong>
-              </div>
-              <div className={styles.studioCardFoot}>
-                <span className={styles.studioCardMediaPlaceholder} aria-hidden="true">
-                  FOTO REAL PENDENTE · produto
-                </span>
-                <p>Conheça cada produto aqui e finalize a compra na Shopee quando estiver disponível.</p>
-                <span className={styles.studioCardAction}>Ver produtos →</span>
-              </div>
-            </StudioMotionLink>
-          </motion.div>
+          <StudioHub
+            active={studioHub}
+            radioFullscreen={radioFullscreen}
+            reducedMotion={Boolean(reduceStudioMotion)}
+          />
 
           {studioNestedRoute ? (
             <div className={styles.studioRouteContent} data-studio-route-content="true">{children}</div>

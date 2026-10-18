@@ -15,6 +15,19 @@ for (const route of routes) {
     expect(response?.status(), `response for ${route.path}`).toBeLessThan(400);
     await page.locator("body").waitFor({ state: "visible" });
     await page.evaluate(() => document.fonts.ready);
+
+    if (route.name === "product") {
+      // Fonts being ready says nothing about media. The previous CDP/Playwright
+      // review occasionally photographed an empty 400px product hero while its
+      // priority image was still decoding. Wait for the actual product photo.
+      const heroPhoto = page.locator('section[aria-labelledby="product-title"] img[alt]:not([alt=""])').first();
+      await expect(heroPhoto).toBeVisible();
+      await expect.poll(async () => heroPhoto.evaluate((image) =>
+        (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0
+      ), { message: "product hero image failed to load before the visual capture" }).toBe(true);
+      await heroPhoto.evaluate((image) => (image as HTMLImageElement).decode());
+    }
+
     await page.screenshot({
       path: testInfo.outputPath(`${route.name}-viewport.png`),
       fullPage: false,

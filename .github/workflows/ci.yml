@@ -18,6 +18,42 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Compare the complete event diff, including multi-commit pushes.
+          fetch-depth: 0
+
+      - name: Detect visual-impacting changes
+        id: visual_changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            BASE="$(jq -r '.pull_request.base.sha' "$GITHUB_EVENT_PATH")"
+          else
+            BASE="$(jq -r '.before // empty' "$GITHUB_EVENT_PATH")"
+          fi
+
+          RUN_VISUAL=false
+          if [ -z "$BASE" ] || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            # New/unusual history must never silently omit a relevant gate.
+            RUN_VISUAL=true
+            echo "No comparable base commit; running visual QA conservatively."
+          else
+            CHANGED_FILES="$(git diff --name-only "$BASE" "$GITHUB_SHA")"
+            echo "Changed paths:"
+            printf '%s\n' "$CHANGED_FILES"
+            # Run for all UI, assets, scripts, tests, build config and CI changes.
+            # Documentation-only changes still get lint, typecheck, tests and build.
+            if printf '%s\n' "$CHANGED_FILES" | grep -Eq '^(src/|public/|tests/visual/|scripts/|\.github/workflows/|playwright\.config\.ts$|next\.config\.|postcss\.config\.|tailwind\.config\.|package\.json$|pnpm-lock\.yaml$)'; then
+              RUN_VISUAL=true
+            fi
+          fi
+
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && jq -r '.head_commit.message // ""' "$GITHUB_EVENT_PATH" | grep -Fq '[visual]'; then
+            RUN_VISUAL=true
+          fi
+          echo "run=$RUN_VISUAL" >> "$GITHUB_OUTPUT"
+          echo "Visual capture, Playwright and lab required: $RUN_VISUAL"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -55,7 +91,7 @@ jobs:
         run: pnpm build
 
       - name: Capture visual review
-        if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
+        if: steps.visual_changes.outputs.run == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -81,11 +117,11 @@ jobs:
             exit 1
           fi
 
-          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=1600             --run-all-compositor-stages-before-draw             --window-size=1440,1000             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-1440.png"             http://127.0.0.1:3000/
+          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=4800             --run-all-compositor-stages-before-draw             --window-size=1440,1000             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-1440.png"             http://127.0.0.1:3000/
 
-          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=1600             --run-all-compositor-stages-before-draw             --window-size=1760,824             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-short-1760x824.png"             http://127.0.0.1:3000/
+          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=4800             --run-all-compositor-stages-before-draw             --window-size=1760,824             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-short-1760x824.png"             http://127.0.0.1:3000/
 
-          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=1600             --run-all-compositor-stages-before-draw             --window-size=390,844             --screenshot="$GITHUB_WORKSPACE/visual-review/mobile-390.png"             http://127.0.0.1:3000/
+          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=4800             --run-all-compositor-stages-before-draw             --window-size=390,844             --screenshot="$GITHUB_WORKSPACE/visual-review/mobile-390.png"             http://127.0.0.1:3000/
 
           "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=2200             --run-all-compositor-stages-before-draw             --window-size=1440,1000             --screenshot="$GITHUB_WORKSPACE/visual-review/product-desktop-1440.png"             http://127.0.0.1:3000/studio/produtos/porta-curativos-compacto
 
@@ -94,15 +130,15 @@ jobs:
           BROWSER="$BROWSER" node scripts/capture-radio-states.mjs "$GITHUB_WORKSPACE/visual-review"
 
       - name: Playwright visual diagnostics
-        if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
+        if: steps.visual_changes.outputs.run == 'true'
         run: pnpm visual:qa
 
       - name: Install browser video recorder for optional 03c QA
-        if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
+        if: steps.visual_changes.outputs.run == 'true'
         run: pnpm exec playwright install ffmpeg
 
       - name: Render isolated visual lab in development
-        if: github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')
+        if: steps.visual_changes.outputs.run == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -150,7 +186,7 @@ jobs:
             --project=desktop-1024 --project=mobile-390
 
       - name: Upload Playwright diagnostics
-        if: always() && (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]'))
+        if: always() && (steps.visual_changes.outputs.run == 'true')
         uses: actions/upload-artifact@v4
         with:
           name: cm-visual-diagnostics
@@ -162,7 +198,7 @@ jobs:
           retention-days: 7
 
       - name: Upload visual review
-        if: (github.event_name == 'pull_request' || contains(github.event.head_commit.message, '[visual]')) && success()
+        if: (steps.visual_changes.outputs.run == 'true') && success()
         uses: actions/upload-artifact@v4
         with:
           name: studio-radio-visual-review

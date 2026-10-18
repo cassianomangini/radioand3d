@@ -27,14 +27,6 @@
   text-decoration: none;
 }
 
-
-
-
-
-
-
-
-
 .desktopNav {
   justify-self: center;
   display: flex;
@@ -76,8 +68,6 @@
   color: var(--text-primary);
 }
 
-
-
 .desktopNav a[aria-current="page"] {
   color: var(--text-primary);
 }
@@ -111,19 +101,9 @@
   background: var(--surface-studio);
 }
 
-
-
-
-
-
-
-
-
 .lead {
   font-size: var(--text-lg);
 }
-
-
 
 .primaryAction {
   display: inline-flex;
@@ -136,22 +116,9 @@
     transform var(--motion-fast) var(--ease-standard);
 }
 
-.primaryAction:not(:disabled):hover {
-}
-
 .primaryAction:not(:disabled):active {
   transform: translateY(1px);
 }
-
-
-
-
-
-
-
-
-
-
 
 .resizeHandle {
   position: sticky;
@@ -187,9 +154,6 @@
   gap: var(--space-4);
 }
 
-.radioHeader h2 {
-}
-
 .iconButton {
   color: var(--text-primary);
   font-size: var(--text-sm);
@@ -199,12 +163,6 @@
 .iconButton:hover {
   background: var(--surface-elevated);
 }
-
-
-
-
-
-
 
 .duration,
 .progressTimes,
@@ -266,8 +224,6 @@
   flex: 1;
   background: linear-gradient(180deg, var(--accent-violet), var(--accent-cyan));
 }
-
-
 
 .queueHeader {
   display: flex;
@@ -397,10 +353,6 @@
     overflow: hidden;
   }
 
-  
-
-  
-
   .visualizer {
     height: clamp(2.75rem, 7dvh, 4.5rem);
     padding-top: 0;
@@ -427,27 +379,9 @@
     min-height: 2.25rem;
   }
 
-  
-
-  
-
-  
-
   .progressBlock {
     gap: 0.2rem;
   }
-
-  .transport > button,
-  .transport .volumeTrigger {
-  }
-
-  .transport .playButton {
-  }
-
-  .visualizer {
-  }
-
-  
 
   .queueHeader {
     padding-top: 0.2rem;
@@ -463,14 +397,11 @@
 }
 
 @media (min-width: 73.75rem) and (max-height: 40rem) {
-  
 
   .coverFallback small,
   .queueHeader span {
     display: none;
   }
-
-  
 
   .visualizer {
     height: 2rem;
@@ -478,9 +409,7 @@
 }
 
 @media (max-width: 81.25rem) and (min-width: 73.75rem) {
-  
 
-  
 }
 
 @media (max-width: 73.74rem) {
@@ -506,8 +435,6 @@
     padding-top: var(--space-3);
     border-top: 1px solid var(--border-subtle);
   }
-
-  
 
   .desktopNav {
     display: none;
@@ -812,15 +739,6 @@
     display: none;
   }
 
-  
-
-  
-
-  .lead {
-  }
-
-  
-
   dialog.mobileDialog {
     position: fixed;
     inset: 0;
@@ -833,11 +751,9 @@
     border-radius: 0;
   }
 
-  
 }
 
 @media (max-width: 34rem) {
-  
 
   .radioContent {
     padding: var(--space-4);
@@ -1731,9 +1647,6 @@
     overflow-y: auto;
   }
 
-  
-
-  
 }
 
 @media (min-width: 73.75rem) and (min-height: 44rem) {
@@ -1862,20 +1775,6 @@
     min-height: 4.5rem;
   }
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
   .mobileDialog .playerMessage {
     order: 9;
     flex: none;
@@ -1932,11 +1831,6 @@
     min-height: 0;
   }
 
-  
-
-  
-
-  
 }
 
 @media (max-width: 73.74rem) and (min-height: 42rem) {
@@ -1975,20 +1869,6 @@
   container: studio / inline-size;
   view-transition-name: cm-studio-surface;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .lead {
   max-width: 39ch;
@@ -2031,7 +1911,6 @@
 .primaryAction:not(:disabled):hover span:last-child {
   transform: translate(2px, -2px);
 }
-
 
 .radioPanel {
   view-transition-name: cm-radio-surface;
@@ -2502,8 +2381,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     display: none;
   }
 
-  
-
   .siteHeader {
     right: calc(var(--radio-width) + var(--rail-width));
   }
@@ -2546,23 +2423,10 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     opacity: 0;
   }
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
   .lead {
     font-size: 1.05rem;
   }
 
-  
 }
 
 @media (max-width: 34rem) {
@@ -2588,11 +2452,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     height: 1.9rem;
   }
 
-  
-
-  
-
-  
 }
 
 .resizeHandle:focus-visible {
@@ -2929,22 +2788,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     scrollbar-color: #4c7395 #000;
   }
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
   .site[data-radio-fullscreen="true"] .trackRow {
     min-height: 4.25rem;
     border-bottom: 1px solid rgb(95 145 191 / 10%);
@@ -3096,8 +2939,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     box-shadow: -0.2rem 0 1.15rem rgb(52 195 255 / 18%);
   }
 
-  
-
   .site[data-radio-layout-motion="opening"][data-radio-layout-mode="fullscreen"] .coverCaption {
     animation: c1-cover-caption-enter 430ms 150ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
@@ -3110,8 +2951,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     border-left-color: rgb(82 214 255 / 26%);
   }
 }
-
-
 
 @keyframes c1-cover-caption-enter {
   0%,
@@ -3147,7 +2986,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     grid-column: 2;
   }
 
-  
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3180,7 +3018,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transition: none;
   }
 }
-
 
 /* C1 route continuity: persistent physical scene, not page snapshots. */
 .studio {
@@ -3292,8 +3129,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 /* The highlighted hook is one idea; never orphan "mais" on its own line. */
-.studioIdentity[data-studio-intro="home"] .studioRevealAccent {
-}
 
 .studioRevealAccent,
 .studioRevealAccent .studioRevealChar {
@@ -3311,8 +3146,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   display: inline;
   white-space: nowrap;
 }
-
-
 
 .studioIdentity[data-studio-intro="home"] .studioRevealChar {
   animation: studio-letter-in 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -3540,28 +3373,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   outline-offset: 3px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* /studio is a full catalog surface inside the Studio pane. */
 .studio[data-studio-route="detail"] {
   min-height: calc(100dvh - var(--header-height));
@@ -3674,14 +3485,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     overflow-y: visible;
   }
 
-  
-
-  
-
-  
-
-  
-
   .studioCatalogHeader {
     position: relative;
     top: auto;
@@ -3751,7 +3554,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transform: none;
   }
 }
-
 
 /* Studio hub approved on 04/10/2026: one dominant Prints surface + Quote + Products. */
 .studioCardMediaPlaceholder {
@@ -3845,7 +3647,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 }
 
-
 @media (max-width: 73.74rem) {
   /* On Studio routes the home identity is not only invisible: it must leave the mobile flow. */
   .studio[data-studio-route="detail"] .studioIdentity {
@@ -3856,7 +3657,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     margin-top: 1.1rem;
   }
 }
-
 
 /* Keep neutral media labels away from real content at every card height. */
 .studioCardMediaPlaceholder {
@@ -3876,7 +3676,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 }
 
-
 @media (max-width: 73.74rem) {
   /* Nested Studio routes must not inherit the mobile hub's normal-flow height. */
   .studio[data-studio-route="detail"] .studioCatalogHeader[aria-hidden="true"],
@@ -3884,7 +3683,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     display: none;
   }
 }
-
 
 /* 03c — real Radio dock. Mutually exclusive with the accepted lateral player.
  * The final optical centering of the mini between nav and socials remains a
@@ -4061,7 +3859,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 }
 
-
 /* Approved CM Studio hub (12/10): photographic Print carousel, violet/cyan
  * custom quote action, Shopee-only orange. Keep Radio/dock rules untouched. */
 .studioDetailCard[data-studio-card="prints"] {
@@ -4229,7 +4026,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 }
 
-
 /* Home mobile: the original split heading's unbroken second line was wider
  * than 390/360px viewports. Scale the display text without clipping it. */
 @media (max-width: 73.74rem) {
@@ -4237,7 +4033,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     font-size: clamp(2.45rem, 11vw, 4.7rem);
   }
 }
-
 
 /* S1.2 — the public Studio hub occupies the same desktop viewport as Radio.
  * Only the hub is locked to the viewport; nested editorial routes still scroll. */
@@ -4297,10 +4092,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     rgb(3 11 28 / 44%) 100%
   );
 }
-
-
-
-
 
 .studioIdentity[data-studio-intro="home"] {
   position: relative;
@@ -4404,12 +4195,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     overscroll-behavior-y: contain;
   }
 
-
-
-
-
-
-
   /* The Home card has one top anchor. Its size and text spacing no longer
      feed back into vertical centering or the route transition. */
   .studioIdentity[data-studio-intro="home"] {
@@ -4505,9 +4290,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   /* Even at the minimum desktop Studio width, the artwork and copy stay side by side. */
   @container studio (max-width: 51.999rem) {
 
-
-
-
     .studioIdentity[data-studio-intro="home"] {
       left: 52%;
       padding: clamp(0.75rem, 1.6cqi, 1rem);
@@ -4548,13 +4330,10 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
    width instead of a centered 36rem strip with empty margins. */
 @media (min-width: 42rem) and (max-width: 73.74rem) {
 
-
-
 }
 
 /* Mobile retains the already-approved mini player before Studio content. */
 @media (max-width: 73.74rem) {
-
 
   .studioIdentity[data-studio-intro="home"] {
     margin: -0.4rem clamp(0.65rem, 2.5vw, 1.4rem) 2rem;

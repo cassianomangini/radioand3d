@@ -122,7 +122,9 @@ A modularização é incremental, feita sem criar um segundo motor de música ne
 
 O módulo legado `studio-radio-shell.module.css` ainda tem **4.791 linhas**. A divisão de arte já criou ownership real de CSS, porém o Header, a identidade editorial, o hub e a Rádio continuam compartilhando regras do módulo principal. A dependência do painel de letras em `radio-lyrics.tsx` continua válida e **não deve ser apagada por análise incompleta**.
 
-**Regra de continuidade:** extrações substituem exatamente o mesmo subárvore DOM e preservam refs, `RadioProvider`, `HTMLAudioElement`, Motion, fila e rotas. Validar por Playwright/CDP e comparar capturas de *mesmo viewport + estado + SHA* antes/depois; um build verde não comprova fidelidade. Os registros de execução estão em [08V](work/08-visual-quality-evolution.md).
+**Regra de continuidade:** extrações substituem a mesma subárvore DOM e preservam refs, `RadioProvider`, `HTMLAudioElement`, Motion, fila e rotas. Validar por Playwright/CDP e comparar capturas de *mesmo viewport + estado + SHA* antes/depois; um build verde não comprova fidelidade. Os registros de execução estão em [08V](work/08-visual-quality-evolution.md).
+
+**Isolamento do Next em CI:** o comando `next build` antecede a captura pública com `next start` e o laboratório de desenvolvimento com `next dev`. São compilações distintas: o laboratório deve usar `CM_VISUAL_LAB_QA=1`, que define `distDir: ".next-visual-lab"` somente no processo dev. Não apontar `next dev` e `next build` para o mesmo diretório `.next` no mesmo runner: o compilador Turbopack produziu falhas intermitentes na resolução interna de `next/font/google` (Outfit) quando o cache foi compartilhado. A separação foi comprovada no [CI 39161703555](https://github.com/cassianomangini/radioand3d/actions/runs/39161703555), com captura pública, 79 testes Playwright, 18 do laboratório e 2 de dock verdes. Não altera a configuração dos usuários em produção.
 
 ### Movimento, mídia e desempenho
 

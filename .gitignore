@@ -3,6 +3,7 @@
 
 # next
 /.next/
+/.next-visual-lab/
 /out/
 
 # production

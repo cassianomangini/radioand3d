@@ -171,7 +171,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          pnpm dev --hostname 127.0.0.1 --port 3100 > /tmp/cm-visual-lab-next.log 2>&1 &
+          # Isolate the dev compiler and next/font cache from the earlier
+          # production build used for the public/CDP captures.
+          CM_VISUAL_LAB_QA=1 pnpm dev --hostname 127.0.0.1 --port 3100 > /tmp/cm-visual-lab-next.log 2>&1 &
           LAB_PID=$!
           trap 'kill "$LAB_PID" 2>/dev/null || true' EXIT
 

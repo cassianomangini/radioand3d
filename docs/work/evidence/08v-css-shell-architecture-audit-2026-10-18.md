@@ -223,6 +223,12 @@ Estas regras são vinculadas, sem criar nova fonte concorrente, por [AGENTS.md](
 
 **Situação após este PR:** documentação corrigida; as ações de engenharia e a inspeção visual da Home nova continuam pendentes. O relatório é uma análise técnica revisada, **não uma certificação de qualidade do site**.
 
+## 8.1. Correção posterior do detector de arquivos em PR
+
+O gatilho por arquivos foi refinado em [`43bcd26`](https://github.com/cassianomangini/radioand3d/commit/43bcd265274c107d373496c47419d0e416f3a224): para a Action executada em `pull_request`, o comparativo usa o **primeiro pai do merge sintético que o próprio CI está testando** (`HEAD^1`), não o `base.sha` do evento, que pode permanecer defasado enquanto a PR está aberta. A falha anterior fazia uma PR somente de documentação parecer modificar `tests/visual` devido a novos commits na `main`, acionando testes visuais indevidamente. Em `push`, o comparativo continua usando `event.before`. O efeito sobre novas execuções deve ser validado pelo respectivo log: caminhos alterados, valor `run` e condição dos passos, não só o status verde.
+
+Uma execução anterior da PR documental ([run 39155820555](https://github.com/cassianomangini/radioand3d/actions/runs/39155820555)) revelou um **overflow móvel transitório de 30px** no teste `impeccable-a11y.spec.ts`, enquanto a execução correspondente da `main` passou. Não declarar regressão permanente sem reproduzir o mesmo cenário após hidratação, imagens e animação estabilizadas. O teste tem de continuar detectando overflow persistente em vez de afrouxar a asserção.
+
 ## 9. Execução iniciada na main (18/10/2026)
 
 **Observação:** as seções anteriores auditam o estado original `main@23f25c3`, anterior aos commits abaixo. Os diagnósticos históricos não se tornam automaticamente problemas atuais após a correção.

@@ -22,6 +22,7 @@ import styles from "./studio-radio-shell.module.css";
 import { Icon, RadioContent, previewTrack, type TrackStepKind } from "./radio-content";
 import type { DocumentWithViewTransition } from "./radio-view-transition";
 import { RadioNavbarDock } from "./radio-navbar-dock";
+import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { StudioPrintsCarousel } from "./studio-prints-carousel";
 import { useRadio } from "@/features/radio/radio-provider";
 import { resolveRadioKeyboardCommand } from "@/features/radio/radio-keyboard";

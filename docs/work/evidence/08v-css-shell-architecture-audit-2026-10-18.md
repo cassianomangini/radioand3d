@@ -222,3 +222,20 @@ Estas regras são vinculadas, sem criar nova fonte concorrente, por [AGENTS.md](
 - [ ] Registrar aprovação de Cassiano para direção visual final, quando houver modificação perceptual.
 
 **Situação após este PR:** documentação corrigida; as ações de engenharia e a inspeção visual da Home nova continuam pendentes. O relatório é uma análise técnica revisada, **não uma certificação de qualidade do site**.
+
+## 9. Execução iniciada na main (18/10/2026)
+
+**Observação:** as seções anteriores auditam o estado original `main@23f25c3`, anterior aos commits abaixo. Os diagnósticos históricos não se tornam automaticamente problemas atuais após a correção.
+
+| Commit | Trabalho efetivamente enviado à main | Validação observada |
+| --- | --- | --- |
+| [`0bcfd5b`](https://github.com/cassianomangini/radioand3d/commit/0bcfd5b5dd2003d4ac2820d086ae35f72e478275) | Contenção do H1 na largura real da copy e do dock; teste reescrito com medidas de letras/estados; animação desabilitada sob movimento reduzido; `aria-valuemax` calculado pelo limite do divisor | [CI 39154733338](https://github.com/cassianomangini/radioand3d/actions/runs/39154733338): lint, tipos, testes, build, capturas/CDP, **77 Playwright**, 18 testes do lab e 2 do dock, todos verdes |
+| [`b792336`](https://github.com/cassianomangini/radioand3d/commit/b792336c4eec4973debd555f2ebf186c08f5dc57) | Gatilho de QA visual por arquivos alterados (não depende apenas de `[visual]`) e ampliação do orçamento de captura CLI | [CI 39155135852](https://github.com/cassianomangini/radioand3d/actions/runs/39155135852): gatilho, lint, tipos, build, Playwright e CDP verdes |
+| [`56599fc`](https://github.com/cassianomangini/radioand3d/commit/56599fc3a42e6f9e94a5d4af58a464fa91d33187) | Remoção de **72 blocos CSS órfãos**, previamente triados contra os dois únicos consumidores do módulo; redução de **5.161 para 4.831 linhas**; teste pontual de motion normal e pipeline de screenshots estáveis via Playwright | [CI 39155551092](https://github.com/cassianomangini/radioand3d/actions/runs/39155551092): lint/tipos/testes/build verdes, **falha na inicialização fria do Chromium CDP**, antes do novo teste visual |
+| [`32be6b6`](https://github.com/cassianomangini/radioand3d/commit/32be6b6e04e3084a0d92b450426c24188dc9d7b8) | Aumento do tempo de inicialização do Chromium e diagnósticos de stderr para resolver a falha no CDP sem voltar a exportar capturas incompletas | [CI 39155705089](https://github.com/cassianomangini/radioand3d/actions/runs/39155705089): **em verificação** no momento deste registro; não tratar como aprovado |
+
+**Revisão humana dos renders:** foram inspecionadas capturas Playwright geradas pelo commit `0bcfd5b` para split desktop 1440, desktop curto 1760, dock, Rádio intermediária e Rádio máxima, além de screenshots mobile. O H1 ficou completo nos estados inspeccionados e os testes objetivos passaram. **Isso é autorrevisão técnica, não aprovação estética de Cassiano.**
+
+**Problema de captura descoberto:** os PNGs gerados por comandos `chrome --screenshot --virtual-time-budget` continuaram mostrando o H1 no meio da animação, mesmo com orçamento maior. A correção substitui essas imagens de apresentação por **screenshots geradas pelo Playwright com animação concluída**. A validação integral desse novo pipeline depende do CI seguinte.
+
+**Trabalho ainda aberto:** estabilidade do CDP no runner frio, conclusão do novo QA de motion normal, redução de redundâncias entre regras **que ainda estão em uso**, modularização real do CSS, extração do shell React de 2.458 linhas, testes perceptuais de mídia e revisão de performance. Não marcar B3/B4/B5 como concluídos apenas porque 330 linhas de CSS foram apagadas.

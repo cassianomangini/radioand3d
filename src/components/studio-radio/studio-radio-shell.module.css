@@ -3865,6 +3865,13 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     min-height: calc(100dvh - var(--header-height));
   }
 
+  /* Studio hub cards enter from +/-X with Motion. The mobile Studio may
+     grow vertically, but an entering card must never enlarge page width. */
+  .studio[data-studio-route="detail"]:not(:has(.studioRouteContent)) {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
   
 
   

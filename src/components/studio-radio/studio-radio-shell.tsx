@@ -19,6 +19,7 @@ import {
 import { flushSync } from "react-dom";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 import styles from "./studio-radio-shell.module.css";
+import { StudioHomeArt } from "./studio-home-art";
 import { Icon, RadioContent, previewTrack, type TrackStepKind } from "./radio-content";
 import type { DocumentWithViewTransition } from "./radio-view-transition";
 import { RadioNavbarDock } from "./radio-navbar-dock";
@@ -1679,18 +1680,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <div className={styles.studioMachine} aria-hidden="true" />
           <div className={styles.studioStageShade} aria-hidden="true" />
 
-          {studioRoute === "home" ? (
-            <div className={styles.studioHomeArt} data-home-art="true" aria-hidden="true">
-              <Image
-                src="/images/studio/cm-home-x1-hd.webp"
-                alt=""
-                fill
-                priority
-                sizes="100vw"
-                unoptimized
-              />
-            </div>
-          ) : null}
+          {studioRoute === "home" ? <StudioHomeArt /> : null}
 
           <div
             className={styles.studioCatalogHeader}

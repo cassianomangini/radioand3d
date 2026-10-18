@@ -1,0 +1,92 @@
+/* CM Studio home artwork. This element only exists on the Home route.
+   Container queries use the actual Studio pane, not the global viewport.
+   Keep original crop/mask behavior in each responsive state. */
+
+.art {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  width: min(100%, 36rem);
+  height: clamp(14rem, 50cqi, 24rem);
+  margin-inline: auto;
+  overflow: hidden;
+  pointer-events: none;
+  background: #030b1c;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 87%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0 87%, transparent 100%);
+}
+
+.art img {
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (min-width: 73.75rem) {
+
+[data-studio-route="home"] .art {
+    position: absolute;
+    inset: var(--header-height) 0 0;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    margin: 0;
+    transform: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+[data-studio-route="home"] .art img {
+    object-fit: cover;
+    object-position: center;
+  }
+
+[data-studio-route="home"] .art::after {
+    content: none;
+  }
+
+  @container studio (max-width: 51.999rem) {
+
+[data-studio-route="home"] .art {
+      inset: var(--header-height) 0 0;
+      width: 100%;
+      height: auto;
+    }
+
+[data-studio-route="home"] .art::after {
+      content: none;
+    }
+
+  }
+
+}
+
+@media (min-width: 42rem) and (max-width: 73.74rem) {
+
+[data-studio-route="home"] .art {
+    width: 100%;
+    max-width: none;
+    height: clamp(19rem, 47dvh, 29rem);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0 83%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0 83%, transparent 100%);
+  }
+
+[data-studio-route="home"] .art img {
+    object-position: center;
+  }
+
+}
+
+@media (max-width: 73.74rem) {
+
+.art {
+    height: clamp(12.5rem, 53vw, 22rem);
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .art { transition: none; }
+
+}
+

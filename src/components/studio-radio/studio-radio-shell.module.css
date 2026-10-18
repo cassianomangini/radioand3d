@@ -4500,24 +4500,9 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   );
 }
 
-.studioHomeArt {
-  position: relative;
-  z-index: 2;
-  isolation: isolate;
-  width: min(100%, 36rem);
-  height: clamp(14rem, 50cqi, 24rem);
-  margin-inline: auto;
-  overflow: hidden;
-  pointer-events: none;
-  background: #030b1c;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0 87%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0 87%, transparent 100%);
-}
 
-.studioHomeArt img {
-  object-fit: cover;
-  object-position: center;
-}
+
+
 
 .studioIdentity[data-studio-intro="home"] {
   position: relative;
@@ -4621,26 +4606,11 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     overscroll-behavior-y: contain;
   }
 
-  .studio[data-studio-route="home"] .studioHomeArt {
-    position: absolute;
-    inset: var(--header-height) 0 0;
-    width: 100%;
-    max-width: none;
-    height: auto;
-    margin: 0;
-    transform: none;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
 
-  .studio[data-studio-route="home"] .studioHomeArt img {
-    object-fit: cover;
-    object-position: center;
-  }
 
-  .studio[data-studio-route="home"] .studioHomeArt::after {
-    content: none;
-  }
+
+
+
 
   /* The Home card has one top anchor. Its size and text spacing no longer
      feed back into vertical centering or the route transition. */
@@ -4736,15 +4706,9 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
   /* Even at the minimum desktop Studio width, the artwork and copy stay side by side. */
   @container studio (max-width: 51.999rem) {
-    .studio[data-studio-route="home"] .studioHomeArt {
-      inset: var(--header-height) 0 0;
-      width: 100%;
-      height: auto;
-    }
 
-    .studio[data-studio-route="home"] .studioHomeArt::after {
-      content: none;
-    }
+
+
 
     .studioIdentity[data-studio-intro="home"] {
       left: 52%;
@@ -4785,24 +4749,14 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 /* Laptop vertical composition has artwork across the whole Studio
    width instead of a centered 36rem strip with empty margins. */
 @media (min-width: 42rem) and (max-width: 73.74rem) {
-  .studio[data-studio-route="home"] .studioHomeArt {
-    width: 100%;
-    max-width: none;
-    height: clamp(19rem, 47dvh, 29rem);
-    -webkit-mask-image: linear-gradient(to bottom, #000 0 83%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 0 83%, transparent 100%);
-  }
 
-  .studio[data-studio-route="home"] .studioHomeArt img {
-    object-position: center;
-  }
+
+
 }
 
 /* Mobile retains the already-approved mini player before Studio content. */
 @media (max-width: 73.74rem) {
-  .studioHomeArt {
-    height: clamp(12.5rem, 53vw, 22rem);
-  }
+
 
   .studioIdentity[data-studio-intro="home"] {
     margin: -0.4rem clamp(0.65rem, 2.5vw, 1.4rem) 2rem;
@@ -4825,7 +4779,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .studioHomeArt,
   .studioIdentity[data-studio-intro="home"] {
     transition: none;
   }

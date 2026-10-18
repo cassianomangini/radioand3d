@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import shellStyles from "@/components/studio-radio/studio-radio-shell.module.css";
 import styles from "./radio-lyrics.module.css";
 import { useRadio } from "./radio-provider";
 import {
@@ -69,23 +68,23 @@ export function RadioLyrics({ trackId, title, headingId = "radio-lyrics-title", 
   }, [active, activeLine]);
 
   return (
-    <section className={shellStyles.lyricsPanel} aria-labelledby={headingId}>
-      <div className={shellStyles.lyricsHeader}>
+    <section className={styles.lyricsPanel} aria-labelledby={headingId}>
+      <div className={styles.lyricsHeader}>
         <h3 id={headingId}>Letra</h3>
         <span title={title}>{title}</span>
-        {onClose ? <button type="button" className={shellStyles.lyricsClose} onClick={onClose} aria-label="Fechar letra">×</button> : null}
+        {onClose ? <button type="button" className={styles.lyricsClose} onClick={onClose} aria-label="Fechar letra">×</button> : null}
       </div>
       <div
         ref={scrollRef}
-        className={shellStyles.lyricsScroll}
+        className={styles.lyricsScroll}
         role="region"
         aria-label={`Letra de ${title ?? "música atual"}`}
         tabIndex={0}
       >
-        {!trackId ? <p className={shellStyles.lyricsStatus}>Selecione uma faixa para ver a letra.</p> : null}
-        {trackId && !current ? <p className={shellStyles.lyricsStatus} role="status">Carregando letra…</p> : null}
-        {current?.failed ? <p className={shellStyles.lyricsStatus} role="alert">Não foi possível carregar a letra.</p> : null}
-        {current && !current.failed && !current.lyrics ? <p className={shellStyles.lyricsStatus}>Letra ainda não disponível para esta faixa.</p> : null}
+        {!trackId ? <p className={styles.lyricsStatus}>Selecione uma faixa para ver a letra.</p> : null}
+        {trackId && !current ? <p className={styles.lyricsStatus} role="status">Carregando letra…</p> : null}
+        {current?.failed ? <p className={styles.lyricsStatus} role="alert">Não foi possível carregar a letra.</p> : null}
+        {current && !current.failed && !current.lyrics ? <p className={styles.lyricsStatus}>Letra ainda não disponível para esta faixa.</p> : null}
         {current?.syncedLyrics ? (
           <div className={styles.syncedLyrics}>
             {current.syncedLyrics.lines.map((line, lineIndex) => {
@@ -137,7 +136,7 @@ export function RadioLyrics({ trackId, title, headingId = "radio-lyrics-title", 
             })}
           </div>
         ) : current?.lyrics ? (
-          <p className={shellStyles.lyricsText}>{current.lyrics}</p>
+          <p className={styles.lyricsText}>{current.lyrics}</p>
         ) : null}
       </div>
     </section>

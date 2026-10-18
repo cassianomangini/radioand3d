@@ -344,11 +344,10 @@ try {
     })()`
   );
   if (!interruptionReopened) throw new Error("Could not reopen Radio after reversal.");
-  // Allow the staged focus -> fullscreen signature and its cleanup window
-  // to finish before asserting that no layout animation remains.
-  await delay(1280);
-
-  const interruptionSettled = await evaluate(
+  // Wait for actual animation ownership to settle rather than assuming
+  // fixed wall-clock timing on a shared CI runner. Never bypass the final
+  // zero-running-animations and audio-identity checks below.
+  const interruptionSettled = await waitForEvaluation(
     client,
     `(() => {
       const site = document.querySelector('[data-radio-layout-mode]');
@@ -371,7 +370,8 @@ try {
         runningLayoutAnimations,
         audioPreserved: document.querySelector("audio") === window.__cmRadioAudioNode
       };
-    })()`
+    })()`,
+    6000
   );
   if (!interruptionSettled?.ok) {
     throw new Error(

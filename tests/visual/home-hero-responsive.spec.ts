@@ -215,3 +215,58 @@ test("Home X1 and copy fit the actual Studio in every Radio state", async ({ pag
     });
   }
 });
+
+test("Home reveal completes under normal motion without concealing its words", async ({ page }, testInfo) => {
+  test.skip(!["desktop-1440", "mobile-390"].includes(testInfo.project.name),
+    "Normal-motion QA on representative desktop and mobile");
+
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const response = await page.goto("/", { waitUntil: "domcontentloaded" });
+  expect(response?.status()).toBeLessThan(400);
+  await page.evaluate(() => document.fonts.ready);
+
+  const heading = page.locator("#studio-title");
+  await expect(heading).toHaveText("Impressão 3D, música e muito mais do que você imagina.");
+
+  await heading.evaluate(async (element) => {
+    await Promise.all(element.getAnimations({ subtree: true }).map((animation) =>
+      animation.finished.catch(() => undefined)
+    ));
+  });
+  const state = await heading.evaluate((element) => {
+    const letters = [...element.querySelectorAll("span")].filter((node) =>
+      getComputedStyle(node).animationName.includes("studio-letter-in")
+    );
+    const studio = document.querySelector("#studio") as HTMLElement;
+    const bounds = studio.getBoundingClientRect();
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    let textRight = bounds.left;
+    while (walker.nextNode()) {
+      if (!walker.currentNode.textContent?.trim()) continue;
+      const range = document.createRange();
+      range.selectNodeContents(walker.currentNode);
+      for (const rect of range.getClientRects()) textRight = Math.max(textRight, rect.right);
+    }
+    return {
+      animatedLetters: letters.length,
+      visibleLetters: letters.filter((node) => Number(getComputedStyle(node).opacity) >= 0.99).length,
+      textRight,
+      studioRight: bounds.right,
+      studioScrollWidth: studio.scrollWidth,
+      studioWidth: studio.clientWidth
+    };
+  });
+  await testInfo.attach("normal-motion-geometry.json", {
+    body: Buffer.from(JSON.stringify(state, null, 2), "utf8"),
+    contentType: "application/json"
+  });
+  expect(state.animatedLetters).toBeGreaterThan(0);
+  expect(state.visibleLetters).toBe(state.animatedLetters);
+  expect(state.textRight).toBeLessThanOrEqual(state.studioRight + 1);
+  expect(state.studioScrollWidth).toBeLessThanOrEqual(state.studioWidth + 1);
+  await page.screenshot({
+    path: testInfo.outputPath("home-normal-motion.png"),
+    fullPage: false,
+    animations: "disabled"
+  });
+});

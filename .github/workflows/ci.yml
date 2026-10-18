@@ -117,21 +117,48 @@ jobs:
             exit 1
           fi
 
-          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=4800             --run-all-compositor-stages-before-draw             --window-size=1440,1000             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-1440.png"             http://127.0.0.1:3000/
 
-          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=4800             --run-all-compositor-stages-before-draw             --window-size=1760,824             --screenshot="$GITHUB_WORKSPACE/visual-review/desktop-short-1760x824.png"             http://127.0.0.1:3000/
 
-          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=4800             --run-all-compositor-stages-before-draw             --window-size=390,844             --screenshot="$GITHUB_WORKSPACE/visual-review/mobile-390.png"             http://127.0.0.1:3000/
 
-          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=2200             --run-all-compositor-stages-before-draw             --window-size=1440,1000             --screenshot="$GITHUB_WORKSPACE/visual-review/product-desktop-1440.png"             http://127.0.0.1:3000/studio/produtos/porta-curativos-compacto
 
-          "$BROWSER"             --headless=new             --no-sandbox             --disable-gpu             --hide-scrollbars             --virtual-time-budget=2200             --run-all-compositor-stages-before-draw             --window-size=390,844             --screenshot="$GITHUB_WORKSPACE/visual-review/product-mobile-390.png"             http://127.0.0.1:3000/studio/produtos/porta-curativos-compacto
 
           BROWSER="$BROWSER" node scripts/capture-radio-states.mjs "$GITHUB_WORKSPACE/visual-review"
 
       - name: Playwright visual diagnostics
         if: steps.visual_changes.outputs.run == 'true'
         run: pnpm visual:qa
+
+      - name: Collect stable visual review screenshots
+        if: steps.visual_changes.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Browser CLI virtual-time-budget had captured the Home mid-letter
+          # reveal even at 4800ms. Playwright captures are made after the
+          # CSS animation completes and the fonts/images are ready.
+          copy_capture() {
+            local test_path="$1"
+            local project="$2"
+            local file_name="$3"
+            local dest="$4"
+            local source
+            source="$(find test-results/visual -type f -path "*${test_path}*${project}*" -name "$file_name" -print -quit)"
+            if [ -z "$source" ]; then
+              echo "Required stable capture missing: $test_path / $project / $file_name" >&2
+              exit 1
+            fi
+            cp "$source" "visual-review/$dest"
+          }
+          copy_capture home-hero-responsive desktop-1440 home-x1-default.png desktop-1440.png
+          copy_capture home-hero-responsive desktop-short home-x1-default.png desktop-short-1760x824.png
+          copy_capture home-hero-responsive mobile-390 home-x1-default.png mobile-390.png
+          copy_capture home-hero-responsive desktop-1440 home-x1-radio-medium.png home-radio-medium-1440.png
+          copy_capture home-hero-responsive desktop-1440 home-x1-studio-compact.png home-studio-minimum-1440.png
+          copy_capture home-hero-responsive desktop-1440 home-x1-radio-docked.png home-radio-docked-1440.png
+          copy_capture home-hero-responsive desktop-1440 home-normal-motion.png home-normal-motion-1440.png
+          copy_capture home-hero-responsive mobile-390 home-normal-motion.png home-normal-motion-390.png
+          copy_capture public-pages-capture-and-inspect-product desktop-1440 product-viewport.png product-desktop-1440.png
+          copy_capture public-pages-capture-and-inspect-product mobile-390 product-viewport.png product-mobile-390.png
 
       - name: Install browser video recorder for optional 03c QA
         if: steps.visual_changes.outputs.run == 'true'

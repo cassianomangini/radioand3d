@@ -2200,11 +2200,12 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           {studioRoute === "home" ? (
             <div className={styles.studioHomeArt} data-home-art="true" aria-hidden="true">
               <Image
-                src="/images/studio/cm-home-x1.png"
+                src="/images/studio/cm-home-x1-hd.webp"
                 alt=""
                 fill
                 priority
                 sizes="100vw"
+                unoptimized
               />
             </div>
           ) : null}

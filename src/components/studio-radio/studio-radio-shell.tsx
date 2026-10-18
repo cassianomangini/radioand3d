@@ -18,6 +18,13 @@ import {
 import { flushSync } from "react-dom";
 import { useReducedMotion } from "motion/react";
 import styles from "./studio-radio-shell.module.css";
+import {
+  getMinRadioWidth,
+  getMaxRadioWidth,
+  clampRadioWidth,
+  getDefaultWidth,
+  getExpandedWidth
+} from "./radio-panel-layout";
 import { StudioWelcome } from "./studio-welcome";
 import { StudioHub } from "./studio-hub";
 import { StudioHomeArt } from "./studio-home-art";
@@ -40,10 +47,6 @@ import {
   type RadioLayoutMode
 } from "./radio-motion-spine";
 
-const RADIO_WIDTH_RATIO = 0.3;
-const MAX_RADIO_WIDTH = 1120;
-const MIN_STUDIO_WIDTH = 640;
-const RESIZE_GUTTER = 32;
 const RADIO_DOCK_FLIGHT_MS = 660;
 const RADIO_DOCK_EDGE_RESTORE_PX = 78;
 
@@ -216,32 +219,6 @@ function SocialIcons() {
       ))}
     </div>
   );
-}
-
-function getMinRadioWidth(shellWidth: number) {
-  return Math.round(shellWidth * RADIO_WIDTH_RATIO);
-}
-
-function getMaxRadioWidth(shellWidth: number) {
-  return Math.min(
-    MAX_RADIO_WIDTH,
-    Math.max(getMinRadioWidth(shellWidth), shellWidth - MIN_STUDIO_WIDTH - RESIZE_GUTTER)
-  );
-}
-
-function clampRadioWidth(shellWidth: number, requested: number) {
-  return Math.min(
-    Math.max(requested, getMinRadioWidth(shellWidth)),
-    getMaxRadioWidth(shellWidth)
-  );
-}
-
-function getDefaultWidth(shellWidth: number) {
-  return clampRadioWidth(shellWidth, getMinRadioWidth(shellWidth));
-}
-
-function getExpandedWidth(shellWidth: number) {
-  return clampRadioWidth(shellWidth, shellWidth * 0.6);
 }
 
 function shouldIgnoreRadioShortcutTarget(target: EventTarget | null) {

@@ -62,7 +62,7 @@ Valores estáticos recorrentes de marca, texto, espaço, borda e sombra devem us
 
 Manter estilos de base no global; estilos de domínio junto do domínio. Utility classes podem compor layout, sem centenas de variantes visuais locais. Evitar `!important` corretivo e overrides em cascata para compensar uma primitiva inadequada.
 
-**Ownership e dívida de cascata (auditoria 18/10/2026):** antes de alterar `studio-radio-shell.module.css`, inspecionar todas as ocorrências dos seletores afetados, `@media`, `@container`, estados `data-*`, importações do CSS Module e computed styles nos cenários reais. O CSS do shell é compartilhado também por `radio-lyrics.tsx`. Não corrigir um layout adicionando mais uma versão conflitante da regra ao fim de 5 mil linhas; consolidar a regra com sua variante por estado e eliminar overrides obsoletos, com screenshots antes/depois. A análise e seus números datados estão no [relatório 08V de 18/10](work/evidence/08v-css-shell-architecture-audit-2026-10-18.md).
+**Ownership e dívida de cascata (auditoria 18/10/2026):** antes de alterar `studio-radio-shell.module.css`, inspecionar todas as ocorrências dos seletores afetados, `@media`, `@container`, estados `data-*`, importações do CSS Module e computed styles nos cenários reais. O acoplamento de `radio-lyrics.tsx` ao módulo do shell existia na auditoria inicial, mas foi **eliminado** em [`aaddc6e`](https://github.com/cassianomangini/radioand3d/commit/aaddc6e62aa64481b20147ddda803219ca871999). Não corrigir um layout adicionando uma nova versão conflitante da regra no fim do arquivo: consolidar a regra e suas variantes com provas renderizadas. A análise e seus números datados estão no [relatório 08V de 18/10](work/evidence/08v-css-shell-architecture-audit-2026-10-18.md).
 
 ### Componentes e composição
 
@@ -108,7 +108,7 @@ Regras técnicas:
 
 ### Ownership implementado do shell público (18/10/2026)
 
-A modularização é incremental, feita sem criar um segundo motor de música nem alterar HTML/semântica das superfícies aprovadas. Mapa do código na `main@c4b2d4a`:
+A modularização é incremental, feita sem criar um segundo motor de música nem alterar HTML/semântica das superfícies aprovadas. Mapa do código na `main@69d8ec7`:
 
 | Responsabilidade | Arquivo atual | Limite |
 | --- | --- | --- |
@@ -119,8 +119,9 @@ A modularização é incremental, feita sem criar um segundo motor de música ne
 | Três entradas do Estúdio e motion de cards | `src/components/studio-radio/studio-hub.tsx` | Motion e galeria pertencem ao hub; sem alteração na fila ou navegação da Rádio |
 | Arte X1 e crop responsivo da Home | `src/components/studio-radio/studio-home-art.tsx` + `studio-home-art.module.css` | CSS Module próprio, imagem existente, sem re-render artificial |
 | Geometria pura do divisor e limites ARIA | `src/components/studio-radio/radio-panel-layout.ts` + `tests/radio-panel-layout.test.mjs` | Mesma fórmula alimenta arraste e valores acessíveis |
+| Layout e animação de Letras | `src/features/radio/radio-lyrics.tsx` + `radio-lyrics.module.css` (**297 linhas**) | Sem importar CSS do shell. Estados desktop, mobile, aba e fullscreen via atributos `data-*` do DOM; efeitos, sincronização e foco preservados. Testes `radio-lyrics-layout.spec.ts` + `radio-lyrics-css-ownership.test.mjs` |
 
-O módulo legado `studio-radio-shell.module.css` ainda tem **4.791 linhas**. A divisão de arte já criou ownership real de CSS, porém o Header, a identidade editorial, o hub e a Rádio continuam compartilhando regras do módulo principal. A dependência do painel de letras em `radio-lyrics.tsx` continua válida e **não deve ser apagada por análise incompleta**.
+O módulo legado `studio-radio-shell.module.css` passou para **4.368 linhas** no `main@69d8ec7`. A refatoração deslocou 23 regras de Letras para o módulo próprio, eliminou **73 declarações substituídas** por regras posteriores no mesmo seletor e contexto, removeu 7 regras vazias e normalizou espaços em branco. **Não confundir linhas removidas do shell com CSS total eliminado:** 192 linhas foram adicionadas ao módulo de Letras. Header, identidade editorial, hub e player ainda compartilham CSS do shell e seguem pendentes de ownership.
 
 **Regra de continuidade:** extrações substituem a mesma subárvore DOM e preservam refs, `RadioProvider`, `HTMLAudioElement`, Motion, fila e rotas. Validar por Playwright/CDP e comparar capturas de *mesmo viewport + estado + SHA* antes/depois; um build verde não comprova fidelidade. Os registros de execução estão em [08V](work/08-visual-quality-evolution.md).
 

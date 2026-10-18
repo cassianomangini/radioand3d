@@ -17,7 +17,7 @@ function delay(milliseconds) {
 }
 
 async function waitForDebugTarget() {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
+  for (let attempt = 0; attempt < 250; attempt += 1) {
     try {
       const response = await fetch(`http://127.0.0.1:${debugPort}/json/list`);
       if (response.ok) {
@@ -155,16 +155,26 @@ async function screenshot(client, fileName) {
 
 await mkdir(outputDirectory, { recursive: true });
 
+let chromeStderr = "";
 const chrome = spawn(browserPath, [
   "--headless=new",
   "--no-sandbox",
   "--disable-gpu",
+  "--disable-dev-shm-usage",
+  "--no-first-run",
+  "--no-default-browser-check",
   "--hide-scrollbars",
   `--remote-debugging-port=${debugPort}`,
   `--user-data-dir=${userDataDirectory}`,
   "about:blank"
 ], {
-  stdio: "ignore"
+  stdio: ["ignore", "ignore", "pipe"]
+});
+chrome.stderr?.on("data", (chunk) => {
+  chromeStderr = (chromeStderr + String(chunk)).slice(-4000);
+});
+chrome.on("error", (error) => {
+  chromeStderr = (chromeStderr + error.message).slice(-4000);
 });
 
 try {
@@ -773,6 +783,11 @@ try {
   await screenshot(client, "mobile-radio-open-390x844.png");
 
   client.close();
+} catch (error) {
+  // Chromium can take longer to start on a cold hosted runner. Preserve a
+  // bounded diagnostic excerpt instead of silently hiding browser failures.
+  if (chromeStderr) console.error("Chromium diagnostics:", chromeStderr);
+  throw error;
 } finally {
   chrome.kill("SIGTERM");
 

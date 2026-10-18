@@ -224,3 +224,19 @@ Os blocos A2.4/A2.5/A2.6/A2.7 não devem ser confundidos com aprovação visual:
 - [`32be6b6`](https://github.com/cassianomangini/radioand3d/commit/32be6b6e04e3084a0d92b450426c24188dc9d7b8): prazo maior e log de stderr para detectar falha fria do CDP. [CI 39155705089](https://github.com/cassianomangini/radioand3d/actions/runs/39155705089) **sucesso completo**: lint, tipos, testes, build, CDP, 79 Playwright, 18 lab e 2 dock. A arte final continua pendente de aceite de Cassiano.
 
 **Retomada operacional:** (1) conferir a composição aprovada com as capturas finais da `main@32be6b6` e registrar apenas diferenças visuais concretas; (2) consolidar os overrides ainda vivos e extrair CSS/TSX por domínio em commits pequenos; (3) medir custo de mídia, carrossel e áudio persistente após cada etapa. A aprovação estética continua de Cassiano.
+
+## B4 parcial: extrações versionadas na main (18/10/2026)
+
+A modularização foi executada em commits pequenos, diretamente na `main`, com QA de cada fronteira. Histórico de SHA, arquivo e resultado: [auditoria consolidada](evidence/08v-css-shell-architecture-audit-2026-10-18.md#10-b4-modularizacao-real-do-shell-e-evidencias).
+
+- [x] Player completo extraído para `radio-content.tsx`; tipos comuns em `radio-view-transition.ts`. A importação do visualizador da animação de dock foi restaurada após falha objetiva de lint. O teste CDP de reversão espera **condição observada**, não um tempo fixo, sem relaxar verificação de animações ou continuidade do áudio. [CI 39160064139](https://github.com/cassianomangini/radioand3d/actions/runs/39160064139) verde.
+- [x] Primeira fronteira CSS isolada: `studio-home-art.tsx` + `studio-home-art.module.css`, com recorte/máscara originais preservados. [CI 39160412327](https://github.com/cassianomangini/radioand3d/actions/runs/39160412327) verde.
+- [x] `StudioWelcome` e `StudioHub` independentes, sem alterar o DOM renderizado nem criar novo player. [CI 39160755783](https://github.com/cassianomangini/radioand3d/actions/runs/39160755783) verde.
+- [ ] Limites do divisor extraídos para `radio-panel-layout.ts` e **três testes unitários adicionais** enviados em [c4b2d4a](https://github.com/cassianomangini/radioand3d/commit/c4b2d4a5a118ec9872e46921144ceac6f90697f9). Conferir [CI 39161117335](https://github.com/cassianomangini/radioand3d/actions/runs/39161117335) antes de marcar validado.
+- [ ] Continuar ownership de CSS e extrair somente outros blocos com limites reais, sobretudo Header, dock e identidade Home. A refatoração **não** está pronta enquanto o shell ainda mantém estados acoplados e o CSS principal não possui domínio claro.
+- [ ] Avaliar performance/crop da imagem com dados de rede, LCP e comparação perceptiva aprovada; aprovar aparência com Cassiano, separado de pixels idênticos.
+
+**Evidência visual automatizada:** entre a base anterior e a extração do player, **9 de 9 screenshots representativas ficaram pixel a pixel idênticas**. Após a extração da arte, **6 de 8 capturas comparadas ficaram idênticas**, com alterações mínimas em dois estados transitórios. Após a separação Hub/Welcome, **7 de 9 capturas ficaram idênticas** e duas apresentaram diferenças muito pequenas (efeitos transitórios). A comparação foi por Pillow/ImageChops em PNGs dos artefatos CI; não substitui aprovação artística.
+
+**Métricas do arquivo monolítico:** `studio-radio-shell.tsx` caiu de **2.459 para 1.738 linhas**; o principal CSS Module caiu para **4.791 linhas**, incluindo a saída da arte para outro módulo. Não confundir diminuição do arquivo principal com eliminação equivalente de CSS total: regras vivas migraram.
+

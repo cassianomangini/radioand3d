@@ -106,6 +106,24 @@ Regras técnicas:
 - sem alturas rígidas dependentes de viewport para sustentar a composição;
 - novas seções 3D entram abaixo da entrada inicial e não exigem alteração do shell da Rádio.
 
+### Ownership implementado do shell público (18/10/2026)
+
+A modularização é incremental, feita sem criar um segundo motor de música nem alterar HTML/semântica das superfícies aprovadas. Mapa do código na `main@c4b2d4a`:
+
+| Responsabilidade | Arquivo atual | Limite |
+| --- | --- | --- |
+| Coordenação de navbar, rotas, divisor, dock e modal mobile | `src/components/studio-radio/studio-radio-shell.tsx` (**1.738 linhas**) | Orquestra; não cria o elemento `audio` nem realiza renderização de playlist dentro do shell |
+| Player completo desktop e modal mobile | `src/components/studio-radio/radio-content.tsx` (**528 linhas**) | Reúne controles, busca/playlist, letras e visualizador; lê o `RadioProvider` existente |
+| Tipos compartilhados da transição de rota | `src/components/studio-radio/radio-view-transition.ts` | Tipos, sem efeitos colaterais |
+| Saudação, H1, copy e CTA persistentes | `src/components/studio-radio/studio-welcome.tsx` | Mantém nó estável entre Home e Studio; recebe navegação do shell |
+| Três entradas do Estúdio e motion de cards | `src/components/studio-radio/studio-hub.tsx` | Motion e galeria pertencem ao hub; sem alteração na fila ou navegação da Rádio |
+| Arte X1 e crop responsivo da Home | `src/components/studio-radio/studio-home-art.tsx` + `studio-home-art.module.css` | CSS Module próprio, imagem existente, sem re-render artificial |
+| Geometria pura do divisor e limites ARIA | `src/components/studio-radio/radio-panel-layout.ts` + `tests/radio-panel-layout.test.mjs` | Mesma fórmula alimenta arraste e valores acessíveis |
+
+O módulo legado `studio-radio-shell.module.css` ainda tem **4.791 linhas**. A divisão de arte já criou ownership real de CSS, porém o Header, a identidade editorial, o hub e a Rádio continuam compartilhando regras do módulo principal. A dependência do painel de letras em `radio-lyrics.tsx` continua válida e **não deve ser apagada por análise incompleta**.
+
+**Regra de continuidade:** extrações substituem exatamente o mesmo subárvore DOM e preservam refs, `RadioProvider`, `HTMLAudioElement`, Motion, fila e rotas. Validar por Playwright/CDP e comparar capturas de *mesmo viewport + estado + SHA* antes/depois; um build verde não comprova fidelidade. Os registros de execução estão em [08V](work/08-visual-quality-evolution.md).
+
 ### Movimento, mídia e desempenho
 
 CSS resolve feedback simples; Motion coordena transições que precisam dele. Não empilhar motores de animação. Carregar visualizador rico, player expandido e 3D sob demanda quando possível. Reservar proporção das imagens, servir tamanho adequado e manter foto/fallback útil enquanto a interação carrega.

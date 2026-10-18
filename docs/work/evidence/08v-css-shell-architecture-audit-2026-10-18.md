@@ -249,3 +249,22 @@ Uma execução anterior da PR documental ([run 39155820555](https://github.com/c
 **Autorreview renderizado atualizado:** inspeção das capturas do CI na `main@32be6b6` confirmou H1 completo em split 1440 e dock e enquadramento sem corte de texto nos estados aferidos. **A direção artística final não foi aprovada pelo usuário por este teste.**
 
 **Trabalho ainda aberto:** reduzir redundâncias entre regras **ainda em uso**, modularizar CSS por domínio, extrair o shell React de 2.458 linhas, medir imagem/LCP, rever carrossel e obter aprovação estética do usuário. O CDP e o QA de motion normal já passaram; não marcar B3/B4/B5 como concluídos apenas porque 330 linhas de CSS foram apagadas.
+
+## 10. B4: modularização real do shell e evidências
+
+A primeira revisão deste relatório mapeou 2.458 linhas de TSX e 5.149 linhas de CSS **na base antiga**. O código evoluiu; não reutilizar esses números como estado atual.
+
+| Commit em `main` | Mudança estrutural | Resultado real |
+| --- | --- | --- |
+| [`d2c9cdb`](https://github.com/cassianomangini/radioand3d/commit/d2c9cdb8c65df465ffac5ca3f397d7c3b4641c0e) | Extração de `RadioContent` para `radio-content.tsx` (528 linhas), tipos de transição para `radio-view-transition.ts`; mesmo DOM e mesmo provider | Falhou primeiro em lint por import ausente do visualizador usado no dock, corrigido no commit seguinte |
+| [`6b515a0`](https://github.com/cassianomangini/radioand3d/commit/6b515a040226bbe2ea94389f62bccb8f1e3c6d98) | Import do `RadioVisualizer` mantido no shell para a animação da navbar | Lint, tipos, testes e build verdes; CDP registrou animações ainda em andamento após janela de 1.280ms |
+| [`ca4c1f7`](https://github.com/cassianomangini/radioand3d/commit/ca4c1f7e2a51057017f967ef13f14d7420e77940) | Espera CDP baseada em estado real, até 6 segundos, sem enfraquecer `runningLayoutAnimations === 0` e identidade do `audio` | [CI 39160064139](https://github.com/cassianomangini/radioand3d/actions/runs/39160064139): lint, tipos, testes, build, CDP e visual Playwright verdes |
+| [`5a50bcd`](https://github.com/cassianomangini/radioand3d/commit/5a50bcd012d675fb7207fd04b076e3ed390332dd) | Extração do asset e 10 regras de `studioHomeArt` para `studio-home-art.tsx` e `studio-home-art.module.css` | [CI 39160412327](https://github.com/cassianomangini/radioand3d/actions/runs/39160412327) verde |
+| [`2eb4141`](https://github.com/cassianomangini/radioand3d/commit/2eb41413aa4206355cde869320e9e956401763a8) | Extração de `StudioWelcome` (103 linhas) e `StudioHub` (124 linhas) do shell; Motion, HTML e callbacks preservados | [CI 39160755783](https://github.com/cassianomangini/radioand3d/actions/runs/39160755783) verde |
+| [`c4b2d4a`](https://github.com/cassianomangini/radioand3d/commit/c4b2d4a5a118ec9872e46921144ceac6f90697f9) | Lógica pura de largura transferida para `radio-panel-layout.ts` e adicionados três testes unitários | [CI 39161117335](https://github.com/cassianomangini/radioand3d/actions/runs/39161117335) **em verificação nesta atualização** |
+
+**Comparação renderizada objetiva:** artefatos `studio-radio-visual-review` do [CI baseline 39156314432](https://github.com/cassianomangini/radioand3d/actions/runs/39156314432) contra [39160064139](https://github.com/cassianomangini/radioand3d/actions/runs/39160064139): **nove capturas idênticas pixel a pixel** (split 1440/1760, mobile 390, dock, intermédio, Estúdio no mínimo, hub, Radio fullscreen, modal mobile). Após a extração da arte, **6/8 capturas selecionadas idênticas**; as duas demais diferiram muito pouco em regiões de animação (média RGB inferior a 0,025). Após extrair Home/Hub, **7/9 idênticas**, duas com média RGB inferior a 0,025. Isso apoia a preservação de UI, mas **não é aprovação estética**.
+
+**Estado quantitativo do código `main@c4b2d4a`:** `studio-radio-shell.tsx` **1.738 linhas** (antes 2.459), `studio-radio-shell.module.css` **4.791 linhas**, e um CSS Module separado de arte com **93 linhas**. Uma parcela do CSS foi **movida**, não removida. O player, o hub, o welcome e o asset possuem ownership em arquivos próprios; o orquestrador ainda não está plenamente desacoplado. O acoplamento do CSS de `RadioLyrics` permanece.
+
+**Pendente:** resultado final do CI de geometria, novas extrações de Header/dock, ownership do CSS de hub/player, classificação de overrides ativos, medição de LCP/nitidez do WebP, revisão do carrossel, e aceite perceptual final de Cassiano. Não chamar B4 de concluído enquanto só parte foi extraída.

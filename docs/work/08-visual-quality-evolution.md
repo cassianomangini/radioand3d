@@ -2,7 +2,7 @@
 
 **Estado:** em execução; auditoria e base de agentes/dependências/QA renderizado verificadas. Baselines aprovadas, QA ampliado, laboratório, piloto e adoção contínua ainda pendentes.  
 **Vínculo:** subfrente da entrega 08 (Estúdio público); não é uma nova fila paralela nem reabre C1–C8 da Rádio.  
-**Base consultada:** `main` em 09/10/2026, commit `080cbd7d2078848f9d6e66bf33efc154c672b4ed`.  
+**Base da auditoria inicial (histórica):** `main` em 09/10/2026, commit `080cbd7d2078848f9d6e66bf33efc154c672b4ed`. A revisão adicional de 18/10 utiliza `main@23f25c3c2193cddadd6a3e0f014ca7df2fcf5666`.  
 **Responsáveis por domínio:** CM Experience (direção), CM Frontend (implementação), CM Review (evidência), CM Planning (controle do checklist).  
 **Referências:** `AGENTS.md`, `docs/EXPERIENCE.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/design/CM_MOTION_EXPERIENCE_PLAN_V1.md`, `docs/design/STUDIO_COMMERCE_EXPERIENCE_V1.md`, `docs/design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md` e pesquisa entregue por Cassiano em 09/10/2026 sobre interfaces render-first.
 
@@ -50,6 +50,20 @@ Em 09/10/2026, Cassiano identificou que a primeira rodada do laboratório **não
 **Conferência renderizada adicional:** foram inspecionados os screenshots do próprio CI [37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229) para Home/hub/Produto/Orçamento, desktop 1440 e mobile 390. A foto de Produto, as miniaturas, o CTA Shopee sólido, o mini-player e a hierarquia colorida ciano/violeta/coral dos três pilares reforçam a diferença em relação ao lab genérico. **A1.5 permanece aberta** especificamente porque falta QA da galeria `/studio/impressoes` com mídia apropriada, não porque nenhum mobile tenha sido visto.
 
 **Artefato de estudo:** [CM — Auditoria da identidade visual aplicada ao site](../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md). **Gate:** V4.4/V4.5 e V5 estão bloqueados até A1.5/A1.6, conforme pertinência da tela. Não pedir que o usuário escolha entre três propostas que compartilham um erro de identidade. **A implementação pública continua intocada.**
+
+## A2. Auditoria complementar de CSS e Home sobre a main atual (18/10/2026)
+
+**Documento de evidência:** [08V, revisão crítica do shell CSS/TSX e QA](evidence/08v-css-shell-architecture-audit-2026-10-18.md), atualizado no PR #34. Esta é uma subfrente operacional do 08V, não um novo roadmap. O diagnóstico de 09/10 acima continua histórico e não se aplica automaticamente à Home de 18/10.
+
+- [x] **A2.1, verificação estática:** confirmar `main@23f25c3c2193cddadd6a3e0f014ca7df2fcf5666`, novo WebP, regras atuais de copy, 5.149 linhas de CSS/2.458 TSX e classe de importação compartilhada com as letras. Contagens de overrides/classes órfãs são **heurísticas**, não remoções autorizadas.
+- [x] **A2.2, CI de fato:** verificar [run 39151011258](https://github.com/cassianomangini/radioand3d/actions/runs/39151011258), no qual lint/typecheck/unit/build passaram e as etapas de captura e Playwright foram `skipped`. O [workflow 39151011224](https://github.com/cassianomangini/radioand3d/actions/runs/39151011224) da prévia de Radio não cobre essa validação da Home.
+- [x] **A2.3, conflito contrato/teste:** documentar que `tests/visual/home-hero-responsive.spec.ts` espera copy relativa/vertical no Estúdio estreito, mas o CSS novo a torna absoluta/lateral; há também requisitos do início de H1 obsoletos no split. **Falha runtime não alegada**, pois a suíte visual não rodou no push atual.
+- [ ] **A2.4, B0:** executar `pnpm visual:qa` e capturas reais no SHA mais recente, inspecionando texto efetivamente pintado, crop, CTA e scroll em cinco viewports e estados do divisor. Diferenciar erro do teste antigo de defeito visual efetivo.
+- [ ] **A2.5, B1:** corrigir expectativas do hero conforme referência aprovada e tornar a execução da suíte visual confiável para mudanças relevantes. Se for exigido bloqueio **antes do merge**, definir branches e checks requeridos; CI após push na `main` sem proteção não impede o commit.
+- [ ] **A2.6, B2/B3:** corrigir apenas diferenças visuais demonstradas, consolidar a cascata, verificar classes realmente mortas e preservar as importações do módulo de letras; medir nitidez e payload do novo asset.
+- [ ] **A2.7, B4/B5:** modularizar shell por responsabilidade, corrigir limite ARIA, testar continuidade do mesmo `<audio>`, carrossel, desempenho e motion normal/reduzido. Exigir QA por etapa e revisões reversíveis.
+
+**Gate A2:** não declarar a Home ou a limpeza CSS como concluídas até haver prova renderizada na implementação atual, testes coerentes com a direção escolhida e aceite visual separado de CI verde. Não reabrir a Rádio aceita; dock continua no 03c.
 
 ## Sequência de execução — marcar somente com evidência
 
@@ -179,9 +193,19 @@ Um `[x]` exige um resultado **efetivamente observado** e localização da prova.
 
 | 09/10/2026 | A1.1–A1.4 | [Auditoria visual real do site](../design/CM_SITE_VISUAL_IDENTITY_AUDIT_V1.md), seis imagens do usuário, tokens/CSS/TSX e contratos aceitos | Erro de identidade dos 3 conceitos V1 reconhecido; descartados como proposta artística, mantidos somente para QA. A1.5/A1.6 abertos. |
 
-## Retomada
+## Evidência complementar, 18/10/2026
+
+| Data | IDs | Evidência | Resultado / próximo passo |
+| --- | --- | --- | --- |
+| 18/10/2026 | A2.1–A2.3 | [Auditoria 08V CSS/shell](evidence/08v-css-shell-architecture-audit-2026-10-18.md), [commit `23f25c3`](https://github.com/cassianomangini/radioand3d/commit/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666), [run 39151011258](https://github.com/cassianomangini/radioand3d/actions/runs/39151011258) | Leitura e estados dos jobs verificados; CI verde **sem** Playwright visual. Render atual, correções de código e aceite humano **não** realizados. Próximo A2.4 (B0) e A2.5 (B1). |
+
+## Retomada do recorte inicial de 09/10 (histórico)
 
 **Último ponto verificado:** auditoria A0; V1.1–V1.4/V1.6; V2.1/V2.3/V2.4; V3.1–V3.4; V4.1–V4.3. [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37942413229) verde, laboratório renderizado 3×4, custos dev registrados e defeitos de texto/hidratação corrigidos.  
 **Pendências:** V1.5 (importação da skill pessoal); V2 (fixtures/baselines aprovadas, checks integrais), V3.5 (adoção de efeitos após seleção), **V4.4/V4.5 (escolha e aceite visual)**, V5/V6 não iniciados. Dados visuais reais E3 permanecem ausentes.  
 **Próxima ação exata:** A1.5 — verificar a rota real `/studio/impressoes` e o mobile do CM no navegador; A1.6 — refazer a direção de Impressões dentro da composição existente, com paleta/tipografia/marca documentadas. **Não** solicitar escolha entre os três estudos iniciais rejeitados.  
 **Deploy e alteração de páginas públicas:** nenhum. **Código alterado:** apenas laboratório isolado de desenvolvimento, testes, scripts, CI e documentação; Home, Estúdio público, Produto e Rádio preservados.
+
+## Retomada atual, 18/10/2026
+
+O foco imediato da frente 08V no shell é [A2.4, B0](evidence/08v-css-shell-architecture-audit-2026-10-18.md): capturar e interagir com a **nova** Home no SHA mais recente, separar falhas da suíte desatualizada dos defeitos renderizados e confirmar a referência vigente. Em seguida, A2.5/B1 repara o gate de CI/teste. Só após evidência e contrato estável entram ajustes visuais, limpeza de CSS e extração do TSX. Não tratar checks já concluídos em 09/10 como execução de 18/10. Nenhuma modificação de UI ou player foi realizada pelo PR documental.

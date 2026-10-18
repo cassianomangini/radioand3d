@@ -1,236 +1,210 @@
-# Auditoria de CSS, arquitetura do shell e QA visual do CM 3D & Radio
+# 08V | Auditoria do CSS, shell e QA visual da CM 3D & Rádio
 
-**Data:** 18/10/2026  
-**Base imutavel da leitura:** `main@23f25c3c2193cddadd6a3e0f014ca7df2fcf5666`  
-**Escopo:** Home, composicao Estudio/Radio, CSS Module compartilhado, componentes consumidores, contratos de interacao, testes Playwright e workflow de CI.  
-**Natureza:** diagnostico e proposta de execucao. Este documento nao altera interface, audio, rotas ou dados.  
-**Estado:** auditoria estatica e leitura dos resultados de CI concluidas; validacao renderizada da nova `main` pendente.  
-**Aprovacao visual:** nao registrada para a nova versao da `main`.  
-**Responsavel pela execucao futura:** a definir. Este PR nao implementa as correcoes.
+**Revisão:** 18/10/2026 (segunda leitura crítica do relatório do PR #34).  
+**Código examinado:** [`main@23f25c3`](https://github.com/cassianomangini/radioand3d/commit/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666). Os números abaixo são um retrato deste SHA, não métricas permanentes.  
+**Estado:** diagnóstico estático revisado e CI conferido; **sem execução ou inspeção renderizada da Home nesse SHA**.  
+**Escopo:** Home, shell Estúdio/Rádio, CSS Module, consumidores de classes, divisor, suíte visual e CI. Não equivale a auditoria de segurança, SEO, Supabase ou todas as jornadas do produto.  
+**Natureza deste PR:** exclusivamente documentação. Não corrige a interface nem altera o motor de áudio.  
+**Aceite visual da Home atual:** pendente; commit e CI verde não representam aprovação estética.
 
-## 1. Resumo executivo e decisao
+## 1. Decisão executiva
 
-A versao atual **nao deve ser julgada pelas capturas do PR #33**. Em 18/10, a `main` recebeu a imagem `cm-home-x1-hd.webp`, ajustou `object-position`, eliminou parte das regras antigas do hero e mudou a Home para um bloco de texto ancorado no topo, com composicao lateral inclusive no Estudio estreito. O PR #33 partiu de outro CSS e de outro asset.
+A mudança enviada à `main` em 18/10 trocou a Home para `cm-home-x1-hd.webp`, centralizou o `object-position` e mudou a composição da copy: no desktop, um painel ancorado no topo e texto ao lado da imagem, inclusive no Estúdio estreito. **É diferente do PR #33, já fechado**. Prints do #33 são evidência histórica, não um diagnóstico do novo render.
 
-Os problemas que continuam sustentados por evidencia direta:
+Existem **dois bloqueios de evidência imediatos**:
 
-1. **P0, gate de qualidade:** os dois workflows do commit atual ficaram verdes, mas o job principal **pulou os passos de captura visual e Playwright**; o push tinha mensagem `c`, sem `[visual]`. Uma alteracao relevante de Home, CSS e imagem chegou a `main` sem executar esse gate.
-2. **P0, teste em contradicao com produto:** `tests/visual/home-hero-responsive.spec.ts` exige layout vertical com `position: relative` no Estudio estreito. A nova `main` exige explicitamente layout lateral e preserva `position: absolute`. O teste precisa ser reescrito a partir do comportamento aprovado e **executado**; nao apenas enfraquecido para ficar verde.
-3. **P1, divida estrutural:** `studio-radio-shell.module.css` tem **5.149 linhas** e `studio-radio-shell.tsx` tem **2.458 linhas**. O mesmo modulo CSS guarda varias superficies, estados e geracoes de estilos.
-4. **P1, divida de cascata:** a contagem estatica encontrou **85 grupos de seletor + propriedade + contexto com valores distintos repetidos**. Isso mede oportunidade de revisao, nao 85 defeitos confirmados.
-5. **P1, codigo potencialmente sem consumidor:** foram identificadas **21 classes candidatas**, por analise das referencias estaticas, e **72 blocos de regras / 245 declaracoes candidatas**. A classificacao e preliminar e exige confirmacao antes da exclusao.
-6. **P1, acessibilidade objetiva:** o divisor divulga `aria-valuemax=1120`, mas o teto operacional e variavel e pode ser menor. O atributo precisa refletir o limite calculado.
-7. **P1, enquadramento e legibilidade ainda sem aceite:** a imagem atual usa `cover` e `center`; as frases da Home sao forçadas a `nowrap` em contêineres a partir de `60rem`. A adequacao desses valores a todos os tamanhos reais da coluna de texto nao foi comprovada em navegador na `main`.
+1. O commit atual teve lint, tipos, testes gerais e build verdes, mas os passos visuais do workflow principal foram **ignorados**: o push tinha mensagem `c`, sem `[visual]`. Não existe validação renderizada atual derivada desse CI.
+2. `tests/visual/home-hero-responsive.spec.ts` ainda codifica a composição anterior. A mudança de CSS não atualizou o teste; se a suíte visual for executada, suas expectativas entram em conflito com a implementação atual. Isso ainda não é resultado de teste executado, e sim contradição verificável por leitura.
 
-**Diretriz:** corrigir primeiro o processo de prova e os testes obsoletos, depois consolidar os estilos e extrair responsabilidades. Nao iniciar reescrita total, nao trocar o motor de audio e nao introduzir mais overrides ao final do CSS.
+Em paralelo, o shell continua concentrando **5.149 linhas de CSS** e **2.458 linhas de TSX**. Precisa de consolidação por responsabilidade, com testes antes e depois, não de novos patches de CSS no rodapé.
 
-## 2. Evidencias e limites
+**Ordem:** estabelecer prova visual e resolver a divergência de contrato/teste; corrigir defeitos realmente vistos; depois eliminar CSS legado e modularizar, sempre mantendo player, rota e interações.
 
-### Base e estado dos workflows
+## 2. Rastreabilidade e o que foi realmente verificado
 
-- `main`, 18/10/2026: [commit 23f25c3](https://github.com/cassianomangini/radioand3d/commit/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666).
-- [CI principal do commit atual, run 39151011258](https://github.com/cassianomangini/radioand3d/actions/runs/39151011258): `lint`, `typecheck`, testes e `build` concluidos com sucesso; etapas `Capture visual review` e `Playwright visual diagnostics` constam como **skipped**.
-- [Workflow da previa de Radio, run 39151011224](https://github.com/cassianomangini/radioand3d/actions/runs/39151011224): sucesso na superficie que cobre; **nao equivale a revisar a nova Home**.
-- [PR #33](https://github.com/cassianomangini/radioand3d/pull/33): versao substituida, capturas e medidas historicas; nao reutilizar seus pixels para declarar defeitos presentes na nova `main`.
-- [Contrato de experiencia](../../EXPERIENCE.md), [arquitetura](../../ARCHITECTURE.md), [processo render-first](../../design/CM_VISUAL_RENDER_PIPELINE_V1.md) e [execucao 08V](../08-visual-quality-evolution.md). Estes documentos nao concedem aprovacao automatica a capturas de agente.
-
-### Metodo
-
-[VERIFICADO] Arquivos e diffs lidos diretamente no GitHub, snapshot de arvore da `main`, estado dos jobs e comparacao com `main@89794b9`. Houve analise estatica das classes e das declaracoes CSS considerando os consumidores `studio-radio-shell.tsx` e `radio-lyrics.tsx`.
-
-[INFERENCIA] Duplicacoes de cascata e classes sem referencia sao **candidatos de refatoracao**. Nem toda redefinicao e bug e nem todo CSS sem referencia textual esta morto. Necessario validar estados dinamicos, especificidade, `:has`, `data-*` e consumidores reais antes de remover.
-
-[NAO VERIFICADO] A nova `main` nao foi renderizada/interagida nesta rodada. Nao foram executados localmente `pnpm visual:qa`, captura CDP, medicao de layout shift, desempenho, rede, a11y completa ou comparacao perceptual com os mocks aprovados. Qualidade visual atual continua **pendente**, e nao reprovada por evidencias de outra branch.
-
-## 3. Inventario quantitativo na main atual
-
-| Arquivo ou indicador | Valor atual | Interpretacao |
-| --- | ---: | --- |
-| `src/components/studio-radio/studio-radio-shell.module.css` | **5.149 linhas**, 121.001 bytes | Excesso de concentracao de responsabilidades |
-| `src/components/studio-radio/studio-radio-shell.tsx` | **2.458 linhas** | Orquestracao e UI acopladas |
-| Regras CSS comuns detectadas | **695** | Contagem estatica, sem `@keyframes` |
-| Declaracoes CSS detectadas | **2.558** | Contagem estatica |
-| `@media` / `@container` / `@keyframes` | **40 / 5 / 22** | Mecanismos legitimos que pedem consolidacao |
-| Grupos de propriedades redefinidas com valores distintos | **85** | Auditoria de cascata necessaria |
-| Classes sem consumidor estatico identificado | **21 candidatas** | Triagem, nao exclusao automatica |
-| Blocos / declaracoes potencialmente orfaos | **72 / 245** | Heuristica, revisar antes de apagar |
-| Asset novo da Home | `cm-home-x1-hd.webp`, **899.842 bytes** | Novo asset, sem QA de enquadramento atual |
-| Asset PNG antigo ainda versionado | `cm-home-x1.png`, **1.921.133 bytes** | Verificar consumidores antes de excluir |
-
-A atualizacao reduziu o CSS de **5.193 para 5.149 linhas**, mas nao eliminou o problema estrutural. Numero de linhas nao deve virar meta artificial: a meta e remover logica redundante, clarificar ownership e reduzir regressao.
-
-## 4. Achados acionaveis
-
-### A-01 [P0] Gate visual opcional em push na main
-
-**Evidencia:** [`.github/workflows/ci.yml`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/.github/workflows/ci.yml), passos condicionados a `pull_request` ou a mensagem contendo `[visual]`. O commit atual de Home entrou com mensagem `c`; [run 39151011258](https://github.com/cassianomangini/radioand3d/actions/runs/39151011258) registra `skipped` para captura e Playwright.
-
-**Problema real:** um CI verde nao certifica sequer que a suite visual rodou. Isso mascara regressao de layout e deixa as capturas recentes fora da base validada.
-
-**Alterar:** detectar mudancas em arquivos visuais/estruturais e executar os testes pertinentes em PR e push na `main` sem depender do texto do commit. Preservar caminhos mais leves para modificacoes sem impacto visual; o filtro deve ser por arquivos/capacidades, nao por convencao editorial. Publicar resumo claro: `executado`, `falhou`, `skipped justificado`.
-
-**Aceite:** em uma alteracao de `studio-radio-shell.module.css`, `studio-radio-shell.tsx`, arte da Home ou teste visual, o gate executa, produz capturas e pode falhar a integracao. O controle nao se limita a gerar anexos.
-
-### A-02 [P0] Teste da Home esta preso ao layout antigo
-
-**Evidencia:** [`tests/visual/home-hero-responsive.spec.ts`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/tests/visual/home-hero-responsive.spec.ts), `inspectHomeState`. Para `studioWidth < 52rem`, o teste espera `copyLayout === "relative"` e texto abaixo da arte; na [nova regra CSS do compacto](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.module.css#L5050-L5100), o texto continua `position: absolute` e `left: 52%`. Para o estado normal mais largo, o teste conserva um limiar de `titleLeft >= 40% do Estudio + 160px`, enquanto a nova regra passa a usar `left: 45%`. O teste nao foi executado no push atual.
-
-**Impacto:** as afirmacoes do teste e o CSS nao descrevem o mesmo comportamento. Nao se deve resolver a divergencia removendo assertions sem uma referencia aprovada.
-
-**Alterar:** atualizar o contrato do teste com as composicoes aceitas hoje, testar largura **real do painel** e incluir `split-default`, intermediaria, limite fisico, `docked`, fullscreen, desktop curto e mobile. Aferir geometrias do texto efetivamente pintado com `Range.getClientRects()` ou spans de palavras, alem das caixas do `h1` e CTA. Verificar corte lateral e vertical, colisao com controles e proposito da area dedicada ao X1.
-
-**Aceite:** a suite passa na versao realmente renderizada e falha ao introduzir truncamento de palavras, colisao com a divisoria ou estado de layout diferente do aprovado.
-
-### A-03 [P1] Textos sem quebra usam gatilho de largura do Estudio inteiro
-
-**Evidencia:** [CSS da Home](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.module.css#L4958-L5110). A partir de `@container studio (min-width: 60rem)`, `.studioHomePhrase` adota `white-space: nowrap`. A coluna de texto ocupa apenas a parte direita do Estudio, com `left: 45%` no split e offset especifico no dock.
-
-**Risco:** a largura do Estudio nao garante que cada frase caiba na coluna restante. Os cortes comprovados nas capturas do **antigo PR #33** mostram por que o criterio precisa ser medido, mas nao comprovam o mesmo defeito no asset/layout novos.
-
-**Alterar:** derivar o layout da largura disponivel para a copy e da medida do texto, nao do viewport geral isoladamente. Evitar regras que mantenham frases inteiras sem demonstrar cabimento. Nao destruir as quebras aprovadas por uma solucao generica; preservar a composicao com fallback de quebra natural para espacos intermediarios.
-
-**Aceite:** nenhuma palavra fora da area visivel em todos os estados do divisor; frases completas somente quando couberem; capturas confrontadas com mock aprovado.
-
-### A-04 [P1] Enquadramento e carregamento do novo background sem prova renderizada
-
-**Evidencia:** [arquivo TSX da Home](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.tsx#L2200-L2212) aponta para `/images/studio/cm-home-x1-hd.webp` com `fill`, `priority`, `sizes="100vw"` e `unoptimized`. O CSS usa `object-fit: cover` e `object-position: center`. A nova imagem possui 899.842 bytes no repositório.
-
-**Risco:** o painel varia continuamente de largura. `cover` recorta o asset; `center` pode privilegiar elementos errados conforme estado. `sizes="100vw"` nao descreve o painel no desktop com split, e `unoptimized` entrega o arquivo fonte sem variantes otimizadas do Next. Nao chamar o WebP de baixa qualidade sem observar o render, nem prometer ganho pela recompressao sem medir.
-
-**Alterar:** estabelecer politica de enquadramento para dock, split, limite estreito, tablet e mobile; conferir resolucao efetiva, `naturalWidth` / `naturalHeight`, `currentSrc`, tamanho transferido, LCP e corte da X1. Manter arte original preservada; gerar variantes somente se trouxerem ganho real. Ajustar `sizes` ou estrategia de otimizacao com base na area visual real.
-
-**Aceite:** foto nitida na area de uso e sem elementos essenciais cortados; medicao de peso e LCP documentada; nenhuma perda perceptiva aprovada.
-
-### A-05 [P1] Cascata antiga e blocos concorrentes no CSS monolitico
-
-**Evidencia:** [CSS completo](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.module.css). Exemplos verificaveis no contexto base: `.siteHeader` recebe `background` e `backdrop-filter` nos blocos iniciais e novamente por volta de L2243; `.radioPanel` recebe backgrounds em L282, L1116 e L2837; `.studio` tem backgrounds sucessivos em L149, L2267 e L3631. `.radioContent` passa por composicoes desktop sucessivas.
-
-**Problema:** propriedades definidas por sucessivas camadas historicas exigem interpretar ordem, especificidade e estado antes de qualquer ajuste. Muitas sobrescritas sao deliberadas; as obsoletas devem ser removidas, e as intencionais, documentadas perto do proprio dono.
-
-**Alterar:** construir inventario por seletor + contexto + valor computado em cenarios representativos; consolidar regras-base, variantes por `data-*` e `@container`. Eliminar pares obsoletos no mesmo PR que introduz a regra final, sem empilhar um novo override no fim.
-
-**Aceite:** demonstrar diff de simplificacao, ausencia de regressao visual, e propriedade com uma fonte de verdade por estado. **Nao** perseguir reducao arbitraria de linhas.
-
-### A-06 [P1] CSS potencialmente inutil e dependencias fora do componente principal
-
-**Evidencia:** varredura de classes `styles.*` em `studio-radio-shell.tsx` e `shellStyles.*` em [`radio-lyrics.tsx`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/features/radio/radio-lyrics.tsx). Candidatas sem referencia incluem `brandMark`, `brandSuffix`, `pendingNav`, `hero`, `heroCopy`, `mediaFrame`, `coverFallback`, `heroContent` e `studioProducts`. O CSS de letras **tem consumidor externo** e nao pode ser apagado como morto.
-
-**Alterar:** confirmar alcance de seletores e usos dinamicos com ferramenta CSS apropriada, checar todas as importacoes do modulo e inspecionar computed styles antes de remover. Mover estilos de letras para `src/features/radio/radio-lyrics.module.css`, mantendo diferencas de apresentacao no modal e na Radio completa. Avaliar `src/app/page.module.css` como arquivo aparentemente sem import atual.
-
-**Aceite:** remocao de lixo comprovado, nenhuma quebra da letra sincronizada, pagina de produtos, navbar, modal mobile ou estados de Radio; relatorio de classes removidas com prova de ausencia de consumidor.
-
-### A-07 [P1] Shell React mistura composicao, maquina de estados e UI
-
-**Evidencia:** [`studio-radio-shell.tsx`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.tsx), **2.458 linhas**. `RadioContent` organiza controles e playlist, enquanto `StudioRadioShell` concentra navbar, hero, card do Estudio, gestos de resize, dock, fullscreen, atalhos, dialog e transicoes de rota.
-
-**Problema:** aumento de acoplamento entre mudancas puramente visuais e transicoes criticas do audio. Ja existem boas extracoes, como `radio-panel-drag.ts`, `radio-motion-spine.ts`, `radio-navbar-dock.tsx` e `studio-prints-carousel.tsx`; devem ser preservadas.
-
-**Alterar:** extrair UI e controle com contratos curtos e tipados, por responsabilidade real: `SiteHeader`, `StudioHome`, `StudioHub`, `RadioFullPlayer`, `RadioMobileMini`, `useRadioPanelLayout` ou equivalente se a extracao reduzir complexidade. `StudioRadioShell` deve orquestrar os mundos. Nao introduzir hooks genericos sem consumidor real.
-
-**Invariantes:** um unico `RadioProvider` e elemento `audio` persistente; fila, faixa, posicao e volume nao reiniciam em split, dock, fullscreen, navegacao, modal mobile ou interrupcao de animacao. Nao trocar Motion/WAAPI/CSS sem beneficio demonstrado.
-
-**Aceite:** componentes menores com responsabilidades explicitas; suites de Radio e carrossel intactas; teste de identidade do mesmo nó `audio` antes/depois das transicoes.
-
-### A-08 [P1] Divisor fornece limite ARIA diferente do limite real
-
-**Evidencia:** [`studio-radio-shell.tsx`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.tsx#L2350-L2369). `aria-valuemax` usa `MAX_RADIO_WIDTH = 1120`, mas `clampRadioWidth()` tambem limita a largura por `shellWidth - MIN_STUDIO_WIDTH - RESIZE_GUTTER`. Para `shellWidth=1440`, o teto pratico e `768px`, nao 1120px.
-
-**Alterar:** usar o teto efetivamente calculado para `aria-valuemax` (considerando fullscreen/dock) e validar `aria-valuemin <= aria-valuenow <= aria-valuemax` em cada viewport apos resize, teclado e troca de estado.
-
-**Aceite:** Range ARIA coerente com movimento do divisor, tests automatizados verificam valores e interacao real, sem mudar as proporcoes aprovadas.
-
-### A-09 [P2] Capturas e instrumentos nao asseguram paridade com o mock
-
-**Evidencia:** `playwright.config.ts` executa por padrao `reducedMotion: "reduce"`; as capturas gerais do workflow usam orcamento de tempo virtual, e `tests/visual/public-pages.spec.ts` produz screenshots e inventario Axe. Nao ha, no escopo revisado, baseline visual curada que comprove concordancia perceptiva da Home com o mock aprovado. O teste do hero compara principalmente caixas.
-
-**Alterar:** capturar estado estavel (fontes carregadas, hidratacao, fim da introducao) e, separadamente, transicoes em andamento; usar sem movimento e com movimento quando relevantes. Criar antes/depois na **mesma** largura e estado de Radio, com referencia explicitamente aprovada e diff perceptual revisado manualmente. Cobrir titulo longo, proporcao e enquadramento, primeira dobra e clique/touch.
-
-**Aceite:** artefatos e logs rastreaveis por SHA, sem confundir CI verde com aprovacão estetica.
-
-### A-10 [P2] Carrossel e efeitos precisam de ownership e revisao de compactacao
-
-**Evidencia:** `studio-prints-carousel.module.css` usa legenda e transporte sobre a area de imagem; o CSS principal e o componente do carrossel definem regras independentes. Existem 22 `@keyframes` no shell, Motion para cards e WAAPI para transformacoes especificas da Radio.
-
-**Alterar:** validar sobreposicao de legenda/controles em 360/390px, area de toque, titulo longo e imagens de diferentes proporcoes. Registrar dono de `transform`/`opacity` por elemento, reduzir `will-change` persistente onde nao houver beneficio medido e auditar reduced-motion. Nao inventar um novo efeito nem trocar biblioteca so para reduzir CSS.
-
-**Aceite:** carrossel legivel, controles acessiveis, imagens sem zoom desigual indevido e nenhuma interrupcao do audio.
-
-## 5. Sequencia proposta de implementacao
-
-**Nao converter este documento em dezenas de tarefas automaticamente.** O roadmap e `docs/work/08-visual-quality-evolution.md` continuam sendo os trackers. Dividir por risco e responsabilidade, nao pelo numero de linhas.
-
-| Bloco | Escopo de entrega futura | Dependencia | Criterio de pronto |
-| --- | --- | --- | --- |
-| **B0: Evidencia atual** | Rodar Playwright e capturas na `main` atual; registrar cinco maiores defeitos efetivos | Nenhuma | Fotos/metricas vinculadas ao SHA atual e comparadas com referencia |
-| **B1: Gate e testes** | Corrigir A-01/A-02 e reforcar geometria/a11y | B0 | Mudanca visual nao passa sem execucao efetiva do gate |
-| **B2: Home cirurgica** | Corrigir apenas diferencas aprovadas A-03/A-04, sem mexer no player | B0/B1 | Cinco viewports + estados do divisor aceitos |
-| **B3: Limpeza e consolidacao** | Inventario de overrides, orfaos e CSS da Home/Hub; remover codigo legado comprovado | B1/B2 | Diminuicao de complexidade, sem diff visual imprevisto |
-| **B4: Extracao por dominio** | Modularizar CSS do Header/Studio/Radio e, depois, o TSX monolitico | B3 | Ownership claro, audio e rotas preservados |
-| **B5: Acabamento** | A11y do divisor, reduced-motion, custo de imagem e efeitos, compactacao do carrossel | B1/B4 quando aplicavel | Medicoes e regressao documentadas |
-
-A-08 pode entrar em B1 se a mudanca for isolada. Nao esperar a modularizacao inteira para corrigir erro objetivo de acessibilidade.
-
-## 6. Mapa proposto de ownership
-
-Estes sao **nomes candidatos**, nao ordem para criar nove arquivos vazios:
-
-| Dono | Conteudo |
-| --- | --- |
-| `site-header` | Navbar, logo, links, redes e seu responsivo |
-| `studio-radio-layout` | Split, divisoria, scroll ownership e larguras da Radio |
-| `studio-home` | Arte da Home, coluna editorial, tipografia, CTA e estados de painel |
-| `studio-hub` | Tres acessos comerciais e suas animacoes de entrada |
-| `radio-player` | Superficie do player completo, transporte, fila e controles |
-| `radio-mobile-mini` / dialog | Mini-player e Radio completa no mobile |
-| `radio-lyrics` | Letras, scroll e estados associados |
-| `radio-navbar-dock` | Manter ownership ja existente |
-| `tokens.css` | Valores semanticos compartilhados, sem paletas locais concorrentes |
-
-Extrair somente se a fronteira for real. O principal resultado deve ser **menos cascata conflitante e menos acoplamento**, nao uma pasta cheia de CSS.
-
-## 7. Matriz minima de QA para toda entrega visual
-
-| Ambiente | Estados essenciais | O que medir |
+| Fonte | Evidência | Limite |
 | --- | --- | --- |
-| 1440 × 900 | split inicial, intermediario, minimo, dock e fullscreen | texto visivel, asset, divisor, botoes e audio |
-| 1760 × 824 | split, dock, titulo/faixa longa | largura real da copy, altura curta, fila e header |
-| 1024 × 768 | composicao compacta para laptop | primeira dobra, CTA, mini-player e scroll |
-| 390 × 844 | mini mobile, dialog aberto/fechado, hub e carrossel | areas tocaveis, legibilidade e overflow |
-| 360 × 800 | mesmo fluxo com titulos longos | quebras, clipping, margem e botoes |
-| Teclado/motion | resize, dock, fullscreen, reduced/no-preference | foco, ARIA, continuidade e ausencia de movimento indevido |
+| [Commit da nova Home](https://github.com/cassianomangini/radioand3d/commit/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666) | WebP novo, troca do src da imagem, ajustes CSS de crop e posicionamento | Não prova qualidade da imagem no browser |
+| [CI principal, run 39151011258](https://github.com/cassianomangini/radioand3d/actions/runs/39151011258) | `lint`, `typecheck`, testes gerais e `build`: success. `Capture visual review` e `Playwright visual diagnostics`: **skipped** | CI verde sem QA visual |
+| [Workflow de dock, run 39151011224](https://github.com/cassianomangini/radioand3d/actions/runs/39151011224) | Workflow complementar verde | Não homologou a Home modificada |
+| [PR #33](https://github.com/cassianomangini/radioand3d/pull/33) | Capturas antigas de dock, split e mobile | Base visual **substituída** |
+| [Contrato de experiência](../../EXPERIENCE.md), [arquitetura](../../ARCHITECTURE.md), [pipeline](../../design/CM_VISUAL_RENDER_PIPELINE_V1.md) | Invariantes de produto e processo | Documentação não substitui interação/render real |
+| [Histórico de 17/10](home-x1-responsive-2026-10-17.md) | Decisões e problemas da versão anterior | Marcado como histórico, não especificação vigente |
 
-**Condicoes obrigatorias:**
+**Verificado:** código e diff na `main`, estrutura dos componentes, configurações, regras do CSS e os estados reais dos jobs.  
+**Estimado por análise estática:** número de candidatos a CSS não utilizado e redefinições de seletor/propriedade. Uma sobrescrita pode ser deliberada; não é automaticamente bug.  
+**Não realizado:** `pnpm visual:qa` na versão de 18/10, captura atual do Chrome/CDP, comparação com o mock, medidas de LCP ou layout shift, inspeção de mobile real, a11y integral e escuta contínua. **Não declarar esses itens como passados ou reprovados.**
 
-1. Fontes e imagens efetivamente carregadas antes da captura de estado final; duracao da animacao nao deve causar capturas intermediarias fingindo ser estado final.
-2. Nao basta `element.getBoundingClientRect()` do container; medir texto pintado, visibilidade e possivel clipping dos descendentes.
-3. Comparar imagens com **mock aprovado do mesmo estado**, separando fidelidade visual de validacao estrutural.
-4. Para o player, testar tocar, pausar, proxima/anterior, faixa longa, busca, fila, volume, erro/buffering e retorno de rota; confirmar um audio persistente.
-5. Validar `prefers-reduced-motion` e `no-preference` nos estados onde motion afeta resultado.
-6. Executar `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` e `pnpm visual:qa`, alem da captura/CDP existente quando modificar a Radio.
-7. Registrar resultados reais, evidencias, bugs residuais e aprovacao humana. `skipped` nao e `passed`.
+## 3. Inventário do SHA auditado
 
-## 8. Limites e seguranca da refatoracao
+| Indicador | Valor | Classificação |
+| --- | ---: | --- |
+| `src/components/studio-radio/studio-radio-shell.module.css` | **5.149 linhas / 121.001 bytes** | Fato do arquivo |
+| `src/components/studio-radio/studio-radio-shell.tsx` | **2.458 linhas** | Fato do arquivo |
+| Regras CSS comuns / declarações | **695 / 2.558** | Contagem estática aproximada |
+| `@media` / `@container` / `@keyframes` | **40 / 5 / 22** | Contagem estática |
+| Grupos de seletor + propriedade + contexto com valores diferentes repetidos | **85** | Candidatos à revisão de cascata |
+| Classes não referenciadas diretamente pelos consumidores inspecionados | **21** | Candidatas, não lixo confirmado |
+| Blocos / declarações potencialmente órfãos | **72 / 245** | Heurística, não cobertura runtime |
+| `public/images/studio/cm-home-x1-hd.webp` | **899.842 bytes** | Fonte atual |
+| `public/images/studio/cm-home-x1.png` | **1.921.133 bytes** | Fonte antiga ainda versionada |
 
-- Nao substituir `RadioProvider`, nao duplicar o elemento de audio, nao alterar algoritmo de fila, playlist, progressao ou visualizador para cumprir objetivo de CSS.
-- Nao descartar Motion, WAAPI, efeitos do divisor, dock ou transicoes ja aceitas sem demonstrar redundancia/perda de qualidade.
-- Nao reabrir textos, imagens aprovadas, CTA, catalogo, Orcamento, Produtos, Shopee ou dados privados durante limpeza estrutural.
-- Nao apagar `radio-lyrics` por nao aparecer no JSX principal. Ha importacao explicita de `studio-radio-shell.module.css` no modulo de letras.
-- Nao marcar o novo design como aprovado por causa de CI. O aceite artistico e separado e pertence ao usuario.
-- Nao integrar uma refatoracao com alteracoes massivas e sem capturas antes/depois. Manter cada diff revisavel e reversivel.
+**Como reproduzir a triagem:** inspecionar todas as regras do CSS Module, agrupar seletor, propriedade e cadeia de `@media`/`@container`, contar valores distintos e confrontar as classes com as importações efetivas em JSX, inclusive `src/features/radio/radio-lyrics.tsx`. Revisar referências dinâmicas, seletores compostos e computed styles nos estados reais antes de excluir. Os totais não são exatos o bastante para servir como meta de redução de linhas.
 
-## 9. Definicao de concluido
+## 4. Achados priorizados
 
-A implementacao so pode receber `done` quando:
+### A01. [P0 operacional] CI não executou a revisão visual no último push
 
-- [ ] A nova `main` tiver baseline renderizada e problemas ativos separados dos defeitos historicos do PR #33.
-- [ ] O gate visual rodar automaticamente em mudancas pertinentes e bloquear falhas objetivas.
-- [ ] O teste da Home refletir a composicao efetivamente aprovada, incluindo largura real da coluna e estados do divisor.
-- [ ] As classes e declaracoes eliminadas forem comprovadamente nao utilizadas.
-- [ ] O CSS tiver ownership por dominio, sem regras antigas duplicadas controlando o mesmo estado por acidente.
-- [ ] O shell React tiver fronteiras de UI/controle claras e nao recriar o audio.
-- [ ] ARIA do divisor refletir os limites reais.
-- [ ] Imagem, tipografia, first fold, Hub e carrossel forem avaliados em cinco viewports e estados relevantes.
-- [ ] Os comandos de qualidade e as capturas tiverem resultado registrado e revisado.
-- [ ] Cassiano tiver avaliado a fidelidade perceptiva da implementacao; isso nao e inferido por teste.
+**Evidência:** [`.github/workflows/ci.yml`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/.github/workflows/ci.yml) restringe capturas e Playwright a PRs ou commits com `[visual]`. O [run 39151011258](https://github.com/cassianomangini/radioand3d/actions/runs/39151011258) pulou essas etapas. A branch `main` estava **sem proteção** no momento da consulta.
 
-**Conclusao:** o maior bloqueio imediato e a falta de prova visual automatica da atualizacao recente da `main`, seguida pela incompatibilidade entre teste e CSS. Modularizar e limpar o shell e necessario, mas deve acontecer sobre comportamento atual reproduzido, preservando audio e referencias aprovadas. Este PR entrega **somente o relatorio** e nao pretende corrigir o site.
+**Correção proposta:** tornar obrigatório o QA apropriado para alterações visuais, com detecção por arquivos e dependências afetadas; registrar `executado / falhou / não executado` por etapa. Manter o CDP existente; não instalar um segundo sistema redundante. Se a intenção for **impedir integração**, usar branch/ruleset/check requerido ou processo pré-push definido com o usuário. **Uma Action que roda após push direto em `main` não bloqueia o commit que já entrou; no máximo detecta e exige correção ou reversão.** Não prometer prevenção sem a regra do repositório correspondente.
+
+**Aceite:** mudança em arte, shell CSS/TSX ou teste visual executa os checks relevantes e disponibiliza screenshots rastreáveis ao SHA; resultado ignorado é explicitamente reportado, nunca celebrado como aprovado.
+
+### A02. [P0 operacional] Teste de Home descreve uma versão anterior
+
+**Evidência:** [`tests/visual/home-hero-responsive.spec.ts`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/tests/visual/home-hero-responsive.spec.ts) exige, no Estúdio estreito, `copyLayout === "relative"`, copy abaixo da imagem e distância vertical mínima. Na [`main` atual](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.module.css#L4950-L5110), a copy mantém `position: absolute`, `left: 52%` no Estúdio estreito e faz composição lateral. Também há divergência no split mais largo: o teste requer o início do título a partir de `40% da largura do Estúdio + 160px`, enquanto a regra geral atual usa `left: 45%` mais padding. **Não chamar de falha observada; o teste não rodou no push.**
+
+**Correção proposta:** reescrever as asserções apenas após registrar a composição que será mantida e conferi-la renderizada; cobrir split inicial, intermediário, máximo, dock, fullscreen, desktop curto, 1024 e mobile. Medir trechos efetivamente renderizados (`Range.getClientRects()` ou caixas dos spans), não apenas `getBoundingClientRect()` do `h1`. Incluir clipping, legibilidade, interseção com imagem e CTA.
+
+**Aceite:** teste falha por palavras cortadas e colisões reais, e passa apenas no layout efetivamente aprovado. Não remover asserts para disfarçar incompatibilidade.
+
+### A03. [P1] Quebras de H1 dependem da largura do Estúdio, não da coluna de texto
+
+**Evidência:** `@container studio (min-width: 60rem)` aplica `white-space: nowrap` a `.studioHomePhrase`. A copy usa aproximadamente a metade direita do Estúdio e muda no dock. O limite de 60rem não demonstra, por si, que cada linha cabe.
+
+**Correção proposta:** dimensionar H1, coluna útil, gaps e quebras conforme a área real da copy e as palavras. Aplicar `nowrap` só com espaço efetivamente suficiente; aceitar fallback intencional nos estados intermediários. Verificar separadamente os quatro grupos de frase, inclusive `do que você imagina.`.
+
+**Aceite:** H1 completo e legível, sem cortar letras, invadir o X1 ou extrapolar o painel nos cinco viewports e estados do divisor. Capturas antigas do PR #33 servem apenas como alerta, não como prova atual.
+
+### A04. [P1] Asset HD ainda sem política de crop e transferência demonstrada
+
+**Evidência:** [Home TSX](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.tsx#L2199-L2214) usa `next/image` com `fill`, `priority`, `sizes="100vw"` e **`unoptimized`**, apontando para o novo WebP. CSS usa `object-fit: cover` e `object-position: center`.
+
+**Precisão técnica:** com `unoptimized`, o Next entrega o asset diretamente, sem seu `srcset` de variantes redimensionadas; **alterar apenas `sizes` não trará o ganho de download prometido por uma implementação otimizada**. Primeiro comparar arquivo fonte, dimensões/`naturalWidth`, `currentSrc`, bytes realmente transferidos e nitidez. Só depois decidir por variantes responsivas/otimização.
+
+**Correção proposta:** revisar o enquadramento em split, dock, largura mínima, laptop e mobile, observando proporções reais da X1, posição do robô/balão e os **quatro filamentos do AMS**, sem inventar peças ou alterar geometria de referência. Medir LCP e custo de rede. Preservar o asset original autorizado.
+
+**Aceite:** imagem nítida e fiel, sem crop acidental do assunto nem custo de mídia injustificado; revisão visual registrada sobre a imagem nova.
+
+### A05. [P1] Cascata concorrente em CSS de 5 mil linhas
+
+**Evidência:** [CSS Module](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.module.css), com novas camadas que redefinem estilos antigos. Exemplos: `.siteHeader` em trechos iniciais e perto de L2243; `.radioPanel` em L282/L1116/L2837; `.studio` em L149/L2267/L3631. Há contextos válidos e sobreposições que podem ser obsoletas.
+
+**Correção proposta:** inventariar comportamento computado por estado; definir ownership de Header, Studio Home, Hub, Radio, modal e divisor; consolidar base e variantes próximas do seu componente. Remover regras antigas **no mesmo diff** da substituição. **Proibido considerar uma nova regra ao final do arquivo como solução definitiva sem resolver a cascata anterior.**
+
+**Aceite:** diff local compreensível, ausência de regressões perceptuais e menor duplicidade por estado. Não impor meta artificial de tamanho.
+
+### A06. [P1] CSS sem uso aparente e importação cruzada de letras
+
+**Evidência:** varredura das referências em `studio-radio-shell.tsx` e em [`radio-lyrics.tsx`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/features/radio/radio-lyrics.tsx). Entre os candidatos estão `brandMark`, `brandSuffix`, `pendingNav`, `hero`, `heroCopy`, `mediaFrame`, `coverFallback`, `heroContent` e `studioProducts`.
+
+**Cuidado importante:** `radio-lyrics.tsx` já importa **dois CSS Modules**: o do shell para `lyricsPanel/lyricsHeader/lyricsScroll` e seu próprio `radio-lyrics.module.css`. O problema não é um CSS de letra inexistente; é o acoplamento entre domínios.
+
+**Correção proposta:** verificar todos os consumidores e estados antes de apagar seletores; onde houver ganho, transferir estilos compartilhados de letras para o módulo **já existente** ou outro dono justificado, corrigindo importações com teste de modal, scroll e sincronização. Inspecionar também `src/app/page.module.css`, aparentemente sem importador na Home atual.
+
+**Aceite:** remoções demonstravelmente seguras. Nunca apagar CSS pelo simples fato de não haver `styles.foo` no shell principal.
+
+### A07. [P1] Shell TSX acopla muitos domínios
+
+**Evidência:** [`studio-radio-shell.tsx`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.tsx) concentra navbar, Home, hub, full player, gestos, animações, dock e rotas. Já existem extrações válidas como `radio-panel-drag.ts`, `radio-motion-spine.ts` e `radio-navbar-dock.tsx`.
+
+**Correção proposta:** extrair por responsabilidade real, preservando a árvore estável. Separar apresentação de máquina de layout apenas quando reduzir acoplamento, sem reescrever interfaces do áudio ou adicionar abstrações sem uso.
+
+**Invariantes:** manter **um único `RadioProvider` e o mesmo elemento `<audio>`** em `src/app/layout.tsx` / `src/features/radio/radio-provider.tsx`; nenhum remount ao navegar, mudar a divisória, entrar/sair do dock ou fullscreen. A ordem, o tempo, o volume e a faixa devem continuar.
+
+**Aceite:** componentes com contratos claros, diffs revisáveis e teste explícito da identidade/continuidade do elemento de áudio em transições.
+
+### A08. [P1] Valor máximo ARIA do divisor diverge do limite real
+
+**Evidência:** [`studio-radio-shell.tsx`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.tsx#L2350-L2368) usa `aria-valuemax={MAX_RADIO_WIDTH}`, definido como 1120px. Porém `clampRadioWidth` restringe o máximo também por `shellWidth - MIN_STUDIO_WIDTH - RESIZE_GUTTER`. Em um exemplo com `shellWidth=1440`, isso dá **768px**, não 1120px.
+
+**Correção proposta:** derivar o valor ARIA do mesmo cálculo do arraste; testar `min <= now <= max` em resize por ponteiro, teclado, mudança de viewport e dock. Preservar a política de limites aprovada, corrigir apenas a representação acessível.
+
+**Aceite:** valores ARIA reproduzem a operação real e o controle continua operável por teclado.
+
+### A09. [P1] QA visual atual é parcial mesmo quando executado
+
+**Evidência:** [`playwright.config.ts`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/playwright.config.ts) define `reducedMotion: "reduce"` por padrão e permite **1 retry no CI** para as suites públicas. Captura de estado reduzido não valida animação normal. Uma execução que passa após retry não prova ausência de instabilidade.
+
+**Correção proposta:** manter o cenário determinístico atual, acrescentar cenários dirigidos de `no-preference`, conclusão e interrupção de motion, título/faixa longa e interação real. Reportar retries e flakiness, sem reclassificar como aprovação estética. Esperar fontes, mídia, hidratação e repouso da transição para screenshots finais; gravar, separadamente, o meio da animação.
+
+**Aceite:** evidências por estado e viewport, com falhas/retries visíveis e captura ligada ao SHA. Baseline visual só após curadoria e aprovação do resultado.
+
+### A10. [P2] Carrossel precisa de conferência de legenda, controles e movimento
+
+**Evidência:** [`studio-prints-carousel.module.css`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-prints-carousel.module.css) possui legenda e transporte na área da imagem. O shell utiliza Motion e animações próprias para outras superfícies.
+
+**Correção proposta:** testar 360/390px com legenda longa, áreas tocáveis e fotos de proporções diferentes. Confirmar cobertura `object-fit` por categoria e ownership de `transform`/`opacity`; não adicionar motor de animação para mascarar montagem inadequada.
+
+**Aceite:** fotos com enquadramento coerente, controles separados do texto, acessibilidade e reduced-motion preservados.
+
+### A11. [P1 documental] Histórico de 17/10 foi mantido como se fosse a Home atual
+
+**Evidência:** [registro de Home de 17/10](home-x1-responsive-2026-10-17.md) descrevia PNG antigo, degradê, copy vertical no compacto e teste de geometria antigo; tudo isso foi substituído, em parte, no commit de 18/10.
+
+**Correção documental neste PR:** marcar esse registro como histórico, registrar a atualização de `main` no [catálogo de referências](../../design/CM_VISUAL_REFERENCE_REGISTER_V1.md) e anotar o trabalho aberto no [checklist 08V](../08-visual-quality-evolution.md) e no [roadmap](../../ROADMAP.md). Não duplicar uma nova especificação visual de Home como se estivesse aprovada.
+
+**Aceite:** nenhum agente usa um estado já substituído como fonte de verdade vigente.
+
+### A12. [P1 processual] Falta separar condição técnica, defeito renderizado e decisão estética
+
+**Risco:** detectar CSS duplicado não prova um defeito visual; por outro lado, CI verde com captura aprovada apenas pela máquina não prova fidelidade ao mock. O inverso também vale: uma regra que contradiz o teste não determina sozinha se o CSS ou o teste representa a intenção certa.
+
+**Correção proposta:** em cada bug, registrar: `SHA / rota / viewport / estado do divisor / dados / motion / imagem / fonte / screenshot / resultado / categoria de evidência / referência aprovada / ação`. Separar: (1) leitura de código; (2) testes executados; (3) inspeção do render; (4) aceite de Cassiano.
+
+**Aceite:** o relatório nunca reutiliza prova antiga de outra branch, nem converte `skipped` em `passed`, nem declara defeito atual a partir de render não inspecionado.
+
+## 5. Plano de execução da frente 08V
+
+A sequência macro permanece em [`docs/ROADMAP.md`](../../ROADMAP.md). O controle dos passos e evidências permanece em [`docs/work/08-visual-quality-evolution.md`](../08-visual-quality-evolution.md). Este relatório **não cria uma segunda fila**.
+
+| Bloco | Entrega futura | Dependência | Saída exigida |
+| --- | --- | --- | --- |
+| **B0, obter evidência atual** | Rodar captura, `pnpm visual:qa` e interações no último SHA da `main`; separar falhas do teste antigo e defeitos do render | Nenhuma | Capturas, logs, lista priorizada de diferenças reais |
+| **B1, reparar gate e suite** | A01, A02, A08 e A09; não encobrir testes incompatíveis | B0 para contrato visual | Checks executados e interpretações corretas de execução/skipped |
+| **B2, corrigir Home de forma cirúrgica** | A03/A04 apenas nas divergências confirmadas com referência | B0 e, quando aplicável, B1 | Composição aprovada e QA repetido |
+| **B3, limpar a cascata** | A05/A06, remover código morto comprovado e reorganizar ownership de CSS | B1/B2 | Simplificação com comparações antes/depois |
+| **B4, modularizar React** | A07, sem mover ou duplicar áudio e sem refatoração cosmética | B3 | Componentes menores e provas de continuidade |
+| **B5, acabamento dirigido** | A10, efeito/reduced-motion, custos de mídia e a11y restante | Conforme cada caso | Fluxo, performance e capturas revisadas |
+
+**Critério de sucesso não é ter menos de 2.000 linhas.** O alvo é poder alterar um estado sem quebrar três outros, com fonte de verdade clara e evidência renderizada.
+
+## 6. Matriz mínima de validação
+
+| Viewport | Estados | Inspeções essenciais |
+| --- | --- | --- |
+| **1440 × 900** | split padrão, intermediário, rádio no limite, dock, fullscreen | texto pintado, corte X1, CTA, resize, continuidade do player |
+| **1760 × 824** | split, dock, faixa/título longos | altura curta, alinhamento e espaços úteis |
+| **1024 × 768** | layout responsivo de laptop | primeira dobra, CTA, mini-player e scroll |
+| **390 × 844** | mini-player, diálogo, hub e carrossel | toque, hierarquia, legibilidade e overflow |
+| **360 × 800** | fluxo mobile e textos longos | quebra de linha, botões e imagens |
+| **Alternâncias** | tocar/pausar, rotas, foco, teclado, motion normal/reduzido | um áudio, ARIA correto, interação sem regressões |
+
+Checklist de coleta: fontes carregadas, imagem com `naturalWidth > 0`, estado estável, viewport/DPR registrados, elemento de áudio persistente, ausência de clipping nos spans, nenhum scroll horizontal involuntário, screenshots antes/depois no mesmo estado e resultado dos jobs de CI inspecionado. Se o mock do estado não existir ou não estiver aprovado, marcar **comparação descritiva**, nunca “pixel parity”.
+
+## 7. Regras para não repetir a falha
+
+1. **Fonte atual:** consultar HEAD e diff reais antes de reutilizar qualquer auditoria, captura ou teste. Histórico datado não vira contrato atual.
+2. **CI por etapa:** conferir `conclusion` de captura e Playwright, não apenas o indicador verde do run. Branch `main` sem proteção não recebe gate pré-merge automático.
+3. **CSS:** localizar **todas** as definições, variantes, @container, breakpoints e importadores antes de editar. Remover a regra antiga em vez de acrescentar override compensatório no fim.
+4. **Teste e design:** se teste e código divergem, registrar conflito e conferir referência aprovada. Não ajustar só para passar, nem afirmar que a intenção do usuário é dedutível da implementação.
+5. **Visual:** conferir imagem real, espaços para o texto, cenário e geometria da X1 com os estados do divisor. Nem build nem screenshot automático são aprovação artística.
+6. **Áudio:** preservar `RadioProvider`, instância única de `<audio>`, fila, posição, volume, visualizador, atalhos, dock e navegação.
+7. **Escopo:** não refatorar Rádio, Supabase, orçamento ou catálogo para resolver problema de CSS de Home. Alterações remotas/deploy exigem autorização própria.
+
+Estas regras são vinculadas, sem criar nova fonte concorrente, por [AGENTS.md](../../../AGENTS.md), [ARCHITECTURE.md](../../ARCHITECTURE.md), [pipeline de QA](../../design/CM_VISUAL_RENDER_PIPELINE_V1.md) e [08V](../08-visual-quality-evolution.md).
+
+## 8. Definição de pronto e pendências atuais
+
+- [ ] Executar navegador/Playwright sobre o SHA de Home em avaliação, sem `skipped` oculto.
+- [ ] Resolver conflito da suíte do hero com o layout efetivamente aprovado.
+- [ ] Testar texto real, crop e arte nos estados de painel relevantes.
+- [ ] Tornar o gate confiável; decidir conscientemente entre push direto ou checks requeridos antes do merge.
+- [ ] Corrigir ARIA do divisor com o cálculo real.
+- [ ] Comprovar antes de excluir CSS potencialmente órfão.
+- [ ] Consolidar CSS e extrair responsabilidades sem regressão nem remount do áudio.
+- [ ] Avaliar carrossel, motion normal/reduzido e custo de mídia.
+- [ ] Registrar aprovação de Cassiano para direção visual final, quando houver modificação perceptual.
+
+**Situação após este PR:** documentação corrigida; as ações de engenharia e a inspeção visual da Home nova continuam pendentes. O relatório é uma análise técnica revisada, **não uma certificação de qualidade do site**.

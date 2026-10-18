@@ -18,7 +18,8 @@ Uma referência válida precisa indicar **a mesma rota/superfície, estado de UI
 
 | Superfície | Fonte de contrato | Capturas verificáveis | Estado |
 | --- | --- | --- | --- |
-| Home desktop/mobile | [Experiência](../EXPERIENCE.md), aprovação de 05/10 | [CI 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995) — PNGs Home em cinco viewports | Comportamento aceito; **capturas são observação**, não baseline |
+| Home anterior (até 17/10) | [Experiência](../EXPERIENCE.md), histórico de 05/10 e [17/10](../work/evidence/home-x1-responsive-2026-10-17.md) | [CI 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995), histórico anterior | **Não representa a Home de 18/10**; apenas implementação observada |
+| Home X1 implementada em 18/10 | [Commit `23f25c3`](https://github.com/cassianomangini/radioand3d/commit/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666) e [auditoria CSS/QA](../work/evidence/08v-css-shell-architecture-audit-2026-10-18.md) | [CI 39151011258](https://github.com/cassianomangini/radioand3d/actions/runs/39151011258): capturas e Playwright **skipped** | **Render atual não validado; sem baseline estética aprovada** |
 | Hub `/studio` (3 entradas) | [Handoff comercial](STUDIO_COMMERCE_EXPERIENCE_V1.md) e [wireframes](STUDIO_COMMERCE_WIREFRAMES_V1.md), hub aprovado | [CI 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995) — PNGs hub em cinco viewports | Contrato aprovado; mídia E3 pendente; **PNG original do mock não versionado** |
 | Produto individual | [Produto V1](STUDIO_PRODUCT_PAGE_VISUAL_V1.md), direção aprovada em 05/10 | [CI 37936816995](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995) — rota real de produto | Contrato aprovado; **sem baseline validada** |
 | Rádio, focus/fullscreen/retorno | [Rádio](../RADIO.md) e [pacote aprovado](STUDIO_RADIO_APPROVAL_PACKAGE_V1.md) | [Capturas CDP](https://github.com/cassianomangini/radioand3d/actions/runs/37936816995/artifacts/11618995570) e `docs/work/evidence/03b-*.png` | Aceita funcionalmente; arte dos estados reais e dados de R2 exigem distinção |
@@ -47,4 +48,4 @@ O [CI 37942413229](https://github.com/cassianomangini/radioand3d/actions/runs/37
 - Imagens reais de Impressões/Placas/Caixas dependem de autorização E3.
 - Nenhuma opção do laboratório foi selecionada pelo usuário.
 
-**Próxima ação:** usar capturas isoladas do laboratório para avaliação comparativa; preservar todas as variantes no artefato CI e registrar uma vencedora **apenas depois** da revisão.
+**Próximas ações distintas:** para o laboratório V4, preservar as variantes de QA rejeitadas como arte e criar nova proposta somente no contexto da marca. Para a **Home atual**, executar primeiro [08V A2.4](../work/08-visual-quality-evolution.md): capturas do SHA novo com split, dock, Rádio no limite, laptop, 390/360, texto legível e imagem real. Nenhuma captura antiga do PR #33 ou CI de 09/10 pode ser promovida como baseline de 18/10.

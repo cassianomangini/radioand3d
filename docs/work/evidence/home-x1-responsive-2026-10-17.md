@@ -1,5 +1,7 @@
 # Home X1 responsiva — integração de 17/10/2026
 
+> **REGISTRO HISTÓRICO, SUBSTITUÍDO EM PARTE EM 18/10/2026.** Os detalhes abaixo documentam as iterações de **17/10**, não a Home atualmente implementada. A [`main@23f25c3`](https://github.com/cassianomangini/radioand3d/commit/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666) adotou `cm-home-x1-hd.webp`, `object-position: center`, painel de copy posicionado no topo e composição **lateral mesmo no Estúdio estreito**. O teste descrito abaixo ainda contém expectativas da composição vertical e **não foi executado** no último push, pois o CI pulou os passos visuais. Nem o resultado atual nem sua aprovação estética foram verificados. Fonte atual para investigação: [auditoria de 18/10](08v-css-shell-architecture-audit-2026-10-18.md) e [08V](../08-visual-quality-evolution.md). Não aplicar as instruções de composição abaixo diretamente ao código novo.
+
 **Escopo:** Home de `radioand3d`, mantendo a Rádio e o divisor existentes.
 
 - A imagem original continua em `docs/fundo_geral_site_estudio.png`. O mesmo blob foi exposto em `public/images/studio/cm-home-x1.png`, preservando pixels e texto do balão; o Next/Image pode produzir WebP/AVIF automaticamente conforme suporte do navegador.

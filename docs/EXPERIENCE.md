@@ -130,6 +130,14 @@ Em frontend visual substancial já autorizado, o agente deve produzir capturas d
 
 **Orientação do split vigente:** Estúdio à esquerda, Rádio à direita no desktop. A seta contextual da divisória existe apenas quando prevista no comportamento aprovado; não adicionar seta permanente.
 
+## Home X1: distinção entre a versão implementada e o aceite visual (18/10/2026)
+
+A `main@23f25c3c2193cddadd6a3e0f014ca7df2fcf5666` passou a usar `public/images/studio/cm-home-x1-hd.webp` e copy lateral em um bloco ancorado no topo, inclusive quando o painel do Estúdio perde largura no desktop. A implementação **não estabelece, por si só, que o enquadramento, a tipografia e a hierarquia foram aprovados visualmente**. O histórico de 17/10 descreve versões anteriores e não deve ser seguido como configuração atual.
+
+**Ao revisar ou alterar a Home:** partir da imagem real e do último mock/direção fornecido por Cassiano; conferir desktop com Rádio lateral, intermediária, no limite e dock, desktop curto, laptop e mobile. Medir as palavras visíveis dentro da área da copy, especialmente quando `white-space: nowrap` aparece em `@container`. A peça deve manter geometria fiel da X1 e quatro filamentos do AMS; não cortar o balão nem sobrepor elementos sem referência. Não inventar espaço de texto na imagem por CSS improvisado, nem transformar a saudação em outro título HTML visual.
+
+O estado atual de evidência está no [relatório de auditoria 18/10](work/evidence/08v-css-shell-architecture-audit-2026-10-18.md); o [registro de referências](design/CM_VISUAL_REFERENCE_REGISTER_V1.md) separa capturas de implementação de arte aprovada. **Não promover captura automatizada como aceite.**
+
 ## Movimento como linguagem
 
 Movimento entra na primeira entrega. Projetar resposta de controles, transições de player/listas/seleções e um momento de assinatura. Uma cena expressiva pode coexistir com áreas quietas; vários detalhes responsivos não exigem atrações competindo simultaneamente.

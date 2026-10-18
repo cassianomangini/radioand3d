@@ -62,6 +62,8 @@ Valores estáticos recorrentes de marca, texto, espaço, borda e sombra devem us
 
 Manter estilos de base no global; estilos de domínio junto do domínio. Utility classes podem compor layout, sem centenas de variantes visuais locais. Evitar `!important` corretivo e overrides em cascata para compensar uma primitiva inadequada.
 
+**Ownership e dívida de cascata (auditoria 18/10/2026):** antes de alterar `studio-radio-shell.module.css`, inspecionar todas as ocorrências dos seletores afetados, `@media`, `@container`, estados `data-*`, importações do CSS Module e computed styles nos cenários reais. O CSS do shell é compartilhado também por `radio-lyrics.tsx`. Não corrigir um layout adicionando mais uma versão conflitante da regra ao fim de 5 mil linhas; consolidar a regra com sua variante por estado e eliminar overrides obsoletos, com screenshots antes/depois. A análise e seus números datados estão no [relatório 08V de 18/10](work/evidence/08v-css-shell-architecture-audit-2026-10-18.md).
+
 ### Componentes e composição
 
 | Nível | Exemplos iniciais | Limite |
@@ -99,7 +101,7 @@ Regras técnicas:
 - estado de largura pertence à apresentação, não ao playback engine;
 - expandir/recolher não troca `src`, não recria `HTMLAudioElement` e não zera fila/posição;
 - o mini player mobile e a Rádio completa leem o mesmo controller; o mini player não é renderizado no desktop;
-- desktop não renderiza mini player adicional: o split já contém a Rádio completa;
+- desktop em `split`/`focus`/`fullscreen` não duplica o mini-player: a Rádio completa é a superfície ativa. **Exceção aprovada funcionalmente para dock:** com a lateral recolhida, um único player compacto ocupa a navbar, antes dos ícones sociais, e a lateral deixa de ser interativa; não é um segundo motor nem um player paralelo. O acabamento visual final do dock permanece pendente no 03c;
 - mobile não replica o split: header -> mini player -> Estúdio, com full player aberto sob demanda;
 - sem alturas rígidas dependentes de viewport para sustentar a composição;
 - novas seções 3D entram abaixo da entrada inicial e não exigem alteração do shell da Rádio.

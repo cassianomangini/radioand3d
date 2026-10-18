@@ -8,6 +8,8 @@ O plano define o produto; contratos de domínio definem comportamento; o roadmap
 
 Documentação em português, código e identificadores técnicos em inglês. Propostas não viram decisões aprovadas apenas porque foram escritas. Não declarar código, teste, deploy, integração ou aprovação visual que não ocorreram.
 
+**Verificação antes de declarar uma entrega visual pronta:** registrar SHA/branch reais, conferir quais etapas do CI foram **executadas** (não apenas se o workflow ficou verde), rodar QA renderizado da alteração e comparar com a referência aprovada no mesmo estado. Se a captura, Playwright ou o browser estiverem ausentes/`skipped`, declarar pendência; não reaproveitar screenshots de outro commit como prova atual. Se testes e layout divergirem, investigar o contrato visual antes de alterar asserts. A referência de execução e o histórico dos problemas do shell estão em [08V](docs/work/08-visual-quality-evolution.md) e na [auditoria de 18/10](docs/work/evidence/08v-css-shell-architecture-audit-2026-10-18.md).
+
 ## Perfis e limites
 
 | Perfil | Responsabilidade | Referência |

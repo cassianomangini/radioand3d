@@ -28,7 +28,9 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-            BASE="$(jq -r '.pull_request.base.sha' "$GITHUB_EVENT_PATH")"
+            # Pull request checkout is a synthetic merge commit. Its first parent
+            # tracks the current actual base even when event base.sha is stale.
+            BASE="$(git rev-parse HEAD^1)"
           else
             BASE="$(jq -r '.before // empty' "$GITHUB_EVENT_PATH")"
           fi

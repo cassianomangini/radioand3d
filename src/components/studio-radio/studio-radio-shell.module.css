@@ -5004,10 +5004,17 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     .studioIdentity[data-studio-intro="home"] h1 {
       width: 100%;
       min-width: 0;
-      font-size: clamp(2rem, calc(6.4cqi - 1rem), min(5.4rem, 9.25dvh));
+      /* The longest heading phrase must fit the *right-side copy lane*, not
+         just the whole Studio container. Do not silently clip letter ink. */
+      font-size: clamp(2rem, min(calc(6.4cqi - 1rem), 4.6cqi), min(5.4rem, 9.25dvh));
       line-height: 1.025;
       letter-spacing: -0.045em;
       text-wrap: balance;
+    }
+
+    /* The docked copy lane is narrower than the full-width Studio. */
+    .site[data-radio-docked="true"] .studioIdentity[data-studio-intro="home"] h1 {
+      font-size: clamp(2rem, 4cqi, 5.4rem);
     }
 
     .studioIdentity[data-studio-intro="home"] .lead {
@@ -5144,5 +5151,10 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   .studioHomeArt,
   .studioIdentity[data-studio-intro="home"] {
     transition: none;
+  }
+
+  /* Motion reduction must not leave text concealed by staggered keyframes. */
+  .studioIdentity[data-studio-intro="home"] .studioRevealChar {
+    animation: none;
   }
 }

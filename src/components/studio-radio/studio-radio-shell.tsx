@@ -291,16 +291,17 @@ function getMinRadioWidth(shellWidth: number) {
   return Math.round(shellWidth * RADIO_WIDTH_RATIO);
 }
 
-function clampRadioWidth(shellWidth: number, requested: number) {
-  const minimum = getMinRadioWidth(shellWidth);
-  const availableMaximum = Math.max(
-    minimum,
-    shellWidth - MIN_STUDIO_WIDTH - RESIZE_GUTTER
-  );
-
+function getMaxRadioWidth(shellWidth: number) {
   return Math.min(
-    Math.max(requested, minimum),
-    Math.min(MAX_RADIO_WIDTH, availableMaximum)
+    MAX_RADIO_WIDTH,
+    Math.max(getMinRadioWidth(shellWidth), shellWidth - MIN_STUDIO_WIDTH - RESIZE_GUTTER)
+  );
+}
+
+function clampRadioWidth(shellWidth: number, requested: number) {
+  return Math.min(
+    Math.max(requested, getMinRadioWidth(shellWidth)),
+    getMaxRadioWidth(shellWidth)
   );
 }
 
@@ -2356,8 +2357,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           aria-label={radioFullscreen ? "Restaurar o Estúdio" : "Arraste para redimensionar CM Rádio"}
           aria-orientation={radioFullscreen ? undefined : "vertical"}
           aria-valuemin={radioFullscreen || shellWidth === null ? undefined : getMinRadioWidth(shellWidth)}
-          aria-valuemax={radioFullscreen ? undefined : MAX_RADIO_WIDTH}
-          aria-valuenow={radioFullscreen || shellWidth === null ? undefined : Math.round(radioWidth ?? getDefaultWidth(shellWidth))}
+          aria-valuemax={radioFullscreen || shellWidth === null ? undefined : Math.round(getMaxRadioWidth(shellWidth))}
+          aria-valuenow={radioFullscreen || shellWidth === null ? undefined : Math.round(clampRadioWidth(shellWidth, radioWidth ?? getDefaultWidth(shellWidth)))}
           aria-controls={radioFullscreen ? undefined : "radio"}
           tabIndex={0}
           onPointerDown={handlePointerDown}

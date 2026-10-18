@@ -2,7 +2,7 @@
 
 **Revisão:** 18/10/2026 (segunda leitura crítica do relatório do PR #34).  
 **Código examinado:** [`main@23f25c3`](https://github.com/cassianomangini/radioand3d/commit/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666). Os números abaixo são um retrato deste SHA, não métricas permanentes.  
-**Estado:** diagnóstico estático revisado e CI conferido; **sem execução ou inspeção renderizada da Home nesse SHA**.  
+**Estado:** diagnóstico estático revisado, CI da `main` e primeira execução visual do PR #34 inspecionados. Há **falhas reais de geometria** no render, mas a revisão de todos os estados/interações e a aprovação estética seguem pendentes.  
 **Escopo:** Home, shell Estúdio/Rádio, CSS Module, consumidores de classes, divisor, suíte visual e CI. Não equivale a auditoria de segurança, SEO, Supabase ou todas as jornadas do produto.  
 **Natureza deste PR:** exclusivamente documentação. Não corrige a interface nem altera o motor de áudio.  
 **Aceite visual da Home atual:** pendente; commit e CI verde não representam aprovação estética.
@@ -14,7 +14,8 @@ A mudança enviada à `main` em 18/10 trocou a Home para `cm-home-x1-hd.webp`, c
 Existem **dois bloqueios de evidência imediatos**:
 
 1. O commit atual teve lint, tipos, testes gerais e build verdes, mas os passos visuais do workflow principal foram **ignorados**: o push tinha mensagem `c`, sem `[visual]`. Não existe validação renderizada atual derivada desse CI.
-2. `tests/visual/home-hero-responsive.spec.ts` ainda codifica a composição anterior. A mudança de CSS não atualizou o teste; se a suíte visual for executada, suas expectativas entram em conflito com a implementação atual. Isso ainda não é resultado de teste executado, e sim contradição verificável por leitura.
+2. `tests/visual/home-hero-responsive.spec.ts` ainda codifica a composição anterior. A suíte **foi executada posteriormente**, no PR documental #34, mas falhou antes de avaliar essas expectativas antigas. O conflito entre teste e CSS permanece demonstrável por leitura.
+3. O [run visual 39152117452](https://github.com/cassianomangini/radioand3d/actions/runs/39152117452) executou Playwright com o mesmo código da `main` e encontrou **duas falhas reproduzidas em retry**: o `scrollWidth` do Estúdio ultrapassou sua largura em desktop 1440 e 1760 curto.
 
 Em paralelo, o shell continua concentrando **5.149 linhas de CSS** e **2.458 linhas de TSX**. Precisa de consolidação por responsabilidade, com testes antes e depois, não de novos patches de CSS no rodapé.
 
@@ -27,13 +28,14 @@ Em paralelo, o shell continua concentrando **5.149 linhas de CSS** e **2.458 lin
 | [Commit da nova Home](https://github.com/cassianomangini/radioand3d/commit/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666) | WebP novo, troca do src da imagem, ajustes CSS de crop e posicionamento | Não prova qualidade da imagem no browser |
 | [CI principal, run 39151011258](https://github.com/cassianomangini/radioand3d/actions/runs/39151011258) | `lint`, `typecheck`, testes gerais e `build`: success. `Capture visual review` e `Playwright visual diagnostics`: **skipped** | CI verde sem QA visual |
 | [Workflow de dock, run 39151011224](https://github.com/cassianomangini/radioand3d/actions/runs/39151011224) | Workflow complementar verde | Não homologou a Home modificada |
+| [PR #34, run 39152117452](https://github.com/cassianomangini/radioand3d/actions/runs/39152117452) | Lint, tipos, testes, build e captura: success; **Playwright: failure**. 75 testes passaram, 2 falharam e 103 foram ignorados nesse run. | Executou código da `main` em PR documental; duas falhas do hero (desktop 1440 e 1760 curto), sem aprovação visual |
 | [PR #33](https://github.com/cassianomangini/radioand3d/pull/33) | Capturas antigas de dock, split e mobile | Base visual **substituída** |
 | [Contrato de experiência](../../EXPERIENCE.md), [arquitetura](../../ARCHITECTURE.md), [pipeline](../../design/CM_VISUAL_RENDER_PIPELINE_V1.md) | Invariantes de produto e processo | Documentação não substitui interação/render real |
 | [Histórico de 17/10](home-x1-responsive-2026-10-17.md) | Decisões e problemas da versão anterior | Marcado como histórico, não especificação vigente |
 
-**Verificado:** código e diff na `main`, estrutura dos componentes, configurações, regras do CSS e os estados reais dos jobs.  
+**Verificado:** código e diff na `main`, estrutura dos componentes, configurações, regras do CSS e os estados reais dos jobs. Foram inspecionadas capturas de falha desktop 1440/1760 e capturas do hero mobile 390/360, extraídas do artefato `cm-visual-diagnostics` do run 39152117452. Captura isolada não é teste de interação nem aceite.  
 **Estimado por análise estática:** número de candidatos a CSS não utilizado e redefinições de seletor/propriedade. Uma sobrescrita pode ser deliberada; não é automaticamente bug.  
-**Não realizado:** `pnpm visual:qa` na versão de 18/10, captura atual do Chrome/CDP, comparação com o mock, medidas de LCP ou layout shift, inspeção de mobile real, a11y integral e escuta contínua. **Não declarar esses itens como passados ou reprovados.**
+**Não realizado integralmente:** a suíte `pnpm visual:qa` **rodou no PR #34 e falhou**, interrompendo a inspeção completa; ainda faltam estados de dock/divisor, teste local com movimento normal e browser em aparelho físico, comparação com o mock aprovado, medidas de LCP/layout shift, a11y integral e escuta contínua. O CDP de Rádio da `main` e a captura geral de PR não substituem essas provas.
 
 ## 3. Inventário do SHA auditado
 
@@ -63,7 +65,7 @@ Em paralelo, o shell continua concentrando **5.149 linhas de CSS** e **2.458 lin
 
 ### A02. [P0 operacional] Teste de Home descreve uma versão anterior
 
-**Evidência:** [`tests/visual/home-hero-responsive.spec.ts`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/tests/visual/home-hero-responsive.spec.ts) exige, no Estúdio estreito, `copyLayout === "relative"`, copy abaixo da imagem e distância vertical mínima. Na [`main` atual](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.module.css#L4950-L5110), a copy mantém `position: absolute`, `left: 52%` no Estúdio estreito e faz composição lateral. Também há divergência no split mais largo: o teste requer o início do título a partir de `40% da largura do Estúdio + 160px`, enquanto a regra geral atual usa `left: 45%` mais padding. **Não chamar de falha observada; o teste não rodou no push.**
+**Evidência:** [`tests/visual/home-hero-responsive.spec.ts`](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/tests/visual/home-hero-responsive.spec.ts) exige, no Estúdio estreito, `copyLayout === "relative"`, copy abaixo da imagem e distância vertical mínima. Na [`main` atual](https://github.com/cassianomangini/radioand3d/blob/23f25c3c2193cddadd6a3e0f014ca7df2fcf5666/src/components/studio-radio/studio-radio-shell.module.css#L4950-L5110), a copy mantém `position: absolute`, `left: 52%` no Estúdio estreito e faz composição lateral. Também há divergência no split mais largo: o teste requer o início do título a partir de `40% da largura do Estúdio + 160px`, enquanto a regra geral atual usa `left: 45%` mais padding. **Estado real:** o teste não rodou no push da `main`; no PR #34 rodou, mas abortou primeiro na verificação de `scrollWidth` (A13), portanto essa asserção de composição antiga ainda não foi alcançada.
 
 **Correção proposta:** reescrever as asserções apenas após registrar a composição que será mantida e conferi-la renderizada; cobrir split inicial, intermediário, máximo, dock, fullscreen, desktop curto, 1024 e mobile. Medir trechos efetivamente renderizados (`Range.getClientRects()` ou caixas dos spans), não apenas `getBoundingClientRect()` do `h1`. Incluir clipping, legibilidade, interseção com imagem e CTA.
 
@@ -75,7 +77,9 @@ Em paralelo, o shell continua concentrando **5.149 linhas de CSS** e **2.458 lin
 
 **Correção proposta:** dimensionar H1, coluna útil, gaps e quebras conforme a área real da copy e as palavras. Aplicar `nowrap` só com espaço efetivamente suficiente; aceitar fallback intencional nos estados intermediários. Verificar separadamente os quatro grupos de frase, inclusive `do que você imagina.`.
 
-**Aceite:** H1 completo e legível, sem cortar letras, invadir o X1 ou extrapolar o painel nos cinco viewports e estados do divisor. Capturas antigas do PR #33 servem apenas como alerta, não como prova atual.
+**Captura atual:** nos screenshots de falha desktop de 1440/1760 do PR #34, o último grupo do H1 ainda não aparece **no instante da captura**. O CSS usa animações com delays por caractere; a captura pode estar no meio da entrada. **Não concluir que o texto desaparece ao fim da animação sem aguardar seu estado estável.**
+
+**Aceite:** H1 completo e legível em estado estabilizado, sem cortar letras, invadir o X1 ou extrapolar o painel nos cinco viewports e estados do divisor. Capturas antigas do PR #33 servem apenas como alerta, não como prova atual.
 
 ### A04. [P1] Asset HD ainda sem política de crop e transferência demonstrada
 
@@ -155,15 +159,25 @@ Em paralelo, o shell continua concentrando **5.149 linhas de CSS** e **2.458 lin
 
 **Aceite:** o relatório nunca reutiliza prova antiga de outra branch, nem converte `skipped` em `passed`, nem declara defeito atual a partir de render não inspecionado.
 
+### A13. [P1 confirmado em browser] Conteúdo extrapola a largura do Estúdio no desktop
+
+**Evidência executada:** [PR #34, CI 39152117452](https://github.com/cassianomangini/radioand3d/actions/runs/39152117452), arquivo `tests/visual/home-hero-responsive.spec.ts:37`, cenário `Studio horizontal scroll`. Em 1440px, o teste exigiu `scrollWidth <= 982` e mediu **985px**. No desktop curto 1760px, exigiu `<= 1208` e mediu **1253px**. A falha repetiu na primeira tentativa e no retry; as capturas e traces estão no artifact `cm-visual-diagnostics`. O Playwright reportou **2 falhas, 75 testes aprovados, 103 não executados/ignorados** nesse run.
+
+**Interpretação exata:** foi demonstrado **overflow geométrico do conteúdo** no painel, não necessariamente uma barra de rolagem horizontal visível. O CSS usa `overflow-x: clip`; portanto, extrapolação pode estar sendo **cortada**. Deve-se localizar o elemento causador e inspecionar suas dimensões computadas, especialmente o H1, os `nowrap` e os elementos de animação. Não eliminar o assert apenas para obter verde.
+
+**Leitura das capturas:** nos prints desktop do erro o quarto grupo de texto ainda está oculto durante o carregamento/animação. Nos prints mobile 390/360 o texto aparece; aos **360x800**, o CTA está fora da primeira dobra. A primeira observação **não prova corte permanente**; a segunda é uma condição de composição a avaliar com a referência e uso, não automaticamente um bug funcional.
+
+**Aceite:** `scrollWidth` dentro do esperado e todo o texto visível após o movimento; nenhum corte do conteúdo essencial; screenshots em estado final e estados do divisor, mais QA com `no-preference` e `reduce`.
+
 ## 5. Plano de execução da frente 08V
 
 A sequência macro permanece em [`docs/ROADMAP.md`](../../ROADMAP.md). O controle dos passos e evidências permanece em [`docs/work/08-visual-quality-evolution.md`](../08-visual-quality-evolution.md). Este relatório **não cria uma segunda fila**.
 
 | Bloco | Entrega futura | Dependência | Saída exigida |
 | --- | --- | --- | --- |
-| **B0, obter evidência atual** | Rodar captura, `pnpm visual:qa` e interações no último SHA da `main`; separar falhas do teste antigo e defeitos do render | Nenhuma | Capturas, logs, lista priorizada de diferenças reais |
+| **B0, completar evidência atual** | **Execução parcial já ocorreu em CI PR #34:** 2 falhas de overflow e screenshots. Reexecutar após diagnóstico, capturar estados do divisor e interações no último SHA da `main` | Nenhuma | Capturas finais estáveis, logs e lista de diferenças reais |
 | **B1, reparar gate e suite** | A01, A02, A08 e A09; não encobrir testes incompatíveis | B0 para contrato visual | Checks executados e interpretações corretas de execução/skipped |
-| **B2, corrigir Home de forma cirúrgica** | A03/A04 apenas nas divergências confirmadas com referência | B0 e, quando aplicável, B1 | Composição aprovada e QA repetido |
+| **B2, corrigir Home de forma cirúrgica** | A03/A04/A13 nas divergências demonstradas, preservando as escolhas de arte | B0 e, quando aplicável, B1 | Geometria regular, composição aprovada e QA repetido |
 | **B3, limpar a cascata** | A05/A06, remover código morto comprovado e reorganizar ownership de CSS | B1/B2 | Simplificação com comparações antes/depois |
 | **B4, modularizar React** | A07, sem mover ou duplicar áudio e sem refatoração cosmética | B3 | Componentes menores e provas de continuidade |
 | **B5, acabamento dirigido** | A10, efeito/reduced-motion, custos de mídia e a11y restante | Conforme cada caso | Fluxo, performance e capturas revisadas |
@@ -197,7 +211,7 @@ Estas regras são vinculadas, sem criar nova fonte concorrente, por [AGENTS.md](
 
 ## 8. Definição de pronto e pendências atuais
 
-- [ ] Executar navegador/Playwright sobre o SHA de Home em avaliação, sem `skipped` oculto.
+- [ ] **Completar** QA Playwright/render no SHA de Home em avaliação: a primeira execução no PR #34 falhou com overflow desktop; ainda faltam estados do divisor, animação estabilizada e comparação com mock.
 - [ ] Resolver conflito da suíte do hero com o layout efetivamente aprovado.
 - [ ] Testar texto real, crop e arte nos estados de painel relevantes.
 - [ ] Tornar o gate confiável; decidir conscientemente entre push direto ou checks requeridos antes do merge.

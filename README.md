@@ -45,7 +45,7 @@ pnpm visual:qa
 
 O visual runner usa o **Google Chrome** instalado (`channel: chrome`) e inicia `pnpm dev` localmente. Na CI, após `pnpm build`, usa `pnpm start`. Captura Home, Estúdio, Orçamento e Produto em cinco perfis de tela e anexa inventário inicial de acessibilidade. **Não gera/aprova baselines automaticamente** nem substitui comparação humana com o mock aprovado. Resultados e pendências: [08V](docs/work/08-visual-quality-evolution.md) e [pipeline](docs/design/CM_VISUAL_RENDER_PIPELINE_V1.md).
 
-**Atenção à CI da Home:** no push de 18/10 (`main@23f25c3`), lint/test/build ficaram verdes, mas os jobs visuais foram `skipped` porque não havia `[visual]` no commit. Isso **não confirma** a qualidade da nova Home. O [relatório de auditoria](docs/work/evidence/08v-css-shell-architecture-audit-2026-10-18.md) e a frente [08V](docs/work/08-visual-quality-evolution.md) registram o reparo necessário no gatilho/contrato dos testes. Uma Action após push direto na `main` não bloqueia esse push.
+**Atenção à CI da Home:** no push de 18/10 (`main@23f25c3`), lint/test/build ficaram verdes, mas os jobs visuais foram `skipped` porque não havia `[visual]` no commit. Isso **não confirma** a qualidade da nova Home. A execução subsequente da suíte no [PR #34, CI 39152117452](https://github.com/cassianomangini/radioand3d/actions/runs/39152117452) encontrou **duas falhas de geometria desktop** no teste do hero, reforçando a necessidade de QA e correção. O [relatório de auditoria](docs/work/evidence/08v-css-shell-architecture-audit-2026-10-18.md) e a frente [08V](docs/work/08-visual-quality-evolution.md) registram o reparo necessário no gatilho/contrato dos testes. Uma Action após push direto na `main` não bloqueia esse push.
 
 ### Catálogo da rádio no R2
 

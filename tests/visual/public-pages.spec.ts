@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { writeFile } from "node:fs/promises";
 
 const routes = [
   { name: "home", path: "/" },
@@ -56,8 +57,10 @@ for (const route of routes) {
           loaded: image.naturalWidth > 0
         }));
       });
+      const mediaDiagnosticPath = testInfo.outputPath("product-visible-media-readiness.json");
+      await writeFile(mediaDiagnosticPath, JSON.stringify({ allReady: visibleMediaReady, media: mediaReadiness }, null, 2));
       await testInfo.attach("product-visible-media-readiness.json", {
-        body: Buffer.from(JSON.stringify({ allReady: visibleMediaReady, media: mediaReadiness }, null, 2), "utf8"),
+        path: mediaDiagnosticPath,
         contentType: "application/json"
       });
       if (!visibleMediaReady) {

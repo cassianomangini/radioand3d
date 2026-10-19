@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { writeFile } from "node:fs/promises";
 
 test("Home X1 and copy fit the actual Studio in every Radio state", async ({ page }, testInfo) => {
   const response = await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -34,8 +35,10 @@ test("Home X1 and copy fit the actual Studio in every Radio state", async ({ pag
       } : null
     };
   });
+  const artDiagnosticPath = testInfo.outputPath("home-x1-media-diagnostic.json");
+  await writeFile(artDiagnosticPath, JSON.stringify(homeArtMetrics, null, 2));
   await testInfo.attach("home-x1-media-diagnostic.json", {
-    body: Buffer.from(JSON.stringify(homeArtMetrics, null, 2), "utf8"),
+    path: artDiagnosticPath,
     contentType: "application/json"
   });
   await expect(page.getByRole("link", { name: "Quero conhecer tudo" }))

@@ -24,7 +24,7 @@ export function clampRadioWidth(shellWidth: number, requested: number) {
 }
 
 export function getDefaultWidth(shellWidth: number) {
-  return clampRadioWidth(shellWidth, getMinRadioWidth(shellWidth));
+  return clampRadioWidth(shellWidth, Math.round(shellWidth * 0.3));
 }
 
 export function getExpandedWidth(shellWidth: number) {

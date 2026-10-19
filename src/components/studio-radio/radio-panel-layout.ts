@@ -1,12 +1,12 @@
 // Pure layout geometry. Both the resize handler and ARIA range use the
 // same bounds, independent of visual panels and persistent playback state.
-export const RADIO_WIDTH_RATIO = 0.3;
+export const RADIO_WIDTH_RATIO = 0.235;
 export const MAX_RADIO_WIDTH = 1120;
 export const MIN_STUDIO_WIDTH = 640;
 export const RESIZE_GUTTER = 32;
 
 export function getMinRadioWidth(shellWidth: number) {
-  return Math.round(shellWidth * RADIO_WIDTH_RATIO);
+  return Math.round(Math.max(340, shellWidth * RADIO_WIDTH_RATIO));
 }
 
 export function getMaxRadioWidth(shellWidth: number) {
@@ -24,7 +24,7 @@ export function clampRadioWidth(shellWidth: number, requested: number) {
 }
 
 export function getDefaultWidth(shellWidth: number) {
-  return clampRadioWidth(shellWidth, getMinRadioWidth(shellWidth));
+  return clampRadioWidth(shellWidth, Math.round(shellWidth * 0.3));
 }
 
 export function getExpandedWidth(shellWidth: number) {

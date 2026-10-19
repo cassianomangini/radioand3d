@@ -1391,3 +1391,15 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   /* Motion reduction must not leave text concealed by staggered keyframes. */
   
 }
+
+/* Approved 19/10 Studio mock: content fills Studio pane below navbar, including bottom media rail. */
+.studio[data-studio-route="detail"]:not(:has(.studioRouteContent)) .studioCatalogHeader { display: none; }
+@media (min-width: 73.75rem) {
+ .studio[data-studio-route="detail"]:not(:has(.studioRouteContent)) {
+    height: 100dvh; min-height: 100dvh; padding-top: var(--header-height); overflow-y: auto;
+ }
+ .studio[data-studio-route="detail"]:not(:has(.studioRouteContent)) > :global([data-studio-motion-owner="motion"]) {
+    min-height: calc(100dvh - var(--header-height));
+    height: calc(100dvh - var(--header-height));
+ }
+}

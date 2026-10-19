@@ -48,9 +48,11 @@ type Props = {
   active: boolean;
   /** Technical QA can supply its own fixtures; the public Studio uses imported real photos. */
   media?: readonly StudioPrintMedia[];
+  selectedIndex?: number | null;
+  onChangeIndex?: (index: number) => void;
 };
 
-export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props) {
+export function StudioPrintsCarousel({ active, media = studioPrintMedia, selectedIndex = null, onChangeIndex }: Props) {
   const [index, setIndex] = useState(0);
   const [restart, setRestart] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -66,14 +68,14 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
   const timelineRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const total = media.length;
-  const currentIndex = total > 0 ? index % total : 0;
+  const currentIndex = total > 0 ? (selectedIndex ?? index) % total : 0;
   const current = media[currentIndex] ?? null;
   const canNavigate = total > 1;
   const slideDuration = current?.kind === "video" ? VIDEO_DURATION_SECONDS : PHOTO_DURATION_SECONDS;
 
   // Reduced-motion removes transitions, not the gallery's explicitly requested
   // initial PLAY state. A visible Pause control always remains available.
-  const advancing = active && canNavigate && playing && documentVisible &&
+  const advancing = active && selectedIndex === null && canNavigate && playing && documentVisible &&
     inViewport && !overControls && !keyboardFocus;
 
   useEffect(() => {
@@ -131,7 +133,9 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
 
   function goTo(requested: number) {
     if (!canNavigate) return;
-    setIndex((requested + total) % total);
+    const nextIndex = (requested + total) % total;
+    setIndex(nextIndex);
+    onChangeIndex?.(nextIndex);
     setRestart((value) => value + 1);
   }
 
@@ -283,11 +287,12 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia }: Props
 
       <div className={styles.titleBlock}>
         <span className={styles.kicker}>ESTÚDIO DE IMPRESSÃO 3D</span>
-        <h2>Impressões</h2>
+        <h1>Impressões</h1>
+        <p>Peças personalizadas, placas, caixas e muito mais. Qualidade, atenção aos detalhes e um estúdio pronto para o seu projeto.</p>
       </div>
 
       <div className={styles.caption}>
-        <p>{current ? current.title : "Veja peças que já saíram das impressoras, com contexto real de produção."}</p>
+        <p className={styles.currentPhotoLabel}>{current ? current.title : "Veja peças que já saíram das impressoras."}</p>
         <div className={styles.bottomLine}>
           <Link
             className={styles.explore}

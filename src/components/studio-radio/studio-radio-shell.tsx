@@ -46,6 +46,10 @@ import {
 
 type StudioRouteMotion = "entering" | "exiting" | null;
 
+function getRouteDefaultRadioWidth(width: number, route: "home" | "detail") {
+  return route === "detail" ? getMinRadioWidth(width) : getDefaultWidth(width);
+}
+
 type TrackStepMotionState = {
   kind: TrackStepKind;
   phase: "source" | "destination";
@@ -124,9 +128,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         docked: radioDocked,
         expanded: radioExpanded,
         width: radioWidth,
-        defaultWidth: shellWidth === null ? null : getDefaultWidth(shellWidth)
+        defaultWidth: shellWidth === null ? null : getRouteDefaultRadioWidth(shellWidth, studioRoute)
       }),
-    [radioDocked, radioExpanded, radioFullscreen, radioWidth, shellWidth]
+    [radioDocked, radioExpanded, radioFullscreen, radioWidth, shellWidth, studioRoute]
   );
 
   const {
@@ -230,14 +234,14 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           : radioExpanded
           ? getExpandedWidth(width)
           : customWidthRef.current
-            ? clampRadioWidth(width, current ?? getDefaultWidth(width))
-            : getDefaultWidth(width)
+            ? clampRadioWidth(width, current ?? getRouteDefaultRadioWidth(width, studioRoute))
+            : getRouteDefaultRadioWidth(width, studioRoute)
       );
     });
 
     observer.observe(shell);
     return () => observer.disconnect();
-  }, [radioExpanded, customWidthRef]);
+  }, [radioExpanded, customWidthRef, studioRoute]);
 
   function runTrackStepMotion(kind: TrackStepKind, action: () => void) {
     if (mobileMotionActiveRef.current) {
@@ -647,7 +651,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     }
     clearSignatureStageTimer();
     const shellWidth = shellRef.current?.getBoundingClientRect().width;
-    const initialWidth = getDefaultWidth(shellWidth ?? window.innerWidth);
+    const initialWidth = getRouteDefaultRadioWidth(shellWidth ?? window.innerWidth, studioRoute);
 
     if (
       !radioFullscreen &&
@@ -880,7 +884,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             className={styles.studioCatalogHeader}
             aria-hidden={!studioHub}
           >
-            <h1>ESTÚDIO DE IMPRESSÃO 3D</h1>
+            <span>ESTÚDIO DE IMPRESSÃO 3D</span>
             <span>PROJETOS PERSONALIZADOS, PEÇAS PRODUZIDAS E PRODUTOS PRONTOS.</span>
           </div>
 

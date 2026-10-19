@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import styles from "./studio-radio-shell.module.css";
+import playerStyles from "./radio-content.module.css";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
@@ -239,7 +240,7 @@ export function RadioContent({
 
   return (
     <div
-      className={styles.radioContent}
+      className={playerStyles.radioContent}
       data-radio-surface={mobile ? "mobile" : "desktop"}
       data-radio-focus={!mobile && focus ? "true" : undefined}
       data-mobile-panel={mobile ? mobilePanel : undefined}
@@ -247,13 +248,13 @@ export function RadioContent({
       data-track-step={trackStepKind}
       data-mobile-motion-endpoint={mobile && mobileMotionEndpoint ? "true" : undefined}
     >
-      <div className={styles.radioHeader} data-radio-motion-key="header">
+      <div className={playerStyles.radioHeader} data-radio-motion-key="header">
         <h2><span>CM</span> RÁDIO</h2>
 
         {onClose ? (
           <button
             type="button"
-            className={styles.iconButton}
+            className={playerStyles.iconButton}
             onClick={onClose}
             aria-label={mobile ? "Fechar rádio" : "Voltar ao Estúdio"}
           >
@@ -261,11 +262,11 @@ export function RadioContent({
           </button>
         ) : null}
         {!mobile && (onDock || onExpand || onMedium) ? (
-          <div className={styles.radioLayoutActions}>
+          <div className={playerStyles.radioLayoutActions}>
             {onDock ? (
               <button
                 type="button"
-                className={styles.iconButton}
+                className={playerStyles.iconButton}
                 onClick={onDock}
                 aria-label="Recolher a Rádio para a versão pocket"
                 title="Versão pocket"
@@ -276,7 +277,7 @@ export function RadioContent({
             {expanded && onMedium ? (
               <button
                 type="button"
-                className={styles.iconButton}
+                className={playerStyles.iconButton}
                 onClick={onMedium}
                 aria-label="Voltar a Rádio ao tamanho médio"
                 title="Tamanho médio"
@@ -286,7 +287,7 @@ export function RadioContent({
             ) : onExpand ? (
               <button
                 type="button"
-                className={styles.iconButton}
+                className={playerStyles.iconButton}
                 onClick={onExpand}
                 aria-label="Expandir a Rádio"
                 title="Tela cheia"
@@ -299,35 +300,35 @@ export function RadioContent({
       </div>
 
       {sharedTrack ? (
-        <div className={styles.sharedTrackPrompt} role="region" aria-label="Música compartilhada">
+        <div className={playerStyles.sharedTrackPrompt} role="region" aria-label="Música compartilhada">
           <span>Recebeu esta música: <strong>{sharedTrack.title}</strong></span>
           {sharedTrackNeedsPlay ? (
             <button type="button" onClick={() => radio.selectShared(sharedTrack.id)}>
               ▶ Ouvir {sharedTrack.title}
             </button>
-          ) : <span className={styles.sharedTrackPlaying}>Tocando agora</span>}
+          ) : <span className={playerStyles.sharedTrackPlaying}>Tocando agora</span>}
         </div>
       ) : null}
 
       <div
-        className={styles.coverArt}
+        className={playerStyles.coverArt}
         data-shareable={radio.currentTrack?.shareSlug ? "true" : undefined}
         data-radio-motion-key="cover"
         data-track-flight-destination={trackFlight?.phase === "destination" ? "true" : undefined}
       >
         <Image src={currentArtwork} alt="Arte visual da CM Rádio" fill sizes="(min-width: 1180px) 720px, 100vw" priority unoptimized />
         <div
-          className={styles.coverCaption}
+          className={playerStyles.coverCaption}
           data-track-flight-destination={trackFlight?.phase === "destination" ? "true" : undefined}
         >
           <strong>{displayTrack.title}</strong>
           <span>{displayTrack.artist}</span>
         </div>
-        {!radio.currentTrack || radio.currentTrack.fixture ? <span className={styles.coverBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span> : null}
+        {!radio.currentTrack || radio.currentTrack.fixture ? <span className={playerStyles.coverBadge}>{radio.currentTrack?.fixture ? "TESTE" : "PRÉVIA"}</span> : null}
         {radio.currentTrack?.shareSlug ? (
           <button
             type="button"
-            className={styles.coverShare}
+            className={playerStyles.coverShare}
             onClick={() => void shareTrack(radio.currentTrack!.title, radio.currentTrack!.shareSlug!)}
             aria-label={`Compartilhar ${radio.currentTrack.title}`}
             title={`Compartilhar ${radio.currentTrack.title}`}
@@ -339,13 +340,13 @@ export function RadioContent({
       <span className={styles.srOnly} role="status">{shareFeedback}</span>
 
       <div
-        className={styles.progressBlock}
+        className={playerStyles.progressBlock}
         data-radio-motion-key="progress"
         data-scrubbing={scrubbing ? "true" : undefined}
         style={{ "--seek-progress": `${progress}%` } as CSSProperties}
       >
         <input
-          className={styles.progressSeek}
+          className={playerStyles.progressSeek}
           type="range"
           min={0}
           max={radio.duration || 1}
@@ -381,22 +382,22 @@ export function RadioContent({
           aria-keyshortcuts="ArrowLeft ArrowRight J L"
           aria-valuetext={formatTime(displayedPosition)}
         />
-        <output className={styles.seekPreview} aria-hidden="true">
+        <output className={playerStyles.seekPreview} aria-hidden="true">
           {formatTime(displayedPosition)}
         </output>
-        <div className={styles.progressTimes}>
+        <div className={playerStyles.progressTimes}>
           <span>{formatTime(displayedPosition)}</span>
           <span>{canPlay ? formatTrackDuration(radio.duration) : previewTrack.duration}</span>
         </div>
       </div>
 
-      <div className={styles.transport} aria-label="Controles da rádio" data-radio-motion-key="transport">
-        <button type="button" className={styles.modeButton} data-radio-flip-key="control-shuffle" onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Embaralhar e trocar de música" data-tooltip="Embaralhar e trocar de música"><Icon name="shuffle" /></button>
-        <button type="button" className={styles.modeButton} data-radio-flip-key="control-repeat" onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir esta faixa" title={radio.repeatOne ? "Desligar repetição da faixa" : "Repetir esta faixa"}><Icon name="repeat" /></button>
+      <div className={playerStyles.transport} aria-label="Controles da rádio" data-radio-motion-key="transport">
+        <button type="button" className={playerStyles.modeButton} data-radio-flip-key="control-shuffle" onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Embaralhar e trocar de música" data-tooltip="Embaralhar e trocar de música"><Icon name="shuffle" /></button>
+        <button type="button" className={playerStyles.modeButton} data-radio-flip-key="control-repeat" onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir esta faixa" title={radio.repeatOne ? "Desligar repetição da faixa" : "Repetir esta faixa"}><Icon name="repeat" /></button>
         <button type="button" data-radio-flip-key="control-previous" onClick={transportPrevious} disabled={!canPlay} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
         <button
           type="button"
-          className={styles.playButton}
+          className={playerStyles.playButton}
           data-radio-flip-key="control-play"
           onClick={radio.toggle}
           disabled={!canPlay}
@@ -418,7 +419,7 @@ export function RadioContent({
           <button
             ref={volumeButtonRef}
             type="button"
-            className={`${styles.modeButton} ${styles.volumeTrigger}`}
+            className={`${playerStyles.modeButton} ${styles.volumeTrigger} ${playerStyles.volumeTrigger}`}
             data-radio-flip-key="control-volume"
             onClick={() => setVolumeOpen((open) => !open)}
             disabled={!canPlay}
@@ -449,15 +450,15 @@ export function RadioContent({
             </div>
           ) : null}
         </div>
-        <button type="button" className={styles.modeButton} data-radio-flip-key="control-favorite" disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
+        <button type="button" className={playerStyles.modeButton} data-radio-flip-key="control-favorite" disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
       </div>
 
-      <RadioVisualizer className={styles.visualizer} motionKey="visualizer" active={visualizerActive} />
+      <RadioVisualizer className={`${styles.visualizer} ${playerStyles.visualizer}`} motionKey="visualizer" active={visualizerActive} />
 
-      <div className={styles.queueHeader} data-radio-motion-key="queue-header">
+      <div className={playerStyles.queueHeader} data-radio-motion-key="queue-header">
         <h3>Playlist</h3>
         {(!mobile || mobilePanel === "playlist") ? (
-          <label className={styles.searchField}>
+          <label className={playerStyles.searchField}>
             <span className={styles.srOnly}>Buscar na playlist</span>
             <Icon name="search" />
             <input
@@ -469,7 +470,7 @@ export function RadioContent({
           </label>
         ) : null}
         {mobile ? (
-          <button type="button" className={styles.panelToggle} onClick={() => setMobilePanel((panel) => panel === "playlist" ? "lyrics" : "playlist")} aria-label={mobilePanel === "playlist" ? "Expandir letra" : "Expandir playlist"}>
+          <button type="button" className={playerStyles.panelToggle} onClick={() => setMobilePanel((panel) => panel === "playlist" ? "lyrics" : "playlist")} aria-label={mobilePanel === "playlist" ? "Expandir letra" : "Expandir playlist"}>
             {mobilePanel === "playlist" ? "Letra ↓" : "↑"}
           </button>
         ) : null}
@@ -477,37 +478,37 @@ export function RadioContent({
 
       <ol
         ref={trackListRef}
-        className={styles.trackList}
+        className={playerStyles.trackList}
         aria-label="Músicas da playlist"
         data-radio-motion-key="queue-list"
       >
         {listTracks.map(({ track, position }) => (
-          <li key={track.id} data-track-id={track.id} className={styles.shareableTrackRow}>
+          <li key={track.id} data-track-id={track.id} className={playerStyles.shareableTrackRow}>
             <button
               type="button"
-              className={styles.trackRow}
+              className={playerStyles.trackRow}
               aria-current={track.id === radio.currentTrack?.id ? "true" : undefined}
               onClick={() => selectTrackWithMotion(track.id)}
               data-track-flight-source={trackFlight?.phase === "source" && trackFlight.id === track.id ? "true" : undefined}
             >
               <span
-                className={styles.trackThumb}
+                className={playerStyles.trackThumb}
                 data-track-flight-source={trackFlight?.phase === "source" && trackFlight.id === track.id ? "true" : undefined}
               ><Image src={track.artwork ?? "/images/cm-radio-preview-art.png"} alt="" fill sizes="48px" unoptimized /></span>
               <span
-                className={styles.trackMeta}
+                className={playerStyles.trackMeta}
                 data-track-flight-source={trackFlight?.phase === "source" && trackFlight.id === track.id ? "true" : undefined}
               ><strong>{track.title}</strong><small>{track.artist}</small></span>
-              <span className={styles.trackState}>{String(position).padStart(2, "0")}</span>
-              <span className={styles.duration}>{formatTrackDuration(track.durationSeconds ?? (track.id === radio.currentTrack?.id ? radio.duration : undefined))}</span>
+              <span className={playerStyles.trackState}>{String(position).padStart(2, "0")}</span>
+              <span className={playerStyles.duration}>{formatTrackDuration(track.durationSeconds ?? (track.id === radio.currentTrack?.id ? radio.duration : undefined))}</span>
             </button>
             {track.shareSlug ? (
-              <Link href={`/musica/${track.shareSlug}`} prefetch={false} className={styles.trackShareButton} aria-label={`Abrir link de ${track.title}`} title="Abrir link da música"><Icon name="link" /></Link>
+              <Link href={`/musica/${track.shareSlug}`} prefetch={false} className={playerStyles.trackShareButton} aria-label={`Abrir link de ${track.title}`} title="Abrir link da música"><Icon name="link" /></Link>
             ) : null}
           </li>
         ))}
         {listTracks.length === 0 ? (
-          <li className={styles.emptyState}>{normalizedQuery ? "Nenhuma música encontrada." : "A playlist está vazia."}</li>
+          <li className={playerStyles.emptyState}>{normalizedQuery ? "Nenhuma música encontrada." : "A playlist está vazia."}</li>
         ) : null}
       </ol>
       {mobile || expanded ? (
@@ -519,8 +520,8 @@ export function RadioContent({
           onClose={mobile ? () => setMobilePanel("playlist") : undefined}
         />
       ) : null}
-      {radio.error ? <p className={styles.playerMessage} role="alert">{radio.error} <button type="button" onClick={radio.retry}>Tentar novamente</button></p> : null}
-      {!radio.error && radio.currentTrack?.fixture ? <p className={styles.playerMessage}>Áudio sintético para teste local. Nenhuma música foi publicada.</p> : null}
+      {radio.error ? <p className={playerStyles.playerMessage} role="alert">{radio.error} <button type="button" onClick={radio.retry}>Tentar novamente</button></p> : null}
+      {!radio.error && radio.currentTrack?.fixture ? <p className={playerStyles.playerMessage}>Áudio sintético para teste local. Nenhuma música foi publicada.</p> : null}
     </div>
   );
 }

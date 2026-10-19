@@ -18,7 +18,7 @@ test("Radio panel minimum/maximum depend on actual shell width", () => {
   for (const { shell, min, max } of cases) {
     assert.equal(getMinRadioWidth(shell), min, `minimum @${shell}`);
     assert.equal(getMaxRadioWidth(shell), max, `maximum @${shell}`);
-    assert.equal(getDefaultWidth(shell), min, `split preset @${shell}`);
+    assert.equal(getDefaultWidth(shell), Math.round(shell * 0.3), `home split preset @${shell}`);
   }
 });
 

@@ -106,22 +106,27 @@ Regras técnicas:
 - sem alturas rígidas dependentes de viewport para sustentar a composição;
 - novas seções 3D entram abaixo da entrada inicial e não exigem alteração do shell da Rádio.
 
-### Ownership implementado do shell público (18/10/2026)
+### Ownership atual do shell público (19/10/2026)
 
-A modularização é incremental, feita sem criar um segundo motor de música nem alterar HTML/semântica das superfícies aprovadas. Mapa do código na `main@bcc1196`:
+A divisão é incremental: estilos e componentes mudam de proprietário sem redesenhar as telas ou duplicar o motor de áudio. Código de referência: [`main@4977a05`](https://github.com/cassianomangini/radioand3d/commit/4977a053bcf2647fe016433669d98cbdf1396811).
 
-| Responsabilidade | Arquivo atual | Limite |
+| Domínio | Implementação | Contrato técnico |
 | --- | --- | --- |
-| Coordenação de navbar, rotas, divisor, dock e modal mobile | `src/components/studio-radio/studio-radio-shell.tsx` (**1.738 linhas**) | Orquestra; não cria o elemento `audio` nem realiza renderização de playlist dentro do shell |
-| Player completo desktop e modal mobile | `src/components/studio-radio/radio-content.tsx` + `radio-content.module.css` (**1.560 linhas**) | Estilos próprios da capa, controles, progresso, lista, estados desktop/mobile/fullscreen, motion e container queries. Usa `RadioProvider` existente; **8 classes compartilhadas** ainda importadas do shell, com pontes duplas específicas para `volumeTrigger` e `visualizer` |
-| Tipos compartilhados da transição de rota | `src/components/studio-radio/radio-view-transition.ts` | Tipos, sem efeitos colaterais |
-| Saudação, H1, copy e CTA persistentes | `src/components/studio-radio/studio-welcome.tsx` + `studio-welcome.module.css` (**551 linhas**) | Own CSS de tipografia, responsividade, CTAs e keyframes; o único estilo compartilhado é `srOnly` |
-| Três entradas do Estúdio e motion de cards | `src/components/studio-radio/studio-hub.tsx` + `studio-hub.module.css` (**475 linhas**) | Own CSS de prints, orçamento e produtos, responsividade e estados de rota; Motion continua controlando transforms |
-| Arte X1 e crop responsivo da Home | `src/components/studio-radio/studio-home-art.tsx` + `studio-home-art.module.css` | CSS Module próprio, imagem existente, sem re-render artificial |
-| Geometria pura do divisor e limites ARIA | `src/components/studio-radio/radio-panel-layout.ts` + `tests/radio-panel-layout.test.mjs` | Mesma fórmula alimenta arraste e valores acessíveis |
-| Layout e animação de Letras | `src/features/radio/radio-lyrics.tsx` + `radio-lyrics.module.css` (**297 linhas**) | Sem importar CSS do shell. Estados desktop, mobile, aba e fullscreen via atributos `data-*` do DOM; efeitos, sincronização e foco preservados. Testes `radio-lyrics-layout.spec.ts` + `radio-lyrics-css-ownership.test.mjs` |
+| Orquestrador: rotas, divisor, modal e dock | `studio-radio-shell.tsx` (1.738 linhas) e `studio-radio-shell.module.css` (**1.594 linhas**) | Controla estados e geometria; não cria o `HTMLAudioElement` da Rádio. Dock flight e parte das transições de View Transition continuam nesse CSS. |
+| Header: branding, menu, redes e navbar adaptativa | `site-header.module.css` (**346 linhas**) | 49 blocos de estilo extraídos em [`4977a05`](https://github.com/cassianomangini/radioand3d/commit/4977a053bcf2647fe016433669d98cbdf1396811), dez deles com seletores mistos separados; estados globais via `[id="top"][data-radio-*]`, sem importar classes CSS Modules de outro domínio. O JSX do Header ainda está no shell React. |
+| Rádio completa desktop/fullscreen e modal mobile | `radio-content.tsx` + `radio-content.module.css` (**1.560 linhas**) | Controles, capa, playlist, busca, progresso e variantes de janela; lê um único `RadioProvider`. Classes locais complementam volume e visualizador compartilhados. |
+| Volume e visualizador das duas superfícies | `radio-audio-controls.module.css` (**242 linhas**) | Em [`34e6450`](https://github.com/cassianomangini/radioand3d/commit/34e64504f55aad6831853d2b66d2f8b4fd08957c), 32 regras comuns migraram do shell para fonte única importada pelo full player e mini-player. Estados específicos da pocket e fullscreen continuam nos arquivos de seus donos; não há novo analisador ou áudio. |
+| Pocket da navbar | `radio-navbar-dock.tsx` + `radio-navbar-dock.module.css` | Uma superfície compacta sobre o mesmo `RadioProvider`, jamais uma segunda reprodução. |
+| Saudação da Home e CTA | `studio-welcome.tsx` + `studio-welcome.module.css` (551 linhas) | Responsividade, tipografia e animação própria. Apenas `srOnly` ainda é um utilitário compartilhado do shell. |
+| Entradas do Estúdio | `studio-hub.tsx` + `studio-hub.module.css` (475 linhas) | Impressões, Orçamento e Produtos, com os mesmos eventos Motion e transições. |
+| Arte do Estúdio | `studio-home-art.tsx` + `studio-home-art.module.css` | Asset e crop aprovados, sem alteração de imagem. |
+| Limites do divisor | `radio-panel-layout.ts` + teste unitário | Geometria pura e valores ARIA idênticos. |
+| Letra da música | `radio-lyrics.tsx` + `radio-lyrics.module.css` (297 linhas) | Layout, estado de aba, fullscreen e acessibilidade sem importar CSS do shell. |
 
-O módulo legado `studio-radio-shell.module.css` passou para **2.079 linhas** em `main@bcc1196`. A última etapa isolou **229 regras de `RadioContent`** (incluindo split conservador de 19 seletores mistos) num módulo de 1.560 linhas, além das extrações anteriores de Hub, Welcome e Letras. `volumeTrigger` e `visualizer` continuam como classes compartilhadas do shell para o mini-player; o player completo usa uma classe local adicional em cada elemento para permitir os overrides de seu módulo sem alterar o visual. **O CSS total não diminuiu na mesma proporção: a migração conservou regras vivas e duplicou dois keyframes necessários ao namespace dos CSS Modules.** Além das correções antigas (Letras, 73 declarações redundantes e 7 regras vazias), a rodada seguinte isolou **65 regras do StudioHub** e **70 regras de StudioWelcome mais o keyframe `studio-letter-in`** em módulos CSS próprios. Para preservar especificidade em seletores dependentes da rota/dock, usam-se os atributos estáveis do DOM `[id="studio"][data-studio-*]` e `[id="top"][data-radio-docked]`, não classes hashed de outro módulo. **A redução é de linhas do monólito, não do CSS total:** os dois módulos possuem 475 + 551 linhas, com wrappers por media/container. O Header, o player completo e os estilos globais de dock permanecem acoplados ao shell.
+**Métrica correta:** o módulo principal caiu de 2.079 para **1.594 linhas nesta rodada**, mas os módulos de volume e Header acrescentaram 242 e 346 linhas. A diferença não significa que 485 linhas de CSS válido foram excluídas. O ganho real é a propriedade explícita por domínio, a manutenção de estados `data-*` e os testes de regressão.
+
+**Validação de [CI 39228501457](https://github.com/cassianomangini/radioand3d/actions/runs/39228501457):** lint, tipos, testes, build, CDP, **83 Playwright, 18 lab, 2 dock** verdes. A comparação de 30 PNGs de mesmo viewport/estado com o [CI de base 39225855957](https://github.com/cassianomangini/radioand3d/actions/runs/39225855957) encontrou **17 capturas idênticas pixel a pixel**. As diferenças foram majoritariamente instantes diferentes de animações; a captura de Produto também variou com o carregamento assíncrono de miniaturas, não com CSS do Header. As telas estáveis da Rádio fullscreen, dock, mobile e página inicial preservaram a composição capturada. O CI e as capturas não representam aceite estético final.
+
 
 **Regra de continuidade:** extrações substituem a mesma subárvore DOM e preservam refs, `RadioProvider`, `HTMLAudioElement`, Motion, fila e rotas. Validar por Playwright/CDP e comparar capturas de *mesmo viewport + estado + SHA* antes/depois; um build verde não comprova fidelidade. Os registros de execução estão em [08V](work/08-visual-quality-evolution.md).
 

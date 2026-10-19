@@ -30,7 +30,7 @@ test("Studio carousel navigation and gallery keep the same Radio audio node", as
     await expect(indicator).not.toHaveText(previous ?? "");
   }
 
-  await page.getByRole("link", { name: /Explorar galeria/i }).click();
+  await page.locator('[data-studio-media-strip="true"]').getByRole("link", { name: /Ver todos/i }).click();
   await expect(page).toHaveURL(/\/studio\/impressoes/);
   await expect(page.getByRole("heading", { level: 1, name: "O que já saiu das impressoras." })).toBeVisible();
   const persisted = await page.evaluate(() => {

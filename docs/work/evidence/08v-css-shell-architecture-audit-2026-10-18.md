@@ -359,3 +359,7 @@ Base `main@4977a05`; HEAD final [`main@c021cd2`](https://github.com/cassianomang
 ## 16. Verificação posterior à auditoria (19/10/2026)
 
 As extrações do `SiteHeader` ([`db0ea2d`](https://github.com/cassianomangini/radioand3d/commit/db0ea2d0e42c0a300bc9fb1beadeee675b7ce992)) e da animação FLIP fullscreen ([`3bd1fd7`](https://github.com/cassianomangini/radioand3d/commit/3bd1fd74bb3848471d649e1c4f7c9c1de667da59)) e a instrumentação de mídia ([`2a05d81`](https://github.com/cassianomangini/radioand3d/commit/2a05d81783d731e0be116a374b89212995a05994)) sucederam esta auditoria. Resultados, arquivos, métricas de CSS e evidências renderizadas ficam concentrados no [registro de execução 08V](../08-visual-quality-evolution.md), sem duplicar o inventário histórico aqui. O PR #34 continua documental e não substitui os commits de aplicação na `main`.
+
+## 17. Fechamento B4: hooks de divisor/modal (19/10/2026)
+
+O ciclo posterior a esta auditoria separou estados e callbacks de gesto em `use-radio-divider.ts` e o ciclo nativo do diálogo em `use-mobile-radio-dialog.ts`. O shell reduzido tem **974 linhas**, contra **1.426** antes da rodada, e seu CSS mantém **1.394**. Os detalhes de commits, falhas intermediárias corrigidas, testes Playwright, CI final [39241597826](https://github.com/cassianomangini/radioand3d/actions/runs/39241597826) e paridade de 30 PNGs estão concentrados no [registro 08V](../08-visual-quality-evolution.md), sem duplicar a sequência. B4 encerrado tecnicamente; B5 e D5 ainda abertos.

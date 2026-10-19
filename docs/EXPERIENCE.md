@@ -1,5 +1,14 @@
 # Experiência e identidade CM
 
+
+## Hub do Estúdio: mock de 19/10/2026
+
+A direção visual mais recente para `/studio` substitui **somente** a composição anterior do hub de três entradas. O mock fornecido em conversa é referência primária de estilo e distribuição: galeria de Impressões dominante à esquerda, quatro links compactos com imagem pequena e tipografia forte à direita, e faixa independente de fotos do estúdio na parte inferior. Ordem dos links: **Orçamentos, Produtos, Materiais, O Estúdio**. O próprio card é o link, sem CTA secundário ou seta. Contornos finos violeta, laranja, ciano e azul, respectivamente. A área de Rádio continua à direita no desktop e mantém interações e player persistente; sua largura padrão mais estreita é específica do Estúdio, preservando a Home já aprovada. Mobile usa mini player persistente e reorganiza os cards sem comprimir suas imagens ou textos.
+
+A antiga regra de exatamente três entradas foi substituída **apenas no hub**, e permanece histórica nos documentos anteriores. Materiais continua com informações de apoio, sem prometer disponibilidade ou criar um catálogo fictício. O Estúdio apresenta o espaço de trabalho e sua prática. Na faixa de fotos, só mostrar reprodução de vídeo quando existir um vídeo real; na versão inicial existem 13 fotografias no manifesto. Imagens comerciais não devem ser inventadas para preencher espaço. Os controles e a lógica de áudio da Rádio não fazem parte do redesign.
+
+O escopo implementado na branch `feat/studio-mock-20261019` permanece **em revisão** até que CI, captura real em desktop/mobile, interação do divisor e comparação visual com a imagem fornecida sejam conferidos. A referência visual final só pode ser aprovada por Cassiano.
+
 ## Direção confirmada
 
 CM como identidade principal. Sem astronauta, lettering Artesopolis ou tema espacial herdado. Cassiano forneceu em 29/09/2026 o logo **CM 3D and Radio**, salvo em `public/images/cm-3d-radio-logo.png`. A navbar mostra uma versão pequena. Preservar o arquivo fornecido, sem redesenhar o monograma no frontend.

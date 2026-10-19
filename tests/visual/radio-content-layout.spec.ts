@@ -9,8 +9,18 @@ test("full desktop Radio keeps cover, transport, volume and playlist after CSS e
   await expect(controls).toBeVisible();
   await expect(pane.locator('ol[aria-label="Músicas da playlist"]')).toBeVisible();
   await expect(pane.locator('input[aria-label="Posição da música"]')).toBeVisible();
-  await controls.getByRole("button", { name: /^Volume / }).click();
-  await expect(pane.getByRole("group", { name: "Controle de volume" })).toBeVisible();
+  // The public Radio may have no published tracks. Volume is deliberately
+  // disabled until a playable track exists; do not click a disabled control.
+  const volume = controls.getByRole("button", { name: /^Volume / });
+  const play = controls.locator('[data-radio-flip-key="control-play"]');
+  expect(await volume.isEnabled()).toBe(await play.isEnabled());
+  if (await volume.isEnabled()) {
+    await volume.click();
+    await expect(pane.getByRole("group", { name: "Controle de volume" })).toBeVisible();
+  } else {
+    await expect(volume).toBeDisabled();
+    await expect(pane.getByRole("group", { name: "Controle de volume" })).toHaveCount(0);
+  }
   const data = await pane.evaluate((node) => {
     const buttons = node.querySelector<HTMLElement>('[aria-label="Controles da rádio"]');
     const visualizer = node.querySelector<HTMLElement>('[data-radio-motion-key="visualizer"]');
@@ -38,7 +48,16 @@ test("mobile full Radio preserves independent controls, spectrum and playlist", 
   const pane = dialog.locator('[data-radio-surface="mobile"]');
   await expect(pane.locator('[aria-label="Controles da rádio"]')).toBeVisible();
   await expect(pane.locator('ol[aria-label="Músicas da playlist"]')).toBeVisible();
-  await pane.locator('[aria-label="Controles da rádio"]').getByRole("button", { name: /^Volume / }).click();
-  await expect(pane.getByRole("group", { name: "Controle de volume" })).toBeVisible();
+  const controls = pane.locator('[aria-label="Controles da rádio"]');
+  const volume = controls.getByRole("button", { name: /^Volume / });
+  const play = controls.locator('[data-radio-flip-key="control-play"]');
+  expect(await volume.isEnabled()).toBe(await play.isEnabled());
+  if (await volume.isEnabled()) {
+    await volume.click();
+    await expect(pane.getByRole("group", { name: "Controle de volume" })).toBeVisible();
+  } else {
+    await expect(volume).toBeDisabled();
+    await expect(pane.getByRole("group", { name: "Controle de volume" })).toHaveCount(0);
+  }
   expect(await page.locator("audio").count()).toBe(beforeAudio);
 });

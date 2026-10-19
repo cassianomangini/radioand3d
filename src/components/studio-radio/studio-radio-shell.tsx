@@ -170,7 +170,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     if (!pathname.startsWith("/musica/") || !window.matchMedia("(max-width: 73.74rem)").matches) return;
     const timer = window.setTimeout(() => setMobileRadioOpen(true), 0);
     return () => window.clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, setMobileRadioOpen]);
 
   useEffect(() => {
     if (studioRoute !== "home") return;

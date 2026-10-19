@@ -10,10 +10,10 @@ import {
 
 test("Radio panel minimum/maximum depend on actual shell width", () => {
   const cases = [
-    { shell: 1180, min: 354, max: 508 },
-    { shell: 1440, min: 432, max: 768 },
-    { shell: 1760, min: 528, max: 1088 },
-    { shell: 2500, min: 750, max: 1120 }
+    { shell: 1180, min: 340, max: 508 },
+    { shell: 1440, min: 340, max: 768 },
+    { shell: 1760, min: 414, max: 1088 },
+    { shell: 2500, min: 588, max: 1120 }
   ];
   for (const { shell, min, max } of cases) {
     assert.equal(getMinRadioWidth(shell), min, `minimum @${shell}`);

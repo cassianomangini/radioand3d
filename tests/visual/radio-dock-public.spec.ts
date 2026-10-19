@@ -127,6 +127,12 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
     const edge = page.locator('[data-radio-dock-edge="true"]');
     await expect(edge).toBeVisible();
+    // CSS module extraction must retain the real fixed restore handle.
+    const edgeCSS = await edge.evaluate((node) => {
+      const styles = getComputedStyle(node);
+      return { position: styles.position, cursor: styles.cursor, touchAction: styles.touchAction };
+    });
+    expect(edgeCSS).toEqual({ position: "fixed", cursor: "ew-resize", touchAction: "none" });
 
     const box = await edge.boundingBox();
     expect(box).not.toBeNull();

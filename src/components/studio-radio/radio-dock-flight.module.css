@@ -1,0 +1,96 @@
+/* Only the temporary 03c sidebar-to-navbar flight and restore-edge UI.
+ * Parent dock state uses stable #top data attributes rather than shell CSS hashes.
+ * The underlying RadioProvider, panel, navbar and WAAPI controller do not change.
+ * Final optical centering of navbar mini remains a separate user visual gate. */
+
+.radioDockFlight {
+  position: fixed;
+  z-index: calc(var(--layer-nav) + 12);
+  inset: 0 auto auto 0;
+  display: none;
+  visibility: hidden;
+  overflow: hidden;
+  isolation: isolate;
+  container: radio-dock-flight / size;
+  pointer-events: none;
+  background: #03050a;
+  border: 1px solid rgb(82 214 255 / 48%);
+  box-shadow: 0 1.2rem 3.4rem rgb(6 48 106 / 30%);
+}
+
+.radioDockFlightArtwork {
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.78;
+}
+
+.radioDockFlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(2 3 5 / 13%), rgb(3 5 10 / 20%) 40%, rgb(3 5 10 / 94%));
+  pointer-events: none;
+}
+
+.radioDockFlightCaption {
+  position: absolute;
+  z-index: 1;
+  left: clamp(0.55rem, 3cqw, 1.2rem);
+  right: clamp(0.45rem, 2cqw, 1rem);
+  bottom: clamp(0.3rem, 2cqh, 0.9rem);
+  display: grid;
+  gap: clamp(0rem, 0.5cqh, 0.24rem);
+  white-space: nowrap;
+}
+
+.radioDockFlightCaption strong {
+  overflow: hidden;
+  font-size: clamp(0.62rem, 3.1cqh, 1.05rem);
+  line-height: 1.14;
+  text-overflow: ellipsis;
+}
+
+.radioDockFlightCaption small {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: clamp(0.5rem, 2.2cqh, 0.7rem);
+  line-height: 1.12;
+  text-overflow: ellipsis;
+}
+
+.radioDockEdge {
+  display: none;
+}
+
+@media (min-width: 73.75rem) {
+
+:global([id="top"])[data-radio-docked="true"] .radioDockEdge {
+    position: fixed;
+    display: block;
+    top: 0;
+    right: 0;
+    z-index: calc(var(--layer-nav) + 5);
+    width: var(--rail-width);
+    height: 100dvh;
+    padding: 0;
+    border: 0;
+    background: #03050a url("/images/cm-radio-divider.webp") center / auto 100% no-repeat;
+    opacity: 1;
+    filter: saturate(0.72) brightness(0.78);
+    touch-action: none;
+    cursor: ew-resize;
+    transition: filter 180ms ease;
+  }
+
+:global([id="top"])[data-radio-docked="true"] .radioDockEdge:hover,
+:global([id="top"])[data-radio-docked="true"] .radioDockEdge:focus-visible {
+    filter: saturate(1.2) brightness(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+.radioDockEdge {
+    transition: none !important;
+  }
+}

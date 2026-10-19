@@ -33,6 +33,7 @@ import { StudioHomeArt } from "./studio-home-art";
 import { Icon, RadioContent, previewTrack, type TrackStepKind } from "./radio-content";
 import type { DocumentWithViewTransition } from "./radio-view-transition";
 import { RadioNavbarDock } from "./radio-navbar-dock";
+import { RadioDockFlight, RadioDockRestoreEdge } from "./radio-dock-flight";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
 import { resolveRadioKeyboardCommand } from "@/features/radio/radio-keyboard";
@@ -50,7 +51,6 @@ import {
 } from "./radio-motion-spine";
 
 const RADIO_DOCK_FLIGHT_MS = 660;
-const RADIO_DOCK_EDGE_RESTORE_PX = 78;
 
 type StudioRouteMotion = "entering" | "exiting" | null;
 
@@ -257,7 +257,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const dockedRef = useRef(false);
   const dockRestoreWidthRef = useRef(0);
   const dockRestoreModeRef = useRef<RadioLayoutMode>("split");
-  const dockEdgeDragRef = useRef<{ pointerId: number; startX: number } | null>(null);
   const mobileDialogRef = useRef<HTMLDialogElement>(null);
   const customWidthRef = useRef(false);
   const dragOffsetRef = useRef(0);
@@ -1667,52 +1666,14 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         </aside>
       </div>
 
-      <div ref={dockFlightRef} className={styles.radioDockFlight} aria-hidden="true" data-radio-dock-flight="true">
-        <Image
-          src={radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png"}
-          fill
-          sizes="(min-width: 1180px) 60vw, 480px"
-          unoptimized
-          alt=""
-          className={styles.radioDockFlightArtwork}
-        />
-        <span className={styles.radioDockFlightCaption}>
-          <strong>{radio.currentTrack?.title ?? "CM Rádio"}</strong>
-          <small>{radio.currentTrack?.artist ?? "Aguardando catálogo"}</small>
-        </span>
-      </div>
+      <RadioDockFlight
+        flightRef={dockFlightRef}
+        artwork={radio.currentTrack?.artwork ?? "/images/cm-radio-preview-art.png"}
+        title={radio.currentTrack?.title ?? "CM Rádio"}
+        artist={radio.currentTrack?.artist ?? "Aguardando catálogo"}
+      />
 
-      {radioDocked ? (
-        <button
-          type="button"
-          className={styles.radioDockEdge}
-          data-radio-dock-edge="true"
-          aria-label="Arraste para a esquerda para voltar a Rádio ao tamanho médio"
-          title="Arraste para voltar a Rádio ao tamanho médio"
-          onPointerDown={(event) => {
-            if (event.pointerType === "mouse" && event.button !== 0) return;
-            dockEdgeDragRef.current = { pointerId: event.pointerId, startX: event.clientX };
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerUp={(event) => {
-            const drag = dockEdgeDragRef.current;
-            dockEdgeDragRef.current = null;
-            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-              event.currentTarget.releasePointerCapture(event.pointerId);
-            }
-            if (drag?.pointerId === event.pointerId && drag.startX - event.clientX >= RADIO_DOCK_EDGE_RESTORE_PX) {
-              restoreMediumFromPocket();
-            }
-          }}
-          onPointerCancel={() => { dockEdgeDragRef.current = null; }}
-          onKeyDown={(event) => {
-            if (["Enter", " ", "ArrowLeft"].includes(event.key)) {
-              event.preventDefault();
-              restoreMediumFromPocket();
-            }
-          }}
-        />
-      ) : null}
+      {radioDocked ? <RadioDockRestoreEdge onRestore={restoreMediumFromPocket} /> : null}
 
       <dialog
         ref={mobileDialogRef}

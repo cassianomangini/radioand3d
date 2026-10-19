@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, type Variants } from "motion/react";
-import styles from "./studio-radio-shell.module.css";
+import styles from "./studio-hub.module.css";
 import { StudioPrintsCarousel } from "./studio-prints-carousel";
 
 // The visual hub remains mounted while the user navigates. Motion owns

@@ -108,20 +108,20 @@ Regras técnicas:
 
 ### Ownership implementado do shell público (18/10/2026)
 
-A modularização é incremental, feita sem criar um segundo motor de música nem alterar HTML/semântica das superfícies aprovadas. Mapa do código na `main@69d8ec7`:
+A modularização é incremental, feita sem criar um segundo motor de música nem alterar HTML/semântica das superfícies aprovadas. Mapa do código na `main@1b4b946`:
 
 | Responsabilidade | Arquivo atual | Limite |
 | --- | --- | --- |
 | Coordenação de navbar, rotas, divisor, dock e modal mobile | `src/components/studio-radio/studio-radio-shell.tsx` (**1.738 linhas**) | Orquestra; não cria o elemento `audio` nem realiza renderização de playlist dentro do shell |
 | Player completo desktop e modal mobile | `src/components/studio-radio/radio-content.tsx` (**528 linhas**) | Reúne controles, busca/playlist, letras e visualizador; lê o `RadioProvider` existente |
 | Tipos compartilhados da transição de rota | `src/components/studio-radio/radio-view-transition.ts` | Tipos, sem efeitos colaterais |
-| Saudação, H1, copy e CTA persistentes | `src/components/studio-radio/studio-welcome.tsx` | Mantém nó estável entre Home e Studio; recebe navegação do shell |
-| Três entradas do Estúdio e motion de cards | `src/components/studio-radio/studio-hub.tsx` | Motion e galeria pertencem ao hub; sem alteração na fila ou navegação da Rádio |
+| Saudação, H1, copy e CTA persistentes | `src/components/studio-radio/studio-welcome.tsx` + `studio-welcome.module.css` (**551 linhas**) | Own CSS de tipografia, responsividade, CTAs e keyframes; o único estilo compartilhado é `srOnly` |
+| Três entradas do Estúdio e motion de cards | `src/components/studio-radio/studio-hub.tsx` + `studio-hub.module.css` (**475 linhas**) | Own CSS de prints, orçamento e produtos, responsividade e estados de rota; Motion continua controlando transforms |
 | Arte X1 e crop responsivo da Home | `src/components/studio-radio/studio-home-art.tsx` + `studio-home-art.module.css` | CSS Module próprio, imagem existente, sem re-render artificial |
 | Geometria pura do divisor e limites ARIA | `src/components/studio-radio/radio-panel-layout.ts` + `tests/radio-panel-layout.test.mjs` | Mesma fórmula alimenta arraste e valores acessíveis |
 | Layout e animação de Letras | `src/features/radio/radio-lyrics.tsx` + `radio-lyrics.module.css` (**297 linhas**) | Sem importar CSS do shell. Estados desktop, mobile, aba e fullscreen via atributos `data-*` do DOM; efeitos, sincronização e foco preservados. Testes `radio-lyrics-layout.spec.ts` + `radio-lyrics-css-ownership.test.mjs` |
 
-O módulo legado `studio-radio-shell.module.css` passou para **4.368 linhas** no `main@69d8ec7`. A refatoração deslocou 23 regras de Letras para o módulo próprio, eliminou **73 declarações substituídas** por regras posteriores no mesmo seletor e contexto, removeu 7 regras vazias e normalizou espaços em branco. **Não confundir linhas removidas do shell com CSS total eliminado:** 192 linhas foram adicionadas ao módulo de Letras. Header, identidade editorial, hub e player ainda compartilham CSS do shell e seguem pendentes de ownership.
+O módulo legado `studio-radio-shell.module.css` passou para **3.471 linhas** em `main@1b4b946`. Além das correções antigas (Letras, 73 declarações redundantes e 7 regras vazias), a rodada seguinte isolou **65 regras do StudioHub** e **70 regras de StudioWelcome mais o keyframe `studio-letter-in`** em módulos CSS próprios. Para preservar especificidade em seletores dependentes da rota/dock, usam-se os atributos estáveis do DOM `[id="studio"][data-studio-*]` e `[id="top"][data-radio-docked]`, não classes hashed de outro módulo. **A redução é de linhas do monólito, não do CSS total:** os dois módulos possuem 475 + 551 linhas, com wrappers por media/container. O Header, o player completo e os estilos globais de dock permanecem acoplados ao shell.
 
 **Regra de continuidade:** extrações substituem a mesma subárvore DOM e preservam refs, `RadioProvider`, `HTMLAudioElement`, Motion, fila e rotas. Validar por Playwright/CDP e comparar capturas de *mesmo viewport + estado + SHA* antes/depois; um build verde não comprova fidelidade. Os registros de execução estão em [08V](work/08-visual-quality-evolution.md).
 

@@ -18,6 +18,7 @@ import {
 import { flushSync } from "react-dom";
 import { useReducedMotion } from "motion/react";
 import styles from "./studio-radio-shell.module.css";
+import sharedAudioStyles from "./radio-audio-controls.module.css";
 import {
   getMinRadioWidth,
   getMaxRadioWidth,
@@ -1517,7 +1518,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <span>Rádio</span>
         </button>
         <div className={styles.miniSignal}>
-          <RadioVisualizer className={`${styles.visualizer} ${styles.miniVisualizer}`} barCount={24} active={!mobileRadioOpen} />
+          <RadioVisualizer className={`${sharedAudioStyles.visualizer} ${styles.miniVisualizer}`} barCount={24} active={!mobileRadioOpen} />
         </div>
         <div className={styles.miniControls}>
           <button type="button" className={styles.miniStep} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Embaralhar e trocar de música" title="Embaralhar e trocar de música"><Icon name="shuffle" /></button>
@@ -1538,7 +1539,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <button type="button" className={styles.miniStep} onClick={nextTrack} disabled={!radio.currentTrack || !radio.canSkipNext} aria-keyshortcuts="N" aria-label="Próxima faixa"><Icon name="next" /></button>
           <div
             ref={miniVolumeMenuRef}
-            className={styles.volumeMenu}
+            className={sharedAudioStyles.volumeMenu}
+            data-radio-volume-menu="pocket"
             onBlur={(event) => {
               if (!event.currentTarget.contains(event.relatedTarget)) setMiniVolumeOpen(false);
             }}
@@ -1546,7 +1548,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             <button
               ref={miniVolumeButtonRef}
               type="button"
-              className={`${styles.miniStep} ${styles.volumeTrigger}`}
+              className={`${styles.miniStep} ${sharedAudioStyles.volumeTrigger}`}
               onClick={() => setMiniVolumeOpen((open) => !open)}
               disabled={!radio.currentTrack}
               aria-label={`Volume ${Math.round(radio.volume * 100)}%. ${miniVolumeOpen ? "Fechar" : "Abrir"} controle`}
@@ -1556,12 +1558,12 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
               <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
             </button>
             {miniVolumeOpen ? (
-              <div id="mini-radio-volume" className={styles.volumePopover} role="group" aria-label="Controle de volume">
-                <button type="button" className={styles.muteButton} onClick={radio.toggleMute} aria-label={radio.volume === 0 ? "Ativar som" : "Silenciar"}>
+              <div id="mini-radio-volume" className={sharedAudioStyles.volumePopover} data-radio-volume-popover="pocket" role="group" aria-label="Controle de volume">
+                <button type="button" className={sharedAudioStyles.muteButton} onClick={radio.toggleMute} aria-label={radio.volume === 0 ? "Ativar som" : "Silenciar"}>
                   <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
                 </button>
                 <input
-                className={styles.volumeSlider}
+                className={sharedAudioStyles.volumeSlider}
                 type="range"
                 min={0}
                 max={1}
@@ -1572,7 +1574,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
                 aria-valuetext={`${Math.round(radio.volume * 100)}%`}
                 style={{ "--volume-level": `${Math.round(radio.volume * 100)}%` } as CSSProperties}
               />
-                <span className={styles.volumeLevel}>{Math.round(radio.volume * 100)}%</span>
+                <span className={sharedAudioStyles.volumeLevel}>{Math.round(radio.volume * 100)}%</span>
               </div>
             ) : null}
           </div>

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import styles from "./studio-radio-shell.module.css";
+import sharedAudioStyles from "./radio-audio-controls.module.css";
 import playerStyles from "./radio-content.module.css";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
@@ -411,7 +412,7 @@ export function RadioContent({
         <button type="button" data-radio-flip-key="control-next" onClick={transportNext} disabled={!canPlay || !radio.canSkipNext} aria-keyshortcuts="N" aria-label="Próxima faixa"><Icon name="next" /></button>
         <div
           ref={volumeMenuRef}
-          className={styles.volumeMenu}
+          className={sharedAudioStyles.volumeMenu}
           onBlur={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) setVolumeOpen(false);
           }}
@@ -419,7 +420,7 @@ export function RadioContent({
           <button
             ref={volumeButtonRef}
             type="button"
-            className={`${playerStyles.modeButton} ${styles.volumeTrigger} ${playerStyles.volumeTrigger}`}
+            className={`${playerStyles.modeButton} ${sharedAudioStyles.volumeTrigger} ${playerStyles.volumeTrigger}`}
             data-radio-flip-key="control-volume"
             onClick={() => setVolumeOpen((open) => !open)}
             disabled={!canPlay}
@@ -430,12 +431,12 @@ export function RadioContent({
             <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
           </button>
           {volumeOpen ? (
-            <div id={volumePanelId} className={styles.volumePopover} role="group" aria-label="Controle de volume">
-              <button type="button" className={styles.muteButton} onClick={radio.toggleMute} aria-label={radio.volume === 0 ? "Ativar som" : "Silenciar"} title={radio.volume === 0 ? "Ativar som" : "Silenciar"}>
+            <div id={volumePanelId} className={sharedAudioStyles.volumePopover} role="group" aria-label="Controle de volume">
+              <button type="button" className={sharedAudioStyles.muteButton} onClick={radio.toggleMute} aria-label={radio.volume === 0 ? "Ativar som" : "Silenciar"} title={radio.volume === 0 ? "Ativar som" : "Silenciar"}>
                 <Icon name={radio.volume === 0 ? "volumeMute" : "volume"} />
               </button>
               <input
-                className={styles.volumeSlider}
+                className={sharedAudioStyles.volumeSlider}
                 type="range"
                 min={0}
                 max={1}
@@ -446,14 +447,14 @@ export function RadioContent({
                 aria-valuetext={`${Math.round(radio.volume * 100)}%`}
                 style={{ "--volume-level": `${Math.round(radio.volume * 100)}%` } as CSSProperties}
               />
-              <span className={styles.volumeLevel}>{Math.round(radio.volume * 100)}%</span>
+              <span className={sharedAudioStyles.volumeLevel}>{Math.round(radio.volume * 100)}%</span>
             </div>
           ) : null}
         </div>
         <button type="button" className={playerStyles.modeButton} data-radio-flip-key="control-favorite" disabled aria-label="Favoritos indisponíveis nesta prévia" title="Favoritos em breve"><Icon name="heart" /></button>
       </div>
 
-      <RadioVisualizer className={`${styles.visualizer} ${playerStyles.visualizer}`} motionKey="visualizer" active={visualizerActive} />
+      <RadioVisualizer className={`${sharedAudioStyles.visualizer} ${playerStyles.visualizer}`} motionKey="visualizer" active={visualizerActive} />
 
       <div className={playerStyles.queueHeader} data-radio-motion-key="queue-header">
         <h3>Playlist</h3>

@@ -853,7 +853,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         }
 
         const { navAnimation, flightAnimation } = startRadioDockWaapi({
-          nav, navFrom, flight, from, destination, header, docking: nextDocked
+          nav: nav ?? null, navFrom, flight, from, destination, header: header ?? null, docking: nextDocked
         });
         if (navAnimation) {
           dockNavAnimationRef.current = navAnimation;

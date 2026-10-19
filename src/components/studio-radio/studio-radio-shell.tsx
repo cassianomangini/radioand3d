@@ -46,6 +46,10 @@ import {
 
 type StudioRouteMotion = "entering" | "exiting" | null;
 
+function getRouteDefaultRadioWidth(width: number, route: "home" | "detail") {
+  return route === "detail" ? getMinRadioWidth(width) : getDefaultWidth(width);
+}
+
 type TrackStepMotionState = {
   kind: TrackStepKind;
   phase: "source" | "destination";
@@ -72,7 +76,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const studioRoute = pathname.startsWith("/studio") ? "detail" : "home";
   const studioHub = pathname === "/studio";
   const studioNestedRoute = studioRoute === "detail" && !studioHub;
-  const studioDefaultRadioWidth = (width: number) => studioRoute === "detail" ? getMinRadioWidth(width) : getDefaultWidth(width);
   const shellRef = useRef<HTMLDivElement>(null);
   const radioNavRef = useRef<HTMLAnchorElement>(null);
   const dockMiniRef = useRef<HTMLDivElement>(null);
@@ -125,9 +128,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         docked: radioDocked,
         expanded: radioExpanded,
         width: radioWidth,
-        defaultWidth: shellWidth === null ? null : studioDefaultRadioWidth(shellWidth)
+        defaultWidth: shellWidth === null ? null : getRouteDefaultRadioWidth(shellWidth, studioRoute)
       }),
-    [radioDocked, radioExpanded, radioFullscreen, radioWidth, shellWidth]
+    [radioDocked, radioExpanded, radioFullscreen, radioWidth, shellWidth, studioRoute]
   );
 
   const {
@@ -231,8 +234,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           : radioExpanded
           ? getExpandedWidth(width)
           : customWidthRef.current
-            ? clampRadioWidth(width, current ?? studioDefaultRadioWidth(width))
-            : studioDefaultRadioWidth(width)
+            ? clampRadioWidth(width, current ?? getRouteDefaultRadioWidth(width, studioRoute))
+            : getRouteDefaultRadioWidth(width, studioRoute)
       );
     });
 
@@ -244,7 +247,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     if (dockedRef.current || customWidthRef.current || radioExpanded || radioFullscreen) return;
     const width = shellRef.current?.getBoundingClientRect().width;
     if (width && window.matchMedia("(min-width: 73.75rem)").matches) {
-      setRadioWidth(studioDefaultRadioWidth(width));
+      setRadioWidth(getRouteDefaultRadioWidth(width, studioRoute));
     }
   }, [studioRoute, radioExpanded, radioFullscreen]);
 
@@ -656,7 +659,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     }
     clearSignatureStageTimer();
     const shellWidth = shellRef.current?.getBoundingClientRect().width;
-    const initialWidth = studioDefaultRadioWidth(shellWidth ?? window.innerWidth);
+    const initialWidth = getRouteDefaultRadioWidth(shellWidth ?? window.innerWidth, studioRoute);
 
     if (
       !radioFullscreen &&

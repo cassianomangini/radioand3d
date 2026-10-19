@@ -34,6 +34,7 @@ import { Icon, RadioContent, previewTrack, type TrackStepKind } from "./radio-co
 import type { DocumentWithViewTransition } from "./radio-view-transition";
 import { RadioNavbarDock } from "./radio-navbar-dock";
 import { RadioDockFlight, RadioDockRestoreEdge } from "./radio-dock-flight";
+import { RADIO_DOCK_FLIGHT_MS, startRadioDockWaapi } from "./radio-dock-flight-motion";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
 import { resolveRadioKeyboardCommand } from "@/features/radio/radio-keyboard";
@@ -50,7 +51,6 @@ import {
   type RadioLayoutMode
 } from "./radio-motion-spine";
 
-const RADIO_DOCK_FLIGHT_MS = 660;
 
 type StudioRouteMotion = "entering" | "exiting" | null;
 
@@ -852,48 +852,15 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           return;
         }
 
-        if (nav && navFrom) {
-          const navTo = nav.getBoundingClientRect();
-          const dx = navFrom.left - navTo.left;
-          if (Math.abs(dx) > 1) {
-            const navAnimation = nav.animate(
-              [{ transform: `translateX(${dx}px)` }, { transform: "translateX(0)" }],
-              { duration: RADIO_DOCK_FLIGHT_MS, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
-            );
-            dockNavAnimationRef.current = navAnimation;
-            void navAnimation.finished.catch(() => undefined);
-          }
-        }
-
-        const rightRemaining = nextDocked && header
-          ? Math.max(0, window.innerWidth - header.getBoundingClientRect().right)
-          : 0;
-        flight.style.display = "block";
-        flight.style.visibility = "visible";
-        const animation = flight.animate([
-          {
-            left: `${from.left}px`,
-            top: `${from.top}px`,
-            width: `${from.width}px`,
-            height: `${from.height}px`,
-            borderRadius: nextDocked ? "0px" : "12px",
-            opacity: 0.98
-          },
-          {
-            left: `${destination.left + rightRemaining}px`,
-            top: `${destination.top}px`,
-            width: `${destination.width}px`,
-            height: `${destination.height}px`,
-            borderRadius: nextDocked ? "12px" : "0px",
-            opacity: 0.96
-          }
-        ], {
-          duration: RADIO_DOCK_FLIGHT_MS,
-          easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-          fill: "forwards"
+        const { navAnimation, flightAnimation } = startRadioDockWaapi({
+          nav, navFrom, flight, from, destination, header, docking: nextDocked
         });
-        dockAnimationRef.current = animation;
-        void animation.finished.then(complete).catch(() => undefined);
+        if (navAnimation) {
+          dockNavAnimationRef.current = navAnimation;
+          void navAnimation.finished.catch(() => undefined);
+        }
+        dockAnimationRef.current = flightAnimation;
+        void flightAnimation.finished.then(complete).catch(() => undefined);
         dockMotionTimerRef.current = setTimeout(complete, RADIO_DOCK_FLIGHT_MS + 150);
       });
     });

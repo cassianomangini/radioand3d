@@ -62,6 +62,8 @@ Valores estáticos recorrentes de marca, texto, espaço, borda e sombra devem us
 
 Manter estilos de base no global; estilos de domínio junto do domínio. Utility classes podem compor layout, sem centenas de variantes visuais locais. Evitar `!important` corretivo e overrides em cascata para compensar uma primitiva inadequada.
 
+**Ownership e dívida de cascata (auditoria 18/10/2026):** antes de alterar `studio-radio-shell.module.css`, inspecionar todas as ocorrências dos seletores afetados, `@media`, `@container`, estados `data-*`, importações do CSS Module e computed styles nos cenários reais. O acoplamento de `radio-lyrics.tsx` ao módulo do shell existia na auditoria inicial, mas foi **eliminado** em [`aaddc6e`](https://github.com/cassianomangini/radioand3d/commit/aaddc6e62aa64481b20147ddda803219ca871999). Não corrigir um layout adicionando uma nova versão conflitante da regra no fim do arquivo: consolidar a regra e suas variantes com provas renderizadas. A análise e seus números datados estão no [relatório 08V de 18/10](work/evidence/08v-css-shell-architecture-audit-2026-10-18.md).
+
 ### Componentes e composição
 
 | Nível | Exemplos iniciais | Limite |
@@ -99,10 +101,40 @@ Regras técnicas:
 - estado de largura pertence à apresentação, não ao playback engine;
 - expandir/recolher não troca `src`, não recria `HTMLAudioElement` e não zera fila/posição;
 - o mini player mobile e a Rádio completa leem o mesmo controller; o mini player não é renderizado no desktop;
-- desktop não renderiza mini player adicional: o split já contém a Rádio completa;
+- desktop em `split`/`focus`/`fullscreen` não duplica o mini-player: a Rádio completa é a superfície ativa. **Exceção aprovada funcionalmente para dock:** com a lateral recolhida, um único player compacto ocupa a navbar, antes dos ícones sociais, e a lateral deixa de ser interativa; não é um segundo motor nem um player paralelo. O acabamento visual final do dock permanece pendente no 03c;
 - mobile não replica o split: header -> mini player -> Estúdio, com full player aberto sob demanda;
 - sem alturas rígidas dependentes de viewport para sustentar a composição;
 - novas seções 3D entram abaixo da entrada inicial e não exigem alteração do shell da Rádio.
+
+### Ownership atual do shell público (19/10/2026)
+
+A divisão é incremental: estilos e componentes mudam de proprietário sem redesenhar as telas ou duplicar o motor de áudio. Código de referência: [`main@3bd1fd7`](https://github.com/cassianomangini/radioand3d/commit/3bd1fd74bb3848471d649e1c4f7c9c1de667da59), com verificação de mídia adicionada depois em `main@2a05d81`.
+
+| Domínio | Implementação | Contrato técnico |
+| --- | --- | --- |
+| Orquestrador: rotas, modos, dock e áudio compartilhado | `studio-radio-shell.tsx` (**974 linhas**) e `studio-radio-shell.module.css` (**1.394 linhas**) | Centraliza os modos de layout, refs e transições cruzadas; não recria `RadioProvider` nem `HTMLAudioElement`. Os estados de gesto do divisor e o ciclo do modal passaram a hooks próprios, deixando a coordenação no shell. |
+| Divisor: arraste, teclado, snap e cancelamento | `use-radio-divider.ts` (**414 linhas**) | Dono dos 20 refs do gesto, três estados locais, magnetismo, preview, resize e rollback de `pointercancel`. Expõe apenas os refs necessários ao fullscreen/dock e callbacks de eventos; preserva `radio-panel-drag.ts` como fonte de geometria. [`4878b7e`](https://github.com/cassianomangini/radioand3d/commit/4878b7ec7ffc736904e4c525e539e47245dd1ab1). |
+| Modal da Rádio mobile | `use-mobile-radio-dialog.ts` (**122 linhas**) | Dono de `mobileRadioOpen`, View Transition, `showModal/close`, cancelamento, refs e retorno de foco à pocket. Compartilha o mesmo conteúdo/áudio da Rádio e mantém o guard contra trocas de faixas durante Motion. [`3321bb5`](https://github.com/cassianomangini/radioand3d/commit/3321bb5843bce833cfc352aacad28aff570440f8), [`e687082`](https://github.com/cassianomangini/radioand3d/commit/e687082370a2a5ff28b8e99ad741640edde6b2bb). |
+| Header: branding, menu, redes e navbar adaptativa | `site-header.tsx` (**198 linhas**) + `site-header.module.css` (**346 linhas**) | 49 blocos de estilo extraídos em [`4977a05`](https://github.com/cassianomangini/radioand3d/commit/4977a053bcf2647fe016433669d98cbdf1396811), dez deles com seletores mistos separados; estados globais via `[id="top"][data-radio-*]`, sem importar classes CSS Modules de outro domínio. O JSX, a navegação e o estado do menu mobile foram extraídos em [`db0ea2d`](https://github.com/cassianomangini/radioand3d/commit/db0ea2d0e42c0a300bc9fb1beadeee675b7ce992); o shell conserva apenas os callbacks e refs necessários ao dock. |
+| Rádio completa desktop/fullscreen e modal mobile | `radio-content.tsx` + `radio-content.module.css` (**1.560 linhas**) | Controles, capa, playlist, busca, progresso e variantes de janela; lê um único `RadioProvider`. Classes locais complementam volume e visualizador compartilhados. |
+| Volume e visualizador das duas superfícies | `radio-audio-controls.module.css` (**242 linhas**) | Em [`34e6450`](https://github.com/cassianomangini/radioand3d/commit/34e64504f55aad6831853d2b66d2f8b4fd08957c), 32 regras comuns migraram do shell para fonte única importada pelo full player e mini-player. Estados específicos da pocket e fullscreen continuam nos arquivos de seus donos; não há novo analisador ou áudio. |
+| Voo e restauração do dock | `radio-dock-flight.tsx` (**77 linhas**) + `radio-dock-flight.module.css` (**97 linhas**) + `radio-dock-flight-motion.ts` (**87 linhas**) | Overlay temporário com ref e foco preservados, gesto de 78px, teclado e WAAPI de 660ms; animações testadas sem novo áudio. [`0f76bb5`](https://github.com/cassianomangini/radioand3d/commit/0f76bb51e7194ca80dcea7a16e0f77463d9e67fe), [`8b81d39`](https://github.com/cassianomangini/radioand3d/commit/8b81d39de7eb45f2e1fa756cedadf5a30dfcf683) e [`c021cd2`](https://github.com/cassianomangini/radioand3d/commit/c021cd2e609b980caf58375c0f7ddf2f8f7cb872). |
+| FLIP da Rádio fullscreen | `radio-flip-motion.ts` (**102 linhas**) | Geometria, timings e animações DOM movidos do shell, sem mudar easing, interrupção ou áudio; [`3bd1fd7`](https://github.com/cassianomangini/radioand3d/commit/3bd1fd74bb3848471d649e1c4f7c9c1de667da59), com três testes unitários de geometria. |
+| Pocket da navbar | `radio-navbar-dock.tsx` + `radio-navbar-dock.module.css` | Uma superfície compacta sobre o mesmo `RadioProvider`, jamais uma segunda reprodução. |
+| Saudação da Home e CTA | `studio-welcome.tsx` + `studio-welcome.module.css` (551 linhas) | Responsividade, tipografia e animação própria. Apenas `srOnly` ainda é um utilitário compartilhado do shell. |
+| Entradas do Estúdio | `studio-hub.tsx` + `studio-hub.module.css` (475 linhas) | Impressões, Orçamento e Produtos, com os mesmos eventos Motion e transições. |
+| Arte do Estúdio | `studio-home-art.tsx` + `studio-home-art.module.css` | Asset e crop aprovados, sem alteração de imagem. |
+| Limites do divisor | `radio-panel-layout.ts` + teste unitário | Geometria pura e valores ARIA idênticos. |
+| Letra da música | `radio-lyrics.tsx` + `radio-lyrics.module.css` (297 linhas) | Layout, estado de aba, fullscreen e acessibilidade sem importar CSS do shell. |
+
+**Métrica atual (main@0acd890):** CSS principal **1.394 linhas**, shell React **974 linhas**, hooks `use-radio-divider.ts` (**414 linhas**) e `use-mobile-radio-dialog.ts` (**122 linhas**). Os ajustes removeram responsabilidades do orquestrador, sem alterar CSS/layout ou retirar funcionalidade; a maior parte das linhas foi realocada.
+
+**Validação de [CI 39228501457](https://github.com/cassianomangini/radioand3d/actions/runs/39228501457):** lint, tipos, testes, build, CDP, **83 Playwright, 18 lab, 2 dock** verdes. A comparação de 30 PNGs de mesmo viewport/estado com o [CI de base 39225855957](https://github.com/cassianomangini/radioand3d/actions/runs/39225855957) encontrou **15 capturas idênticas pixel a pixel**. As diferenças foram majoritariamente instantes diferentes de animações; a captura de Produto também variou com o carregamento assíncrono de miniaturas, não com CSS do Header. As telas estáveis da Rádio fullscreen, dock, mobile e página inicial preservaram a composição capturada. O CI e as capturas não representam aceite estético final.
+
+
+**Regra de continuidade:** extrações substituem a mesma subárvore DOM e preservam refs, `RadioProvider`, `HTMLAudioElement`, Motion, fila e rotas. Validar por Playwright/CDP e comparar capturas de *mesmo viewport + estado + SHA* antes/depois; um build verde não comprova fidelidade. Os registros de execução estão em [08V](work/08-visual-quality-evolution.md).
+
+**Isolamento do Next em CI:** o comando `next build` antecede a captura pública com `next start` e o laboratório de desenvolvimento com `next dev`. São compilações distintas: o laboratório deve usar `CM_VISUAL_LAB_QA=1`, que define `distDir: ".next-visual-lab"` somente no processo dev. Não apontar `next dev` e `next build` para o mesmo diretório `.next` no mesmo runner: o compilador Turbopack produziu falhas intermitentes na resolução interna de `next/font/google` (Outfit) quando o cache foi compartilhado. A separação foi comprovada no [CI 39161703555](https://github.com/cassianomangini/radioand3d/actions/runs/39161703555), com captura pública, 79 testes Playwright, 18 do laboratório e 2 de dock verdes. Não altera a configuração dos usuários em produção.
 
 ### Movimento, mídia e desempenho
 
@@ -158,3 +190,7 @@ O bucket R2 `musicas` informado por Cassiano é a origem inicial de leitura da r
 Antes da publicação: documentar limites de upload e lote, cache/revalidação, domínio, HTTPS, logs sem dados sensíveis, alertas de erro/custo, backup de metadados, retenção dos originais e procedimento de restauração. Rollback de código não desfaz automaticamente alterações de banco ou arquivos.
 
 A CI da entrega 02 deve validar dependências reproduzíveis, lint, tipos, testes e build. Acrescentar E2E e verificações visuais conforme os fluxos existirem. Não registrar execução de comandos inexistentes. Alterações remotas de infraestrutura exigem autorização e conferência do alvo.
+
+**Verificação adicional de 19/10:** [CI 39236389458](https://github.com/cassianomangini/radioand3d/actions/runs/39236389458) e [CI 39237182602](https://github.com/cassianomangini/radioand3d/actions/runs/39237182602) inteiramente verdes após as extrações de Header e FLIP, incluindo Playwright e laboratório. Comparação das mesmas 30 capturas do antes/depois do FLIP: **16 idênticas em RGB**, inclusive Home dockada, Rádio fullscreen e mobile. As outras variaram em Motion/transições e carregamento remoto do catálogo; isso não aprova o design. [CI 39237991854](https://github.com/cassianomangini/radioand3d/actions/runs/39237991854) passou após adicionar espera limitada para fotos visíveis de Produto e diagnósticos da arte X1, sem alterar UI.
+
+**Validação do divisor e modal em 19/10/2026:** [CI 39241597826](https://github.com/cassianomangini/radioand3d/actions/runs/39241597826) e [preview 39241597819](https://github.com/cassianomangini/radioand3d/actions/runs/39241597819) encerraram verdes, com 83 Playwright públicos, 18 laboratório e 15 cenários da preview (desktop/mobile). De 30 PNGs da [base 39238651048](https://github.com/cassianomangini/radioand3d/actions/runs/39238651048), **16 permaneceram idênticos em RGB** após a mudança, inclusive Rádio fullscreen, dockada e modal mobile. Diferenças restantes incluem capturas cronometradas de Motion e mídia assíncrona. Não equivalem a aprovação visual humana.

@@ -26,6 +26,46 @@ for (const route of routes) {
         (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0
       ), { message: "product hero image failed to load before the visual capture" }).toBe(true);
       await heroPhoto.evaluate((image) => (image as HTMLImageElement).decode());
+
+      // A loaded hero is not proof that visible lazy thumbnails and variants
+      // are ready for a screenshot. The Shopee origin can also be unavailable.
+      const visibleMediaReady = await page.waitForFunction(() => {
+        const images = [...document.querySelectorAll<HTMLImageElement>('section[aria-labelledby="product-title"] img')];
+        const onScreen = images.filter((image) => {
+          const rect = image.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0 && rect.bottom > 0 &&
+            rect.right > 0 && rect.top < innerHeight && rect.left < innerWidth;
+        });
+        return onScreen.length > 0 && onScreen.every((image) => image.complete && image.naturalWidth > 0);
+      }, null, { timeout: 9000 }).then(() => true, () => false);
+
+      const mediaReadiness = await page.evaluate(async () => {
+        const images = [...document.querySelectorAll<HTMLImageElement>('section[aria-labelledby="product-title"] img')];
+        const onScreen = images.filter((image) => {
+          const rect = image.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0 && rect.bottom > 0 &&
+            rect.right > 0 && rect.top < innerHeight && rect.left < innerWidth;
+        });
+        await Promise.allSettled(
+          onScreen.filter((image) => image.complete && image.naturalWidth > 0)
+            .map((image) => image.decode())
+        );
+        return onScreen.map((image) => ({
+          source: image.currentSrc || image.src,
+          complete: image.complete,
+          loaded: image.naturalWidth > 0
+        }));
+      });
+      await testInfo.attach("product-visible-media-readiness.json", {
+        body: Buffer.from(JSON.stringify({ allReady: visibleMediaReady, media: mediaReadiness }, null, 2), "utf8"),
+        contentType: "application/json"
+      });
+      if (!visibleMediaReady) {
+        testInfo.annotations.push({
+          type: "external-product-media-incomplete",
+          description: `Visible product photos still unavailable: ${mediaReadiness.filter((image) => !image.loaded).length}/${mediaReadiness.length}. See attachment before accepting the visual capture.`
+        });
+      }
     }
 
     await page.screenshot({

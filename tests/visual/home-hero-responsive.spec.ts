@@ -13,6 +13,31 @@ test("Home X1 and copy fit the actual Studio in every Radio state", async ({ pag
   await expect.poll(async () =>
     art.locator("img").evaluate((image) => (image as HTMLImageElement).naturalWidth)
   ).toBeGreaterThan(0);
+  // Image decode and resource diagnostics are separate from typography and
+  // do not, on their own, establish LCP or visual acceptance.
+  const homeArtMetrics = await art.locator("img").evaluate(async (element) => {
+    const image = element as HTMLImageElement;
+    await image.decode();
+    const resource = performance.getEntriesByName(image.currentSrc, "resource").at(-1) as PerformanceResourceTiming | undefined;
+    return {
+      source: new URL(image.currentSrc).pathname,
+      optimized: new URL(image.currentSrc).pathname.startsWith("/_next/image"),
+      naturalWidth: image.naturalWidth,
+      naturalHeight: image.naturalHeight,
+      renderedWidth: image.getBoundingClientRect().width,
+      renderedHeight: image.getBoundingClientRect().height,
+      resource: resource ? {
+        transferSize: resource.transferSize,
+        encodedBodySize: resource.encodedBodySize,
+        decodedBodySize: resource.decodedBodySize,
+        durationMs: resource.duration
+      } : null
+    };
+  });
+  await testInfo.attach("home-x1-media-diagnostic.json", {
+    body: Buffer.from(JSON.stringify(homeArtMetrics, null, 2), "utf8"),
+    contentType: "application/json"
+  });
   await expect(page.getByRole("link", { name: "Quero conhecer tudo" }))
     .toHaveAttribute("href", "/studio");
 

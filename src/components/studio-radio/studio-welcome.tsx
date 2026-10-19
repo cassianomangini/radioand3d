@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { Fragment, type MouseEvent as ReactMouseEvent } from "react";
-import styles from "./studio-radio-shell.module.css";
+import styles from "./studio-welcome.module.css";
+import shellStyles from "./studio-radio-shell.module.css";
 
 // A stable Home identity node preserves the transition between Home and Studio.
 function revealChars(text: string, startDelayMs: number, stepMs: number) {
@@ -51,7 +52,7 @@ export function StudioWelcome({
             aria-labelledby="studio-title"
             data-studio-intro={route === "home" ? "home" : undefined}
           >
-            {route === "home" ? <span className={styles.srOnly}>Seja muito bem-vindo!</span> : null}
+            {route === "home" ? <span className={shellStyles.srOnly}>Seja muito bem-vindo!</span> : null}
             <div className={styles.studioEyebrowStack} aria-live="off">
               <span aria-hidden={route !== "detail"}>ESTÚDIO DE IMPRESSÃO 3D</span>
             </div>

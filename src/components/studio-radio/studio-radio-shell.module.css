@@ -101,25 +101,6 @@
   background: var(--surface-studio);
 }
 
-.lead {
-  font-size: var(--text-lg);
-}
-
-.primaryAction {
-  display: inline-flex;
-  align-items: center;
-  background: var(--action-primary);
-  font-family: inherit;
-  text-decoration: none;
-  transition:
-    background-color var(--motion-fast) var(--ease-standard),
-    transform var(--motion-fast) var(--ease-standard);
-}
-
-.primaryAction:not(:disabled):active {
-  transform: translateY(1px);
-}
-
 .resizeHandle {
   position: sticky;
   top: var(--header-height);
@@ -769,7 +750,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .primaryAction,
   .desktopNav a,
   .miniPlay,
   .miniStep,
@@ -1870,48 +1850,6 @@
   view-transition-name: cm-studio-surface;
 }
 
-.lead {
-  max-width: 39ch;
-  margin: 0;
-  color: #bec4ce;
-  font-size: clamp(1.05rem, 2.4cqw, 1.35rem);
-  line-height: 1.38;
-}
-
-.primaryAction {
-  width: min(100%, 14.8rem);
-  min-height: 2.625rem;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1.25rem;
-  padding: 0.4rem 1.25rem;
-  background: linear-gradient(#02040a, #02040a) padding-box, linear-gradient(100deg, #00dbf3, #198cff 55%, #cf2aea) border-box;
-  border: 2px solid transparent;
-  border-radius: 999px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 700;
-  opacity: 1;
-}
-
-.primaryAction:not(:disabled):hover {
-  background: rgb(22 143 255 / 12%);
-  border-color: var(--accent-cyan);
-  color: var(--text-primary);
-}
-
-.primaryAction span:last-child {
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 400;
-  line-height: 1;
-  transition: transform var(--motion-fast) var(--ease-standard);
-}
-
-.primaryAction:not(:disabled):hover span:last-child {
-  transform: translate(2px, -2px);
-}
-
 .radioPanel {
   view-transition-name: cm-radio-surface;
 }
@@ -2421,10 +2359,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
   .brand img {
     opacity: 0;
-  }
-
-  .lead {
-    font-size: 1.05rem;
   }
 
 }
@@ -3065,143 +2999,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     opacity 700ms ease;
 }
 
-.studioIdentity {
-  position: absolute;
-  top: 50%;
-  right: clamp(1.5rem, 4.5%, 4.5rem);
-  left: 58%;
-  z-index: 3;
-  display: grid;
-  justify-items: start;
-  align-content: start;
-  transform: translateY(-48%);
-  transform-origin: 0 0;
-  transition:
-    top 1080ms var(--studio-route-ease),
-    right 1080ms var(--studio-route-ease),
-    left 1080ms var(--studio-route-ease),
-    transform 1080ms cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: top, left, transform;
-}
-
-.studioEyebrowStack {
-  position: relative;
-  width: 100%;
-  min-height: 1.45rem;
-  margin: 0 0 0.75rem;
-  color: #f7f8fb;
-  font-size: clamp(0.78rem, 1.35cqw, 1rem);
-  font-weight: 650;
-  letter-spacing: 0.46em;
-  line-height: 1.25;
-}
-
-.studioEyebrowStack > span {
-  position: absolute;
-  inset: 0 auto auto 0;
-  white-space: nowrap;
-  transition:
-    opacity 280ms ease,
-    transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.studioEyebrowStack > span[aria-hidden="true"] {
-  opacity: 0;
-  transform: translateY(0.6rem);
-}
-
-.studioEyebrowStack > span[aria-hidden="false"] {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.studioIdentity h1 {
-  max-width: 10ch;
-  margin: 0 0 0.95rem;
-  color: #fff;
-  font-size: clamp(3.15rem, 5.1cqw, 5rem);
-  font-weight: 800;
-  line-height: 0.94;
-  letter-spacing: -0.06em;
-  transition:
-    font-size 1080ms var(--studio-route-ease),
-    letter-spacing 1080ms var(--studio-route-ease);
-}
-
 /* The highlighted hook is one idea; never orphan "mais" on its own line. */
-
-.studioRevealAccent,
-.studioRevealAccent .studioRevealChar {
-  background: linear-gradient(100deg, #00d7f5 5%, #1398ff 48%, #b82ee9 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.studioRevealChar {
-  display: inline-block;
-}
-
-.studioRevealWord {
-  display: inline;
-  white-space: nowrap;
-}
-
-.studioIdentity[data-studio-intro="home"] .studioRevealChar {
-  animation: studio-letter-in 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes studio-letter-in {
-  from {
-    opacity: 0;
-    transform: translateY(0.55em);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.studioIdentity .lead {
-  max-width: 39ch;
-  font-size: clamp(1.02rem, 1.55cqw, 1.32rem);
-  transition:
-    font-size 900ms ease,
-    max-width 900ms ease;
-}
-
-.studioRouteActions {
-  position: relative;
-  width: min(100%, 15.5rem);
-  min-height: 3.95rem;
-  margin-top: 1.15rem;
-}
-
-.studioRouteActions .primaryAction {
-  position: absolute;
-  white-space: nowrap;
-  inset: 0 auto auto 0;
-  width: 100%;
-  margin-top: 0;
-  transition:
-    opacity 260ms ease,
-    transform 620ms cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 160ms ease,
-    border-color 160ms ease;
-}
-
-.studioRouteActions .primaryAction[aria-hidden="true"] {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(0.8rem);
-}
-
-.studioRouteActions .primaryAction[aria-hidden="false"] {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
 
 .studioCatalogHeader {
   position: absolute;
@@ -3248,15 +3046,10 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 .studio[data-studio-route="detail"] .studioMachine,
-.studio[data-studio-route="detail"] .studioStageShade,
-.studio[data-studio-route="detail"] .studioIdentity {
+  .studio[data-studio-route="detail"] .studioStageShade {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-}
-
-.studio[data-studio-route="detail"]:not([data-studio-transition]) .studioIdentity {
-  display: none;
 }
 
 /* Extra travel while navigation is active: this is real DOM motion and remains visible in capture. */
@@ -3264,12 +3057,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   transition-duration: 1120ms;
 }
 
-.studio[data-studio-transition="entering"] .studioIdentity {
-  transition-delay: 65ms;
-}
-
-.studio[data-studio-transition="exiting"] .studioMachine,
-.studio[data-studio-transition="exiting"] .studioIdentity {
+.studio[data-studio-transition="exiting"] .studioMachine {
   transition-duration: 1050ms;
 }
 
@@ -3303,39 +3091,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     display: none;
   }
 
-  .studioIdentity {
-    position: relative;
-    top: auto;
-    right: auto;
-    left: auto;
-    min-height: calc(100dvh - var(--header-height));
-    padding:
-      calc(clamp(18rem, 48dvh, 28rem) + 1.3rem)
-      1.1rem
-      2.5rem;
-    transform: none;
-    transition:
-      padding-top 900ms var(--studio-route-ease);
-  }
-
-  .studioIdentity h1 {
-    font-size: clamp(3rem, 15vw, 4.7rem);
-  }
-
-  .studioIdentity .lead {
-    max-width: 34ch;
-    font-size: 1rem;
-  }
-
-  .studioEyebrowStack {
-    font-size: 0.72rem;
-    letter-spacing: 0.34em;
-  }
-
-  .studioRouteActions {
-    min-height: 3.4rem;
-  }
-
   .studio[data-studio-route="detail"] {
     height: auto;
     min-height: calc(100dvh - var(--header-height));
@@ -3361,22 +3116,12 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 @media (prefers-reduced-motion: reduce) {
   .studioMachine,
   .studioStageShade,
-  .studioIdentity,
-  .studioIdentity h1,
-  .studioIdentity .lead,
-  .studioEyebrowStack > span,
-  .studioRevealChar,
-  .studioRouteActions .primaryAction,
   .studioCatalogHeader,
   .studioProducts {
     transition: none;
   }
 
-  .studioRevealChar {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
+  
 }
 
 /* Studio hub approved on 04/10/2026: one dominant Prints surface + Quote + Products. */
@@ -3406,9 +3151,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
 @media (max-width: 73.74rem) {
   /* On Studio routes the home identity is not only invisible: it must leave the mobile flow. */
-  .studio[data-studio-route="detail"] .studioIdentity {
-    display: none;
-  }
+  
 
   .studio[data-studio-route="detail"] .studioCatalogHeader {
     margin-top: 1.1rem;
@@ -3618,9 +3361,7 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 /* Home mobile: the original split heading's unbroken second line was wider
  * than 390/360px viewports. Scale the display text without clipping it. */
 @media (max-width: 73.74rem) {
-  .studio[data-studio-route="home"] .studioIdentity h1 {
-    font-size: clamp(2.45rem, 11vw, 4.7rem);
-  }
+  
 }
 
 /* S1.2 — the public Studio hub occupies the same desktop viewport as Radio.
@@ -3669,94 +3410,8 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   );
 }
 
-.studioIdentity[data-studio-intro="home"] {
-  position: relative;
-  top: auto;
-  right: auto;
-  left: auto;
-  min-width: 0;
-  width: auto;
-  min-height: 0;
-  margin: -0.75rem clamp(0.85rem, 2.4cqi, 1.5rem) 2.5rem;
-  padding: clamp(1.2rem, 3cqi, 2.2rem);
-  transform: none;
-  background: linear-gradient(112deg, rgb(3 11 28 / 88%), rgb(3 11 28 / 97%));
-  border: 1px solid rgb(83 143 218 / 12%);
-  border-radius: 1.5rem;
-  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 14%);
-}
-
-.studioIdentity[data-studio-intro="home"] .studioEyebrowStack {
-  display: none;
-}
-
-.studioIdentity[data-studio-intro="home"] h1 {
-  max-width: none;
-  margin: 0;
-  color: #f8fbff;
-  font-family: var(--font-outfit), var(--font-sans), sans-serif;
-  font-size: clamp(2.15rem, 6.1cqi, 3.6rem);
-  font-weight: 800;
-  line-height: 1.055;
-  letter-spacing: -0.028em;
-  text-wrap: pretty;
-  overflow-wrap: normal;
-}
-
-.studioIdentity[data-studio-intro="home"] .studioRevealAccent {
-  color: #78d7f9;
-  white-space: nowrap;
-}
-
 @supports (-webkit-background-clip: text) or (background-clip: text) {
-  .studioIdentity[data-studio-intro="home"] .studioRevealAccent {
-    background: linear-gradient(95deg, #16d5f7 0%, #337dfc 45%, #c43af7 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-}
-
-.studioIdentity[data-studio-intro="home"] .lead {
-  max-width: 55ch;
-  margin: clamp(1rem, 2.2cqi, 1.5rem) 0 0;
-  color: #e9eff8;
-  font-family: var(--font-plus-jakarta), var(--font-sans), sans-serif;
-  font-size: clamp(1rem, 1.7cqi, 1.24rem);
-  font-weight: 600;
-  line-height: 1.53;
-  text-wrap: pretty;
-}
-
-.studioIdentity[data-studio-intro="home"] .studioRouteActions {
-  width: min(100%, 17.8rem);
-  min-height: 3.2rem;
-  margin-top: clamp(1.25rem, 2.5cqi, 1.8rem);
-}
-
-.studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction {
-  min-height: 3.15rem;
-  padding: 0.65rem 1.1rem;
-  background:
-    linear-gradient(#070e1c, #070e1c) padding-box,
-    linear-gradient(115deg, #16d5f7, #428cff 50%, #c43af7) border-box;
-  border: 1px solid transparent;
-  border-radius: 0.85rem;
-  color: #fff;
-  font-family: var(--font-outfit), var(--font-sans), sans-serif;
-  font-size: 0.98rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  box-shadow: 0 0.4rem 1.5rem rgb(0 0 0 / 15%);
-}
-
-.studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction:hover {
-  box-shadow: 0 0.5rem 1.7rem rgb(38 126 242 / 22%);
-}
-
-.studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction:focus-visible {
-  outline: 2px solid #7ce4ff;
-  outline-offset: 3px;
+  
 }
 
 /* Full-bleed Home artwork: the source image is a layer of the Studio scene,
@@ -3773,132 +3428,22 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
   /* The Home card has one top anchor. Its size and text spacing no longer
      feed back into vertical centering or the route transition. */
-  .studioIdentity[data-studio-intro="home"] {
-    position: absolute;
-    top: clamp(calc(var(--header-height) + 1rem), 12dvh, calc(var(--header-height) + 3rem));
-    right: clamp(0.75rem, 2cqi, 1.25rem);
-    bottom: auto;
-    left: 45%;
-    width: auto;
-    min-width: 0;
-    min-height: 0;
-    height: auto;
-    max-width: none;
-    margin: 0;
-    padding: clamp(1.25rem, 2.2cqi, 2rem);
-    transform: none;
-    transition: none;
-    will-change: auto;
-    background: rgb(3 11 28 / 76%);
-    border: 0;
-    border-radius: 1.75rem;
-    box-shadow: none;
-  }
-
-  .studioIdentity[data-studio-intro="home"] h1,
-  .studioIdentity[data-studio-intro="home"] .lead {
-    transition: none;
-  }
 
   @container studio (min-width: 52rem) {
 
-    .site[data-radio-docked="true"] .studioIdentity[data-studio-intro="home"] {
-      right: calc(clamp(1rem, 1.5cqi, 2.3rem) + 4.75rem);
-      left: calc(40% + 5.25rem);
-    }
-
-    .studioIdentity[data-studio-intro="home"] h1 {
-      width: 100%;
-      min-width: 0;
-      /* The longest heading phrase must fit the *right-side copy lane*, not
-         just the whole Studio container. Do not silently clip letter ink. */
-      font-size: clamp(2rem, min(calc(6.4cqi - 1rem), 4.6cqi), min(5.4rem, 9.25dvh));
-      line-height: 1.025;
-      letter-spacing: -0.045em;
-      text-wrap: balance;
-    }
-
     /* The docked copy lane is narrower than the full-width Studio. */
-    .site[data-radio-docked="true"] .studioIdentity[data-studio-intro="home"] h1 {
-      font-size: clamp(2rem, 4cqi, 5.4rem);
-    }
 
-    .studioIdentity[data-studio-intro="home"] .lead {
-      width: 100%;
-      min-width: 0;
-      max-width: 52ch;
-      margin-top: clamp(1.5rem, 2.64cqi, 2.4rem);
-      font-size: clamp(1.05rem, 1.85cqi, min(1.95rem, 3.35dvh));
-      line-height: 1.43;
-    }
-
-    .studioIdentity[data-studio-intro="home"] .studioRouteActions {
-      width: min(100%, clamp(17.8rem, 32.3cqi, 36rem));
-      min-height: clamp(3.2rem, 5cqi, min(4.8rem, 8.4dvh));
-      margin-top: clamp(3.9rem, 6.6cqi, 5.1rem);
-    }
-
-    .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction {
-      min-height: clamp(3.2rem, 5cqi, min(4.8rem, 8.4dvh));
-      padding: 0.55rem clamp(1rem, 1.5cqi, 1.75rem);
-      border-radius: 999px;
-      font-size: clamp(1rem, 1.6cqi, min(1.8rem, 3.1dvh));
-    }
-
-    .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction span:last-child {
-      font-size: clamp(1.4rem, 2.15cqi, 2.15rem);
-    }
   }
 
   /* Keep the mock's four headline groups in both the lateral and docked
      desktop layouts. Below this width, let the phrases wrap naturally. */
   @container studio (min-width: 60rem) {
-    .studioIdentity[data-studio-intro="home"] .studioHomePhrase {
-      display: block;
-      white-space: nowrap;
-    }
 
-    .studioIdentity[data-studio-intro="home"] .studioHomePhrase.studioRevealAccent {
-      width: fit-content;
-    }
   }
 
   /* Even at the minimum desktop Studio width, the artwork and copy stay side by side. */
   @container studio (max-width: 51.999rem) {
 
-    .studioIdentity[data-studio-intro="home"] {
-      left: 52%;
-      padding: clamp(0.75rem, 1.6cqi, 1rem);
-      border-radius: 1.4rem;
-    }
-
-    .studioIdentity[data-studio-intro="home"] h1 {
-      width: 100%;
-      min-width: 0;
-      font-size: clamp(1.3rem, min(2.8cqi, 4.1dvh), 1.75rem);
-      line-height: 1.07;
-    }
-
-    .studioIdentity[data-studio-intro="home"] .lead {
-      width: 100%;
-      min-width: 0;
-      max-width: none;
-      margin-top: 1rem;
-      font-size: clamp(0.75rem, min(1.8cqi, 2.35dvh), 0.95rem);
-      line-height: 1.4;
-    }
-
-    .studioIdentity[data-studio-intro="home"] .studioRouteActions {
-      width: min(100%, 19rem);
-      min-height: 2.75rem;
-      margin-top: 1.1rem;
-    }
-
-    .studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction {
-      min-height: 2.75rem;
-      border-radius: 999px;
-      font-size: 0.95rem;
-    }
   }
 }
 
@@ -3911,33 +3456,15 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 /* Mobile retains the already-approved mini player before Studio content. */
 @media (max-width: 73.74rem) {
 
-  .studioIdentity[data-studio-intro="home"] {
-    margin: -0.4rem clamp(0.65rem, 2.5vw, 1.4rem) 2rem;
-    padding: clamp(1.15rem, 4.6vw, 1.8rem);
-  }
-
-  .studio[data-studio-route="home"] .studioIdentity[data-studio-intro="home"] h1 {
-    font-size: clamp(2.08rem, 7.7vw, 3.6rem);
-  }
-
-  .studioIdentity[data-studio-intro="home"] .lead {
-    font-size: clamp(1rem, 3.2vw, 1.13rem);
-  }
 }
 
 @media (max-width: 26rem) {
-  .studio[data-studio-route="home"] .studioIdentity[data-studio-intro="home"] h1 {
-    font-size: clamp(2rem, 8.1vw, 2.5rem);
-  }
+  
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .studioIdentity[data-studio-intro="home"] {
-    transition: none;
-  }
+  
 
   /* Motion reduction must not leave text concealed by staggered keyframes. */
-  .studioIdentity[data-studio-intro="home"] .studioRevealChar {
-    animation: none;
-  }
+  
 }

@@ -227,9 +227,17 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     test.skip(testInfo.project.name !== "desktop-1440", "Physical divider cancellation contract");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
     const root = page.locator("#top");
     const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
     await expect(divider).toHaveAttribute("aria-valuenow", /[0-9]+/);
+    // Use a keyboard resize as an observable hydration handshake before a
+    // pointer gesture; visibility alone does not prove React handlers exist.
+    await divider.focus();
+    await divider.press("Home");
+    const minimum = await divider.getAttribute("aria-valuenow");
+    await divider.press("ArrowLeft");
+    await expect.poll(() => divider.getAttribute("aria-valuenow")).not.toBe(minimum);
     const before = await divider.getAttribute("aria-valuenow");
     const box = await divider.boundingBox();
     expect(box).not.toBeNull();
@@ -237,9 +245,9 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     const y = box!.y + Math.min(box!.height / 3, 180);
     await page.mouse.move(x, y);
     await page.mouse.down();
-    await page.mouse.move(x + 64, y, { steps: 10 });
+    await page.mouse.move(x - 110, y, { steps: 12 });
     await expect.poll(() => divider.getAttribute("aria-valuenow")).not.toBe(before);
-    await divider.dispatchEvent("pointercancel", { bubbles: true, pointerId: 1, pointerType: "mouse", clientX: x + 64, clientY: y });
+    await divider.dispatchEvent("pointercancel", { bubbles: true, pointerId: 1, pointerType: "mouse", clientX: x - 110, clientY: y });
     await page.mouse.up();
     await expect(divider).toHaveAttribute("aria-valuenow", before!);
     await expect(root).not.toHaveAttribute("data-radio-docked", "true");

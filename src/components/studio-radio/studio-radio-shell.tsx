@@ -243,14 +243,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     return () => observer.disconnect();
   }, [radioExpanded, customWidthRef, studioRoute]);
 
-  useEffect(() => {
-    if (dockedRef.current || customWidthRef.current || radioExpanded || radioFullscreen) return;
-    const width = shellRef.current?.getBoundingClientRect().width;
-    if (width && window.matchMedia("(min-width: 73.75rem)").matches) {
-      setRadioWidth(getRouteDefaultRadioWidth(width, studioRoute));
-    }
-  }, [studioRoute, radioExpanded, radioFullscreen]);
-
   function runTrackStepMotion(kind: TrackStepKind, action: () => void) {
     if (mobileMotionActiveRef.current) {
       action();

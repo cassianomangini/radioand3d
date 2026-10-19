@@ -18,6 +18,7 @@ import {
 import { flushSync } from "react-dom";
 import { useReducedMotion } from "motion/react";
 import styles from "./studio-radio-shell.module.css";
+import headerStyles from "./site-header.module.css";
 import sharedAudioStyles from "./radio-audio-controls.module.css";
 import {
   getMinRadioWidth,
@@ -212,9 +213,9 @@ function SocialGlyph({ name }: { name: SocialIconName }) {
 
 function SocialIcons() {
   return (
-    <div className={styles.socialIcons} role="group" aria-label="Contato e redes sociais">
+    <div className={headerStyles.socialIcons} role="group" aria-label="Contato e redes sociais">
       {socialIcons.map(({ label, name }) => (
-        <span className={styles.socialIcon} key={label} title={label} data-icon={name}>
+        <span className={headerStyles.socialIcon} key={label} title={label} data-icon={name}>
           <SocialGlyph name={name} />
         </span>
       ))}
@@ -784,8 +785,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     if (radioFullscreen && !fromFullscreen) return;
     if (dockedRef.current === nextDocked && dockAnimationRef.current === null) return;
 
-    const header = shell.closest(`.${styles.site}`)?.querySelector<HTMLElement>(`.${styles.siteHeader}`);
-    const nav = header?.querySelector<HTMLElement>(`.${styles.desktopNav}`);
+    const header = shell.closest(`.${styles.site}`)?.querySelector<HTMLElement>(`.${headerStyles.siteHeader}`);
+    const nav = header?.querySelector<HTMLElement>(`.${headerStyles.desktopNav}`);
     const navFrom = nav?.getBoundingClientRect() ?? null;
     const currentlyFlying = flight.style.display === "block" && dockAnimationRef.current !== null;
     const from = currentlyFlying
@@ -1402,9 +1403,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
         {playbackStatusMessage}
       </span>
-      <header className={styles.siteHeader}>
+      <header className={headerStyles.siteHeader}>
         <Link
-          className={styles.brand}
+          className={headerStyles.brand}
           href="/"
           aria-label="CM 3D e Rádio, início"
           onClick={(event) => handleStudioRouteLink(event, "/")}
@@ -1412,7 +1413,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
         </Link>
 
-        <nav className={styles.desktopNav} aria-label="Navegação principal">
+        <nav className={headerStyles.desktopNav} aria-label="Navegação principal">
           <Link
             href="/"
             aria-current={activeNav === "home" ? "page" : undefined}
@@ -1431,7 +1432,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <a ref={radioNavRef} href="#radio" aria-current={activeNav === "radio" ? "page" : undefined} onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
         </nav>
 
-        <div className={styles.headerActions} data-radio-dock-actions="true">
+        <div className={headerStyles.headerActions} data-radio-dock-actions="true">
           <RadioNavbarDock
             miniRef={dockMiniRef}
             visible={radioDocked && !radioDockMotion && !radioFullscreen}
@@ -1443,7 +1444,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
 
         <button
           type="button"
-          className={styles.menuButton}
+          className={headerStyles.menuButton}
           onClick={() => setMobileMenuOpen((open) => !open)}
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-navigation"
@@ -1454,7 +1455,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         {mobileMenuOpen ? (
           <nav
             id="mobile-navigation"
-            className={styles.mobileNav}
+            className={headerStyles.mobileNav}
             aria-label="Navegação mobile"
           >
             <Link

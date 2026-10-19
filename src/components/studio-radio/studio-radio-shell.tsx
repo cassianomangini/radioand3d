@@ -237,7 +237,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
 
     observer.observe(shell);
     return () => observer.disconnect();
-  }, [radioExpanded]);
+  }, [radioExpanded, customWidthRef]);
 
   function runTrackStepMotion(kind: TrackStepKind, action: () => void) {
     if (mobileMotionActiveRef.current) {

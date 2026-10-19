@@ -35,6 +35,7 @@ import { SiteHeader } from "./site-header";
 import { RadioDockFlight, RadioDockRestoreEdge } from "./radio-dock-flight";
 import { RADIO_DOCK_FLIGHT_MS, startRadioDockWaapi } from "./radio-dock-flight-motion";
 import { collectRadioFlipSnapshot, animateRadioFlip } from "./radio-flip-motion";
+import { useMobileRadioDialog } from "./use-mobile-radio-dialog";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
 import { resolveRadioKeyboardCommand } from "@/features/radio/radio-keyboard";
@@ -53,11 +54,6 @@ import {
 
 
 type StudioRouteMotion = "entering" | "exiting" | null;
-
-type MobileRadioMotionState = {
-  direction: "opening" | "closing";
-  phase: "source" | "destination";
-};
 
 type TrackStepMotionState = {
   kind: TrackStepKind;
@@ -98,7 +94,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const dockedRef = useRef(false);
   const dockRestoreWidthRef = useRef(0);
   const dockRestoreModeRef = useRef<RadioLayoutMode>("split");
-  const mobileDialogRef = useRef<HTMLDialogElement>(null);
   const customWidthRef = useRef(false);
   const dragOffsetRef = useRef(0);
   const dragStartXRef = useRef(0);
@@ -133,17 +128,15 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const [radioDockMotion, setRadioDockMotion] = useState<"docking" | "restoring" | null>(null);
   const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
   const [dividerSettling, setDividerSettling] = useState(false);
-  const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
-  const [mobileRadioMotion, setMobileRadioMotion] = useState<MobileRadioMotionState | null>(null);
+  const { mobileDialogRef, miniOpenButtonRef, mobileRadioOpen, setMobileRadioOpen,
+    miniMotionEndpoint, dialogMotionEndpoint, openMobileRadio, closeMobileRadio
+  } = useMobileRadioDialog({ onBeforeTransition: () => setMiniVolumeOpen(false) });
   const [trackStepMotion, setTrackStepMotion] = useState<TrackStepMotionState | null>(null);
   const [studioRouteMotion, setStudioRouteMotion] = useState<StudioRouteMotion>(null);
   const [studioIntroCycle, setStudioIntroCycle] = useState(0);
   const miniVolumeMenuRef = useRef<HTMLDivElement>(null);
   const miniVolumeButtonRef = useRef<HTMLButtonElement>(null);
-  const miniOpenButtonRef = useRef<HTMLButtonElement>(null);
-  const mobileMotionActiveRef = useRef(false);
-  const mobileMotionTokenRef = useRef(0);
   const trackStepMotionTokenRef = useRef(0);
   const routeTransitionActiveRef = useRef(false);
   const routeMotionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -193,21 +186,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       clearTimeout(routeMotionTimerRef.current);
     }
   }, []);
-
-  useEffect(() => {
-    const dialog = mobileDialogRef.current;
-    if (!dialog) {
-      return;
-    }
-
-    if (mobileRadioOpen && !dialog.open) {
-      dialog.showModal();
-    }
-
-    if (!mobileRadioOpen && dialog.open) {
-      dialog.close();
-    }
-  }, [mobileRadioOpen]);
 
   useEffect(() => {
     if (!miniVolumeOpen) return;
@@ -453,69 +431,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     window.addEventListener("keydown", handleRadioShortcut);
     return () => window.removeEventListener("keydown", handleRadioShortcut);
   }, []);
-
-  function runMobileRadioMotion(direction: "opening" | "closing") {
-    if (mobileMotionActiveRef.current) return;
-
-    const open = direction === "opening";
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const documentWithTransition = document as DocumentWithViewTransition;
-
-    setMiniVolumeOpen(false);
-
-    if (reduce || !documentWithTransition.startViewTransition) {
-      setMobileRadioMotion(null);
-      setMobileRadioOpen(open);
-      if (!open) {
-        requestAnimationFrame(() => miniOpenButtonRef.current?.focus());
-      }
-      return;
-    }
-
-    mobileMotionActiveRef.current = true;
-    const token = ++mobileMotionTokenRef.current;
-
-    flushSync(() => {
-      setMobileRadioMotion({ direction, phase: "source" });
-    });
-
-    try {
-      const transition = documentWithTransition.startViewTransition(() => {
-        flushSync(() => {
-          setMobileRadioOpen(open);
-          setMobileRadioMotion({ direction, phase: "destination" });
-        });
-
-        const dialog = mobileDialogRef.current;
-        if (open && dialog && !dialog.open) {
-          dialog.showModal();
-        } else if (!open && dialog?.open) {
-          dialog.close();
-        }
-      });
-
-      void transition.finished.finally(() => {
-        if (mobileMotionTokenRef.current !== token) return;
-        mobileMotionActiveRef.current = false;
-        setMobileRadioMotion(null);
-        if (!open) {
-          requestAnimationFrame(() => miniOpenButtonRef.current?.focus());
-        }
-      });
-    } catch {
-      mobileMotionActiveRef.current = false;
-      setMobileRadioMotion(null);
-      setMobileRadioOpen(open);
-    }
-  }
-
-  function openMobileRadio() {
-    runMobileRadioMotion("opening");
-  }
-
-  function closeMobileRadio() {
-    runMobileRadioMotion("closing");
-  }
 
   function clearSignatureStageTimer() {
     if (signatureStageTimerRef.current !== null) {
@@ -1160,21 +1075,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     event.preventDefault();
     navigateStudioRoute(href);
   }
-
-  const miniMotionEndpoint = Boolean(
-    mobileRadioMotion &&
-      (
-        (mobileRadioMotion.direction === "opening" && mobileRadioMotion.phase === "source") ||
-        (mobileRadioMotion.direction === "closing" && mobileRadioMotion.phase === "destination")
-      )
-  );
-  const dialogMotionEndpoint = Boolean(
-    mobileRadioMotion &&
-      (
-        (mobileRadioMotion.direction === "opening" && mobileRadioMotion.phase === "destination") ||
-        (mobileRadioMotion.direction === "closing" && mobileRadioMotion.phase === "source")
-      )
-  );
 
   const radioAtMaximumWidth =
     desktopLayout &&

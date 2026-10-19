@@ -318,6 +318,28 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     await page.screenshot({ path: testInfo.outputPath("mobile-original-layout.png"), animations: "disabled" });
   });
 
+  test("mobile dialog opens and closes through Escape without duplicating the player", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile-390", "One dialog and focus on mobile");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const openButton = page.getByRole("button", { name: "Abrir rádio completa" });
+    const dialog = page.getByRole("dialog", { name: "CM Rádio completa" });
+    await expect(openButton).toBeVisible();
+    const originalAudioNodes = await page.locator("audio").count();
+    await openButton.click();
+    await expect(dialog).toBeVisible();
+    await expect(page.locator("dialog[open]")).toHaveCount(1);
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toBeVisible();
+    await expect(openButton).toBeFocused();
+    expect(await page.locator("audio").count()).toBe(originalAudioNodes);
+    await openButton.click();
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: /Fechar|Voltar/i }).first().click();
+    await expect(dialog).toBeHidden();
+    expect(await page.locator("audio").count()).toBe(originalAudioNodes);
+  });
+
   test("mobile Header menu still navigates and opens the original Radio dialog", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile-390", "Mobile navigation contract");
     await page.emulateMedia({ reducedMotion: "reduce" });

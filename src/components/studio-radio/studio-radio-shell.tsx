@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   useEffect,
@@ -32,7 +31,7 @@ import { StudioHub } from "./studio-hub";
 import { StudioHomeArt } from "./studio-home-art";
 import { Icon, RadioContent, previewTrack, type TrackStepKind } from "./radio-content";
 import type { DocumentWithViewTransition } from "./radio-view-transition";
-import { RadioNavbarDock } from "./radio-navbar-dock";
+import { SiteHeader } from "./site-header";
 import { RadioDockFlight, RadioDockRestoreEdge } from "./radio-dock-flight";
 import { RADIO_DOCK_FLIGHT_MS, startRadioDockWaapi } from "./radio-dock-flight-motion";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
@@ -162,67 +161,6 @@ function animateRadioFlip(
   return animations;
 }
 
-type SocialIconName = "email" | "instagram" | "shopee";
-
-const socialIcons = [
-  { label: "Email", name: "email" },
-  { label: "Instagram", name: "instagram" },
-  { label: "Shopee", name: "shopee" }
-] as const satisfies ReadonlyArray<{ label: string; name: SocialIconName }>;
-
-function SocialGlyph({ name }: { name: SocialIconName }) {
-  const common = {
-    width: 16,
-    height: 16,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.35,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    "aria-hidden": true as const
-  };
-
-  if (name === "email") {
-    return (
-      <svg {...common}>
-        <rect x="3" y="5" width="18" height="14" rx="2.2" />
-        <path d="m4 7.5 8 6 8-6" />
-      </svg>
-    );
-  }
-
-  if (name === "instagram") {
-    return (
-      <svg {...common}>
-        <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
-        <circle cx="12" cy="12" r="3.6" />
-        <circle cx="17.15" cy="6.85" r="0.7" fill="currentColor" stroke="none" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg {...common}>
-      <path d="M3.4 8.4h17.2c.8 0 1.4.7 1.3 1.5l-1 10.4a1.9 1.9 0 0 1-1.9 1.7H5a1.9 1.9 0 0 1-1.9-1.7l-1-10.4c-.1-.8.5-1.5 1.3-1.5Z" />
-      <path d="M8.1 8.3c.15-3.3 1.8-5.5 3.9-5.5s3.75 2.2 3.9 5.5" />
-      <path d="M15.7 12.6c-.4-1-1.4-1.4-2.8-1.2-1.5.3-2.2 1.2-2 2.1.3 1 1.5 1.4 2.7 1.8 1.2.3 2.1.9 1.9 1.9-.2 1.2-1.2 1.9-2.7 1.8-1.3-.1-2.2-.7-2.5-1.6" />
-    </svg>
-  );
-}
-
-function SocialIcons() {
-  return (
-    <div className={headerStyles.socialIcons} role="group" aria-label="Contato e redes sociais">
-      {socialIcons.map(({ label, name }) => (
-        <span className={headerStyles.socialIcon} key={label} title={label} data-icon={name}>
-          <SocialGlyph name={name} />
-        </span>
-      ))}
-    </div>
-  );
-}
-
 function shouldIgnoreRadioShortcutTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   if (target.isContentEditable) return true;
@@ -293,7 +231,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
   const [dividerSettling, setDividerSettling] = useState(false);
   const [mobileRadioOpen, setMobileRadioOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
   const [mobileRadioMotion, setMobileRadioMotion] = useState<MobileRadioMotionState | null>(null);
   const [trackStepMotion, setTrackStepMotion] = useState<TrackStepMotionState | null>(null);
@@ -1321,10 +1258,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     navigateStudioRoute(href);
   }
 
-  function closeMobileMenu() {
-    setMobileMenuOpen(false);
-  }
-
   const miniMotionEndpoint = Boolean(
     mobileRadioMotion &&
       (
@@ -1369,98 +1302,19 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
         {playbackStatusMessage}
       </span>
-      <header className={headerStyles.siteHeader}>
-        <Link
-          className={headerStyles.brand}
-          href="/"
-          aria-label="CM 3D e Rádio, início"
-          onClick={(event) => handleStudioRouteLink(event, "/")}
-        >
-          <Image src="/images/cm-3d-radio-logo.png" alt="" width={1983} height={793} priority unoptimized />
-        </Link>
-
-        <nav className={headerStyles.desktopNav} aria-label="Navegação principal">
-          <Link
-            href="/"
-            aria-current={activeNav === "home" ? "page" : undefined}
-            onClick={(event) => handleStudioRouteLink(event, "/")}
-          >
-            Início
-          </Link>
-          <Link
-            href="/studio"
-            aria-current={activeNav === "studio" ? "page" : undefined}
-            onPointerEnter={() => router.prefetch("/studio")}
-            onClick={(event) => handleStudioRouteLink(event, "/studio")}
-          >
-            Estúdio
-          </Link>
-          <a ref={radioNavRef} href="#radio" aria-current={activeNav === "radio" ? "page" : undefined} onClick={(event) => { event.preventDefault(); openRadioFullscreen(false); }}>Rádio</a>
-        </nav>
-
-        <div className={headerStyles.headerActions} data-radio-dock-actions="true">
-          <RadioNavbarDock
-            miniRef={dockMiniRef}
-            visible={radioDocked && !radioDockMotion && !radioFullscreen}
-            animating={radioDockMotion !== null}
-            onRestore={() => runRadioDockTransition(false)}
-          />
-          <SocialIcons />
-        </div>
-
-        <button
-          type="button"
-          className={headerStyles.menuButton}
-          onClick={() => setMobileMenuOpen((open) => !open)}
-          aria-expanded={mobileMenuOpen}
-          aria-controls="mobile-navigation"
-        >
-          Menu
-        </button>
-
-        {mobileMenuOpen ? (
-          <nav
-            id="mobile-navigation"
-            className={headerStyles.mobileNav}
-            aria-label="Navegação mobile"
-          >
-            <Link
-              href="/"
-              aria-current={activeNav === "home" ? "page" : undefined}
-              onClick={(event) => {
-                closeMobileMenu();
-                handleStudioRouteLink(event, "/");
-              }}
-            >
-              Início
-            </Link>
-            <Link
-              href="/studio"
-              aria-current={activeNav === "studio" ? "page" : undefined}
-              onClick={(event) => {
-                closeMobileMenu();
-                handleStudioRouteLink(event, "/studio");
-              }}
-            >
-              Estúdio
-            </Link>
-            <button
-              type="button"
-              aria-current={activeNav === "radio" ? "page" : undefined}
-              onClick={() => {
-                closeMobileMenu();
-                openMobileRadio();
-              }}
-            >
-              Rádio
-            </button>
-            <button type="button" disabled title="Página do Estúdio em breve">
-              Sobre
-            </button>
-            <SocialIcons />
-          </nav>
-        ) : null}
-      </header>
+      <SiteHeader
+        activeNav={activeNav}
+        radioNavRef={radioNavRef}
+        dockMiniRef={dockMiniRef}
+        radioDocked={radioDocked}
+        radioDockMotion={radioDockMotion}
+        radioFullscreen={radioFullscreen}
+        onNavigate={handleStudioRouteLink}
+        onPrefetchStudio={() => router.prefetch("/studio")}
+        onOpenRadioFullscreen={() => openRadioFullscreen(false)}
+        onOpenMobileRadio={openMobileRadio}
+        onRestoreDock={() => runRadioDockTransition(false)}
+      />
 
       <div
         className={styles.mobileMiniPlayer}

@@ -317,4 +317,25 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     expect(overflow).toBeLessThanOrEqual(1);
     await page.screenshot({ path: testInfo.outputPath("mobile-original-layout.png"), animations: "disabled" });
   });
+
+  test("mobile Header menu still navigates and opens the original Radio dialog", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile-390", "Mobile navigation contract");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const menu = page.getByRole("button", { name: "Menu" });
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    await menu.click();
+    const nav = page.getByRole("navigation", { name: "Navegação mobile" });
+    await expect(nav).toBeVisible();
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await nav.getByRole("link", { name: "Estúdio" }).click();
+    await expect(page).toHaveURL(/\/studio$/);
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+
+    await menu.click();
+    await nav.getByRole("button", { name: "Rádio" }).click();
+    await expect(page.getByRole("dialog", { name: "CM Rádio completa" })).toBeVisible();
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    expect(await page.locator("audio").count()).toBeLessThanOrEqual(1);
+  });
 });

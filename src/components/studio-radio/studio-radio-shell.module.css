@@ -75,24 +75,11 @@
   border: 0;
 }
 
-@media (min-width: 73.75rem) {
-
-}
-
-@media (min-width: 73.75rem) and (max-height: 48rem) {
-
-}
-
 @media (min-width: 73.75rem) and (max-height: 40rem) {
 
   .coverFallback small {
     display: none;
   }
-
-  
-}
-
-@media (max-width: 81.25rem) and (min-width: 73.75rem) {
 
 }
 
@@ -354,10 +341,6 @@
 
 }
 
-@media (max-width: 34rem) {
-
-}
-
 @media (prefers-reduced-motion: reduce) {
   .miniPlay,
 .miniStep,
@@ -368,7 +351,6 @@
 
 /* Radio composition: the player owns the full viewport height on desktop. */
 @media (min-width: 73.75rem) {
-  
 
   .studio {
     padding-top: var(--header-height);
@@ -390,10 +372,6 @@
 
 .radioPanel {
   border-left: 1px solid rgb(82 214 255 / 12%);
-}
-
-@media (min-width: 73.75rem) {
-
 }
 
 .miniCover img {
@@ -440,20 +418,7 @@
   overflow: hidden;
 }
 
-@media (min-width: 73.75rem) {
-
-}
-
-@media (min-width: 73.75rem) and (min-height: 44rem) {
-  
-}
-
-@media (min-width: 73.75rem) and (max-height: 48rem) {
-
-}
-
 @media (max-width: 73.74rem) {
-  
 
   dialog.mobileDialog:modal {
     position: fixed;
@@ -477,14 +442,6 @@
     height: 2.6rem;
   }
 
-}
-
-@media (max-width: 73.74rem) {
-
-}
-
-@media (max-width: 73.74rem) and (min-height: 42rem) {
-  
 }
 
 /* Cassiano's CM logo and the darker, editorial Studio entry. */
@@ -921,18 +878,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   }
 }
 
-@media (max-width: 81.25rem) and (min-width: 73.75rem) {
-  
-}
-
-@media (max-width: 73.74rem) {
-
-}
-
-@media (max-width: 34rem) {
-
-}
-
 .resizeHandle:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: -3px;
@@ -961,10 +906,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
       radial-gradient(ellipse at 92% 88%, rgb(96 54 168 / 16%), transparent 32%),
       #03050a;
     box-shadow: -1rem 0 3rem rgb(17 92 180 / 18%);
-  }
-
-  @container radio-panel (max-width: 39.99rem) {
-
   }
 
   .site[data-radio-fullscreen="true"] {
@@ -1112,7 +1053,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transform: none;
   }
 
-  
 }
 
 /* C1 route continuity: persistent physical scene, not page snapshots. */
@@ -1283,7 +1223,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transition: none;
   }
 
-  
 }
 
 /* Studio hub approved on 04/10/2026: one dominant Prints surface + Quote + Products. */
@@ -1303,7 +1242,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 @media (max-width: 73.74rem) {
-  
 
   .studioRouteContent {
     min-height: calc(100dvh - var(--header-height));
@@ -1313,7 +1251,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
 @media (max-width: 73.74rem) {
   /* On Studio routes the home identity is not only invisible: it must leave the mobile flow. */
-  
 
   .studio[data-studio-route="detail"] .studioCatalogHeader {
     margin-top: 1.1rem;
@@ -1321,11 +1258,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 }
 
 /* Keep neutral media labels away from real content at every card height. */
-
-
-@media (max-width: 73.74rem) {
-  
-}
 
 @media (max-width: 73.74rem) {
   /* Nested Studio routes must not inherit the mobile hub's normal-flow height. */
@@ -1338,10 +1270,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
  * The final optical centering of the mini between nav and socials remains a
  * deliberately OPEN visual adjustment requested by Cassiano.
  */
-
-@media (max-width: 73.74rem) {
-  
-}
 
 @media (min-width: 73.75rem) {
   /* Match the prior rule for a full/focused/wider Radio, now that social icons
@@ -1390,19 +1318,8 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 /* Approved CM Studio hub (12/10): photographic Print carousel, violet/cyan
  * custom quote action, Shopee-only orange. Keep Radio/dock rules untouched. */
 
-@media (max-width: 73.74rem) {
-
-}
-
-@media (prefers-reduced-motion: reduce) {
-  
-}
-
 /* Home mobile: the original split heading's unbroken second line was wider
  * than 390/360px viewports. Scale the display text without clipping it. */
-@media (max-width: 73.74rem) {
-  
-}
 
 /* S1.2 — the public Studio hub occupies the same desktop viewport as Radio.
  * Only the hub is locked to the viewport; nested editorial routes still scroll. */
@@ -1417,14 +1334,9 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
  * the hidden rail must not participate in scrollable overflow. Previously,
  * translated hidden cards leaked 21-30px beyond the Home viewport. */
 
-
 /* Motion for React owns each Studio card entrance/exit and interaction transform.
  * The rail itself becomes available immediately so the stagger is perceptible.
  * CSS owns dimensions and the responsive grid; the C1 Radio spine is unchanged. */
-
-@media (prefers-reduced-motion: reduce) {
-  
-}
 
 /* 17/10/2026: Approved X1 home artwork. Keep the radio's control grammar unchanged.
  * The picture carries the visible greeting; assistive technology gets HTML text.
@@ -1450,10 +1362,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
   );
 }
 
-@supports (-webkit-background-clip: text) or (background-clip: text) {
-  
-}
-
 /* Full-bleed Home artwork: the source image is a layer of the Studio scene,
    NOT a framed illustration strip. The entire area below the navbar is covered.
    Text and divider remain independent from this visual-only layer. */
@@ -1477,33 +1385,17 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
   /* Keep the mock's four headline groups in both the lateral and docked
      desktop layouts. Below this width, let the phrases wrap naturally. */
-  @container studio (min-width: 60rem) {
-
-  }
 
   /* Even at the minimum desktop Studio width, the artwork and copy stay side by side. */
-  @container studio (max-width: 51.999rem) {
 
-  }
 }
 
 /* Laptop vertical composition has artwork across the whole Studio
    width instead of a centered 36rem strip with empty margins. */
-@media (min-width: 42rem) and (max-width: 73.74rem) {
-
-}
 
 /* Mobile retains the already-approved mini player before Studio content. */
-@media (max-width: 73.74rem) {
-
-}
-
-@media (max-width: 26rem) {
-  
-}
 
 @media (prefers-reduced-motion: reduce) {
-  
 
   /* Motion reduction must not leave text concealed by staggered keyframes. */
   

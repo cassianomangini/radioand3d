@@ -129,7 +129,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const [layoutMotionDirection, setLayoutMotionDirection] = useState<"opening" | "closing" | null>(null);
   const [dividerSettling, setDividerSettling] = useState(false);
   const [miniVolumeOpen, setMiniVolumeOpen] = useState(false);
-  const { mobileDialogRef, miniOpenButtonRef, mobileRadioOpen, setMobileRadioOpen,
+  const { mobileDialogRef, miniOpenButtonRef, mobileMotionActiveRef, mobileRadioOpen, setMobileRadioOpen,
     miniMotionEndpoint, dialogMotionEndpoint, openMobileRadio, closeMobileRadio
   } = useMobileRadioDialog({ onBeforeTransition: () => setMiniVolumeOpen(false) });
   const [trackStepMotion, setTrackStepMotion] = useState<TrackStepMotionState | null>(null);

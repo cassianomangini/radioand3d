@@ -113,7 +113,7 @@ export function useMobileRadioDialog({ onBeforeTransition }: { onBeforeTransitio
   );
 
   return {
-    mobileDialogRef, miniOpenButtonRef,
+    mobileDialogRef, miniOpenButtonRef, mobileMotionActiveRef,
     mobileRadioOpen, setMobileRadioOpen,
     miniMotionEndpoint, dialogMotionEndpoint,
     openMobileRadio, closeMobileRadio

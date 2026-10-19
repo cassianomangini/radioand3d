@@ -49,9 +49,10 @@ type Props = {
   /** Technical QA can supply its own fixtures; the public Studio uses imported real photos. */
   media?: readonly StudioPrintMedia[];
   selectedIndex?: number | null;
+  onChangeIndex?: (index: number) => void;
 };
 
-export function StudioPrintsCarousel({ active, media = studioPrintMedia, selectedIndex = null }: Props) {
+export function StudioPrintsCarousel({ active, media = studioPrintMedia, selectedIndex = null, onChangeIndex }: Props) {
   const [index, setIndex] = useState(0);
   const [restart, setRestart] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -132,7 +133,9 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
 
   function goTo(requested: number) {
     if (!canNavigate) return;
-    setIndex((requested + total) % total);
+    const nextIndex = (requested + total) % total;
+    setIndex(nextIndex);
+    onChangeIndex?.(nextIndex);
     setRestart((value) => value + 1);
   }
 

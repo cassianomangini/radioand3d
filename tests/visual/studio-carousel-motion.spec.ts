@@ -36,18 +36,34 @@ test.describe("Studio slideshow: real playback clock + truthful image framing", 
     expect(frame.ambientFit).toBe("cover");
     expect(frame.photoWidth).toBe(frame.slideWidth);
 
+    // A visible <img> can still be a blank rectangle while next/image
+    // decodes. Fail the visual test instead of accepting an empty slide.
+    const firstPhoto = carousel.locator('img[class*="photo"]').last();
+    await expect.poll(
+      () => firstPhoto.evaluate((node) => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth > 0),
+      { timeout: 6500, message: "First fixture photo must decode before capture" }
+    ).toBe(true);
+    await firstPhoto.evaluate((node) => (node as HTMLImageElement).decode());
     await page.screenshot({
       path: testInfo.outputPath("carousel-fixture-first-photo.png"),
       animations: "disabled"
     });
+
     await expect(carousel).toHaveAttribute("data-active-media-id", "fixture-beta", { timeout: 8500 });
+    // Freeze the current slide before waiting for its image; otherwise a
+    // slow image decode can outlive the 4.8s rotation and skew the screenshot.
+    await page.getByRole("button", { name: "Pausar apresentação" }).click();
+    await expect(carousel).toHaveAttribute("data-carousel-playing", "false");
+    const secondPhoto = carousel.locator('img[class*="photo"]').last();
+    await expect.poll(
+      () => secondPhoto.evaluate((node) => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth > 0),
+      { timeout: 6500, message: "Second fixture photo must decode before capture" }
+    ).toBe(true);
+    await secondPhoto.evaluate((node) => (node as HTMLImageElement).decode());
     await page.screenshot({
       path: testInfo.outputPath("carousel-fixture-second-photo.png"),
       animations: "disabled"
     });
-
-    await page.getByRole("button", { name: "Pausar apresentação" }).click();
-    await expect(carousel).toHaveAttribute("data-carousel-playing", "false");
     await page.waitForTimeout(5400);
     await expect(carousel).toHaveAttribute("data-active-media-id", "fixture-beta");
     await page.getByRole("button", { name: "Reproduzir apresentação" }).click();

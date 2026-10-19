@@ -880,7 +880,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             className={styles.studioCatalogHeader}
             aria-hidden={!studioHub}
           >
-            <h1>ESTÚDIO DE IMPRESSÃO 3D</h1>
+            <span>ESTÚDIO DE IMPRESSÃO 3D</span>
             <span>PROJETOS PERSONALIZADOS, PEÇAS PRODUZIDAS E PRODUTOS PRONTOS.</span>
           </div>
 

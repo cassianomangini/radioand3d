@@ -44,7 +44,7 @@ export function StudioHub({
     >
       <div className={styles.studioTop}>
         <section className={styles.studioDetailCard} data-studio-card="prints" aria-label="Impressões em destaque">
-          <StudioPrintsCarousel active={active && !radioFullscreen} selectedIndex={selectedPhoto} />
+          <StudioPrintsCarousel active={active && !radioFullscreen} selectedIndex={selectedPhoto} onChangeIndex={setSelectedPhoto} />
         </section>
         <nav className={styles.studioActions} data-studio-nav="true" aria-label="Explore o Estúdio">
           {cards.map((card) => (

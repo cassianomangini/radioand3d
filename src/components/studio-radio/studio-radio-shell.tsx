@@ -818,7 +818,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           <RadioVisualizer className={`${sharedAudioStyles.visualizer} ${styles.miniVisualizer}`} barCount={36} active={!mobileRadioOpen} />
         </div>
         <div className={styles.miniControls}>
-          <button type="button" className={styles.miniStep} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Embaralhar e trocar de música" title="Embaralhar e trocar de música"><Icon name="shuffle" /></button>
+          <button type="button" className={styles.miniStep} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Sortear outra música" title="Sortear outra música"><Icon name="dice" /></button>
           <button type="button" className={styles.miniStep} onClick={radio.toggleRepeatOne} disabled={!radio.currentTrack} aria-pressed={radio.repeatOne} aria-label="Repetir esta faixa" title={radio.repeatOne ? "Desligar repetição da faixa" : "Repetir esta faixa"}><Icon name="repeat" /></button>
           <button type="button" className={styles.miniStep} onClick={previousTrack} disabled={!radio.currentTrack} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
           <button

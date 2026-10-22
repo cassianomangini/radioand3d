@@ -22,7 +22,7 @@ export const previewTrack = {
 
 export type TrackStepKind = "next" | "previous" | "shuffle";
 
-type IconName = "expand" | "medium" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute" | "share" | "check";
+type IconName = "expand" | "medium" | "close" | "heart" | "dice" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute" | "share" | "check";
 
 export function Icon({ name }: { name: IconName }) {
   const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
@@ -31,7 +31,7 @@ export function Icon({ name }: { name: IconName }) {
     medium: <><rect x="3" y="4" width="18" height="16" rx="1.5" /><path d="M14 4v16" /></>,
     close: <><path d="M5 5l14 14M19 5 5 19" /></>,
     heart: <path d="M20.8 8.6c0 4.2-8.8 10-8.8 10s-8.8-5.8-8.8-10a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z" />,
-    shuffle: <><path d="M3 6h2c5 0 7 12 12 12h4m-4-4 4 4-4 4" /><path d="M3 18h2c1.8 0 3.2-1.5 4.5-3.5M14.5 9.5C15.8 7.5 17.2 6 19 6h2m-4-4 4 4-4 4" /></>,
+    dice: <><rect x="3.5" y="3.5" width="17" height="17" rx="3.5" /><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" /><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" /><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" /><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" /></>,
     repeat: <><path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15" /><path d="m7 22-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3" /><path d="m11 11 1-1v5" /></>,
     previous: <><path d="M5 5v14" /><path d="m19 5-11 7 11 7V5Z" fill="currentColor" stroke="none" /></>,
     play: <path d="m8 5 11 7-11 7V5Z" fill="currentColor" stroke="none" />,
@@ -393,7 +393,7 @@ export function RadioContent({
       </div>
 
       <div className={playerStyles.transport} aria-label="Controles da rádio" data-radio-motion-key="transport">
-        <button type="button" className={playerStyles.modeButton} data-radio-flip-key="control-shuffle" onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Embaralhar e trocar de música" data-tooltip="Embaralhar e trocar de música"><Icon name="shuffle" /></button>
+        <button type="button" className={playerStyles.modeButton} data-radio-flip-key="control-shuffle" onClick={transportReshuffle} disabled={radio.tracks.length < 2} aria-label="Sortear outra música" data-tooltip="Sortear outra música"><Icon name="dice" /></button>
         <button type="button" className={playerStyles.modeButton} data-radio-flip-key="control-repeat" onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir esta faixa" title={radio.repeatOne ? "Desligar repetição da faixa" : "Repetir esta faixa"}><Icon name="repeat" /></button>
         <button type="button" data-radio-flip-key="control-previous" onClick={transportPrevious} disabled={!canPlay} aria-keyshortcuts="P" aria-label="Faixa anterior"><Icon name="previous" /></button>
         <button

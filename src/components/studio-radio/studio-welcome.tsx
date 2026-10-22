@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Fragment, type MouseEvent as ReactMouseEvent } from "react";
 import styles from "./studio-welcome.module.css";
-import shellStyles from "./studio-radio-shell.module.css";
 
 // A stable Home identity node preserves the transition between Home and Studio.
 function revealChars(text: string, startDelayMs: number, stepMs: number) {
@@ -52,23 +51,37 @@ export function StudioWelcome({
             aria-labelledby="studio-title"
             data-studio-intro={route === "home" ? "home" : undefined}
           >
-            {route === "home" ? <span className={shellStyles.srOnly}>Seja muito bem-vindo!</span> : null}
             <div className={styles.studioEyebrowStack} aria-live="off">
               <span aria-hidden={route !== "detail"}>ESTÚDIO DE IMPRESSÃO 3D</span>
             </div>
 
-            <h1 id="studio-title" aria-label="Impressão 3D, música e muito mais do que você imagina.">
+            <h1 id="studio-title" aria-label="Seja muito bem vindo!">
               <span key={introCycle}>
-                <span className={styles.studioHomePhrase}>{revealPhrase("Impressão 3D,", 120, 22)}</span>{" "}
-                <span className={styles.studioHomePhrase}>{revealPhrase("música e", 380, 22)}</span>{" "}
-                <span className={`${styles.studioHomePhrase} ${styles.studioRevealAccent}`}>muito mais</span>{" "}
-                <span className={styles.studioHomePhrase}>{revealPhrase("do que você imagina.", 880, 22)}</span>
+                <span className={styles.studioHomePhrase}>{revealPhrase("Seja muito", 120, 22)}</span>{" "}
+                <span className={`${styles.studioHomePhrase} ${styles.studioRevealAccent}`}>bem vindo!</span>
               </span>
             </h1>
 
-            <p className={styles.lead} aria-label="Um estúdio cheio de possibilidades, produtos para descobrir, seus projetos transformados em peças reais e uma rádio para deixar tudo ainda melhor.">
+            <p className={styles.lead} aria-label="Conheça nossos produtos, trabalhos e serviços de impressão 3D.">
               <span key={introCycle}>
-                {revealPhrase("Um estúdio cheio de possibilidades, produtos para descobrir, seus projetos transformados em peças reais e uma rádio para deixar tudo ainda melhor.", 1100, 11)}
+                <strong className={styles.leadLine}>
+                  {revealPhrase("Conheça nossos produtos, trabalhos e serviços de impressão 3D.", 500, 11)}
+                </strong>
+              </span>
+            </p>
+
+            <p className={styles.lead} aria-label="Solicite um orçamento para placas personalizadas e caixas sob medida ou envie seu próprio arquivo para avaliarmos a possibilidade de impressão.">
+              <span key={introCycle}>
+                <strong className={styles.leadLine}>
+                  Solicite um <span className={styles.studioRevealAccent}>orçamento</span>{" "}
+                  {revealPhrase("para placas personalizadas e caixas sob medida ou envie seu próprio arquivo para avaliarmos a possibilidade de impressão.", 1200, 11)}
+                </strong>
+              </span>
+            </p>
+
+            <p className={styles.lead} aria-label="E, enquanto explora o estúdio, aproveite nossa rádio com músicas 100% autorais!">
+              <span key={introCycle}>
+                {revealPhrase("E, enquanto explora o estúdio, aproveite nossa rádio com músicas 100% autorais!", 1800, 11)}
               </span>
             </p>
 
@@ -83,6 +96,16 @@ export function StudioWelcome({
                 onClick={(event) => onNavigate(event, "/studio")}
               >
                 <span>Quero conhecer tudo</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+
+              <Link
+                href="/studio/orcamento"
+                className={`${styles.primaryAction} ${styles.quoteAction}`}
+                aria-hidden={route !== "home"}
+                tabIndex={route === "home" ? 0 : -1}
+              >
+                <span>Pedir orçamento</span>
                 <span aria-hidden="true">→</span>
               </Link>
 

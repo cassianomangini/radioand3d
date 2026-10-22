@@ -8,7 +8,7 @@ export function StudioHomeArt() {
   return (
     <div className={styles.art} data-home-art="true" aria-hidden="true">
       <Image
-        src="/images/studio/cm-home-x1-hd.webp"
+        src="/images/studio/cm-home-x1-v2.png"
         alt=""
         fill
         priority

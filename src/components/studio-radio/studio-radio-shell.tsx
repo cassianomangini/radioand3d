@@ -38,6 +38,7 @@ import { useRadioDivider } from "./use-radio-divider";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
 import { resolveRadioKeyboardCommand } from "@/features/radio/radio-keyboard";
+import { moveDirectionalFocus, shouldKeepNativeArrow } from "./directional-focus";
 import {
   resolveRadioLayoutMode,
   type RadioLayoutMode
@@ -298,6 +299,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   }
 
   const handleRadioShortcut = useEffectEvent((event: globalThis.KeyboardEvent) => {
+    // The remote uses these keys to move focus; a focused range handles seeking itself.
+    if (event.code === "ArrowLeft" || event.code === "ArrowRight") return;
     if (shouldIgnoreRadioShortcutTarget(event.target)) return;
 
     const command = resolveRadioKeyboardCommand(event);
@@ -328,6 +331,23 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   useEffect(() => {
     window.addEventListener("keydown", handleRadioShortcut);
     return () => window.removeEventListener("keydown", handleRadioShortcut);
+  }, []);
+
+  useEffect(() => {
+    function handleDirectionalFocus(event: globalThis.KeyboardEvent) {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (
+        event.key !== "ArrowLeft" && event.key !== "ArrowRight" &&
+        event.key !== "ArrowUp" && event.key !== "ArrowDown"
+      ) return;
+      if (shouldKeepNativeArrow(event.target, event.key)) return;
+      const root = document.querySelector<HTMLDialogElement>("dialog[open]") ??
+        document.getElementById("top");
+      if (!root || !moveDirectionalFocus(root, event.key)) return;
+      event.preventDefault();
+    }
+    window.addEventListener("keydown", handleDirectionalFocus);
+    return () => window.removeEventListener("keydown", handleDirectionalFocus);
   }, []);
 
   function clearSignatureStageTimer() {
@@ -737,9 +757,11 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const activeNav =
     radioFullscreen || radioExpanded || mobileRadioOpen || radioAtMaximumWidth
       ? "radio"
-      : studioRoute === "detail"
-        ? "studio"
-        : "home";
+      : pathname === "/studio/orcamento"
+        ? "quote"
+        : studioRoute === "detail"
+          ? "studio"
+          : "home";
 
   const playbackStatusMessage =
     radio.status === "loading"
@@ -791,10 +813,9 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           aria-label="Abrir rádio completa"
         >
           <Icon name="expand" />
-          <span>Rádio</span>
         </button>
         <div className={styles.miniSignal}>
-          <RadioVisualizer className={`${sharedAudioStyles.visualizer} ${styles.miniVisualizer}`} barCount={24} active={!mobileRadioOpen} />
+          <RadioVisualizer className={`${sharedAudioStyles.visualizer} ${styles.miniVisualizer}`} barCount={36} active={!mobileRadioOpen} />
         </div>
         <div className={styles.miniControls}>
           <button type="button" className={styles.miniStep} onClick={radio.reshuffle} disabled={radio.tracks.length < 2} aria-label="Embaralhar e trocar de música" title="Embaralhar e trocar de música"><Icon name="shuffle" /></button>

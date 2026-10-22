@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, type Variants } from "motion/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { studioProducts } from "@/features/studio/catalog";
 import { studioPrintMedia } from "@/features/studio/prints-media";
 import { StudioPrintsCarousel } from "./studio-prints-carousel";
@@ -26,11 +26,17 @@ const cards = [
 export function StudioHub({
   active, radioFullscreen, reducedMotion
 }: { active: boolean; radioFullscreen: boolean; reducedMotion: boolean }) {
-  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [stripOffset, setStripOffset] = useState(0);
   const media = studioPrintMedia;
   const productImage = studioProducts[0]?.images[0];
-  const visibleCount = Math.min(media.length, 8);
+  const visibleCount = Math.min(media.length, 9);
+  const lastPageOffset = visibleCount ? Math.floor((media.length - 1) / visibleCount) * visibleCount : 0;
+
+  const selectPhoto = useCallback((index: number) => {
+    setSelectedPhoto(index);
+    setStripOffset(Math.floor(index / visibleCount) * visibleCount);
+  }, [visibleCount]);
 
   return (
     <motion.div
@@ -44,7 +50,7 @@ export function StudioHub({
     >
       <div className={styles.studioTop}>
         <section className={styles.studioDetailCard} data-studio-card="prints" aria-label="Impressões em destaque">
-          <StudioPrintsCarousel active={active && !radioFullscreen} selectedIndex={selectedPhoto} onChangeIndex={setSelectedPhoto} />
+          <StudioPrintsCarousel active={active && !radioFullscreen} selectedIndex={selectedPhoto} onChangeIndex={selectPhoto} />
         </section>
         <nav className={styles.studioActions} data-studio-nav="true" aria-label="Explore o Estúdio">
           {cards.map((card) => (
@@ -85,21 +91,22 @@ export function StudioHub({
         </div>
         {media.length ? (
           <div className={styles.stripCarousel}>
-            <button type="button" className={styles.stripStep} aria-label="Miniaturas anteriores" disabled={stripOffset === 0} onClick={() => setStripOffset((v) => Math.max(0, v - 1))}>‹</button>
+            <button type="button" className={styles.stripStep} aria-label="Miniaturas anteriores" disabled={stripOffset === 0} onClick={() => setStripOffset((v) => Math.max(0, v - visibleCount))}>‹</button>
             <div className={styles.stripItems}>
-              {media.slice(stripOffset, stripOffset + visibleCount).map((item, localIndex) => {
-                const index = stripOffset + localIndex;
+              {Array.from({ length: visibleCount }, (_, localIndex) => {
+                const index = (stripOffset + localIndex) % media.length;
+                const item = media[index];
                 return (
                   <button key={item.id} className={styles.thumbnail} data-studio-thumbnail={index} type="button"
-                    aria-pressed={selectedPhoto === index || (selectedPhoto === null && index === 0)}
+                    aria-pressed={selectedPhoto === index}
                     aria-label={`Mostrar imagem: ${item.title}`}
-                    onClick={() => setSelectedPhoto(index)}>
+                    onClick={() => selectPhoto(index)}>
                     {item.kind === "image" ? <Image src={item.src} alt="" fill sizes="120px" /> : <video src={item.src} muted playsInline preload="metadata" />}
                   </button>
                 );
               })}
             </div>
-            <button type="button" className={styles.stripStep} aria-label="Próximas miniaturas" disabled={stripOffset + visibleCount >= media.length} onClick={() => setStripOffset((v) => Math.min(media.length - visibleCount, v + 1))}>›</button>
+            <button type="button" className={styles.stripStep} aria-label="Próximas miniaturas" disabled={stripOffset === lastPageOffset} onClick={() => setStripOffset((v) => Math.min(lastPageOffset, v + visibleCount))}>›</button>
           </div>
         ) : <p className={styles.emptyMedia}>Fotos reais do Estúdio em preparação.</p>}
       </section>

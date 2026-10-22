@@ -3,15 +3,15 @@ import Link from "next/link";
 import {
   MediaPlaceholder,
   PrimaryLink,
-  StudioPageShell,
+  StudioBreadcrumbs,
   StudioSection
 } from "@/components/studio/studio-content";
-import catalogStyles from "@/components/studio/studio-catalog.module.css";
 import { studioProducts } from "@/features/studio/catalog";
 import {
   absoluteSiteUrl,
   buildPublicMetadata
 } from "@/lib/site-config";
+import styles from "./products-page.module.css";
 
 export const metadata = buildPublicMetadata({
   title: "Produtos do Estúdio | CM 3D & Radio",
@@ -34,39 +34,36 @@ export default function StudioProductsPage() {
   });
 
   return (
-    <StudioPageShell
-      eyebrow="Produtos"
-      title="Conheça a peça antes de comprar."
-      lead="Fotos, medidas, variações e detalhes ficam organizados aqui. A Shopee entra somente no momento de finalizar a compra."
-      pathname="/studio/produtos"
-      breadcrumbLabel="Produtos"
-    >
-      <StudioSection title="Produtos do Estúdio">
+    <article className={styles.page}>
+      <header className={styles.header}>
+        <StudioBreadcrumbs currentLabel="Produtos" pathname="/studio/produtos" />
+        <h1 className={styles.title}>Produtos do <span>Estúdio</span></h1>
+      </header>
+
+      <section aria-label="Produtos do Estúdio">
         {studioProducts.length ? (
-          <div className={catalogStyles.grid}>
+          <div className={styles.grid}>
             {studioProducts.map((product) => {
               const image = product.images[0];
               return (
                 <Link
-                  className={catalogStyles.item}
+                  className={styles.card}
                   href={`/studio/produtos/${product.slug}`}
                   key={product.slug}
                 >
                   {image ? (
-                    <div className={catalogStyles.media}>
+                    <div className={styles.media}>
                       <Image
                         src={image.src}
                         alt={image.alt}
                         width={image.width}
                         height={image.height}
-                        sizes="(max-width: 1180px) 100vw, 33vw"
+                        sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
                       />
                     </div>
                   ) : null}
-                  <div className={catalogStyles.meta}>
-                    <strong>{product.title}</strong>
-                    <p>{product.summary}</p>
-                  </div>
+                  <strong className={styles.cardTitle}>{product.title}</strong>
+                  <p className={styles.cardSummary}>{product.summary}</p>
                 </Link>
               );
             })}
@@ -77,29 +74,31 @@ export default function StudioProductsPage() {
             note="Fotografia real do primeiro produto publicado no site. Não criaremos cards vazios para simular variedade."
           />
         )}
-        <p>
+        <p className={styles.catalogNote}>
           Cada produto abre uma página própria com galeria, medidas, ficha técnica e
           variações reais antes da saída para a Shopee.
         </p>
-      </StudioSection>
+      </section>
 
-      <StudioSection
-        eyebrow="Compra externa"
-        title="Preço e disponibilidade são confirmados na Shopee"
-      >
-        <p>
-          O site não replica preço ou estoque sem sincronização confiável. A página
-          própria explica a peça e mantém um único CTA comercial: “Comprar na Shopee”.
-        </p>
-      </StudioSection>
+      <div className={styles.details}>
+        <StudioSection
+          eyebrow="Compra externa"
+          title="Preço e disponibilidade são confirmados na Shopee"
+        >
+          <p>
+            O site não replica preço ou estoque sem sincronização confiável. A página
+            própria explica a peça e mantém um único CTA comercial: “Comprar na Shopee”.
+          </p>
+        </StudioSection>
 
-      <StudioSection title="Precisa de outra medida ou de algo personalizado?">
-        <p>
-          Produto pronto e projeto sob medida são jornadas diferentes. Uma necessidade
-          específica segue pelo orçamento, sem obrigar a pessoa a procurar outro canal.
-        </p>
-        <PrimaryLink href="/studio/orcamento">Pedir algo personalizado</PrimaryLink>
-      </StudioSection>
+        <StudioSection title="Precisa de outra medida ou de algo personalizado?">
+          <p>
+            Produto pronto e projeto sob medida são jornadas diferentes. Uma necessidade
+            específica segue pelo orçamento, sem obrigar a pessoa a procurar outro canal.
+          </p>
+          <PrimaryLink href="/studio/orcamento">Pedir algo personalizado</PrimaryLink>
+        </StudioSection>
+      </div>
 
       {itemList.length === studioProducts.length ? (
         <script
@@ -113,6 +112,6 @@ export default function StudioProductsPage() {
           }}
         />
       ) : null}
-    </StudioPageShell>
+    </article>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
@@ -23,13 +22,12 @@ export const previewTrack = {
 
 export type TrackStepKind = "next" | "previous" | "shuffle";
 
-type IconName = "expand" | "minimize" | "medium" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute" | "share" | "link" | "check";
+type IconName = "expand" | "medium" | "close" | "heart" | "shuffle" | "repeat" | "previous" | "play" | "pause" | "next" | "search" | "volume" | "volumeMute" | "share" | "check";
 
 export function Icon({ name }: { name: IconName }) {
   const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
   const paths: Record<IconName, ReactNode> = {
     expand: <><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" /><path d="m4 4 5 5m11-5-5 5M4 20l5-5m11 5-5-5" /></>,
-    minimize: <><path d="M4 14h6v6M20 10h-6V4" /><path d="m14 10 7-7M3 21l7-7" /></>,
     medium: <><rect x="3" y="4" width="18" height="16" rx="1.5" /><path d="M14 4v16" /></>,
     close: <><path d="M5 5l14 14M19 5 5 19" /></>,
     heart: <path d="M20.8 8.6c0 4.2-8.8 10-8.8 10s-8.8-5.8-8.8-10a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z" />,
@@ -43,7 +41,6 @@ export function Icon({ name }: { name: IconName }) {
     volume: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12" /></>,
     volumeMute: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="m16 9 5 6m0-6-5 6" /></>,
     share: <><circle cx="18" cy="5" r="2" /><circle cx="6" cy="12" r="2" /><circle cx="18" cy="19" r="2" /><path d="m8 11 8-5M8 13l8 5" /></>,
-    link: <><path d="M10 13a5 5 0 0 0 7.1 0l2-2A5 5 0 0 0 12 3.9l-1.2 1.2" /><path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.2-1.2" /></>,
     check: <path d="m4 12 5 5L20 6" />
   };
   return <svg {...common}>{paths[name]}</svg>;
@@ -264,21 +261,11 @@ export function RadioContent({
         ) : null}
         {!mobile && (onDock || onExpand || onMedium) ? (
           <div className={playerStyles.radioLayoutActions}>
-            {onDock ? (
-              <button
-                type="button"
-                className={playerStyles.iconButton}
-                onClick={onDock}
-                aria-label="Recolher a Rádio para a versão pocket"
-                title="Versão pocket"
-              >
-                <Icon name="minimize" />
-              </button>
-            ) : null}
             {expanded && onMedium ? (
               <button
                 type="button"
                 className={playerStyles.iconButton}
+                data-layout-action="expand"
                 onClick={onMedium}
                 aria-label="Voltar a Rádio ao tamanho médio"
                 title="Tamanho médio"
@@ -289,11 +276,24 @@ export function RadioContent({
               <button
                 type="button"
                 className={playerStyles.iconButton}
+                data-layout-action="expand"
                 onClick={onExpand}
                 aria-label="Expandir a Rádio"
                 title="Tela cheia"
               >
                 <Icon name="expand" />
+              </button>
+            ) : null}
+            {onDock ? (
+              <button
+                type="button"
+                className={playerStyles.iconButton}
+                data-layout-action="dock"
+                onClick={onDock}
+                aria-label="Minimizar a Rádio para a barra superior"
+                title="Minimizar Rádio"
+              >
+                <Icon name="close" />
               </button>
             ) : null}
           </div>
@@ -503,9 +503,6 @@ export function RadioContent({
               <span className={playerStyles.trackState}>{String(position).padStart(2, "0")}</span>
               <span className={playerStyles.duration}>{formatTrackDuration(track.durationSeconds ?? (track.id === radio.currentTrack?.id ? radio.duration : undefined))}</span>
             </button>
-            {track.shareSlug ? (
-              <Link href={`/musica/${track.shareSlug}`} prefetch={false} className={playerStyles.trackShareButton} aria-label={`Abrir link de ${track.title}`} title="Abrir link da música"><Icon name="link" /></Link>
-            ) : null}
           </li>
         ))}
         {listTracks.length === 0 ? (

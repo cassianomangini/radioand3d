@@ -68,7 +68,7 @@ function SocialIcons() {
 }
 
 type SiteHeaderProps = {
-  activeNav: "home" | "studio" | "radio";
+  activeNav: "home" | "studio" | "radio" | "quote";
   radioDocked: boolean;
   radioDockMotion: "docking" | "restoring" | null;
   radioFullscreen: boolean;
@@ -127,6 +127,9 @@ export function SiteHeader({
         >
           Estúdio
         </Link>
+        <Link href="/studio/orcamento" aria-current={activeNav === "quote" ? "page" : undefined}>
+          Orçamentos
+        </Link>
         <a ref={radioNavRef} href="#radio" aria-current={activeNav === "radio" ? "page" : undefined} onClick={(event) => { event.preventDefault(); onOpenRadioFullscreen(); }}>Rádio</a>
       </nav>
 
@@ -175,6 +178,13 @@ export function SiteHeader({
             }}
           >
             Estúdio
+          </Link>
+          <Link
+            href="/studio/orcamento"
+            aria-current={activeNav === "quote" ? "page" : undefined}
+            onClick={closeMobileMenu}
+          >
+            Orçamentos
           </Link>
           <button
             type="button"

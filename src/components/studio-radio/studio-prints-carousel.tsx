@@ -1,13 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import {
-  AnimatePresence,
   animate,
   motion,
-  useMotionValue,
-  useReducedMotion
+  useMotionValue
 } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { studioPrintMedia, type StudioPrintMedia } from "@/features/studio/prints-media";
@@ -60,23 +57,30 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
   const [keyboardFocus, setKeyboardFocus] = useState(false);
   const [documentVisible, setDocumentVisible] = useState(true);
   const [inViewport, setInViewport] = useState(true);
-  const reducedMotion = useReducedMotion();
+  const [zoomItem, setZoomItem] = useState<StudioPrintMedia | null>(null);
 
   const progress = useMotionValue(0);
   const clockRef = useRef<ReturnType<typeof animate> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const zoomDialogRef = useRef<HTMLDialogElement>(null);
   const total = media.length;
   const currentIndex = total > 0 ? (selectedIndex ?? index) % total : 0;
   const current = media[currentIndex] ?? null;
   const canNavigate = total > 1;
   const slideDuration = current?.kind === "video" ? VIDEO_DURATION_SECONDS : PHOTO_DURATION_SECONDS;
 
-  // Reduced-motion removes transitions, not the gallery's explicitly requested
-  // initial PLAY state. A visible Pause control always remains available.
-  const advancing = active && selectedIndex === null && canNavigate && playing && documentVisible &&
-    inViewport && !overControls && !keyboardFocus;
+  const advancing = active && canNavigate && playing && documentVisible &&
+    inViewport && !overControls && !keyboardFocus && !zoomItem;
+
+  useEffect(() => {
+    if (zoomItem && !zoomDialogRef.current?.open) zoomDialogRef.current?.showModal();
+  }, [zoomItem]);
+
+  useEffect(() => {
+    if (!active) zoomDialogRef.current?.close();
+  }, [active]);
 
   useEffect(() => {
     const onVisibility = () => setDocumentVisible(!document.hidden);
@@ -105,14 +109,18 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
       duration: slideDuration,
       ease: "linear",
       autoplay: false,
-      onComplete: () => setIndex((previous) => (previous + 1) % total)
+      onComplete: () => {
+        const nextIndex = (currentIndex + 1) % total;
+        setIndex(nextIndex);
+        onChangeIndex?.(nextIndex);
+      }
     });
     clockRef.current = clock;
     return () => {
       clock.stop();
       if (clockRef.current === clock) clockRef.current = null;
     };
-  }, [current?.id, canNavigate, total, restart, progress, slideDuration]);
+  }, [current?.id, currentIndex, canNavigate, total, restart, progress, slideDuration, onChangeIndex]);
 
   useEffect(() => {
     if (advancing) clockRef.current?.play();
@@ -122,14 +130,14 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (!active || !playing || !documentVisible || !inViewport || keyboardFocus) {
+    if (!active || !playing || !documentVisible || !inViewport || keyboardFocus || zoomItem) {
       video.pause();
       return;
     }
     // Presentation videos never interrupt the Radio's audio.
     void video.play().catch(() => undefined);
     return () => video.pause();
-  }, [active, playing, documentVisible, inViewport, keyboardFocus, current?.id]);
+  }, [active, playing, documentVisible, inViewport, keyboardFocus, zoomItem, current?.id]);
 
   function goTo(requested: number) {
     if (!canNavigate) return;
@@ -177,92 +185,56 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
       }}
     >
       <div className={styles.mediaLayer} aria-hidden="true">
-        <AnimatePresence initial={false} mode="sync">
-          {current ? (
-            <motion.div
-              key={current.id}
-              className={styles.mediaSlide}
-              initial={reducedMotion ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: reducedMotion ? 0 : 0.58, ease: [0.16, 1, 0.3, 1] }}
-            >
-              {current.kind === "image" ? (
-                <>
-                  <Image
-                    className={styles.ambientImage}
-                    src={current.src}
-                    alt=""
-                    fill
-                    sizes="(max-width: 1179px) 100vw, 65vw"
-                    aria-hidden="true"
-                  />
-                  <Image
-                    className={styles.photo}
-                    src={current.src}
-                    alt=""
-                    fill
-                    sizes="(max-width: 1179px) 100vw, 65vw"
-                    priority={active && currentIndex === 0}
-                  />
-                </>
-              ) : (
-                <>
-                  {current.poster ? (
-                    <Image
-                      className={styles.ambientImage}
-                      src={current.poster}
-                      alt=""
-                      fill
-                      sizes="(max-width: 1179px) 100vw, 65vw"
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                  <video
-                    ref={videoRef}
-                    className={styles.photo}
-                    muted
-                    playsInline
-                    loop
-                    preload="metadata"
-                    poster={current.poster}
-                    aria-hidden="true"
-                  >
-                    <source
-                      src={current.src}
-                      type={current.src.endsWith(".webm") ? "video/webm" : "video/mp4"}
-                    />
-                  </video>
-                </>
-              )}
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+        {current ? (
+          <div className={styles.mediaSlide}>
+            {current.kind === "image" ? (
+              <Image
+                className={styles.photo}
+                src={current.src}
+                alt=""
+                fill
+                sizes="(max-width: 1179px) 100vw, 65vw"
+                priority={active && currentIndex === 0}
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                className={styles.photo}
+                muted
+                playsInline
+                loop
+                preload="metadata"
+                poster={current.poster}
+                aria-hidden="true"
+              >
+                <source
+                  src={current.src}
+                  type={current.src.endsWith(".webm") ? "video/webm" : "video/mp4"}
+                />
+              </video>
+            )}
+          </div>
+        ) : null}
         {!current ? (
           <span className={styles.emptyMediaLabel}>FOTO REAL PENDENTE · PEÇA PRODUZIDA</span>
         ) : null}
       </div>
 
-      <div className={styles.readability} aria-hidden="true" />
       {current ? (
-        <Link
-          className={styles.mediaLink}
-          href={`/studio/impressoes#${encodeURIComponent(current.id)}`}
-          aria-label={`Abrir na galeria: ${current.title}`}
+        <button
+          type="button"
+          className={styles.mediaZoom}
+          aria-label={`Ampliar ${current.kind === "image" ? "foto" : "vídeo"}: ${current.title}`}
+          onClick={() => setZoomItem(current)}
           tabIndex={active ? 0 : -1}
         />
       ) : null}
 
-      {current && canNavigate ? (
-        <>
-          <span className={styles.counter} aria-hidden="true">
-            <span className={styles.counterNow}>{String(currentIndex + 1).padStart(2, "0")}</span>
-            <span className={styles.counterSeparator}>/</span>
-            {String(total).padStart(2, "0")}
-          </span>
+      {canNavigate ? (
+        <div className={styles.controls}>
           <button
             type="button"
-            className={`${styles.arrow} ${styles.previous}`}
+            className={styles.arrow}
             aria-label="Impressão anterior"
             onClick={() => goTo(currentIndex - 1)}
             onPointerEnter={() => setOverControls(true)}
@@ -271,9 +243,52 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
           >
             <Chevron direction="previous" />
           </button>
+          <div
+            className={styles.transport}
+            role="group"
+            aria-label="Controles da apresentação de Impressões"
+            onPointerEnter={() => setOverControls(true)}
+            onPointerLeave={() => setOverControls(false)}
+          >
+            <div ref={timelineRef} className={styles.timeline} role="group" aria-label="Escolher impressão">
+              {visibleSteps.map((step) => (
+                <button
+                  key={step}
+                  type="button"
+                  className={styles.timelineStep}
+                  aria-label={`Mostrar impressão ${step + 1} de ${total}: ${media[step].title}`}
+                  aria-pressed={step === currentIndex}
+                  data-current={step === currentIndex}
+                  onClick={() => goTo(step)}
+                  tabIndex={active ? 0 : -1}
+                >
+                  <span className={styles.timelineRail}>
+                    {step < currentIndex ? <span className={styles.timelineCompleted} /> : null}
+                    {step === currentIndex ? (
+                      <motion.span
+                        className={styles.timelineFill}
+                        style={{ scaleX: progress }}
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className={styles.pause}
+              aria-label={playing ? "Pausar apresentação" : "Reproduzir apresentação"}
+              aria-pressed={playing}
+              onClick={() => setPlaying((state) => !state)}
+              tabIndex={active ? 0 : -1}
+            >
+              <PlaybackSymbol playing={playing} />
+            </button>
+          </div>
           <button
             type="button"
-            className={`${styles.arrow} ${styles.next}`}
+            className={styles.arrow}
             aria-label="Próxima impressão"
             onClick={() => goTo(currentIndex + 1)}
             onPointerEnter={() => setOverControls(true)}
@@ -282,74 +297,35 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
           >
             <Chevron direction="next" />
           </button>
-        </>
-      ) : null}
-
-      <div className={styles.titleBlock}>
-        <span className={styles.kicker}>ESTÚDIO DE IMPRESSÃO 3D</span>
-        <h1>Impressões</h1>
-        <p>Peças personalizadas, placas, caixas e muito mais. Qualidade, atenção aos detalhes e um estúdio pronto para o seu projeto.</p>
-      </div>
-
-      <div className={styles.caption}>
-        <p className={styles.currentPhotoLabel}>{current ? current.title : "Veja peças que já saíram das impressoras."}</p>
-        <div className={styles.bottomLine}>
-          <Link
-            className={styles.explore}
-            href="/studio/impressoes"
-            tabIndex={active ? 0 : -1}
-            onPointerEnter={() => setOverControls(true)}
-            onPointerLeave={() => setOverControls(false)}
-          >
-            Explorar galeria <span aria-hidden="true">→</span>
-          </Link>
-          {canNavigate ? (
-            <div
-              className={styles.transport}
-              role="group"
-              aria-label="Controles da apresentação de Impressões"
-              onPointerEnter={() => setOverControls(true)}
-              onPointerLeave={() => setOverControls(false)}
-            >
-              <div ref={timelineRef} className={styles.timeline} role="group" aria-label="Escolher impressão">
-                {visibleSteps.map((step) => (
-                  <button
-                    key={step}
-                    type="button"
-                    className={styles.timelineStep}
-                    aria-label={`Mostrar impressão ${step + 1} de ${total}: ${media[step].title}`}
-                    aria-pressed={step === currentIndex}
-                    data-current={step === currentIndex}
-                    onClick={() => goTo(step)}
-                    tabIndex={active ? 0 : -1}
-                  >
-                    <span className={styles.timelineRail}>
-                      {step < currentIndex ? <span className={styles.timelineCompleted} /> : null}
-                      {step === currentIndex ? (
-                        <motion.span
-                          className={styles.timelineFill}
-                          style={{ scaleX: progress }}
-                          aria-hidden="true"
-                        />
-                      ) : null}
-                    </span>
-                  </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                className={styles.pause}
-                aria-label={playing ? "Pausar apresentação" : "Reproduzir apresentação"}
-                aria-pressed={playing}
-                onClick={() => setPlaying((state) => !state)}
-                tabIndex={active ? 0 : -1}
-              >
-                <PlaybackSymbol playing={playing} />
-              </button>
-            </div>
-          ) : null}
         </div>
-      </div>
+      ) : null}
+      {zoomItem ? (
+        <dialog
+          ref={zoomDialogRef}
+          className={styles.zoomDialog}
+          aria-label={zoomItem.title}
+          onClose={() => setZoomItem(null)}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) event.currentTarget.close();
+          }}
+        >
+          <button
+            type="button"
+            className={styles.zoomClose}
+            aria-label="Fechar imagem ampliada"
+            onClick={() => zoomDialogRef.current?.close()}
+          >
+            ×
+          </button>
+          <div className={styles.zoomContent}>
+            {zoomItem.kind === "image" ? (
+              <Image src={zoomItem.src} alt={zoomItem.alt} fill sizes="94vw" />
+            ) : (
+              <video src={zoomItem.src} poster={zoomItem.poster} controls playsInline />
+            )}
+          </div>
+        </dialog>
+      ) : null}
     </div>
   );
 }

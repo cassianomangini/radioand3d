@@ -1,5 +1,4 @@
-// Pure layout geometry. Both the resize handler and ARIA range use the
-// same bounds, independent of visual panels and persistent playback state.
+// Pure layout geometry for the fixed desktop sidebar width.
 export const RADIO_WIDTH_RATIO = 0.235;
 export const MAX_RADIO_WIDTH = 1120;
 export const MIN_STUDIO_WIDTH = 640;
@@ -27,7 +26,7 @@ export function getDefaultWidth(shellWidth: number) {
   return clampRadioWidth(shellWidth, Math.round(shellWidth * 0.3));
 }
 
-export function getExpandedWidth(shellWidth: number) {
-  return clampRadioWidth(shellWidth, shellWidth * 0.6);
+export function getRouteDefaultRadioWidth(shellWidth: number, route: "home" | "detail") {
+  return route === "detail" ? getMinRadioWidth(shellWidth) : getDefaultWidth(shellWidth);
 }
 

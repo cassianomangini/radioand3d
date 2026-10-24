@@ -19,10 +19,10 @@ test("Site header owns its navigation/social CSS and its own resize/dock appeara
   }
 });
 
-test("Header responds to #top dock/fullscreen/drag states without coupling CSS Modules", () => {
+test("Header responds to #top dock/fullscreen states without coupling CSS Modules", () => {
   assert.match(headerCSS, /:global\(\[id="top"\]\)\[data-radio-docked="true"\]/);
   assert.match(headerCSS, /:global\(\[id="top"\]\)\[data-radio-fullscreen="true"\]/);
-  assert.match(headerCSS, /data-radio-divider-settling="true"/);
+  assert.doesNotMatch(headerCSS, /data-radio-divider-settling="true"/);
   assert.match(headerCSS, /data-radio-dock-motion/);
   assert.match(headerCSS, /@media \(max-width: 73\.74rem\)/);
   assert.match(headerCSS, /@media \(prefers-reduced-motion: reduce\)/);

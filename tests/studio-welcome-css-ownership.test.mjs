@@ -8,8 +8,7 @@ const shellCSS = readFileSync(new URL("../src/components/studio-radio/studio-rad
 
 test("welcome text and CTA styles belong to their own CSS module", () => {
   assert.match(welcome, /import styles from "\.\/studio-welcome\.module\.css"/);
-  assert.match(welcome, /shellStyles\.srOnly/);
-  for (const name of ["studioRevealChar","studioRevealWord","studioIdentity","studioEyebrowStack","studioHomePhrase","studioRevealAccent","lead","studioRouteActions","primaryAction"]) {
+  for (const name of ["studioRevealChar","studioRevealWord","studioIdentity","studioEyebrowStack","studioGreeting","studioHomePhrase","studioRevealAccent","lead","studioRouteActions","primaryAction"]) {
     assert.ok(welcome.includes(`styles.${name}`), `Welcome JSX lacks ${name}`);
     assert.ok(welcomeCSS.includes(`.${name}`), `Welcome CSS lacks ${name}`);
     assert.ok(!shellCSS.includes(`.${name}`), `Shell retains ${name}`);
@@ -21,6 +20,6 @@ test("welcome reveal respects Studio states, dock state and reduced motion", () 
   assert.doesNotMatch(shellCSS, /@keyframes studio-letter-in/);
   assert.match(welcomeCSS, /:global\(\[id="studio"\]\[data-studio-route="home"\]\)/);
   assert.match(welcomeCSS, /:global\(\[id="top"\]\[data-radio-docked="true"\]\)/);
-  assert.match(welcomeCSS, /@container studio \(min-width: 60rem\)/);
+  assert.match(welcomeCSS, /@container studio \(min-width: 52rem\)/);
   assert.match(welcomeCSS, /@media \(prefers-reduced-motion: reduce\)/);
 });

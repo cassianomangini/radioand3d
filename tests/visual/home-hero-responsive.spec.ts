@@ -7,7 +7,7 @@ test("Home X1 and copy fit the actual Studio in every Radio state", async ({ pag
   await page.evaluate(() => document.fonts.ready);
 
   const title = page.locator("#studio-title");
-  await expect(title).toHaveText("Impressão 3D, música e muito mais do que você imagina.");
+  await expect(title).toHaveText("Conheça nossos produtos, trabalhos e serviços de impressão 3D.");
 
   const art = page.locator('[data-home-art="true"]');
   await expect(art).toBeVisible();
@@ -185,6 +185,13 @@ test("Home X1 and copy fit the actual Studio in every Radio state", async ({ pag
     expect(metric.mask).toBe("none");
   }
 
+  if (testInfo.project.name === "desktop-1440" || testInfo.project.name === "desktop-short") {
+    await expect.poll(async () => Number(await page.getByRole("separator", {
+      name: "Arraste para redimensionar CM Rádio"
+    }).getAttribute("aria-valuemax")), { message: "divider range must be measured before geometry QA" })
+      .toBeGreaterThan(0);
+  }
+
   const initial = await inspectHomeState("split-default");
   if (testInfo.project.name === "desktop-1440" || testInfo.project.name === "desktop-short") {
     await verifyArtCoverage();
@@ -192,8 +199,9 @@ test("Home X1 and copy fit the actual Studio in every Radio state", async ({ pag
       const shellWidth = await page.locator('[aria-label="Estúdio e Rádio"]').evaluate((e) =>
         e.getBoundingClientRect().width
       );
-      const physicalMaximum = Math.min(1120, Math.max(Math.round(shellWidth * 0.3), shellWidth - 640 - 32));
-      expect(initial.dividerRange.max).toBeCloseTo(physicalMaximum, 0);
+      const physicalMaximum = Math.min(1120, Math.max(Math.round(shellWidth * 0.235), shellWidth - 640 - 32));
+      const expandedWidth = Math.min(physicalMaximum, Math.max(Math.round(shellWidth * 0.235), shellWidth * 0.6));
+      expect(initial.dividerRange.max).toBeCloseTo(expandedWidth, 0);
     }
   }
   await page.screenshot({
@@ -208,27 +216,32 @@ test("Home X1 and copy fit the actual Studio in every Radio state", async ({ pag
     await divider.focus();
     await divider.press("Home");
 
-    for (let index = 0; index < 4; index += 1) {
-      await divider.press("Shift+ArrowLeft");
-    }
+    await divider.press("ArrowLeft");
+    await expect.poll(async () => Number(await divider.getAttribute("aria-valuenow")))
+      .toBeCloseTo(initial.dividerRange!.max, 0);
     await expect.poll(async () =>
       page.locator("#studio").evaluate((node) => node.getBoundingClientRect().width)
-    ).toBeLessThan(850);
-    await inspectHomeState("radio-medium");
+    ).toBeLessThan(initial.studioWidth - 80);
+    await inspectHomeState("radio-expanded");
     await page.screenshot({
-      path: testInfo.outputPath("home-x1-radio-medium.png"),
+      path: testInfo.outputPath("home-x1-radio-expanded.png"),
+      fullPage: false,
+      animations: "disabled"
+    });
+
+    await divider.press("ArrowRight");
+    await expect.poll(async () => Number(await divider.getAttribute("aria-valuenow")))
+      .toBeCloseTo(initial.dividerRange!.min, 0);
+    await inspectHomeState("split-restored");
+    await page.screenshot({
+      path: testInfo.outputPath("home-x1-split-restored.png"),
       fullPage: false,
       animations: "disabled"
     });
 
     await divider.press("End");
     await verifyArtCoverage();
-    await inspectHomeState("radio-maximum");
-    await page.screenshot({
-      path: testInfo.outputPath("home-x1-studio-compact.png"),
-      fullPage: false,
-      animations: "disabled"
-    });
+    await inspectHomeState("radio-expanded-end-key");
 
     await divider.press("Home");
     await divider.press("ArrowRight");
@@ -254,7 +267,7 @@ test("Home reveal completes under normal motion without concealing its words", a
   await page.evaluate(() => document.fonts.ready);
 
   const heading = page.locator("#studio-title");
-  await expect(heading).toHaveText("Impressão 3D, música e muito mais do que você imagina.");
+  await expect(heading).toHaveText("Conheça nossos produtos, trabalhos e serviços de impressão 3D.");
 
   await heading.evaluate(async (element) => {
     await Promise.all(element.getAnimations({ subtree: true }).map((animation) =>

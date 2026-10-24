@@ -7,9 +7,9 @@ Existe um único motor e uma única fila por instância da aplicação no navega
 - **Desktop:** a interface visível é a Rádio completa/acoplada. Não existe mini player adicional no rodapé.
 - **Mobile:** existe mini player persistente logo abaixo do header; a Rádio completa abre sob demanda.
 
-Trocar entre estados de largura da Rádio, abrir a Rádio completa no mobile ou navegar internamente preserva versão da faixa, posição, volume e modos. Nenhuma interface cria outro elemento de áudio.
+Trocar entre lateral, navbar e tela cheia no desktop, abrir a Rádio completa no mobile ou navegar internamente preserva versão da faixa, posição, volume e modos. Nenhuma interface cria outro elemento de áudio.
 
-No desktop, a divisória entre Estúdio e Rádio continua ajustando a largura lateral. Ao arrastá-la além da largura máxima para a esquerda, a Rádio avança proporcionalmente sobre o Estúdio; ao chegar ao limite esquerdo e soltar, ocupa a tela inteira. O link Rádio abre esse mesmo estado; o controle de fechar retorna ao layout dividido. Um arraste incompleto retorna à largura lateral. O mobile mantém a Rádio de tela inteira acessível pelo menu e pelo mini player.
+No desktop, a Rádio lateral usa a largura inicial fixa da rota. Não há arraste da divisória, largura intermediária nem zona de retorno na borda. O X recolhe a Rádio para o mini-player na navbar; o botão desse player restaura a lateral. O botão de expandir e o link Rádio abrem a tela inteira; o botão de recolher retorna ao layout dividido. O mobile mantém a Rádio de tela inteira acessível pelo menu e pelo mini player.
 
 Isso cobre navegação interna, não continuidade sonora durante refresh, fechamento do navegador ou entre dispositivos. Recuperação de preferências após recarga é uma melhoria separada; não prometer autoplay. Controles de sistema e reprodução em segundo plano dependem de suporte e testes reais.
 
@@ -17,7 +17,7 @@ Isso cobre navegação interna, não continuidade sonora durante refresh, fecham
 
 Mini player **mobile**: faixa/capa ou fallback CM, play/pause, anterior/próxima, barras ligadas ao mesmo analisador, indicação de progresso e ação de abrir a Rádio completa. Volume, fila completa e controles adicionais ficam na Rádio completa quando faltar espaço.
 
-Rádio completa: no desktop fica acoplada à composição e pode ser redimensionada/expandida; no mobile abre sob demanda. Contém a **Playlist** inicialmente embaralhada, busca simples entre suas faixas, seleção direta, posição/duração, seek e volume quando suportado. A reprodução abre em modo aleatório, sem repetição automática. O transporte mostra Embaralhar novamente, Repetir faixa, Anterior, Play/Pausa, Próxima, Volume e Coração nessa ordem. Repetir faixa indica quando está ativo. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
+Rádio completa: no desktop fica acoplada à composição no tamanho inicial fixo ou em tela inteira; no mobile abre sob demanda. Contém a **Playlist** inicialmente embaralhada, busca simples entre suas faixas, seleção direta, posição/duração, seek e volume quando suportado. A reprodução abre em modo aleatório, sem repetição automática. O transporte mostra Embaralhar novamente, Repetir faixa, Anterior, Play/Pausa, Próxima, Volume e Coração nessa ordem. Repetir faixa indica quando está ativo. Tocar uma faixa atualiza imediatamente qualquer superfície visível; o estado tocando só aparece após confirmação do motor.
 
 O botão de volume fica depois de Próxima no transporte, abre um slider e uma ação de mudo. Ao sair do mudo, restaura o último volume audível; mover o slider para acima de zero também reativa o som. Desktop e Rádio completa mobile compartilham o mesmo volume do motor. Fechar o controle não altera o volume nem a reprodução.
 
@@ -89,6 +89,6 @@ O player usa a posição do mesmo motor de áudio já existente para selecionar 
 
 ## Aceite da rádio
 
-Testar zero, uma e várias faixas; início aleatório em novas aberturas; ordem anunciada igual aos avanços; término sem repetição; seleção manual; histórico; seek; pausa; erro real; bloqueio do navegador; cliques rápidos; capa/título ausentes; volume e mudo conforme suporte. Redimensionar/expandir a Rádio no desktop, abrir/fechar a Rádio completa no mobile e navegar entre duas rotas repetidamente sem recriar áudio, duplicar som ou perder posição.
+Testar zero, uma e várias faixas; início aleatório em novas aberturas; ordem anunciada igual aos avanços; término sem repetição; seleção manual; histórico; seek; pausa; erro real; bloqueio do navegador; cliques rápidos; capa/título ausentes; volume e mudo conforme suporte. Alternar pelos botões entre lateral, navbar e tela cheia no desktop; abrir/fechar a Rádio completa no mobile e navegar entre duas rotas repetidamente sem recriar áudio, duplicar som ou perder posição.
 
 Validar com mídia real, storage e CORS do ambiente, não apenas mocks. Automação testa estados; escuta e navegador real verificam som e continuidade. Registrar resultados separados para desktop e mobile. Fallback visual não pode interromper a música.

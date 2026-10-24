@@ -1,5 +1,9 @@
 # Experiência e identidade CM
 
+## Rádio desktop — decisão vigente de 24/10/2026
+
+Cassiano removeu toda interação de arrastar a Rádio. A lateral tem largura fixa; a divisória é apenas visual. Os botões existentes controlam tela cheia, recolhimento para a navbar e restauração da lateral. As descrições datadas de arraste, foco e largura expandida abaixo são histórico de propostas substituídas por esta decisão.
+
 
 ## Hub do Estúdio: mock de 19/10/2026
 
@@ -43,7 +47,7 @@ Cassiano pediu também que, no desktop, arrastar a divisória para a esquerda al
 
 ## Nova experiência solicitada — Rádio sobe para a navbar (09/10/2026)
 
-Cassiano pediu expressamente **um novo caminho reversível para a Rádio desktop**: arrastar a lateral **para a direita**, ultrapassando intencionalmente o tamanho mínimo, deve fazer a Rádio **subir e encaixar como player compacto imediatamente ANTES dos botões de redes sociais no lado direito da navbar**; o logotipo CM e os links `Início / Estúdio / Rádio` ficam **juntos à esquerda somente enquanto a Rádio estiver no dock**, liberando largura para o mini-player, e os ícones sociais permanecem à direita. O Estúdio passa a ocupar a largura liberada. O retorno à Rádio **lateral** ocorre por botão no próprio header ou por novo arraste da borda direita em direção à esquerda, com transformação inversa. Este **dock** difere de expandir para foco/fullscreen, que continuam existindo. **A música, fila e tempo de reprodução permanecem contínuos.**
+Cassiano pediu expressamente **um novo caminho reversível para a Rádio desktop**: arrastar a lateral **para a direita**, ultrapassando intencionalmente o tamanho inicial da rota, ou clicar no X faz a Rádio **subir e encaixar como player compacto imediatamente ANTES dos botões de redes sociais no lado direito da navbar**; o logotipo CM e os links `Início / Estúdio / Rádio` ficam **juntos à esquerda somente enquanto a Rádio estiver no dock**, liberando largura para o mini-player, e os ícones sociais permanecem à direita. O Estúdio passa a ocupar a largura liberada. O retorno à Rádio **lateral** ocorre por botão no próprio header ou por novo arraste da borda direita em direção à esquerda, com transformação inversa. A lateral tem apenas tamanho inicial ou expandido como estados estáveis, sem redução parcial; fullscreen continua como ação separada. **A música, fila e tempo de reprodução permanecem contínuos.**
 
 O mini-player desktop existe **somente nesse estado recolhido**, nunca lado a lado com a Rádio completa. O mini mobile não muda. O item atual **Rádio** da navegação continua abrindo fullscreen; o retorno lateral terá controle distinto, claramente identificado.
 
@@ -54,7 +58,7 @@ Essa posição foi esclarecida por Cassiano a partir da antiga `Artesópolis Lan
 - Header CM enxuto.
 - Área principal com o **Estúdio de Impressão 3D** à esquerda/centro.
 - Rádio acoplada à direita como uma superfície própria, não como um card genérico.
-- A rádio tem botão de expandir/recolher e pode ser redimensionada por divisor quando a interação for confortável.
+- A Rádio lateral tem largura fixa. O X a leva ao dock da navbar; o botão do mini-player a restaura. O botão de expandir abre tela cheia.
 - O conteúdo 3D não precisa começar completo. A primeira versão pode ter hero + uma pequena entrada do estúdio e crescer conforme chegam fotos, materiais, peças e trabalhos reais.
 - A riqueza visual vem de mídia real, composição, tipografia e do player, não de quatro cards explicativos genéricos abaixo do hero.
 
@@ -139,11 +143,13 @@ Em frontend visual substancial já autorizado, o agente deve produzir capturas d
 
 **Orientação do split vigente:** Estúdio à esquerda, Rádio à direita no desktop. A seta contextual da divisória existe apenas quando prevista no comportamento aprovado; não adicionar seta permanente.
 
-## Home X1: distinção entre a versão implementada e o aceite visual (18/10/2026)
+## Home: arte vigente e aceite visual
 
-A `main@23f25c3c2193cddadd6a3e0f014ca7df2fcf5666` passou a usar `public/images/studio/cm-home-x1-hd.webp` e copy lateral em um bloco ancorado no topo, inclusive quando o painel do Estúdio perde largura no desktop. A implementação **não estabelece, por si só, que o enquadramento, a tipografia e a hierarquia foram aprovados visualmente**. O histórico de 17/10 descreve versões anteriores e não deve ser seguido como configuração atual.
+Em 18/10, a `main@23f25c3c2193cddadd6a3e0f014ca7df2fcf5666` passou a usar `cm-home-x1-hd.webp` e copy lateral em um bloco ancorado no topo. Esse é um estado histórico. Em 24/10, Cassiano forneceu `imagem_principal_fundo23.png` para substituir a arte da Home; a cópia fiel em `public/images/studio/` é a imagem apontada por `StudioHomeArt`. A escolha do arquivo não equivale à aprovação do enquadramento renderizado, da tipografia ou da hierarquia.
 
-**Ao revisar ou alterar a Home:** partir da imagem real e do último mock/direção fornecido por Cassiano; conferir desktop com Rádio lateral, intermediária, no limite e dock, desktop curto, laptop e mobile. Medir as palavras visíveis dentro da área da copy, especialmente quando `white-space: nowrap` aparece em `@container`. A peça deve manter geometria fiel da X1 e quatro filamentos do AMS; não cortar o balão nem sobrepor elementos sem referência. Não inventar espaço de texto na imagem por CSS improvisado, nem transformar a saudação em outro título HTML visual.
+Ainda em 24/10, Cassiano mudou a hierarquia da Home: “Seja muito bem vindo!” fica bem menor, como saudação, e “Conheça nossos produtos, trabalhos e serviços de impressão 3D.” passa a ser o título principal abaixo dela. “impressão 3D.” recebe o degradê ciano, azul e violeta no título. Na divisão próxima de meio a meio entre Estúdio e Rádio, a caixa de texto deve ser estreita o bastante para não cobrir o robô X1. A redação e o destaque de título registrados para 14/10 acima são históricos neste ponto; os parágrafos seguintes e os CTAs continuam na composição atual.
+
+**Ao revisar ou alterar a Home:** partir da imagem real e do último mock/direção fornecido por Cassiano; conferir desktop com Rádio lateral, intermediária, no limite e dock, desktop curto, laptop e mobile. Medir as palavras visíveis dentro da área da copy, especialmente quando `white-space: nowrap` aparece em `@container`. A peça deve manter a geometria da impressora e do robô fornecidos; verificar cortes da arte e sobreposição com o texto no enquadramento real. Não inventar espaço de texto na imagem por CSS improvisado; a saudação pequena precede o único `h1` da Home.
 
 O estado atual de evidência está no [relatório de auditoria 18/10](work/evidence/08v-css-shell-architecture-audit-2026-10-18.md); o [registro de referências](design/CM_VISUAL_REFERENCE_REGISTER_V1.md) separa capturas de implementação de arte aprovada. **Não promover captura automatizada como aceite.**
 

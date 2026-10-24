@@ -346,3 +346,31 @@ A `main` recebeu três commits: [`0f76bb5`](https://github.com/cassianomangini/r
 **Paridade visual calculada independentemente:** 30 screenshots PNG do último CI verde antes da extração ([39238651048](https://github.com/cassianomangini/radioand3d/actions/runs/39238651048)) contra [39241597826](https://github.com/cassianomangini/radioand3d/actions/runs/39241597826). Comparação pixel a pixel, mesma dimensão e cores RGB via Pillow/NumPy: **16 PNGs idênticos**. Entre eles `desktop-radio-fullscreen-1760x824.png`, `home-radio-docked-1440.png`, `home-radio-medium-1440.png`, `mobile-390.png`, `mobile-radio-open-390x844.png` e `product-mobile-390.png`. As maiores diferenças são capturas temporizadas do Motion (`desktop-studio-route-enter-180ms.png` e `mobile-studio-route-transition-390x844.png`). Não atribuir divergências dinâmicas automaticamente à refatoração. A comparação mostra preservação da composição em estados estáveis, mas **não é aprovação estética**.
 
 **Números atuais:** shell React **1.426 → 974 linhas**; novos hooks **122** (modal) e **414** (divisor) linhas; CSS permanece em **1.394 linhas**. Redução é reatribuição de responsabilidades e não eliminação equivalente de comportamento. B4 concluído tecnicamente para estados de divisor/modal. B5 e D5 seguem independentes.
+
+## Arte da Home fornecida em 24/10/2026
+
+**Estado:** em execução na `main@a0904684cbe27d0ffe85ec23fa6f749e0f395175`. **Responsável:** CM Frontend. **Contratos lidos:** `docs/EXPERIENCE.md` e esta frente 08V. Cassiano indicou a imagem mais recente `imagem_principal_fundo23.png` para a Home. O recorte autorizado é copiar o arquivo original e trocar somente a referência de `StudioHomeArt`; a imagem não versionada `cm-home-neon-background.png` e a Rádio ficam intocadas. Aceite técnico: cópia idêntica por hash, imagem carregada em navegador em desktop/mobile, sem novo overflow; aceite visual final cabe a Cassiano.
+
+- [x] Base, diff e imagem fornecida conferidos.
+- [x] Imagem copiada sem recompressão e Home apontada para ela. SHA-256 do original e da cópia: `F47BB4FEBB57F72BB801A1C038D99B281C2ED01459770777FAB49080618DDB6F`.
+- [x] QA local em Chrome: `output/playwright/home23-desktop-1440.png` e `output/playwright/home23-mobile-390.png` (artefatos locais ignorados); imagem 1672 × 941 carregada, sem overflow horizontal em 1440 px. `pnpm exec eslint src/components/studio-radio/studio-home-art.tsx`, `pnpm typecheck` e `pnpm build` passaram. O cartão ainda cobre parte da mão do robô no desktop com o CSS preexistente; nenhum ajuste de layout foi feito nesta troca.
+
+**Retomada:** conferir o enquadramento com Cassiano. Não há aprovação visual final nem CI deste diff local sem commit; 08V permanece `in_progress` no roadmap. Não reutilizar as capturas antigas de `fundo_site_aline.png` como evidência desta imagem.
+
+### Hierarquia do texto da Home solicitada em 24/10/2026
+
+**Responsável:** CM Frontend, na mesma `main@a0904684cbe27d0ffe85ec23fa6f749e0f395175`. **Objetivo:** reduzir “Seja muito bem vindo!” a uma saudação pequena e tornar “Conheça nossos produtos, trabalhos e serviços de impressão 3D.” o `h1` visível e acessível. **Limite:** manter os parágrafos seguintes, ações, arte e Rádio. **Aceite:** hierarquia legível em desktop/mobile, sem overflow ou texto cortado; lint, tipos, build e QA renderizado local. Aprovação estética final permanece com Cassiano.
+
+**Ajuste solicitado em 24/10:** aplicar o degradê ciano, azul e violeta apenas a “impressão 3D.” no título, sem alterar o tamanho, a arte ou o layout.
+
+**Ajuste seguinte:** na divisão meio a meio, estreitar e deslocar a caixa de texto para que não cubra o robô X1; reduzir a tipografia e o espaçamento dos CTAs nesse estado para manter os rótulos em uma linha, preservando a imagem.
+
+**QA desses ajustes:** build de produção isolado com `CM_VISUAL_LAB_QA=1` passou. Capturas renderizadas em Chrome: `output/playwright/home-gradient-split-1440.png`, `output/playwright/home-gradient-split-1440x800.png` e `output/playwright/home-gradient-mobile-390.png` (artefatos locais ignorados). Com Estúdio de cerca de 980 px, a caixa começa à direita da mão do X1, os dois CTAs ficam em uma linha e “impressão 3D.” mostra o degradê contínuo. O teste `home-hero-responsive.spec.ts` contra `http://127.0.0.1:3001` passou nos perfis `desktop-1440` e `mobile-390` (4/4). Esta é autorrevisão técnica e visual do agente, não aceite estético de Cassiano; sem commit, não há CI desta versão.
+
+- [x] Base e contrato `docs/EXPERIENCE.md` conferidos; alterações anteriores preservadas.
+- [x] JSX, CSS, contrato e expectativa do teste da Home atualizados. O teste de ownership do `StudioWelcome` também foi alinhado ao componente/CSS vigentes (`studioGreeting` e container de 52rem; as expectativas antigas de `shellStyles.srOnly` e 60rem já não correspondiam ao HEAD inicial).
+- [x] QA local e verificações técnicas registrados; diff revisado. Em Chrome, `output/playwright/home-hierarchy-desktop-1440.png` e `output/playwright/home-hierarchy-mobile-390.png` mostram a saudação pequena acima do novo título, sem overflow; o título mede cerca de 36px no split desktop e 29,65px no mobile, contra 14px da saudação. Capturas da suíte em modo de produção incluem Estúdio compacto e Rádio docked. `pnpm exec eslint` dos arquivos alterados, `pnpm typecheck`, o build isolado com `CM_VISUAL_LAB_QA=1` e os dois testes de ownership passaram.
+
+**Playwright:** o dev server local respondeu com HMR inválido e não calculou o range ARIA da divisória; por isso a verificação foi repetida contra o build de produção isolado em `http://127.0.0.1:3001`. Nesse modo, a rodada dos cinco perfis teve seis testes aprovados, três `skipped` previstos e um teste desktop falhou numa expectativa antiga de largura fixa (`<850px`) após quatro passos de 48px. Corrigida a expectativa para o passo real e a redução da área, os dois testes desktop 1440 passaram na repetição focal. `pnpm test` teve 152/153 aprovações; a falha em `radio-content-css-ownership.test.mjs` exige `trackShareButton` num componente da Rádio que não foi alterado nesta entrega. Não declarar a suíte unitária inteira verde.
+
+**Pendente:** revisão visual final de Cassiano, CI de commit e a falha unitária preexistente da Rádio. Não houve commit nem deploy. A subfrente 08V continua `in_progress` no roadmap.

@@ -154,8 +154,8 @@ jobs:
           copy_capture home-hero-responsive desktop-1440 home-x1-default.png desktop-1440.png
           copy_capture home-hero-responsive desktop-short home-x1-default.png desktop-short-1760x824.png
           copy_capture home-hero-responsive mobile-390 home-x1-default.png mobile-390.png
-          copy_capture home-hero-responsive desktop-1440 home-x1-radio-medium.png home-radio-medium-1440.png
-          copy_capture home-hero-responsive desktop-1440 home-x1-studio-compact.png home-studio-minimum-1440.png
+          copy_capture home-hero-responsive desktop-1440 home-x1-radio-expanded.png home-radio-expanded-1440.png
+          copy_capture home-hero-responsive desktop-1440 home-x1-split-restored.png home-radio-restored-1440.png
           copy_capture home-hero-responsive desktop-1440 home-x1-radio-docked.png home-radio-docked-1440.png
           copy_capture home-hero-responsive desktop-1440 home-normal-motion.png home-normal-motion-1440.png
           copy_capture home-hero-responsive mobile-390 home-normal-motion.png home-normal-motion-390.png

@@ -1,4 +1,4 @@
-/* Only the temporary 03c sidebar-to-navbar flight and restore-edge UI.
+/* Only the temporary 03c sidebar-to-navbar flight UI.
  * Parent dock state uses stable #top data attributes rather than shell CSS hashes.
  * The underlying RadioProvider, panel, navbar and WAAPI controller do not change.
  * Final optical centering of navbar mini remains a separate user visual gate. */
@@ -56,41 +56,4 @@
   font-size: clamp(0.5rem, 2.2cqh, 0.7rem);
   line-height: 1.12;
   text-overflow: ellipsis;
-}
-
-.radioDockEdge {
-  display: none;
-}
-
-@media (min-width: 73.75rem) {
-
-:global([id="top"])[data-radio-docked="true"] .radioDockEdge {
-    position: fixed;
-    display: block;
-    top: 0;
-    right: 0;
-    z-index: calc(var(--layer-nav) + 5);
-    width: var(--rail-width);
-    height: 100dvh;
-    padding: 0;
-    border: 0;
-    background: #03050a url("/images/cm-radio-divider.webp") center / auto 100% no-repeat;
-    opacity: 1;
-    filter: saturate(0.72) brightness(0.78);
-    touch-action: none;
-    cursor: ew-resize;
-    transition: filter 180ms ease;
-  }
-
-:global([id="top"])[data-radio-docked="true"] .radioDockEdge:hover,
-:global([id="top"])[data-radio-docked="true"] .radioDockEdge:focus-visible {
-    filter: saturate(1.2) brightness(1.1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-.radioDockEdge {
-    transition: none !important;
-  }
 }

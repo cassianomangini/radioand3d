@@ -1,5 +1,7 @@
 # 03c — Dock reversível da Rádio no cabeçalho
 
+**Revisão vigente de 24/10/2026:** por pedido de Cassiano, foram removidos o arraste da divisória, os tamanhos laterais alternativos e o arraste da borda em dock. Permanecem somente os botões de tela cheia, recolher na navbar, restaurar a lateral e voltar da tela cheia. Os itens anteriores sobre gestos são evidência histórica, não critérios ativos. Esta revisão ainda aguarda validação visual de Cassiano; build e QA renderizado não foram executados após ela, conforme pedido para validar primeiro sem interferir no `localhost:3000`.
+
 **Estado da entrega:** `in_progress` em **QA complementar e aprovação visual D5**. **I1–I6 concluídos funcionalmente no shell público** após autorização expressa de Cassiano, com 11 testes de browser verdes. A centralização óptica do player entre menu e sociais continua aberta e músicas R2 não foram homologadas; nenhuma aprovação final foi presumida.  
 **Responsável:** CM Experience (contrato); CM Frontend (implementação após aprovação); CM Review (QA/evidências).  
 **Solicitação:** Cassiano, 09/10/2026. Nova capacidade expressamente solicitada; **03b/06 e C1–C8 permanecem aceitas**, com modificação apenas do que esta função exigir.  
@@ -54,8 +56,8 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 
 | Origem | Ação | Destino | Invariante |
 | --- | --- | --- | --- |
-| `split/custom/focus` | Arrastar divisória à direita além do mínimo e soltar | `docked` | Música não para; Estúdio recupera espaço |
-| `split/custom/focus` | Arraste pequeno e soltar | `split/custom/focus` | Não recolhe involuntariamente |
+| `split/focus` | Arrastar divisória à direita além do tamanho inicial e soltar | `docked` | Música não para; Estúdio recupera espaço |
+| `split/focus` | Arraste parcial e soltar | `split/focus` | Não cria largura intermediária nem recolhe involuntariamente |
 | `docked` | Botão **Abrir Rádio lateral** | lateral anterior | Mesma faixa, tempo, fila e largura útil restaurada |
 | `docked` | Puxar borda direita para esquerda | lateral anterior | Mesmo retorno espacial, sem segunda instância |
 | `docked` | Link Rádio da navbar | `fullscreen` | Semântica atual do link preservada |
@@ -91,4 +93,13 @@ Em desktop, a Rádio **sai fisicamente da lateral direita, sobe e encaixa como p
 **Último ponto comprovado:** **I1–I6 completos na integração funcional**, não apenas em dev-only. [Run 38140803545](https://github.com/cassianomangini/radioand3d/actions/runs/38140803545) = 11 testes aplicáveis passaram, 29 skips por perfil, zero retry; inclusive cancelamento, interrupção em pleno voo e reprodução **WAV realmente avançando** durante dock/navegação, bandas reais e pausa. [CI 38140689340](https://github.com/cassianomangini/radioand3d/actions/runs/38140689340) global verde; [screenshots/vídeo da integração](https://github.com/cassianomangini/radioand3d/actions/runs/38140243922/artifacts/11703125315). [Relatório completo](evidence/03c-radio-dock-integrated-2026-10-11.md).  
 **Próxima atividade:** **Q3 complementar** (360/zoom, mídia ausente/erros/buffering e R2 real quando disponível) e **D5**: Cassiano revisar a **centralização exata do mini no espaço entre a nav e os botões sociais**, deferida explicitamente. **Q6** ainda não aprovado. Q2 funcional agora passou em 1180/1440/1760 e mudança 1180→390→1440.  
 **Deploy:** nenhum solicitado. **Código público na main:** sim, integração funcional sem mudança do catálogo/motor. **Prova musical:** somente fixture WAV sintética real de 8s; ainda não prova reprodução com o acervo R2. **Aprovação visual final:** não obtida.  
-**Não fazer:** não reabrir Rádio inteira, não instalar outro engine de animação por reflexo, não criar dois áudio players, não trocar o comportamento do link Rádio existente.
+**Não fazer:** não redesenhar a Rádio inteira sem pedido, não instalar outro engine de animação por reflexo, não criar dois áudio players, não trocar o comportamento do link Rádio existente.
+
+## Ajuste dos três estágios solicitado em 24/10/2026
+
+**Estado:** `in_progress`, `main@a0904684cbe27d0ffe85ec23fa6f749e0f395175`. **Responsável:** CM Frontend. **Contratos lidos:** `docs/PROJECT_PLAN.md`, `docs/RADIO.md`, `docs/EXPERIENCE.md` e `docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`. **Objetivo:** a lateral fixa apenas nos tamanhos inicial e expandido; X ou arraste à direita a levam ao mini-player da navbar. **Limites:** preservar tela cheia como ação separada, mini mobile, áudio único, rotas e trabalho local alheio. **Aceite técnico:** nenhum tamanho menor ou intermediário após soltar, teclas e ARIA coerentes, dock e restauração funcionando, QA renderizado em desktop/mobile, lint, tipos, testes pertinentes e build. Cassiano mantém o aceite visual final.
+
+- [x] Branch, HEAD, diff e contratos conferidos; código de `compact`/`custom` localizado.
+- [ ] Larguras estáveis e gestos/teclado ajustados; X e dock verificados em navegador.
+- [ ] QA renderizado e verificações técnicas finais registrados com resultados reais.
+- [ ] Revisão do diff e pendências documentadas antes de encerrar.

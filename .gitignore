@@ -33,3 +33,5 @@ next-env.d.ts
 /.playwright-cli/
 /.playwright-mcp/
 /output/
+/playwright-report/
+/test-results/

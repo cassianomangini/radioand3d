@@ -318,6 +318,16 @@
   overflow-wrap: normal;
 }
 
+.studioIdentity[data-studio-intro="home"] .studioGreeting {
+  margin: 0 0 clamp(0.75rem, 1.5cqi, 1.125rem);
+  color: #dbe5f4;
+  font-family: var(--font-outfit), var(--font-sans), sans-serif;
+  font-size: clamp(0.875rem, 1.35cqi, 1rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
 .studioHomePhrase {
   display: inline;
 }
@@ -325,6 +335,11 @@
 .studioIdentity[data-studio-intro="home"] .studioRevealAccent {
   color: #78d7f9;
   white-space: nowrap;
+}
+
+.studioIdentity[data-studio-intro="home"] h1 .studioRevealAccent {
+  display: inline-block;
+  animation: studio-letter-in 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @supports (-webkit-background-clip: text) or (background-clip: text) {
@@ -473,6 +488,28 @@
     }
 }
 
+@container studio (min-width: 56rem) and (max-width: 70rem) {
+
+.studioIdentity[data-studio-intro="home"] {
+      left: 51%;
+    }
+
+.studioIdentity[data-studio-intro="home"] h1 {
+      font-size: clamp(1.9rem, 3.35cqi, 2.2rem);
+    }
+
+.studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction {
+      gap: 0.3rem;
+      padding-inline: 0.65rem;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+.studioIdentity[data-studio-intro="home"] .studioRouteActions .primaryAction span:last-child {
+      font-size: 1.1rem;
+    }
+}
+
 @container studio (max-width: 51.999rem) {
 
 .studioIdentity[data-studio-intro="home"] {
@@ -549,6 +586,10 @@
   }
 
 .studioIdentity[data-studio-intro="home"] .studioRevealChar {
+    animation: none;
+  }
+
+.studioIdentity[data-studio-intro="home"] h1 .studioRevealAccent {
     animation: none;
   }
 }

@@ -27,8 +27,7 @@
   top: var(--header-height);
   z-index: 5;
   height: calc(100dvh - var(--header-height));
-  cursor: col-resize;
-  touch-action: none;
+  pointer-events: none;
   background: var(--surface-page);
   border-inline: 1px solid var(--border-subtle);
 }
@@ -867,47 +866,16 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     z-index: 15;
     background: #03050a url("/images/cm-radio-divider.webp") center / auto 100% no-repeat;
     border: 0;
-    cursor: ew-resize;
     filter: saturate(0.72) brightness(0.78);
     transition:
       right var(--motion-expand) var(--ease-standard),
-      filter var(--motion-fast) var(--ease-standard),
       box-shadow var(--motion-fast) var(--ease-standard);
   }
-
-  .resizeHandle[data-resize-hint="true"] {
-    filter: saturate(1.2) brightness(1.1);
-  }
-}
-
-.resizeHandle:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -3px;
 }
 
 @media (min-width: 73.75rem) {
   .desktopShell {
     transition: grid-template-columns var(--motion-expand) var(--ease-standard);
-  }
-
-  .desktopShell[data-radio-preview="true"] .radioPanel {
-    width: calc(var(--radio-width) + var(--radio-preview-width));
-    z-index: calc(var(--layer-nav) + 1);
-    box-shadow: -1rem 0 3rem rgb(37 129 255 / 24%);
-  }
-
-  .desktopShell[data-radio-preview="true"] .resizeHandle {
-    right: calc(var(--radio-width) + var(--radio-preview-width));
-    z-index: calc(var(--layer-nav) + 2);
-    box-shadow: -0.25rem 0 1.25rem rgb(37 129 255 / 32%);
-  }
-
-  .site[data-radio-expanded="true"]:not([data-radio-fullscreen="true"]) .radioPanel {
-    background:
-      radial-gradient(ellipse at 18% 10%, rgb(22 84 157 / 24%), transparent 34%),
-      radial-gradient(ellipse at 92% 88%, rgb(96 54 168 / 16%), transparent 32%),
-      #03050a;
-    box-shadow: -1rem 0 3rem rgb(17 92 180 / 18%);
   }
 
   .site[data-radio-fullscreen="true"] {
@@ -917,14 +885,14 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
 
   .site[data-radio-fullscreen="true"] .resizeHandle {
     display: block;
-    right: calc(100vw - var(--rail-width) - var(--radio-return-offset, 0px));
+    right: calc(100vw - var(--rail-width));
     z-index: calc(var(--layer-nav) + 4);
     box-shadow: -0.35rem 0 1.5rem rgb(37 129 255 / 24%);
   }
 
   .site[data-radio-fullscreen="true"] .radioPanel {
     top: var(--header-height);
-    width: calc(100vw - var(--rail-width) - var(--radio-return-offset, 0px));
+    width: calc(100vw - var(--rail-width));
     height: calc(100dvh - var(--header-height));
     z-index: calc(var(--layer-nav) - 1);
     background: radial-gradient(ellipse at 85% 0%, rgb(24 55 113 / 22%), transparent 50%), #03050a;
@@ -952,32 +920,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     transition:
       width var(--motion-expand) var(--ease-standard),
       transform var(--motion-expand) var(--ease-standard);
-  }
-
-  .site[data-radio-dragging="true"] .desktopShell,
-.site[data-radio-dragging="true"] .resizeHandle,
-.site[data-radio-dragging="true"] .radioPanel {
-    transition: none;
-  }
-
-  .site[data-radio-dragging="true"] .resizeHandle {
-    cursor: ew-resize;
-  }
-
-  .desktopShell[data-radio-magnet] .resizeHandle {
-    filter: saturate(0.96) brightness(0.98);
-    box-shadow: -0.1rem 0 0.7rem rgb(82 214 255 / 18%);
-  }
-
-  .site[data-radio-dragging="true"] .resizeHandle {
-    filter: saturate(1) brightness(1);
-  }
-
-  .site[data-radio-divider-settling="true"] .desktopShell,
-.site[data-radio-divider-settling="true"] .resizeHandle,
-.site[data-radio-divider-settling="true"] .radioPanel {
-    transition-duration: var(--motion-divider-settle);
-    transition-timing-function: var(--ease-divider-spring);
   }
 
   .site[data-radio-layout-motion] .desktopShell,
@@ -1017,9 +959,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     box-shadow: -1.5rem 0 4.5rem rgb(22 110 208 / 25%);
   }
 
-  .site[data-radio-layout-mode="focus"] .radioPanel {
-    border-left-color: rgb(82 214 255 / 26%);
-  }
 }
 
 @keyframes c1-cover-caption-enter {
@@ -1277,9 +1216,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
  */
 
 @media (min-width: 73.75rem) {
-  /* Match the prior rule for a full/focused/wider Radio, now that social icons
-     live inside the header-actions wrapper rather than as a header child. */
-
   .site[data-radio-docked="true"] [data-radio-navbar-mini="true"] {
     display: flex;
   }
@@ -1301,11 +1237,6 @@ dialog.mobileDialog[data-mobile-motion-endpoint="true"] {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-  }
-
-  .desktopShell[data-radio-dock-ready="true"] .resizeHandle {
-    filter: saturate(1.3) brightness(1.16);
-    box-shadow: -0.3rem 0 1.3rem rgb(82 214 255 / 34%);
   }
 
   .site[data-radio-dock-motion] .desktopShell {

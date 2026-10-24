@@ -1,5 +1,7 @@
 # CM Rádio — Dock superior na navbar (proposta V1)
 
+**Decisão vigente em 24/10/2026:** Cassiano retirou toda interação de arraste, redimensionamento e retorno pela borda. A Rádio desktop usa apenas os botões existentes: expandir para tela cheia, X para recolher na navbar, restaurar a lateral pelo botão do mini-player e voltar da tela cheia pelo botão da Rádio. A divisória é decorativa. As seções abaixo que descrevem drag, overshoot, `focus` ou largura intermediária documentam a proposta histórica e não orientam a implementação atual. A posição do mini na navbar e a continuidade do áudio permanecem válidas. QA renderizado e aceite visual desta revisão ainda pendentes.
+
 **Pedido funcional:** Cassiano, 09/10/2026. **Contexto:** nova evolução pontual da Rádio após a passagem aceita em 05/10, **não** reabertura automática de C1–C8.  
 **Comportamento solicitado:** ao empurrar/arrastar a Rádio lateral **para a direita**, ela deve **subir e se transformar em um player compacto dentro da navbar**, liberando o Estúdio. O usuário consegue **restaurar a Rádio lateral** por um botão na navegação ou arrastando novamente a partir da borda direita.  
 **Gate atual (11/10/2026):** Cassiano aprovou seguir **com a integração funcional** do dock, mas **não aprovou a centralização/espaçamento visual final** do mini entre menu e ícones sociais. `ready_for_frontend: yes` **somente para mecânica autorizada**; `visual_approved_by: null`, D5 pendente. `artifact_ref: docs/design/CM_RADIO_NAVBAR_DOCK_V1.md`.  
@@ -33,7 +35,7 @@ A revisão visual do agente detectou clipping de texto durante compressão/voo e
 
 ## 1. Princípio de interação
 
-O produto passa a ter um novo estado de apresentação da Rádio no desktop: **`docked`**. Ele é mutuamente exclusivo com `split`, `custom`, `focus` e `fullscreen`, sem interferir na reprodução.
+O produto passa a ter um novo estado de apresentação da Rádio no desktop: **`docked`**. Ele é mutuamente exclusivo com `split` (tamanho inicial), `focus` (expandido) e `fullscreen`, sem interferir na reprodução. A decisão de 24/10/2026 removeu o estado lateral `custom` e o encaixe lateral `compact`.
 
 A Rádio **não desaparece abruptamente**. Ela parece fisicamente ser recolhida da lateral direita, subir e encaixar-se **à esquerda e imediatamente antes dos botões de redes sociais no cabeçalho** (no mesmo agrupamento de ações à direita), onde só permanece um **player pequeno**. Enquanto isso, o Estúdio ganha a largura liberada. O conteúdo da Rádio e o motor de áudio não são reinicializados.
 
@@ -100,7 +102,7 @@ Cassiano esclareceu em 09/10/2026 que o mini player deve ficar **antes dos botõ
 
 ## 2. Gatilhos e reversão
 
-**Entrar no dock pelo gesto:** no desktop, o usuário arrasta a divisória **para a direita**. O resize normal continua funcionando até a largura mínima da Rádio; somente uma continuação clara do gesto **além** desse mínimo sinaliza o magnetismo do dock. Durante o arraste, a navbar antecipa discretamente o ponto de encaixe. Ao soltar depois de passar o limiar, a Rádio sobe e se recolhe. Um movimento pequeno ou cancelado volta ao estado lateral sem ativar o dock.
+**Entrar no dock pelo gesto:** no desktop, o usuário arrasta a divisória **para a direita**. A Rádio não fica menor que seu tamanho inicial; somente uma continuação clara do gesto **além** desse tamanho sinaliza o magnetismo do dock. Durante o arraste, a navbar antecipa discretamente o ponto de encaixe. Ao soltar depois de passar o limiar, a Rádio sobe e se recolhe. Um movimento pequeno ou cancelado volta ao tamanho lateral inicial sem ativar o dock. O X da Rádio também a recolhe diretamente na navbar.
 
 **Retornar por botão:** o player da navbar contém um controle nomeado **“Abrir Rádio lateral”** (rótulo acessível visível ou tooltip com foco); clicar nele executa a transformação inversa e restaura a largura lateral anterior. O item **Rádio** da navegação principal já abre a Rádio em tela inteira e **preserva essa função**: o botão do dock é distinto, para não criar ambiguidade. É aceitável explorar visualmente o controle junto ao player, mas não duplicar o logo nem cobrir o título da música.
 
@@ -125,7 +127,7 @@ O player inteiro não é um segundo motor de áudio nem cópia independente do p
 
 Direção: **deslocamento para cima + compressão horizontal e vertical + encaixe no header**. Percepção esperada: a mesma superfície física que ocupava a lateral encontra seu lugar na navbar. A capa/título têm continuidade visual; conteúdos de playlist/letra/visualizador reduzem sua presença durante a transição, sem teleporte de elementos nem zoom de toda a UI em escala ilegível.
 
-- Gatilho: drag para direita além do mínimo ou botão “Recolher Rádio” da interface lateral (se o mock confirmar). 
+- Gatilho: drag para direita além do tamanho inicial ou X da interface lateral.
 - Distância: da borda direita da Rádio até a zona de encaixe no canto direito do header, com resize do Estúdio coordenado.
 - Duração-base a testar: aproximadamente **550–700 ms** no snap, sem atraso arbitrário. Arraste imediato, com feedback de proximidade; interromper/reverter em qualquer ponto.
 - Interrupção: novo drag, clique de restaurar, rota Home↔Estúdio, resize do viewport ou abrir fullscreen devem terminar no **estado correto**, sem painéis fantasmas, timers órfãos ou dois transportes ativos.
@@ -137,8 +139,8 @@ Direção: **deslocamento para cima + compressão horizontal e vertical + encaix
 Inspecionado em 09/10/2026:
 
 - **Implementado após o estudo:** `radio-motion-spine.ts` já conhece `docked`, com prioridade de fullscreen e testes unitários; preservar essa decisão em futuras alterações.
-- `studio-radio-shell.tsx`: resize usa `clampRadioWidth`, `handlePointerDown`, `handlePointerMove`, `stopDragging`; o valor é calculado por `rect.right - event.clientX - dragOffsetRef.current`. O limite mínimo atual impede dock por simples resize. Detectar **overshoot para a direita antes do clamp** e aplicar gatilho/histerese independente do fullscreen, que usa overshoot na direção oposta.
-- `radio-panel-drag.ts`: snap points existentes são `compact, balanced, focus` (todos com sidebar). O dock é **estado terminal diferente de `compact`**: não transformar o snap `compact` em `docked` automaticamente.
+- `studio-radio-shell.tsx` e `use-radio-divider.ts`: o valor do gesto é calculado por `rect.right - event.clientX - dragOffsetRef.current`. Detectar **overshoot para a direita antes do clamp** sobre o tamanho inicial e aplicar gatilho independente do fullscreen, que usa overshoot na direção oposta. Ao soltar sem dock/fullscreen, fixar apenas no tamanho inicial ou expandido.
+- `radio-panel-drag.ts`: os encaixes laterais atuais são `balanced` (inicial) e `focus` (expandido). O dock é o terceiro estágio, com mini-player na navbar; `compact` e larguras customizadas não são mais destinos persistentes.
 - `studio-radio-shell.module.css`: o header desktop termina em `right: calc(var(--radio-width) + var(--rail-width))`, a Rádio é fixa à direita e o divisor permanece à esquerda dela. Em dock, o header precisa **ocupar todo o viewport** sem alterar a navegação global; o Estúdio ocupa a área liberada. O bloco direito atual contém `SocialIcons` e tem espaço limitado: será preciso compor um grupo **[dock player][SocialIcons]**, mantendo o menu principal geometricamente centrado. Atualmente o CSS oculta os ícones sociais em expansão/focus; **essa regra não pode esconder redes sociais em dock**. O antigo `resizeHandle` deixa de estar na fronteira do painel e vira uma zona de retorno na borda da tela.
 - `studio-radio-shell.tsx` `navigateStudioRoute`/`restoreInitialRadioLayout` restauram o split durante navegação: deve haver uma exceção deliberada para preservar `docked` ao visitar Home/Estúdio/Produtos. Não redefinir áudio nem forçar a sidebar a reaparecer a cada link.
 - `RadioContent` permanece montado ou isolado de modo que não perca dados/estado; com dock estável, conteúdo completo deve ficar **inert/fora da ordem de foco** e o custo de desenhar o visualizador oculto deve ser suspenso quando possível. **Não montar um segundo `<audio>`.**

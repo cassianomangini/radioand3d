@@ -106,8 +106,7 @@
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
-  :global([data-radio-layout-mode="split"]) .grid,
-  :global([data-radio-layout-mode="custom"]:not([data-radio-wider-than-default="true"])) .grid {
+  :global([data-radio-layout-mode="split"]) .grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

@@ -18,11 +18,7 @@ import styles from "./studio-radio-shell.module.css";
 import headerStyles from "./site-header.module.css";
 import sharedAudioStyles from "./radio-audio-controls.module.css";
 import {
-  getMinRadioWidth,
-  getMaxRadioWidth,
-  clampRadioWidth,
-  getDefaultWidth,
-  getExpandedWidth
+  getRouteDefaultRadioWidth
 } from "./radio-panel-layout";
 import { StudioWelcome } from "./studio-welcome";
 import { StudioHub } from "./studio-hub";
@@ -30,26 +26,18 @@ import { StudioHomeArt } from "./studio-home-art";
 import { Icon, RadioContent, previewTrack, type TrackStepKind } from "./radio-content";
 import type { DocumentWithViewTransition } from "./radio-view-transition";
 import { SiteHeader } from "./site-header";
-import { RadioDockFlight, RadioDockRestoreEdge } from "./radio-dock-flight";
+import { RadioDockFlight } from "./radio-dock-flight";
 import { RADIO_DOCK_FLIGHT_MS, startRadioDockWaapi } from "./radio-dock-flight-motion";
 import { collectRadioFlipSnapshot, animateRadioFlip } from "./radio-flip-motion";
 import { useMobileRadioDialog } from "./use-mobile-radio-dialog";
-import { useRadioDivider } from "./use-radio-divider";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
 import { useRadio } from "@/features/radio/radio-provider";
 import { resolveRadioKeyboardCommand } from "@/features/radio/radio-keyboard";
 import { moveDirectionalFocus, shouldKeepNativeArrow } from "./directional-focus";
-import {
-  resolveRadioLayoutMode,
-  type RadioLayoutMode
-} from "./radio-motion-spine";
+import type { RadioLayoutMode } from "./radio-motion-spine";
 
 
 type StudioRouteMotion = "entering" | "exiting" | null;
-
-function getRouteDefaultRadioWidth(width: number, route: "home" | "detail") {
-  return route === "detail" ? getMinRadioWidth(width) : getDefaultWidth(width);
-}
 
 type TrackStepMotionState = {
   kind: TrackStepKind;
@@ -87,16 +75,11 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   const dockMotionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dockMotionTokenRef = useRef(0);
   const dockedRef = useRef(false);
-  const dockRestoreWidthRef = useRef(0);
-  const dockRestoreModeRef = useRef<RadioLayoutMode>("split");
+  const initialRadioLayoutModeRef = useRef<RadioLayoutMode>("split");
   const motionResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeRadioAnimationsRef = useRef<Animation[]>([]);
   const radioMotionTokenRef = useRef(0);
-  const signatureStageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [radioWidth, setRadioWidth] = useState<number | null>(null);
-  const [shellWidth, setShellWidth] = useState<number | null>(null);
-  const [desktopLayout, setDesktopLayout] = useState(false);
-  const [radioExpanded, setRadioExpanded] = useState(false);
   const [radioFullscreen, setRadioFullscreen] = useState(false);
   const [radioDocked, setRadioDocked] = useState(false);
   const [radioDockMotion, setRadioDockMotion] = useState<"docking" | "restoring" | null>(null);
@@ -122,29 +105,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     [radioWidth]
   );
 
-  const radioLayoutMode = useMemo(
-    () =>
-      resolveRadioLayoutMode({
-        fullscreen: radioFullscreen,
-        docked: radioDocked,
-        expanded: radioExpanded,
-        width: radioWidth,
-        defaultWidth: shellWidth === null ? null : getRouteDefaultRadioWidth(shellWidth, studioRoute)
-      }),
-    [radioDocked, radioExpanded, radioFullscreen, radioWidth, shellWidth, studioRoute]
-  );
-
-  const {
-    resizeHandleRef, customWidthRef, initialRadioWidthRef, initialRadioLayoutModeRef,
-    dragFullscreenRef, openedFromDragRef, showResizeHint, setShowResizeHint,
-    dragging, dividerSettling, clearDragPreview, clearReturnPreview,
-    handlePointerDown, handlePointerMove, stopDragging, handleResizeKeyDown
-  } = useRadioDivider({
-    shellRef, radioWidth, radioExpanded, radioFullscreen, radioLayoutMode,
-    setRadioWidth, setRadioExpanded,
-    runRadioMotion, cancelRadioMotionForDirectManipulation,
-    openRadioFullscreen, closeRadioFullscreen, runRadioDockTransition
-  });
+  const radioLayoutMode: RadioLayoutMode = radioFullscreen ? "fullscreen" : radioDocked ? "docked" : "split";
 
   useEffect(() => {
     router.prefetch("/");
@@ -203,7 +164,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         setRadioDocked(false);
         setRadioDockMotion(null);
         setRadioFullscreen(false);
-        setRadioExpanded(false);
       }
     }
     media.addEventListener("change", leaveDesktop);
@@ -213,7 +173,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   useEffect(() => () => {
     radioMotionTokenRef.current += 1;
     if (motionResetTimerRef.current !== null) clearTimeout(motionResetTimerRef.current);
-    if (signatureStageTimerRef.current !== null) clearTimeout(signatureStageTimerRef.current);
     for (const animation of activeRadioAnimationsRef.current) animation.cancel();
     activeRadioAnimationsRef.current = [];
     cancelDockFlight();
@@ -227,22 +186,16 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
 
     const observer = new ResizeObserver(() => {
       const width = shell.getBoundingClientRect().width;
-      setShellWidth(width);
-      setDesktopLayout(window.matchMedia("(min-width: 73.75rem)").matches);
       setRadioWidth((current) =>
         dockedRef.current
           ? current
-          : radioExpanded
-          ? getExpandedWidth(width)
-          : customWidthRef.current
-            ? clampRadioWidth(width, current ?? getRouteDefaultRadioWidth(width, studioRoute))
-            : getRouteDefaultRadioWidth(width, studioRoute)
+          : getRouteDefaultRadioWidth(width, studioRoute)
       );
     });
 
     observer.observe(shell);
     return () => observer.disconnect();
-  }, [radioExpanded, customWidthRef, studioRoute]);
+  }, [studioRoute]);
 
   function runTrackStepMotion(kind: TrackStepKind, action: () => void) {
     if (mobileMotionActiveRef.current) {
@@ -350,27 +303,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     return () => window.removeEventListener("keydown", handleDirectionalFocus);
   }, []);
 
-  function clearSignatureStageTimer() {
-    if (signatureStageTimerRef.current !== null) {
-      clearTimeout(signatureStageTimerRef.current);
-      signatureStageTimerRef.current = null;
-    }
-  }
-
-  function cancelRadioMotionForDirectManipulation() {
-    radioMotionTokenRef.current += 1;
-    clearSignatureStageTimer();
-    if (motionResetTimerRef.current !== null) {
-      clearTimeout(motionResetTimerRef.current);
-      motionResetTimerRef.current = null;
-    }
-    for (const animation of activeRadioAnimationsRef.current) {
-      animation.cancel();
-    }
-    activeRadioAnimationsRef.current = [];
-    setLayoutMotionDirection(null);
-  }
-
   function runRadioMotion(direction: "opening" | "closing", update: () => void) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const token = ++radioMotionTokenRef.current;
@@ -447,7 +379,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
    * artwork surface to its target while the real Studio and header reflow.
    * React never remounts the player provider or fabricates audio.
    */
-  function runRadioDockTransition(nextDocked: boolean, restoreWidth?: number, restoreMode?: RadioLayoutMode, fromFullscreen = false) {
+  function runRadioDockTransition(nextDocked: boolean, fromFullscreen = false) {
     const shell = shellRef.current;
     const mini = dockMiniRef.current;
     const flight = dockFlightRef.current;
@@ -465,13 +397,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       ? flight.getBoundingClientRect()
       : (nextDocked ? panel : mini).getBoundingClientRect();
 
-    if (nextDocked && !dockedRef.current) {
-      dockRestoreWidthRef.current = restoreWidth ?? radioWidth ?? getDefaultWidth(shell.getBoundingClientRect().width);
-      dockRestoreModeRef.current = restoreMode && restoreMode !== "docked" && restoreMode !== "fullscreen"
-        ? restoreMode
-        : radioLayoutMode === "docked" || radioLayoutMode === "fullscreen" ? "split" : radioLayoutMode;
-    }
-
     cancelDockFlight();
     const token = dockMotionTokenRef.current;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -482,18 +407,14 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       setRadioDockMotion(reduce ? null : nextDocked ? "docking" : "restoring");
       if (nextDocked) {
         setRadioFullscreen(false);
-        setRadioExpanded(false);
-        setShowResizeHint(false);
       } else {
-        const width = clampRadioWidth(shell.getBoundingClientRect().width, dockRestoreWidthRef.current);
-        customWidthRef.current = dockRestoreModeRef.current === "custom";
-        setRadioWidth(width);
-        setRadioExpanded(dockRestoreModeRef.current === "focus");
+        const shellWidth = shell.getBoundingClientRect().width;
+        setRadioWidth(getRouteDefaultRadioWidth(shellWidth, studioRoute));
       }
     });
 
     if (reduce) {
-      if (!nextDocked) requestAnimationFrame(() => resizeHandleRef.current?.focus());
+      if (!nextDocked) requestAnimationFrame(() => radioNavRef.current?.focus());
       return;
     }
 
@@ -510,7 +431,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       flight.style.display = "none";
       flight.style.visibility = "hidden";
       setRadioDockMotion(null);
-      if (!nextDocked) requestAnimationFrame(() => resizeHandleRef.current?.focus());
+      if (!nextDocked) requestAnimationFrame(() => radioNavRef.current?.focus());
     };
 
     // Two frames allow a CSS grid transition to establish the destination
@@ -539,78 +460,26 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     });
   }
 
-  function openRadioFullscreen(fromDrag: boolean) {
-    if (!fromDrag && (radioFullscreen || signatureStageTimerRef.current !== null)) {
-      return;
-    }
-
-    const shell = shellRef.current;
-    const shellWidth = shell?.getBoundingClientRect().width;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function openRadioFullscreen() {
+    if (radioFullscreen) return;
     const wasDocked = dockedRef.current;
 
-    clearSignatureStageTimer();
     if (wasDocked) {
       cancelDockFlight();
       dockedRef.current = false;
     }
 
-    if (!fromDrag) {
-      initialRadioWidthRef.current = wasDocked
-        ? dockRestoreWidthRef.current
-        : radioWidth ?? getDefaultWidth(shellWidth ?? window.innerWidth);
-      initialRadioLayoutModeRef.current = wasDocked ? "docked" : radioLayoutMode;
-    }
-
-    openedFromDragRef.current = fromDrag;
-    dragFullscreenRef.current = true;
-
-    const enterFullscreen = () => {
-      signatureStageTimerRef.current = null;
-      runRadioMotion("opening", () => {
-        clearDragPreview();
-        setShowResizeHint(false);
-        setRadioDocked(false);
-        setRadioDockMotion(null);
-        setRadioFullscreen(true);
-      });
-    };
-
-    if (
-      !reduce &&
-      !fromDrag &&
-      !radioExpanded &&
-      !radioFullscreen &&
-      !wasDocked &&
-      shellWidth
-    ) {
-      customWidthRef.current = false;
-      runRadioMotion("opening", () => {
-        setRadioWidth(getExpandedWidth(shellWidth));
-        setRadioExpanded(true);
-        setShowResizeHint(false);
-      });
-
-      signatureStageTimerRef.current = setTimeout(enterFullscreen, 190);
-      return;
-    }
-
-    enterFullscreen();
-  }
-
-  function restoreMediumFromPocket() {
-    const shell = shellRef.current;
-    if (!shell || !dockedRef.current) return;
-    dockRestoreWidthRef.current = getDefaultWidth(shell.getBoundingClientRect().width);
-    dockRestoreModeRef.current = "split";
-    runRadioDockTransition(false);
+    initialRadioLayoutModeRef.current = wasDocked ? "docked" : "split";
+    runRadioMotion("opening", () => {
+      setRadioDocked(false);
+      setRadioDockMotion(null);
+      setRadioFullscreen(true);
+    });
   }
 
   function dockRadio() {
     if (radioFullscreen) {
-      const shell = shellRef.current;
-      const width = getDefaultWidth(shell?.getBoundingClientRect().width ?? window.innerWidth);
-      runRadioDockTransition(true, width, "split", true);
+      runRadioDockTransition(true, true);
       return;
     }
     runRadioDockTransition(true);
@@ -619,45 +488,31 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
   function showMediumRadio() {
     const shell = shellRef.current;
     if (!shell) return;
-    clearSignatureStageTimer();
-    const width = getDefaultWidth(shell.getBoundingClientRect().width);
+    const width = getRouteDefaultRadioWidth(shell.getBoundingClientRect().width, studioRoute);
     runRadioMotion("closing", () => {
-      clearDragPreview();
-      clearReturnPreview();
-      dragFullscreenRef.current = false;
-      openedFromDragRef.current = false;
-      customWidthRef.current = false;
       dockedRef.current = false;
-      initialRadioWidthRef.current = width;
       initialRadioLayoutModeRef.current = "split";
       setRadioWidth(width);
       setRadioDocked(false);
       setRadioDockMotion(null);
-      setRadioExpanded(false);
       setRadioFullscreen(false);
     });
   }
 
   function closeRadioFullscreen(restoreFocus = true) {
-    clearSignatureStageTimer();
     const returnMode = initialRadioLayoutModeRef.current;
     runRadioMotion("closing", () => {
-      clearDragPreview();
-      dragFullscreenRef.current = false;
-      customWidthRef.current = returnMode === "custom" || (returnMode === "docked" && dockRestoreModeRef.current === "custom");
       dockedRef.current = returnMode === "docked";
-      setRadioWidth(initialRadioWidthRef.current);
+      setRadioWidth(getRouteDefaultRadioWidth(shellRef.current?.getBoundingClientRect().width ?? window.innerWidth, studioRoute));
       setRadioDocked(returnMode === "docked");
       setRadioDockMotion(null);
-      setRadioExpanded(returnMode === "focus");
       setRadioFullscreen(false);
-      clearReturnPreview();
     });
     if (restoreFocus) {
       requestAnimationFrame(() => {
         (returnMode === "docked"
           ? dockMiniRef.current?.querySelector<HTMLButtonElement>('[data-dock-restore="true"]')
-          : openedFromDragRef.current ? resizeHandleRef.current : radioNavRef.current)?.focus();
+          : radioNavRef.current)?.focus();
       });
     }
   }
@@ -669,29 +524,19 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
       closeRadioFullscreen(false);
       return;
     }
-    clearSignatureStageTimer();
     const shellWidth = shellRef.current?.getBoundingClientRect().width;
     const initialWidth = getRouteDefaultRadioWidth(shellWidth ?? window.innerWidth, studioRoute);
 
     if (
       !radioFullscreen &&
-      !radioExpanded &&
-      !customWidthRef.current &&
       (radioWidth === null || radioWidth === initialWidth)
     ) {
       return;
     }
 
     runRadioMotion("closing", () => {
-      clearDragPreview();
-      clearReturnPreview();
-      dragFullscreenRef.current = false;
-      openedFromDragRef.current = false;
-      customWidthRef.current = false;
-      initialRadioWidthRef.current = initialWidth;
       initialRadioLayoutModeRef.current = "split";
       setRadioWidth(initialWidth);
-      setRadioExpanded(false);
       setRadioFullscreen(false);
     });
   }
@@ -748,14 +593,8 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
     navigateStudioRoute(href);
   }
 
-  const radioAtMaximumWidth =
-    desktopLayout &&
-    shellWidth !== null &&
-    radioWidth !== null &&
-    radioWidth >= clampRadioWidth(shellWidth, Number.POSITIVE_INFINITY) - 1;
-
   const activeNav =
-    radioFullscreen || radioExpanded || mobileRadioOpen || radioAtMaximumWidth
+    radioFullscreen || mobileRadioOpen
       ? "radio"
       : pathname === "/studio/orcamento"
         ? "quote"
@@ -775,7 +614,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             : "";
 
   return (
-    <div id="top" className={styles.site} style={shellStyle} data-radio-layout-mode={radioLayoutMode} data-radio-docked={radioDocked ? "true" : undefined} data-radio-dock-motion={radioDockMotion ?? undefined} data-radio-expanded={radioExpanded ? "true" : undefined} data-radio-wider-than-default={shellWidth !== null && radioWidth !== null && radioWidth > getDefaultWidth(shellWidth) ? "true" : undefined} data-radio-dragging={dragging ? "true" : undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined} data-radio-divider-settling={dividerSettling ? "true" : undefined}>
+    <div id="top" className={styles.site} style={shellStyle} data-radio-layout-mode={radioLayoutMode} data-radio-docked={radioDocked ? "true" : undefined} data-radio-dock-motion={radioDockMotion ?? undefined} data-radio-fullscreen={radioFullscreen ? "true" : undefined} data-radio-layout-motion={layoutMotionDirection ?? undefined}>
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
         {playbackStatusMessage}
       </span>
@@ -788,7 +627,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         radioFullscreen={radioFullscreen}
         onNavigate={handleStudioRouteLink}
         onPrefetchStudio={() => router.prefetch("/studio")}
-        onOpenRadioFullscreen={() => openRadioFullscreen(false)}
+        onOpenRadioFullscreen={openRadioFullscreen}
         onOpenMobileRadio={openMobileRadio}
         onRestoreDock={() => runRadioDockTransition(false)}
       />
@@ -887,7 +726,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         className={styles.desktopShell}
         role="region"
         aria-label="Estúdio e Rádio"
-        data-dragging={dragging ? "true" : undefined}
       >
         <main
           id="studio"
@@ -927,29 +765,10 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
           ) : null}
         </main>
 
-        <div
-          ref={resizeHandleRef}
-          className={styles.resizeHandle}
-          data-resize-hint={showResizeHint && !radioFullscreen ? "true" : undefined}
-          role={radioFullscreen ? "button" : "separator"}
-          aria-label={radioFullscreen ? "Restaurar o Estúdio" : "Arraste para redimensionar CM Rádio"}
-          aria-orientation={radioFullscreen ? undefined : "vertical"}
-          aria-valuemin={radioFullscreen || shellWidth === null ? undefined : getMinRadioWidth(shellWidth)}
-          aria-valuemax={radioFullscreen || shellWidth === null ? undefined : Math.round(getMaxRadioWidth(shellWidth))}
-          aria-valuenow={radioFullscreen || shellWidth === null ? undefined : Math.round(clampRadioWidth(shellWidth, radioWidth ?? getDefaultWidth(shellWidth)))}
-          aria-controls={radioFullscreen ? undefined : "radio"}
-          tabIndex={0}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={stopDragging}
-          onPointerCancel={stopDragging}
-          onKeyDown={handleResizeKeyDown}
-          title={radioFullscreen ? "Arraste para a direita para mostrar o Estúdio" : "Arraste para ajustar livremente a largura da CM Rádio"}
-        />
+        <div className={styles.resizeHandle} aria-hidden="true" />
 
         <aside id="radio" className={styles.radioPanel} data-radio-flip-root="true" aria-label="CM Rádio" inert={radioDocked} aria-hidden={radioDocked}>
           <RadioContent
-            focus={radioExpanded && !radioFullscreen}
             visualizerActive={!radioDocked}
             expanded={radioFullscreen}
             trackStepKind={trackStepMotion?.kind}
@@ -957,7 +776,7 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
             onNext={nextTrack}
             onReshuffle={radio.reshuffle}
             onDock={dockRadio}
-            onExpand={() => openRadioFullscreen(false)}
+            onExpand={openRadioFullscreen}
             onMedium={showMediumRadio}
           />
         </aside>
@@ -969,8 +788,6 @@ export function StudioRadioShell({ children }: { children?: ReactNode }) {
         title={radio.currentTrack?.title ?? "CM Rádio"}
         artist={radio.currentTrack?.artist ?? "Aguardando catálogo"}
       />
-
-      {radioDocked ? <RadioDockRestoreEdge onRestore={restoreMediumFromPocket} /> : null}
 
       <dialog
         ref={mobileDialogRef}

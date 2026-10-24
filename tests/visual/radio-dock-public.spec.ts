@@ -179,6 +179,39 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     await expect(page.locator('aside[aria-label="CM Rádio"]')).toBeVisible();
   });
 
+  test("sidebar settles only at opening or expanded size and its close button docks", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Three-stage sidebar interaction on representative desktop");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const root = page.locator("#top");
+    const divider = page.getByRole("separator", { name: "Arraste para redimensionar CM Rádio" });
+    await expect(divider).toHaveAttribute("aria-valuemax", /[0-9]+/);
+    const opening = Number(await divider.getAttribute("aria-valuemin"));
+    const expanded = Number(await divider.getAttribute("aria-valuemax"));
+    expect(expanded).toBeGreaterThan(opening);
+
+    const box = await divider.boundingBox();
+    expect(box).not.toBeNull();
+    const x = box!.x + box!.width / 2;
+    const y = box!.y + Math.min(box!.height / 3, 180);
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x - 120, y, { steps: 12 });
+    await page.mouse.up();
+    await expect.poll(async () => {
+      const width = Number(await divider.getAttribute("aria-valuenow"));
+      return width === opening || width === expanded;
+    }).toBe(true);
+
+    await divider.focus();
+    await divider.press("ArrowLeft");
+    await expect(divider).toHaveAttribute("aria-valuenow", String(expanded));
+    await page.getByRole("button", { name: "Minimizar a Rádio para a barra superior" }).click();
+    await expect(root).toHaveAttribute("data-radio-layout-mode", "docked");
+    await page.getByRole("button", { name: "Restaurar a Rádio lateral" }).click();
+    await expect(divider).toHaveAttribute("aria-valuenow", String(opening));
+  });
+
   test("real development audio continues through dock and Studio route, and spectrum is truthful", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop-1440", "Playback continuity on representative desktop");
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -238,6 +271,8 @@ test.describe("03c — integrated public Radio dock (development fixture)", () =
     const minimum = await divider.getAttribute("aria-valuenow");
     await divider.press("ArrowLeft");
     await expect.poll(() => divider.getAttribute("aria-valuenow")).not.toBe(minimum);
+    await divider.press("ArrowRight");
+    await expect(divider).toHaveAttribute("aria-valuenow", minimum!);
     const before = await divider.getAttribute("aria-valuenow");
     const box = await divider.boundingBox();
     expect(box).not.toBeNull();

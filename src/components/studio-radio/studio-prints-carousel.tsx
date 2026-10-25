@@ -69,6 +69,7 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
   const currentIndex = total > 0 ? (selectedIndex ?? index) % total : 0;
   const current = media[currentIndex] ?? null;
   const canNavigate = total > 1;
+  const next = canNavigate ? media[(currentIndex + 1) % total] : null;
   const slideDuration = current?.kind === "video" ? VIDEO_DURATION_SECONDS : PHOTO_DURATION_SECONDS;
 
   const advancing = active && canNavigate && playing && documentVisible &&
@@ -194,7 +195,8 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
                 alt=""
                 fill
                 sizes="(max-width: 1179px) 100vw, 65vw"
-                priority={active && currentIndex === 0}
+                loading={active ? "eager" : "lazy"}
+                fetchPriority={active && currentIndex === 0 ? "high" : "auto"}
               />
             ) : (
               <video
@@ -214,6 +216,18 @@ export function StudioPrintsCarousel({ active, media = studioPrintMedia, selecte
               </video>
             )}
           </div>
+        ) : null}
+        {active && inViewport && documentVisible && next?.kind === "image" ? (
+          <Image
+            key={next.src}
+            src={next.src}
+            alt=""
+            fill
+            sizes="(max-width: 1179px) 100vw, 65vw"
+            loading="eager"
+            fetchPriority="low"
+            style={{ visibility: "hidden" }}
+          />
         ) : null}
         {!current ? (
           <span className={styles.emptyMediaLabel}>FOTO REAL PENDENTE · PEÇA PRODUZIDA</span>

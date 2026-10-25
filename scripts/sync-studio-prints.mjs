@@ -1,137 +1,95 @@
 /**
- * Imports Cassiano's approved local portfolio media into public web assets.
- *
- * Source (gitignored): output/Fotos Impressoes
- * Run: pnpm studio:media
- * Optional source: node scripts/sync-studio-prints.mjs "/path/to/photos"
- *
- * Each immediate subfolder becomes a project. Loose files are individual entries.
- * The importer does not invent dimensions, materials, descriptions, or product names.
+ * Refresh the Studio carousel manifest from the images in the R2 carrossel bucket.
+ * The manifest contains object names only; the image bytes stay in R2.
  */
-import { copyFile, mkdir, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
+import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repository = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const source = path.resolve(repository, process.argv[2] ?? "output/Fotos Impressoes");
-const destination = path.join(repository, "public", "images", "studio", "impressoes");
+if (existsSync(path.join(repository, ".env.local"))) {
+  process.loadEnvFile(path.join(repository, ".env.local"));
+}
+
+const endpoint = process.env.R2_S3_ENDPOINT;
+const accessKeyId = process.env.R2_ACCESS_KEY_ID;
+const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+if (!endpoint || !accessKeyId || !secretAccessKey) {
+  throw new Error("R2_S3_ENDPOINT and read-only R2 credentials are required.");
+}
+
+const bucket = "carrossel";
 const manifestPath = path.join(repository, "src", "features", "studio", "prints-media.json");
 const imageTypes = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
-const videoTypes = new Set([".mp4", ".webm"]);
-const allowedTypes = new Set([...imageTypes, ...videoTypes]);
-const MAX_MEDIA_FILES = 80;
-const MAX_FILE_BYTES = 120 * 1024 * 1024;
-const MAX_TOTAL_BYTES = 650 * 1024 * 1024;
+// Exact content hashes of the thirteen photos previously shipped with the local carousel.
+// Ten of them also exist in R2 and must not reappear after the local copies are removed.
+const legacyCarouselHashes = new Set([
+  "f381f13d2e254bc97e25e716a3fb4bd8",
+  "f1db58d9838aee646c3f497da9e08ae2",
+  "bdc64085d32d1c9ba7b225e4639798e1",
+  "b15173ea30e264ae2c43c210566bb915",
+  "53df3925fb9906ab95ca282f0cd29517",
+  "c4ac5acd86982f8acc0bcb3cd35522cf",
+  "aeb3f17ba400cf76cb182d0d1d0042f6",
+  "b6cb18b91f43a7a73f1ca06ead000ae7",
+  "623cb7f40017e97dac3acd81d8d7aa0a",
+  "03c732c523738c84cf88df93e0825843",
+  "9d4eb97c1d78f246a449714d9c4422d1",
+  "00d8dac4e76eb91e6b147435ba9cc67d",
+  "349f2e8d72b1fe1400205752d4282139"
+]);
+const client = new S3Client({
+  region: "auto",
+  endpoint,
+  forcePathStyle: true,
+  credentials: { accessKeyId, secretAccessKey }
+});
 
-function readableName(input) {
-  return input
-    .replace(/\.[^.]+$/, "")
-    .replace(/[_-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slug(input) {
-  return input
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "") || "peca";
-}
-
-async function collectFiles(directory, parentName = null) {
-  const entries = (await readdir(directory, { withFileTypes: true }))
-    .filter((entry) => !entry.name.startsWith("."))
-    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR", { numeric: true }));
-
-  const result = [];
-  for (const entry of entries) {
-    const fullPath = path.join(directory, entry.name);
-    if (entry.isDirectory() && parentName === null) {
-      result.push(...await collectFiles(fullPath, entry.name));
-      continue;
-    }
-    if (!entry.isFile()) continue;
-    const extension = path.extname(entry.name).toLowerCase();
-    if (allowedTypes.has(extension)) {
-      result.push({ fullPath, fileName: entry.name, extension, parentName });
-    }
-  }
-  return result;
-}
-
-let candidates;
 try {
-  candidates = await collectFiles(source);
-} catch (error) {
-  if (error?.code === "ENOENT") {
-    console.error(`Pasta de origem não encontrada: ${source}`);
-    console.error("Copie suas fotos para output/Fotos Impressoes e execute pnpm studio:media.");
-    process.exitCode = 1;
-  } else {
-    throw error;
-  }
-}
-
-if (candidates) {
-  if (candidates.length === 0) {
-    console.error(`Nenhuma foto ou vídeo compatível foi encontrado em ${source}`);
-    process.exitCode = 1;
-  } else if (candidates.length > MAX_MEDIA_FILES) {
-    console.error(`Limite de ${MAX_MEDIA_FILES} arquivos por importação excedido: ${candidates.length}.`);
-    process.exitCode = 1;
-  } else {
-    const entries = [];
-    const usedNames = new Map();
-    let totalBytes = 0;
-    for (const candidate of candidates) {
-      const size = (await stat(candidate.fullPath)).size;
-      totalBytes += size;
-      if (size > MAX_FILE_BYTES || totalBytes > MAX_TOTAL_BYTES) {
-        throw new Error("Mídia acima do limite de segurança. Reduza o tamanho antes da importação.");
-      }
-      const project = slug(candidate.parentName ?? readableName(candidate.fileName));
-      const title = readableName(candidate.parentName ?? candidate.fileName) || "Impressão";
-      const basename = slug(readableName(candidate.fileName));
-      const candidateKey = `${project}/${basename}`;
-      const sequence = (usedNames.get(candidateKey) ?? 0) + 1;
-      usedNames.set(candidateKey, sequence);
-      const file = `${basename}${sequence > 1 ? `-${sequence}` : ""}${candidate.extension}`;
-      const relative = path.posix.join(project, file);
-      const kind = videoTypes.has(candidate.extension) ? "video" : "image";
-      entries.push({
-        ...candidate,
-        project,
-        id: `${project}-${basename}${sequence > 1 ? `-${sequence}` : ""}`,
-        kind,
-        src: `/images/studio/impressoes/${relative}`,
-        title,
-        alt: `${kind === "video" ? "Vídeo" : "Foto"} de ${title}`,
-        relative
-      });
-    }
-
-    const tempDestination = `${destination}.tmp-${process.pid}`;
-    await rm(tempDestination, { force: true, recursive: true });
-    try {
-      for (const entry of entries) {
-        const target = path.join(tempDestination, entry.relative);
-        await mkdir(path.dirname(target), { recursive: true });
-        await copyFile(entry.fullPath, target);
-      }
-      await rm(destination, { force: true, recursive: true });
-      await mkdir(path.dirname(destination), { recursive: true });
-      await rename(tempDestination, destination);
-    } finally {
-      await rm(tempDestination, { force: true, recursive: true });
-    }
-
-    const items = entries.map(({ id, project, kind, src, title, alt }) => ({
-      id, project, kind, src, title, alt
+  const objects = [];
+  let continuationToken;
+  do {
+    const page = await client.send(new ListObjectsV2Command({
+      Bucket: bucket,
+      ContinuationToken: continuationToken,
+      MaxKeys: 1000
     }));
-    await writeFile(manifestPath, JSON.stringify({ items }, null, 2) + "\n");
-    console.warn(`Importados ${items.length} arquivos de ${source}.`);
-    console.warn("Confira a apresentação antes de publicar: títulos e enquadramentos vêm dos nomes dos arquivos.");
-  }
+    objects.push(...(page.Contents ?? []));
+    continuationToken = page.NextContinuationToken;
+  } while (continuationToken);
+
+  const browserImages = objects
+    .filter((object) => object.Key && object.Size && imageTypes.has(path.extname(object.Key).toLowerCase()));
+  const images = browserImages
+    .filter((object) => !legacyCarouselHashes.has((object.ETag ?? "").replaceAll('"', "").toLowerCase()))
+    .sort((a, b) => a.Key.localeCompare(b.Key, "pt-BR", { numeric: true }));
+
+  const items = images.map((object) => {
+    const key = object.Key;
+    const version = object.ETag?.replaceAll('"', "") ?? String(object.LastModified?.getTime() ?? 0);
+    const id = createHash("sha256").update(key).update("\0").update(version).digest("hex").slice(0, 20);
+    const title = path.basename(key, path.extname(key)).replace(/[_-]+/g, " ").trim();
+    return {
+      id,
+      project: id,
+      kind: "image",
+      src: `/api/studio/prints/${id}`,
+      r2Key: key,
+      title,
+      alt: `Imagem do Estúdio: ${title}`
+    };
+  });
+
+  if (items.length === 0) throw new Error("No browser-compatible images found in R2 carrossel.");
+  await writeFile(manifestPath, JSON.stringify({ items }, null, 2) + "\n");
+  console.log(`Studio carousel: ${items.length} images from R2 carrossel.`);
+  const legacyCount = browserImages.length - images.length;
+  if (legacyCount) console.log(`${legacyCount} former local-carousel photos excluded.`);
+  const unsupportedCount = objects.length - browserImages.length;
+  if (unsupportedCount) console.log(`${unsupportedCount} unsupported objects skipped (including HEIC).`);
+} finally {
+  client.destroy();
 }

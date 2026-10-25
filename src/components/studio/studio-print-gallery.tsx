@@ -78,7 +78,7 @@ export function StudioPrintGallery() {
                   project: index,
                   media: Math.max(0, project.media.findIndex((entry) => entry.id === cover.id))
                 })}
-                aria-label={`Ver projeto ${project.title}, ${project.media.length} ${project.media.length === 1 ? "arquivo" : "arquivos"}`}
+                aria-label={`Ampliar ${project.title}`}
               >
                 <span className={styles.tileMedia}>
                   {cover.kind === "image" ? (
@@ -86,7 +86,7 @@ export function StudioPrintGallery() {
                       src={cover.src}
                       alt={cover.alt}
                       fill
-                      sizes="(max-width: 650px) 100vw, (max-width: 1180px) 48vw, 28vw"
+                      sizes="(max-width: 420px) 30vw, (max-width: 650px) 23vw, 130px"
                     />
                   ) : (
                     <span className={styles.videoPlaceholder}>VÍDEO · VER PROJETO</span>
@@ -94,10 +94,6 @@ export function StudioPrintGallery() {
                   {project.media.some((entry) => entry.kind === "video") ? (
                     <span className={styles.videoBadge}>Vídeo disponível</span>
                   ) : null}
-                </span>
-                <span className={styles.tileCaption}>
-                  <strong>{project.title}</strong>
-                  <span>{project.media.length} {project.media.length === 1 ? "registro" : "registros"}</span>
                 </span>
               </button>
             );
@@ -120,26 +116,18 @@ export function StudioPrintGallery() {
           if (event.key === "ArrowRight") { event.preventDefault(); shift(1); }
           if (event.key === "ArrowLeft") { event.preventDefault(); shift(-1); }
         }}
-        aria-label={currentProject ? `Galeria: ${currentProject.title}` : "Galeria de impressões"}
+        aria-label="Foto ampliada da galeria de impressões"
       >
         {currentProject && currentMedia ? (
           <div className={styles.viewer}>
-            <header className={styles.viewerHeader}>
-              <div>
-                <span>IMPRESSÕES · PROJETO</span>
-                <h3>{currentProject.title}</h3>
-              </div>
-              <button type="button" className={styles.close} onClick={close} aria-label="Fechar visualização">×</button>
-            </header>
-
             <div className={styles.featured}>
               {currentMedia.kind === "image" ? (
-                <Image
+                // The bucket manifest has no dimensions; intrinsic sizing keeps the dialog fitted to each photo.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   key={currentMedia.src}
                   src={currentMedia.src}
                   alt={currentMedia.alt}
-                  fill
-                  sizes="(max-width: 900px) 100vw, 75vw"
                 />
               ) : (
                 // Muted preview: sound from a project video must not start over the Radio.
@@ -147,10 +135,14 @@ export function StudioPrintGallery() {
                   <source src={currentMedia.src} type={currentMedia.src.endsWith(".webm") ? "video/webm" : "video/mp4"} />
                 </video>
               )}
+              <button type="button" className={styles.close} onClick={close} aria-label="Fechar visualização">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </button>
             </div>
 
             <div className={styles.viewerFooter}>
-              <span className={styles.position}>{selection ? selection.media + 1 : 1} / {currentProject.media.length}</span>
               {currentProject.media.length > 1 ? (
                 <div className={styles.viewerNavigation}>
                   <button type="button" onClick={() => shift(-1)} aria-label="Foto ou vídeo anterior">←</button>
@@ -161,23 +153,6 @@ export function StudioPrintGallery() {
                 Quero algo parecido <span aria-hidden="true">→</span>
               </Link>
             </div>
-            {currentProject.media.length > 1 ? (
-              <div className={styles.filmstrip} role="group" aria-label="Outros ângulos e vídeos deste projeto">
-                {currentProject.media.map((media, index) => (
-                  <button
-                    type="button"
-                    key={media.id}
-                    aria-label={`Ver mídia ${index + 1}`}
-                    aria-pressed={selection?.media === index}
-                    onClick={() => setSelection((previous) => previous ? { ...previous, media: index } : null)}
-                  >
-                    {media.kind === "image" ? (
-                      <Image src={media.src} alt="" fill sizes="96px" />
-                    ) : <span>VÍDEO</span>}
-                  </button>
-                ))}
-              </div>
-            ) : null}
           </div>
         ) : null}
       </dialog>

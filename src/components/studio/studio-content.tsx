@@ -79,7 +79,7 @@ export function StudioPageShell({
 }: {
   eyebrow: string;
   title: string;
-  lead: string;
+  lead?: string;
   pathname: string;
   breadcrumbLabel: string;
   breadcrumbParents?: StudioBreadcrumbItem[];
@@ -95,7 +95,7 @@ export function StudioPageShell({
         />
         <p className={styles.eyebrow}>{eyebrow}</p>
         <h1>{title}</h1>
-        <p className={styles.lead}>{lead}</p>
+        {lead ? <p className={styles.lead}>{lead}</p> : null}
       </header>
       {children}
     </article>

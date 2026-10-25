@@ -31,13 +31,12 @@ export default function StudioPrintsPage() {
 
   return (
     <StudioPageShell
-      eyebrow="Impressões"
-      title="O que já saiu das impressoras."
-      lead="Esta área é portfólio e prova de capacidade. Só entram peças realmente produzidas, projetos autorizados ou conceitos claramente identificados como conceito."
+      eyebrow=""
+      title="Impressões 3D"
       pathname="/studio/impressoes"
       breadcrumbLabel="Impressões"
     >
-      <StudioSection title="Peças, detalhes e projetos reais">
+      <section aria-label="Galeria de impressões">
         {studioPrintMedia.length ? (
           <StudioPrintGallery />
         ) : publishedPrints.length ? (
@@ -72,11 +71,7 @@ export default function StudioPrintsPage() {
             note="Galeria principal de peças realmente impressas. Ideal: fotos próprias, enquadramento consistente e contexto de cada peça."
           />
         )}
-        <p>
-          Cada entrada poderá informar o que é a peça, por que foi produzida, material,
-          medidas e acabamento quando essas informações forem úteis e publicáveis.
-        </p>
-      </StudioSection>
+      </section>
 
       <StudioSection eyebrow="Serviço" title="Já tem um arquivo 3D pronto?">
         <p>

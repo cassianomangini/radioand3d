@@ -11,6 +11,20 @@ import styles from "./studio-hub.module.css";
 
 const StudioMotionLink = motion.create(Link);
 
+function StripChevron({ direction }: { direction: "previous" | "next" }) {
+  return (
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path
+        d={direction === "previous" ? "m14.5 5-7 7 7 7" : "m9.5 5 7 7-7 7"}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   shown: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } }
@@ -91,7 +105,7 @@ export function StudioHub({
         </div>
         {media.length ? (
           <div className={styles.stripCarousel}>
-            <button type="button" className={styles.stripStep} aria-label="Miniaturas anteriores" disabled={stripOffset === 0} onClick={() => setStripOffset((v) => Math.max(0, v - visibleCount))}>‹</button>
+            <button type="button" className={styles.stripStep} aria-label="Miniaturas anteriores" disabled={stripOffset === 0} onClick={() => setStripOffset((v) => Math.max(0, v - visibleCount))}><StripChevron direction="previous" /></button>
             <div className={styles.stripItems}>
               {Array.from({ length: visibleCount }, (_, localIndex) => {
                 const index = (stripOffset + localIndex) % media.length;
@@ -106,7 +120,7 @@ export function StudioHub({
                 );
               })}
             </div>
-            <button type="button" className={styles.stripStep} aria-label="Próximas miniaturas" disabled={stripOffset === lastPageOffset} onClick={() => setStripOffset((v) => Math.min(lastPageOffset, v + visibleCount))}>›</button>
+            <button type="button" className={styles.stripStep} aria-label="Próximas miniaturas" disabled={stripOffset === lastPageOffset} onClick={() => setStripOffset((v) => Math.min(lastPageOffset, v + visibleCount))}><StripChevron direction="next" /></button>
           </div>
         ) : <p className={styles.emptyMedia}>Fotos reais do Estúdio em preparação.</p>}
       </section>

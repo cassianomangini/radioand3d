@@ -26,7 +26,7 @@ export function getDefaultWidth(shellWidth: number) {
   return clampRadioWidth(shellWidth, Math.round(shellWidth * 0.3));
 }
 
-export function getRouteDefaultRadioWidth(shellWidth: number, route: "home" | "detail") {
-  return route === "detail" ? getMinRadioWidth(shellWidth) : getDefaultWidth(shellWidth);
+export function getRouteDefaultRadioWidth(shellWidth: number, _route: "home" | "detail") {
+  return getDefaultWidth(shellWidth);
 }
 

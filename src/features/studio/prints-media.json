@@ -1,108 +1,1984 @@
 {
   "items": [
     {
-      "id": "autisticamente-autisticamente",
-      "project": "autisticamente",
+      "id": "03c1cb3c7feff225b05c",
+      "project": "03c1cb3c7feff225b05c",
       "kind": "image",
-      "src": "/images/studio/impressoes/autisticamente/autisticamente.jpg",
-      "title": "autisticamente",
-      "alt": "Foto de autisticamente"
+      "src": "/api/studio/prints/03c1cb3c7feff225b05c",
+      "r2Key": "1.png",
+      "title": "1",
+      "alt": "Imagem do Estúdio: 1"
     },
     {
-      "id": "familia-familia",
-      "project": "familia",
+      "id": "9be6139d5bd19b2eb177",
+      "project": "9be6139d5bd19b2eb177",
       "kind": "image",
-      "src": "/images/studio/impressoes/familia/familia.jpg",
-      "title": "familia",
-      "alt": "Foto de familia"
+      "src": "/api/studio/prints/9be6139d5bd19b2eb177",
+      "r2Key": "2.png",
+      "title": "2",
+      "alt": "Imagem do Estúdio: 2"
     },
     {
-      "id": "img-20250112-131114-img-20250112-131114",
-      "project": "img-20250112-131114",
+      "id": "eb6f4dd4f074df8efc65",
+      "project": "eb6f4dd4f074df8efc65",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20250112-131114/img-20250112-131114.jpg",
-      "title": "IMG 20250112 131114",
-      "alt": "Foto de IMG 20250112 131114"
+      "src": "/api/studio/prints/eb6f4dd4f074df8efc65",
+      "r2Key": "3.png",
+      "title": "3",
+      "alt": "Imagem do Estúdio: 3"
     },
     {
-      "id": "img-20250112-131254-img-20250112-131254",
-      "project": "img-20250112-131254",
+      "id": "10d09db4322549fa5f37",
+      "project": "10d09db4322549fa5f37",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20250112-131254/img-20250112-131254.jpg",
-      "title": "IMG 20250112 131254",
-      "alt": "Foto de IMG 20250112 131254"
+      "src": "/api/studio/prints/10d09db4322549fa5f37",
+      "r2Key": "4.png",
+      "title": "4",
+      "alt": "Imagem do Estúdio: 4"
     },
     {
-      "id": "img-20250112-131427-img-20250112-131427",
-      "project": "img-20250112-131427",
+      "id": "31a099d2d6d95a88c1e2",
+      "project": "31a099d2d6d95a88c1e2",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20250112-131427/img-20250112-131427.jpg",
-      "title": "IMG 20250112 131427",
-      "alt": "Foto de IMG 20250112 131427"
+      "src": "/api/studio/prints/31a099d2d6d95a88c1e2",
+      "r2Key": "5.png",
+      "title": "5",
+      "alt": "Imagem do Estúdio: 5"
     },
     {
-      "id": "img-20250112-131557-img-20250112-131557",
-      "project": "img-20250112-131557",
+      "id": "e3068de392aae858af52",
+      "project": "e3068de392aae858af52",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20250112-131557/img-20250112-131557.jpg",
-      "title": "IMG 20250112 131557",
-      "alt": "Foto de IMG 20250112 131557"
+      "src": "/api/studio/prints/e3068de392aae858af52",
+      "r2Key": "6.png",
+      "title": "6",
+      "alt": "Imagem do Estúdio: 6"
     },
     {
-      "id": "img-20250413-075911-img-20250413-075911",
-      "project": "img-20250413-075911",
+      "id": "b753a887d6de7dc2cfd0",
+      "project": "b753a887d6de7dc2cfd0",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20250413-075911/img-20250413-075911.jpg",
-      "title": "IMG 20250413 075911",
-      "alt": "Foto de IMG 20250413 075911"
+      "src": "/api/studio/prints/b753a887d6de7dc2cfd0",
+      "r2Key": "7.png",
+      "title": "7",
+      "alt": "Imagem do Estúdio: 7"
     },
     {
-      "id": "img-20251022-151343-img-20251022-151343",
-      "project": "img-20251022-151343",
+      "id": "d53fa12510e26290feab",
+      "project": "d53fa12510e26290feab",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20251022-151343/img-20251022-151343.jpg",
-      "title": "IMG 20251022 151343",
-      "alt": "Foto de IMG 20251022 151343"
+      "src": "/api/studio/prints/d53fa12510e26290feab",
+      "r2Key": "8.png",
+      "title": "8",
+      "alt": "Imagem do Estúdio: 8"
     },
     {
-      "id": "img-20260717-094222-img-20260717-094222",
-      "project": "img-20260717-094222",
+      "id": "ffedc6cc34db514a9d7e",
+      "project": "ffedc6cc34db514a9d7e",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20260717-094222/img-20260717-094222.jpg",
-      "title": "IMG 20260717 094222",
-      "alt": "Foto de IMG 20260717 094222"
+      "src": "/api/studio/prints/ffedc6cc34db514a9d7e",
+      "r2Key": "9.png",
+      "title": "9",
+      "alt": "Imagem do Estúdio: 9"
     },
     {
-      "id": "img-20250415-wa0027-img-20250415-wa0027",
-      "project": "img-20250415-wa0027",
+      "id": "6d63ac939d1b0f57ab86",
+      "project": "6d63ac939d1b0f57ab86",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20250415-wa0027/img-20250415-wa0027.jpg",
-      "title": "IMG 20250415 WA0027",
-      "alt": "Foto de IMG 20250415 WA0027"
+      "src": "/api/studio/prints/6d63ac939d1b0f57ab86",
+      "r2Key": "10.png",
+      "title": "10",
+      "alt": "Imagem do Estúdio: 10"
     },
     {
-      "id": "img-20250415-wa0031-img-20250415-wa0031",
-      "project": "img-20250415-wa0031",
+      "id": "e69ac800bc7af47ebbbe",
+      "project": "e69ac800bc7af47ebbbe",
       "kind": "image",
-      "src": "/images/studio/impressoes/img-20250415-wa0031/img-20250415-wa0031.jpg",
-      "title": "IMG 20250415 WA0031",
-      "alt": "Foto de IMG 20250415 WA0031"
+      "src": "/api/studio/prints/e69ac800bc7af47ebbbe",
+      "r2Key": "11.png",
+      "title": "11",
+      "alt": "Imagem do Estúdio: 11"
     },
     {
-      "id": "jota-placa-jota-placa",
-      "project": "jota-placa",
+      "id": "b777f196e7d3975fc192",
+      "project": "b777f196e7d3975fc192",
       "kind": "image",
-      "src": "/images/studio/impressoes/jota-placa/jota-placa.png",
-      "title": "Jota Placa",
-      "alt": "Foto de Jota Placa"
+      "src": "/api/studio/prints/b777f196e7d3975fc192",
+      "r2Key": "12.png",
+      "title": "12",
+      "alt": "Imagem do Estúdio: 12"
     },
     {
-      "id": "soldados-soldados",
-      "project": "soldados",
+      "id": "308549d2f5767833b041",
+      "project": "308549d2f5767833b041",
       "kind": "image",
-      "src": "/images/studio/impressoes/soldados/soldados.jpg",
-      "title": "soldados",
-      "alt": "Foto de soldados"
+      "src": "/api/studio/prints/308549d2f5767833b041",
+      "r2Key": "13.png",
+      "title": "13",
+      "alt": "Imagem do Estúdio: 13"
+    },
+    {
+      "id": "a4fe2cd29da9d01239a0",
+      "project": "a4fe2cd29da9d01239a0",
+      "kind": "image",
+      "src": "/api/studio/prints/a4fe2cd29da9d01239a0",
+      "r2Key": "14.png",
+      "title": "14",
+      "alt": "Imagem do Estúdio: 14"
+    },
+    {
+      "id": "1b5ad2ad4f2b2ed7bbcd",
+      "project": "1b5ad2ad4f2b2ed7bbcd",
+      "kind": "image",
+      "src": "/api/studio/prints/1b5ad2ad4f2b2ed7bbcd",
+      "r2Key": "15.png",
+      "title": "15",
+      "alt": "Imagem do Estúdio: 15"
+    },
+    {
+      "id": "ce63ee2f5ed9c85303f1",
+      "project": "ce63ee2f5ed9c85303f1",
+      "kind": "image",
+      "src": "/api/studio/prints/ce63ee2f5ed9c85303f1",
+      "r2Key": "16.png",
+      "title": "16",
+      "alt": "Imagem do Estúdio: 16"
+    },
+    {
+      "id": "f3fa0eb1c1dd0c72a49d",
+      "project": "f3fa0eb1c1dd0c72a49d",
+      "kind": "image",
+      "src": "/api/studio/prints/f3fa0eb1c1dd0c72a49d",
+      "r2Key": "17.png",
+      "title": "17",
+      "alt": "Imagem do Estúdio: 17"
+    },
+    {
+      "id": "36c86c26c9c0c85f9ba2",
+      "project": "36c86c26c9c0c85f9ba2",
+      "kind": "image",
+      "src": "/api/studio/prints/36c86c26c9c0c85f9ba2",
+      "r2Key": "18.png",
+      "title": "18",
+      "alt": "Imagem do Estúdio: 18"
+    },
+    {
+      "id": "446e6c66853a2bad8b15",
+      "project": "446e6c66853a2bad8b15",
+      "kind": "image",
+      "src": "/api/studio/prints/446e6c66853a2bad8b15",
+      "r2Key": "19.png",
+      "title": "19",
+      "alt": "Imagem do Estúdio: 19"
+    },
+    {
+      "id": "445dc53fdd1f4a0a0a88",
+      "project": "445dc53fdd1f4a0a0a88",
+      "kind": "image",
+      "src": "/api/studio/prints/445dc53fdd1f4a0a0a88",
+      "r2Key": "20.png",
+      "title": "20",
+      "alt": "Imagem do Estúdio: 20"
+    },
+    {
+      "id": "fe50df0a8d6b938f2e7f",
+      "project": "fe50df0a8d6b938f2e7f",
+      "kind": "image",
+      "src": "/api/studio/prints/fe50df0a8d6b938f2e7f",
+      "r2Key": "21.png",
+      "title": "21",
+      "alt": "Imagem do Estúdio: 21"
+    },
+    {
+      "id": "18b6742ee5d218f33a1c",
+      "project": "18b6742ee5d218f33a1c",
+      "kind": "image",
+      "src": "/api/studio/prints/18b6742ee5d218f33a1c",
+      "r2Key": "22.png",
+      "title": "22",
+      "alt": "Imagem do Estúdio: 22"
+    },
+    {
+      "id": "d01868ddc77a90b054f9",
+      "project": "d01868ddc77a90b054f9",
+      "kind": "image",
+      "src": "/api/studio/prints/d01868ddc77a90b054f9",
+      "r2Key": "23.png",
+      "title": "23",
+      "alt": "Imagem do Estúdio: 23"
+    },
+    {
+      "id": "f6629f7824a46af14c9b",
+      "project": "f6629f7824a46af14c9b",
+      "kind": "image",
+      "src": "/api/studio/prints/f6629f7824a46af14c9b",
+      "r2Key": "24.png",
+      "title": "24",
+      "alt": "Imagem do Estúdio: 24"
+    },
+    {
+      "id": "d555ce3ae6e2dc25c3ce",
+      "project": "d555ce3ae6e2dc25c3ce",
+      "kind": "image",
+      "src": "/api/studio/prints/d555ce3ae6e2dc25c3ce",
+      "r2Key": "25.png",
+      "title": "25",
+      "alt": "Imagem do Estúdio: 25"
+    },
+    {
+      "id": "92aab7b7279d7e5b4138",
+      "project": "92aab7b7279d7e5b4138",
+      "kind": "image",
+      "src": "/api/studio/prints/92aab7b7279d7e5b4138",
+      "r2Key": "26.png",
+      "title": "26",
+      "alt": "Imagem do Estúdio: 26"
+    },
+    {
+      "id": "20d7f3269a5eb3c66de4",
+      "project": "20d7f3269a5eb3c66de4",
+      "kind": "image",
+      "src": "/api/studio/prints/20d7f3269a5eb3c66de4",
+      "r2Key": "27.png",
+      "title": "27",
+      "alt": "Imagem do Estúdio: 27"
+    },
+    {
+      "id": "b479e3f55f3213ccd51c",
+      "project": "b479e3f55f3213ccd51c",
+      "kind": "image",
+      "src": "/api/studio/prints/b479e3f55f3213ccd51c",
+      "r2Key": "28.png",
+      "title": "28",
+      "alt": "Imagem do Estúdio: 28"
+    },
+    {
+      "id": "3fd4cadaac11d19e2af1",
+      "project": "3fd4cadaac11d19e2af1",
+      "kind": "image",
+      "src": "/api/studio/prints/3fd4cadaac11d19e2af1",
+      "r2Key": "29.png",
+      "title": "29",
+      "alt": "Imagem do Estúdio: 29"
+    },
+    {
+      "id": "64c2159995863779fbca",
+      "project": "64c2159995863779fbca",
+      "kind": "image",
+      "src": "/api/studio/prints/64c2159995863779fbca",
+      "r2Key": "30.png",
+      "title": "30",
+      "alt": "Imagem do Estúdio: 30"
+    },
+    {
+      "id": "ea963bf7f9855f915734",
+      "project": "ea963bf7f9855f915734",
+      "kind": "image",
+      "src": "/api/studio/prints/ea963bf7f9855f915734",
+      "r2Key": "31.png",
+      "title": "31",
+      "alt": "Imagem do Estúdio: 31"
+    },
+    {
+      "id": "a07f2b75b26d0fdebadc",
+      "project": "a07f2b75b26d0fdebadc",
+      "kind": "image",
+      "src": "/api/studio/prints/a07f2b75b26d0fdebadc",
+      "r2Key": "32.png",
+      "title": "32",
+      "alt": "Imagem do Estúdio: 32"
+    },
+    {
+      "id": "3bec5fcb06efb4fdab9f",
+      "project": "3bec5fcb06efb4fdab9f",
+      "kind": "image",
+      "src": "/api/studio/prints/3bec5fcb06efb4fdab9f",
+      "r2Key": "33.png",
+      "title": "33",
+      "alt": "Imagem do Estúdio: 33"
+    },
+    {
+      "id": "41f10e306eb22148775f",
+      "project": "41f10e306eb22148775f",
+      "kind": "image",
+      "src": "/api/studio/prints/41f10e306eb22148775f",
+      "r2Key": "34.png",
+      "title": "34",
+      "alt": "Imagem do Estúdio: 34"
+    },
+    {
+      "id": "42d9d2c49ce345a1d5ce",
+      "project": "42d9d2c49ce345a1d5ce",
+      "kind": "image",
+      "src": "/api/studio/prints/42d9d2c49ce345a1d5ce",
+      "r2Key": "36.png",
+      "title": "36",
+      "alt": "Imagem do Estúdio: 36"
+    },
+    {
+      "id": "7d8d642a9af406a4a4c3",
+      "project": "7d8d642a9af406a4a4c3",
+      "kind": "image",
+      "src": "/api/studio/prints/7d8d642a9af406a4a4c3",
+      "r2Key": "barcos.jpg",
+      "title": "barcos",
+      "alt": "Imagem do Estúdio: barcos"
+    },
+    {
+      "id": "cbaf500f16785e146d99",
+      "project": "cbaf500f16785e146d99",
+      "kind": "image",
+      "src": "/api/studio/prints/cbaf500f16785e146d99",
+      "r2Key": "botao base preto galaxia.png",
+      "title": "botao base preto galaxia",
+      "alt": "Imagem do Estúdio: botao base preto galaxia"
+    },
+    {
+      "id": "1bbe938e9094652631af",
+      "project": "1bbe938e9094652631af",
+      "kind": "image",
+      "src": "/api/studio/prints/1bbe938e9094652631af",
+      "r2Key": "botao branco botao vermelho.png",
+      "title": "botao branco botao vermelho",
+      "alt": "Imagem do Estúdio: botao branco botao vermelho"
+    },
+    {
+      "id": "97bca8528e04aa2eaf2d",
+      "project": "97bca8528e04aa2eaf2d",
+      "kind": "image",
+      "src": "/api/studio/prints/97bca8528e04aa2eaf2d",
+      "r2Key": "botão lançar missil.png",
+      "title": "botão lançar missil",
+      "alt": "Imagem do Estúdio: botão lançar missil"
+    },
+    {
+      "id": "bd52dbeae88a156a868c",
+      "project": "bd52dbeae88a156a868c",
+      "kind": "image",
+      "src": "/api/studio/prints/bd52dbeae88a156a868c",
+      "r2Key": "botao lancar.png",
+      "title": "botao lancar",
+      "alt": "Imagem do Estúdio: botao lancar"
+    },
+    {
+      "id": "3ce792352f0accbbe9ff",
+      "project": "3ce792352f0accbbe9ff",
+      "kind": "image",
+      "src": "/api/studio/prints/3ce792352f0accbbe9ff",
+      "r2Key": "botao rosa coracao.png",
+      "title": "botao rosa coracao",
+      "alt": "Imagem do Estúdio: botao rosa coracao"
+    },
+    {
+      "id": "8076d35292a3f0e5890e",
+      "project": "8076d35292a3f0e5890e",
+      "kind": "image",
+      "src": "/api/studio/prints/8076d35292a3f0e5890e",
+      "r2Key": "Caixa - porta coisas - 1.png",
+      "title": "Caixa   porta coisas   1",
+      "alt": "Imagem do Estúdio: Caixa   porta coisas   1"
+    },
+    {
+      "id": "53c5e6f32f4c0f8774ae",
+      "project": "53c5e6f32f4c0f8774ae",
+      "kind": "image",
+      "src": "/api/studio/prints/53c5e6f32f4c0f8774ae",
+      "r2Key": "caixa alien verde.jpg",
+      "title": "caixa alien verde",
+      "alt": "Imagem do Estúdio: caixa alien verde"
+    },
+    {
+      "id": "394312af3663cb7d2275",
+      "project": "394312af3663cb7d2275",
+      "kind": "image",
+      "src": "/api/studio/prints/394312af3663cb7d2275",
+      "r2Key": "caixa alien verde.png",
+      "title": "caixa alien verde",
+      "alt": "Imagem do Estúdio: caixa alien verde"
+    },
+    {
+      "id": "cb4f67c6784b39c0a73f",
+      "project": "cb4f67c6784b39c0a73f",
+      "kind": "image",
+      "src": "/api/studio/prints/cb4f67c6784b39c0a73f",
+      "r2Key": "caixa astronauta 2.png",
+      "title": "caixa astronauta 2",
+      "alt": "Imagem do Estúdio: caixa astronauta 2"
+    },
+    {
+      "id": "10965a89a4b768d4f078",
+      "project": "10965a89a4b768d4f078",
+      "kind": "image",
+      "src": "/api/studio/prints/10965a89a4b768d4f078",
+      "r2Key": "caixa astronauta.jpg",
+      "title": "caixa astronauta",
+      "alt": "Imagem do Estúdio: caixa astronauta"
+    },
+    {
+      "id": "6193a34b46f3d58b5999",
+      "project": "6193a34b46f3d58b5999",
+      "kind": "image",
+      "src": "/api/studio/prints/6193a34b46f3d58b5999",
+      "r2Key": "caixa azul alien.png",
+      "title": "caixa azul alien",
+      "alt": "Imagem do Estúdio: caixa azul alien"
+    },
+    {
+      "id": "9e65d5b05c2c5572dc1f",
+      "project": "9e65d5b05c2c5572dc1f",
+      "kind": "image",
+      "src": "/api/studio/prints/9e65d5b05c2c5572dc1f",
+      "r2Key": "Caixa bolinha.jpg",
+      "title": "Caixa bolinha",
+      "alt": "Imagem do Estúdio: Caixa bolinha"
+    },
+    {
+      "id": "ea595788afd3c330daa3",
+      "project": "ea595788afd3c330daa3",
+      "kind": "image",
+      "src": "/api/studio/prints/ea595788afd3c330daa3",
+      "r2Key": "caixa grande 1.png",
+      "title": "caixa grande 1",
+      "alt": "Imagem do Estúdio: caixa grande 1"
+    },
+    {
+      "id": "ca33e2f254b3649030a1",
+      "project": "ca33e2f254b3649030a1",
+      "kind": "image",
+      "src": "/api/studio/prints/ca33e2f254b3649030a1",
+      "r2Key": "caixa grande 2.png",
+      "title": "caixa grande 2",
+      "alt": "Imagem do Estúdio: caixa grande 2"
+    },
+    {
+      "id": "b75b4740b9320685cc31",
+      "project": "b75b4740b9320685cc31",
+      "kind": "image",
+      "src": "/api/studio/prints/b75b4740b9320685cc31",
+      "r2Key": "caixa holografica 2.png",
+      "title": "caixa holografica 2",
+      "alt": "Imagem do Estúdio: caixa holografica 2"
+    },
+    {
+      "id": "d9f1ffb594e732e9e7a5",
+      "project": "d9f1ffb594e732e9e7a5",
+      "kind": "image",
+      "src": "/api/studio/prints/d9f1ffb594e732e9e7a5",
+      "r2Key": "caixa holográfica 3.png",
+      "title": "caixa holográfica 3",
+      "alt": "Imagem do Estúdio: caixa holográfica 3"
+    },
+    {
+      "id": "b383d82b53b2a70f90c1",
+      "project": "b383d82b53b2a70f90c1",
+      "kind": "image",
+      "src": "/api/studio/prints/b383d82b53b2a70f90c1",
+      "r2Key": "caixa holografica 4.png",
+      "title": "caixa holografica 4",
+      "alt": "Imagem do Estúdio: caixa holografica 4"
+    },
+    {
+      "id": "463bce030d519a7265c7",
+      "project": "463bce030d519a7265c7",
+      "kind": "image",
+      "src": "/api/studio/prints/463bce030d519a7265c7",
+      "r2Key": "Caixa Média 1.png",
+      "title": "Caixa Média 1",
+      "alt": "Imagem do Estúdio: Caixa Média 1"
+    },
+    {
+      "id": "74956d069fd923ec1543",
+      "project": "74956d069fd923ec1543",
+      "kind": "image",
+      "src": "/api/studio/prints/74956d069fd923ec1543",
+      "r2Key": "caixa média 2.png",
+      "title": "caixa média 2",
+      "alt": "Imagem do Estúdio: caixa média 2"
+    },
+    {
+      "id": "b922bffb28aa2975e6a0",
+      "project": "b922bffb28aa2975e6a0",
+      "kind": "image",
+      "src": "/api/studio/prints/b922bffb28aa2975e6a0",
+      "r2Key": "Caixa porta coisas - 5.png",
+      "title": "Caixa porta coisas   5",
+      "alt": "Imagem do Estúdio: Caixa porta coisas   5"
+    },
+    {
+      "id": "5dbff8421754056a34a1",
+      "project": "5dbff8421754056a34a1",
+      "kind": "image",
+      "src": "/api/studio/prints/5dbff8421754056a34a1",
+      "r2Key": "Caixa porta coisas - 6.png",
+      "title": "Caixa porta coisas   6",
+      "alt": "Imagem do Estúdio: Caixa porta coisas   6"
+    },
+    {
+      "id": "96206deed31ef9cc9fd9",
+      "project": "96206deed31ef9cc9fd9",
+      "kind": "image",
+      "src": "/api/studio/prints/96206deed31ef9cc9fd9",
+      "r2Key": "Caixa porta coisas - 7.png",
+      "title": "Caixa porta coisas   7",
+      "alt": "Imagem do Estúdio: Caixa porta coisas   7"
+    },
+    {
+      "id": "3ee920972c444dcae702",
+      "project": "3ee920972c444dcae702",
+      "kind": "image",
+      "src": "/api/studio/prints/3ee920972c444dcae702",
+      "r2Key": "caixa rabisco].jpg",
+      "title": "caixa rabisco]",
+      "alt": "Imagem do Estúdio: caixa rabisco]"
+    },
+    {
+      "id": "eef751f1173a2eea9d9b",
+      "project": "eef751f1173a2eea9d9b",
+      "kind": "image",
+      "src": "/api/studio/prints/eef751f1173a2eea9d9b",
+      "r2Key": "caixa rosa.png",
+      "title": "caixa rosa",
+      "alt": "Imagem do Estúdio: caixa rosa"
+    },
+    {
+      "id": "80c6bdbc18c050108586",
+      "project": "80c6bdbc18c050108586",
+      "kind": "image",
+      "src": "/api/studio/prints/80c6bdbc18c050108586",
+      "r2Key": "caixa vermelha e branca.png",
+      "title": "caixa vermelha e branca",
+      "alt": "Imagem do Estúdio: caixa vermelha e branca"
+    },
+    {
+      "id": "90bff006672613f36b40",
+      "project": "90bff006672613f36b40",
+      "kind": "image",
+      "src": "/api/studio/prints/90bff006672613f36b40",
+      "r2Key": "caixas capa.png",
+      "title": "caixas capa",
+      "alt": "Imagem do Estúdio: caixas capa"
+    },
+    {
+      "id": "0f8237a805ea2468c332",
+      "project": "0f8237a805ea2468c332",
+      "kind": "image",
+      "src": "/api/studio/prints/0f8237a805ea2468c332",
+      "r2Key": "caixas.png",
+      "title": "caixas",
+      "alt": "Imagem do Estúdio: caixas"
+    },
+    {
+      "id": "cc9485f3fbf7d80792e6",
+      "project": "cc9485f3fbf7d80792e6",
+      "kind": "image",
+      "src": "/api/studio/prints/cc9485f3fbf7d80792e6",
+      "r2Key": "capa botao 3.png",
+      "title": "capa botao 3",
+      "alt": "Imagem do Estúdio: capa botao 3"
+    },
+    {
+      "id": "ae1e75ef2e7858d8e891",
+      "project": "ae1e75ef2e7858d8e891",
+      "kind": "image",
+      "src": "/api/studio/prints/ae1e75ef2e7858d8e891",
+      "r2Key": "capa botao 4.png",
+      "title": "capa botao 4",
+      "alt": "Imagem do Estúdio: capa botao 4"
+    },
+    {
+      "id": "d176b1deb9594202c482",
+      "project": "d176b1deb9594202c482",
+      "kind": "image",
+      "src": "/api/studio/prints/d176b1deb9594202c482",
+      "r2Key": "Captura de tela 2026-10-24 175011.png",
+      "title": "Captura de tela 2026 10 24 175011",
+      "alt": "Imagem do Estúdio: Captura de tela 2026 10 24 175011"
+    },
+    {
+      "id": "3684e921a7fa2dd46a44",
+      "project": "3684e921a7fa2dd46a44",
+      "kind": "image",
+      "src": "/api/studio/prints/3684e921a7fa2dd46a44",
+      "r2Key": "Captura de tela 2026-10-25 074410.png",
+      "title": "Captura de tela 2026 10 25 074410",
+      "alt": "Imagem do Estúdio: Captura de tela 2026 10 25 074410"
+    },
+    {
+      "id": "1f15bad189ce44ef9323",
+      "project": "1f15bad189ce44ef9323",
+      "kind": "image",
+      "src": "/api/studio/prints/1f15bad189ce44ef9323",
+      "r2Key": "Captura de tela 2026-10-25 074419.png",
+      "title": "Captura de tela 2026 10 25 074419",
+      "alt": "Imagem do Estúdio: Captura de tela 2026 10 25 074419"
+    },
+    {
+      "id": "6d11daca7eae76fac368",
+      "project": "6d11daca7eae76fac368",
+      "kind": "image",
+      "src": "/api/studio/prints/6d11daca7eae76fac368",
+      "r2Key": "Captura de tela 2026-10-25 074424.png",
+      "title": "Captura de tela 2026 10 25 074424",
+      "alt": "Imagem do Estúdio: Captura de tela 2026 10 25 074424"
+    },
+    {
+      "id": "fa9e035199ba1530b822",
+      "project": "fa9e035199ba1530b822",
+      "kind": "image",
+      "src": "/api/studio/prints/fa9e035199ba1530b822",
+      "r2Key": "ChatGPT Image 15 de jul. de 2026, 17_44_11.png",
+      "title": "ChatGPT Image 15 de jul. de 2026, 17 44 11",
+      "alt": "Imagem do Estúdio: ChatGPT Image 15 de jul. de 2026, 17 44 11"
+    },
+    {
+      "id": "b729bc339582648b438d",
+      "project": "b729bc339582648b438d",
+      "kind": "image",
+      "src": "/api/studio/prints/b729bc339582648b438d",
+      "r2Key": "EDD344E3-E9F5-418C-B22B-34B1C4F2B60C.jpg",
+      "title": "EDD344E3 E9F5 418C B22B 34B1C4F2B60C",
+      "alt": "Imagem do Estúdio: EDD344E3 E9F5 418C B22B 34B1C4F2B60C"
+    },
+    {
+      "id": "4b75d628d2281c1ee811",
+      "project": "4b75d628d2281c1ee811",
+      "kind": "image",
+      "src": "/api/studio/prints/4b75d628d2281c1ee811",
+      "r2Key": "Gemini_Generated_Image_qzg7kiqzg7kiqzg7.png",
+      "title": "Gemini Generated Image qzg7kiqzg7kiqzg7",
+      "alt": "Imagem do Estúdio: Gemini Generated Image qzg7kiqzg7kiqzg7"
+    },
+    {
+      "id": "59a95b11537bb95c31c6",
+      "project": "59a95b11537bb95c31c6",
+      "kind": "image",
+      "src": "/api/studio/prints/59a95b11537bb95c31c6",
+      "r2Key": "Gemini_Generated_Image_umo9chumo9chumo9.png",
+      "title": "Gemini Generated Image umo9chumo9chumo9",
+      "alt": "Imagem do Estúdio: Gemini Generated Image umo9chumo9chumo9"
+    },
+    {
+      "id": "f142635942f631d9c8f2",
+      "project": "f142635942f631d9c8f2",
+      "kind": "image",
+      "src": "/api/studio/prints/f142635942f631d9c8f2",
+      "r2Key": "Gemini_Generated_Image_y9s7exy9s7exy9s7.png",
+      "title": "Gemini Generated Image y9s7exy9s7exy9s7",
+      "alt": "Imagem do Estúdio: Gemini Generated Image y9s7exy9s7exy9s7"
+    },
+    {
+      "id": "a55e6d4c6fcb81d0f7c1",
+      "project": "a55e6d4c6fcb81d0f7c1",
+      "kind": "image",
+      "src": "/api/studio/prints/a55e6d4c6fcb81d0f7c1",
+      "r2Key": "IMG_0358.JPG",
+      "title": "IMG 0358",
+      "alt": "Imagem do Estúdio: IMG 0358"
+    },
+    {
+      "id": "021dcea5e09b18cd49d2",
+      "project": "021dcea5e09b18cd49d2",
+      "kind": "image",
+      "src": "/api/studio/prints/021dcea5e09b18cd49d2",
+      "r2Key": "IMG_0360.JPG",
+      "title": "IMG 0360",
+      "alt": "Imagem do Estúdio: IMG 0360"
+    },
+    {
+      "id": "94e2084a3103f3e41ff5",
+      "project": "94e2084a3103f3e41ff5",
+      "kind": "image",
+      "src": "/api/studio/prints/94e2084a3103f3e41ff5",
+      "r2Key": "IMG_0387.JPG",
+      "title": "IMG 0387",
+      "alt": "Imagem do Estúdio: IMG 0387"
+    },
+    {
+      "id": "ab32ae74d831f2279f0e",
+      "project": "ab32ae74d831f2279f0e",
+      "kind": "image",
+      "src": "/api/studio/prints/ab32ae74d831f2279f0e",
+      "r2Key": "IMG_0389.JPG",
+      "title": "IMG 0389",
+      "alt": "Imagem do Estúdio: IMG 0389"
+    },
+    {
+      "id": "be1a42a6b450b1bc40cc",
+      "project": "be1a42a6b450b1bc40cc",
+      "kind": "image",
+      "src": "/api/studio/prints/be1a42a6b450b1bc40cc",
+      "r2Key": "IMG_0390.JPG",
+      "title": "IMG 0390",
+      "alt": "Imagem do Estúdio: IMG 0390"
+    },
+    {
+      "id": "6c4f6f09e03a728c4b84",
+      "project": "6c4f6f09e03a728c4b84",
+      "kind": "image",
+      "src": "/api/studio/prints/6c4f6f09e03a728c4b84",
+      "r2Key": "IMG_0391.JPG",
+      "title": "IMG 0391",
+      "alt": "Imagem do Estúdio: IMG 0391"
+    },
+    {
+      "id": "8f55401b3e1f37a5d581",
+      "project": "8f55401b3e1f37a5d581",
+      "kind": "image",
+      "src": "/api/studio/prints/8f55401b3e1f37a5d581",
+      "r2Key": "IMG_0392.JPG",
+      "title": "IMG 0392",
+      "alt": "Imagem do Estúdio: IMG 0392"
+    },
+    {
+      "id": "aa471a09ff0d9ebddfb6",
+      "project": "aa471a09ff0d9ebddfb6",
+      "kind": "image",
+      "src": "/api/studio/prints/aa471a09ff0d9ebddfb6",
+      "r2Key": "IMG_0393.JPG",
+      "title": "IMG 0393",
+      "alt": "Imagem do Estúdio: IMG 0393"
+    },
+    {
+      "id": "c6eca263f9d974e5c3fb",
+      "project": "c6eca263f9d974e5c3fb",
+      "kind": "image",
+      "src": "/api/studio/prints/c6eca263f9d974e5c3fb",
+      "r2Key": "IMG_0833.JPG",
+      "title": "IMG 0833",
+      "alt": "Imagem do Estúdio: IMG 0833"
+    },
+    {
+      "id": "2d4bb6a7c7c43cebe4e6",
+      "project": "2d4bb6a7c7c43cebe4e6",
+      "kind": "image",
+      "src": "/api/studio/prints/2d4bb6a7c7c43cebe4e6",
+      "r2Key": "IMG_0837.JPG",
+      "title": "IMG 0837",
+      "alt": "Imagem do Estúdio: IMG 0837"
+    },
+    {
+      "id": "b1c8240e6cb3e3eed09c",
+      "project": "b1c8240e6cb3e3eed09c",
+      "kind": "image",
+      "src": "/api/studio/prints/b1c8240e6cb3e3eed09c",
+      "r2Key": "IMG_0953.JPG",
+      "title": "IMG 0953",
+      "alt": "Imagem do Estúdio: IMG 0953"
+    },
+    {
+      "id": "82795ad07f36663a7ad1",
+      "project": "82795ad07f36663a7ad1",
+      "kind": "image",
+      "src": "/api/studio/prints/82795ad07f36663a7ad1",
+      "r2Key": "IMG_0974.JPG",
+      "title": "IMG 0974",
+      "alt": "Imagem do Estúdio: IMG 0974"
+    },
+    {
+      "id": "f08943f54e4646e8120b",
+      "project": "f08943f54e4646e8120b",
+      "kind": "image",
+      "src": "/api/studio/prints/f08943f54e4646e8120b",
+      "r2Key": "IMG_0977.JPG",
+      "title": "IMG 0977",
+      "alt": "Imagem do Estúdio: IMG 0977"
+    },
+    {
+      "id": "0c253fe95d39366b9435",
+      "project": "0c253fe95d39366b9435",
+      "kind": "image",
+      "src": "/api/studio/prints/0c253fe95d39366b9435",
+      "r2Key": "IMG_0981.JPG",
+      "title": "IMG 0981",
+      "alt": "Imagem do Estúdio: IMG 0981"
+    },
+    {
+      "id": "1bec2fdc2b560f3ea7b2",
+      "project": "1bec2fdc2b560f3ea7b2",
+      "kind": "image",
+      "src": "/api/studio/prints/1bec2fdc2b560f3ea7b2",
+      "r2Key": "IMG_1324.JPG",
+      "title": "IMG 1324",
+      "alt": "Imagem do Estúdio: IMG 1324"
+    },
+    {
+      "id": "b5acf7b04b869b95eb76",
+      "project": "b5acf7b04b869b95eb76",
+      "kind": "image",
+      "src": "/api/studio/prints/b5acf7b04b869b95eb76",
+      "r2Key": "IMG_1355.JPG",
+      "title": "IMG 1355",
+      "alt": "Imagem do Estúdio: IMG 1355"
+    },
+    {
+      "id": "972274eb0b4c109ffaf0",
+      "project": "972274eb0b4c109ffaf0",
+      "kind": "image",
+      "src": "/api/studio/prints/972274eb0b4c109ffaf0",
+      "r2Key": "IMG_1379.JPG",
+      "title": "IMG 1379",
+      "alt": "Imagem do Estúdio: IMG 1379"
+    },
+    {
+      "id": "0fdfecba3d601f89bc92",
+      "project": "0fdfecba3d601f89bc92",
+      "kind": "image",
+      "src": "/api/studio/prints/0fdfecba3d601f89bc92",
+      "r2Key": "IMG_1459.JPG",
+      "title": "IMG 1459",
+      "alt": "Imagem do Estúdio: IMG 1459"
+    },
+    {
+      "id": "e76d4d20f9effa3f7144",
+      "project": "e76d4d20f9effa3f7144",
+      "kind": "image",
+      "src": "/api/studio/prints/e76d4d20f9effa3f7144",
+      "r2Key": "IMG_1516.JPG",
+      "title": "IMG 1516",
+      "alt": "Imagem do Estúdio: IMG 1516"
+    },
+    {
+      "id": "91ce58753acd2c42eadc",
+      "project": "91ce58753acd2c42eadc",
+      "kind": "image",
+      "src": "/api/studio/prints/91ce58753acd2c42eadc",
+      "r2Key": "IMG_1520.JPG",
+      "title": "IMG 1520",
+      "alt": "Imagem do Estúdio: IMG 1520"
+    },
+    {
+      "id": "038511b5fba1b43685e4",
+      "project": "038511b5fba1b43685e4",
+      "kind": "image",
+      "src": "/api/studio/prints/038511b5fba1b43685e4",
+      "r2Key": "IMG_1548.JPG",
+      "title": "IMG 1548",
+      "alt": "Imagem do Estúdio: IMG 1548"
+    },
+    {
+      "id": "8f6df92bf46d68f3ab0b",
+      "project": "8f6df92bf46d68f3ab0b",
+      "kind": "image",
+      "src": "/api/studio/prints/8f6df92bf46d68f3ab0b",
+      "r2Key": "IMG_1552.JPG",
+      "title": "IMG 1552",
+      "alt": "Imagem do Estúdio: IMG 1552"
+    },
+    {
+      "id": "4329e3cea249f90698f4",
+      "project": "4329e3cea249f90698f4",
+      "kind": "image",
+      "src": "/api/studio/prints/4329e3cea249f90698f4",
+      "r2Key": "IMG_1559.JPG",
+      "title": "IMG 1559",
+      "alt": "Imagem do Estúdio: IMG 1559"
+    },
+    {
+      "id": "efca3e9fbe8691bab09c",
+      "project": "efca3e9fbe8691bab09c",
+      "kind": "image",
+      "src": "/api/studio/prints/efca3e9fbe8691bab09c",
+      "r2Key": "IMG_1562.JPG",
+      "title": "IMG 1562",
+      "alt": "Imagem do Estúdio: IMG 1562"
+    },
+    {
+      "id": "d795a16b93fae3747769",
+      "project": "d795a16b93fae3747769",
+      "kind": "image",
+      "src": "/api/studio/prints/d795a16b93fae3747769",
+      "r2Key": "IMG_1563.JPG",
+      "title": "IMG 1563",
+      "alt": "Imagem do Estúdio: IMG 1563"
+    },
+    {
+      "id": "fda84d4d9b0bde48861f",
+      "project": "fda84d4d9b0bde48861f",
+      "kind": "image",
+      "src": "/api/studio/prints/fda84d4d9b0bde48861f",
+      "r2Key": "IMG_1567.JPG",
+      "title": "IMG 1567",
+      "alt": "Imagem do Estúdio: IMG 1567"
+    },
+    {
+      "id": "5d11824331d07a95cc87",
+      "project": "5d11824331d07a95cc87",
+      "kind": "image",
+      "src": "/api/studio/prints/5d11824331d07a95cc87",
+      "r2Key": "IMG_1568.JPG",
+      "title": "IMG 1568",
+      "alt": "Imagem do Estúdio: IMG 1568"
+    },
+    {
+      "id": "ffa7e71f956568fe299d",
+      "project": "ffa7e71f956568fe299d",
+      "kind": "image",
+      "src": "/api/studio/prints/ffa7e71f956568fe299d",
+      "r2Key": "IMG_1569.JPG",
+      "title": "IMG 1569",
+      "alt": "Imagem do Estúdio: IMG 1569"
+    },
+    {
+      "id": "2064916fd508f948cb98",
+      "project": "2064916fd508f948cb98",
+      "kind": "image",
+      "src": "/api/studio/prints/2064916fd508f948cb98",
+      "r2Key": "IMG_1571.JPG",
+      "title": "IMG 1571",
+      "alt": "Imagem do Estúdio: IMG 1571"
+    },
+    {
+      "id": "92d16d5020e25792bf9d",
+      "project": "92d16d5020e25792bf9d",
+      "kind": "image",
+      "src": "/api/studio/prints/92d16d5020e25792bf9d",
+      "r2Key": "IMG_1573.JPG",
+      "title": "IMG 1573",
+      "alt": "Imagem do Estúdio: IMG 1573"
+    },
+    {
+      "id": "716a1c65337b70ed0fb0",
+      "project": "716a1c65337b70ed0fb0",
+      "kind": "image",
+      "src": "/api/studio/prints/716a1c65337b70ed0fb0",
+      "r2Key": "IMG_1579.JPG",
+      "title": "IMG 1579",
+      "alt": "Imagem do Estúdio: IMG 1579"
+    },
+    {
+      "id": "84f70a28481d5690ef9a",
+      "project": "84f70a28481d5690ef9a",
+      "kind": "image",
+      "src": "/api/studio/prints/84f70a28481d5690ef9a",
+      "r2Key": "IMG_1583.JPG",
+      "title": "IMG 1583",
+      "alt": "Imagem do Estúdio: IMG 1583"
+    },
+    {
+      "id": "fcbc9deb354f94b6c1d7",
+      "project": "fcbc9deb354f94b6c1d7",
+      "kind": "image",
+      "src": "/api/studio/prints/fcbc9deb354f94b6c1d7",
+      "r2Key": "IMG_1584.JPG",
+      "title": "IMG 1584",
+      "alt": "Imagem do Estúdio: IMG 1584"
+    },
+    {
+      "id": "54430926ed3df36a1857",
+      "project": "54430926ed3df36a1857",
+      "kind": "image",
+      "src": "/api/studio/prints/54430926ed3df36a1857",
+      "r2Key": "IMG_1586.JPG",
+      "title": "IMG 1586",
+      "alt": "Imagem do Estúdio: IMG 1586"
+    },
+    {
+      "id": "dcdddbc3cc19d5eea3bc",
+      "project": "dcdddbc3cc19d5eea3bc",
+      "kind": "image",
+      "src": "/api/studio/prints/dcdddbc3cc19d5eea3bc",
+      "r2Key": "IMG_1588.JPG",
+      "title": "IMG 1588",
+      "alt": "Imagem do Estúdio: IMG 1588"
+    },
+    {
+      "id": "1abc4c1806e0b90e431f",
+      "project": "1abc4c1806e0b90e431f",
+      "kind": "image",
+      "src": "/api/studio/prints/1abc4c1806e0b90e431f",
+      "r2Key": "IMG_1589.JPG",
+      "title": "IMG 1589",
+      "alt": "Imagem do Estúdio: IMG 1589"
+    },
+    {
+      "id": "483a3f95fe46d1305e5e",
+      "project": "483a3f95fe46d1305e5e",
+      "kind": "image",
+      "src": "/api/studio/prints/483a3f95fe46d1305e5e",
+      "r2Key": "IMG_1591.JPG",
+      "title": "IMG 1591",
+      "alt": "Imagem do Estúdio: IMG 1591"
+    },
+    {
+      "id": "a869c79eef93c60aa4e9",
+      "project": "a869c79eef93c60aa4e9",
+      "kind": "image",
+      "src": "/api/studio/prints/a869c79eef93c60aa4e9",
+      "r2Key": "IMG_1593.JPG",
+      "title": "IMG 1593",
+      "alt": "Imagem do Estúdio: IMG 1593"
+    },
+    {
+      "id": "8348fb091df078b73b5a",
+      "project": "8348fb091df078b73b5a",
+      "kind": "image",
+      "src": "/api/studio/prints/8348fb091df078b73b5a",
+      "r2Key": "IMG_1595.JPG",
+      "title": "IMG 1595",
+      "alt": "Imagem do Estúdio: IMG 1595"
+    },
+    {
+      "id": "e44cd5cc2c098ae7b2f2",
+      "project": "e44cd5cc2c098ae7b2f2",
+      "kind": "image",
+      "src": "/api/studio/prints/e44cd5cc2c098ae7b2f2",
+      "r2Key": "IMG_1596.JPG",
+      "title": "IMG 1596",
+      "alt": "Imagem do Estúdio: IMG 1596"
+    },
+    {
+      "id": "21db0d56f04a62930fe6",
+      "project": "21db0d56f04a62930fe6",
+      "kind": "image",
+      "src": "/api/studio/prints/21db0d56f04a62930fe6",
+      "r2Key": "IMG_1600.JPG",
+      "title": "IMG 1600",
+      "alt": "Imagem do Estúdio: IMG 1600"
+    },
+    {
+      "id": "394d851ea0dd3d5e55ea",
+      "project": "394d851ea0dd3d5e55ea",
+      "kind": "image",
+      "src": "/api/studio/prints/394d851ea0dd3d5e55ea",
+      "r2Key": "IMG_1602.JPG",
+      "title": "IMG 1602",
+      "alt": "Imagem do Estúdio: IMG 1602"
+    },
+    {
+      "id": "243358deebba3b943b9d",
+      "project": "243358deebba3b943b9d",
+      "kind": "image",
+      "src": "/api/studio/prints/243358deebba3b943b9d",
+      "r2Key": "IMG_1622.JPG",
+      "title": "IMG 1622",
+      "alt": "Imagem do Estúdio: IMG 1622"
+    },
+    {
+      "id": "a98fcba8eef1e5229e86",
+      "project": "a98fcba8eef1e5229e86",
+      "kind": "image",
+      "src": "/api/studio/prints/a98fcba8eef1e5229e86",
+      "r2Key": "IMG_1623.JPG",
+      "title": "IMG 1623",
+      "alt": "Imagem do Estúdio: IMG 1623"
+    },
+    {
+      "id": "4d57641f963c51931bb6",
+      "project": "4d57641f963c51931bb6",
+      "kind": "image",
+      "src": "/api/studio/prints/4d57641f963c51931bb6",
+      "r2Key": "IMG_1624.JPG",
+      "title": "IMG 1624",
+      "alt": "Imagem do Estúdio: IMG 1624"
+    },
+    {
+      "id": "52f65dbd480fbf15fd7a",
+      "project": "52f65dbd480fbf15fd7a",
+      "kind": "image",
+      "src": "/api/studio/prints/52f65dbd480fbf15fd7a",
+      "r2Key": "IMG_1625.JPG",
+      "title": "IMG 1625",
+      "alt": "Imagem do Estúdio: IMG 1625"
+    },
+    {
+      "id": "8f1b2edaa87ef3b0bbfa",
+      "project": "8f1b2edaa87ef3b0bbfa",
+      "kind": "image",
+      "src": "/api/studio/prints/8f1b2edaa87ef3b0bbfa",
+      "r2Key": "IMG_1626.JPG",
+      "title": "IMG 1626",
+      "alt": "Imagem do Estúdio: IMG 1626"
+    },
+    {
+      "id": "b306958486671508bcd2",
+      "project": "b306958486671508bcd2",
+      "kind": "image",
+      "src": "/api/studio/prints/b306958486671508bcd2",
+      "r2Key": "IMG_1628.JPG",
+      "title": "IMG 1628",
+      "alt": "Imagem do Estúdio: IMG 1628"
+    },
+    {
+      "id": "2f85b191bd871ff252c3",
+      "project": "2f85b191bd871ff252c3",
+      "kind": "image",
+      "src": "/api/studio/prints/2f85b191bd871ff252c3",
+      "r2Key": "IMG_1630.JPG",
+      "title": "IMG 1630",
+      "alt": "Imagem do Estúdio: IMG 1630"
+    },
+    {
+      "id": "9ca605cf98121ff95336",
+      "project": "9ca605cf98121ff95336",
+      "kind": "image",
+      "src": "/api/studio/prints/9ca605cf98121ff95336",
+      "r2Key": "IMG_2317.JPG",
+      "title": "IMG 2317",
+      "alt": "Imagem do Estúdio: IMG 2317"
+    },
+    {
+      "id": "fdb023860488d01c05c1",
+      "project": "fdb023860488d01c05c1",
+      "kind": "image",
+      "src": "/api/studio/prints/fdb023860488d01c05c1",
+      "r2Key": "IMG_2320.JPG",
+      "title": "IMG 2320",
+      "alt": "Imagem do Estúdio: IMG 2320"
+    },
+    {
+      "id": "1b9c2788642dc1f60494",
+      "project": "1b9c2788642dc1f60494",
+      "kind": "image",
+      "src": "/api/studio/prints/1b9c2788642dc1f60494",
+      "r2Key": "IMG_3283.jpg",
+      "title": "IMG 3283",
+      "alt": "Imagem do Estúdio: IMG 3283"
+    },
+    {
+      "id": "69aa33f33461602d2086",
+      "project": "69aa33f33461602d2086",
+      "kind": "image",
+      "src": "/api/studio/prints/69aa33f33461602d2086",
+      "r2Key": "IMG_3286.jpg",
+      "title": "IMG 3286",
+      "alt": "Imagem do Estúdio: IMG 3286"
+    },
+    {
+      "id": "fcdaf7c2e0e8563aab8a",
+      "project": "fcdaf7c2e0e8563aab8a",
+      "kind": "image",
+      "src": "/api/studio/prints/fcdaf7c2e0e8563aab8a",
+      "r2Key": "IMG_4607.JPG",
+      "title": "IMG 4607",
+      "alt": "Imagem do Estúdio: IMG 4607"
+    },
+    {
+      "id": "d04c721a8ebe0565528e",
+      "project": "d04c721a8ebe0565528e",
+      "kind": "image",
+      "src": "/api/studio/prints/d04c721a8ebe0565528e",
+      "r2Key": "IMG_6295.jpeg",
+      "title": "IMG 6295",
+      "alt": "Imagem do Estúdio: IMG 6295"
+    },
+    {
+      "id": "69dde52510bf02ed4aa0",
+      "project": "69dde52510bf02ed4aa0",
+      "kind": "image",
+      "src": "/api/studio/prints/69dde52510bf02ed4aa0",
+      "r2Key": "IMG_6306.jpeg",
+      "title": "IMG 6306",
+      "alt": "Imagem do Estúdio: IMG 6306"
+    },
+    {
+      "id": "c535cb55645e35925624",
+      "project": "c535cb55645e35925624",
+      "kind": "image",
+      "src": "/api/studio/prints/c535cb55645e35925624",
+      "r2Key": "IMG_20241203_151713.jpg",
+      "title": "IMG 20241203 151713",
+      "alt": "Imagem do Estúdio: IMG 20241203 151713"
+    },
+    {
+      "id": "cd913628983701cffc0e",
+      "project": "cd913628983701cffc0e",
+      "kind": "image",
+      "src": "/api/studio/prints/cd913628983701cffc0e",
+      "r2Key": "IMG_20241213_221241.jpg",
+      "title": "IMG 20241213 221241",
+      "alt": "Imagem do Estúdio: IMG 20241213 221241"
+    },
+    {
+      "id": "4737f97811e4ca480df5",
+      "project": "4737f97811e4ca480df5",
+      "kind": "image",
+      "src": "/api/studio/prints/4737f97811e4ca480df5",
+      "r2Key": "IMG_20241214_114310.jpg",
+      "title": "IMG 20241214 114310",
+      "alt": "Imagem do Estúdio: IMG 20241214 114310"
+    },
+    {
+      "id": "749caebbe9026a35c9a1",
+      "project": "749caebbe9026a35c9a1",
+      "kind": "image",
+      "src": "/api/studio/prints/749caebbe9026a35c9a1",
+      "r2Key": "IMG_20241220_132540.jpg",
+      "title": "IMG 20241220 132540",
+      "alt": "Imagem do Estúdio: IMG 20241220 132540"
+    },
+    {
+      "id": "6ce1bfa9cadce9894bb0",
+      "project": "6ce1bfa9cadce9894bb0",
+      "kind": "image",
+      "src": "/api/studio/prints/6ce1bfa9cadce9894bb0",
+      "r2Key": "IMG_20250112_131029.jpg",
+      "title": "IMG 20250112 131029",
+      "alt": "Imagem do Estúdio: IMG 20250112 131029"
+    },
+    {
+      "id": "eacbbb67d2bde501ee51",
+      "project": "eacbbb67d2bde501ee51",
+      "kind": "image",
+      "src": "/api/studio/prints/eacbbb67d2bde501ee51",
+      "r2Key": "IMG_20250219_112036.jpg",
+      "title": "IMG 20250219 112036",
+      "alt": "Imagem do Estúdio: IMG 20250219 112036"
+    },
+    {
+      "id": "fb03d71596e03b67156c",
+      "project": "fb03d71596e03b67156c",
+      "kind": "image",
+      "src": "/api/studio/prints/fb03d71596e03b67156c",
+      "r2Key": "IMG_20250225_091715.jpg",
+      "title": "IMG 20250225 091715",
+      "alt": "Imagem do Estúdio: IMG 20250225 091715"
+    },
+    {
+      "id": "9a6e18e9b8f5a947fb55",
+      "project": "9a6e18e9b8f5a947fb55",
+      "kind": "image",
+      "src": "/api/studio/prints/9a6e18e9b8f5a947fb55",
+      "r2Key": "IMG_20250225_091800.jpg",
+      "title": "IMG 20250225 091800",
+      "alt": "Imagem do Estúdio: IMG 20250225 091800"
+    },
+    {
+      "id": "ca15932b7feaff1d7440",
+      "project": "ca15932b7feaff1d7440",
+      "kind": "image",
+      "src": "/api/studio/prints/ca15932b7feaff1d7440",
+      "r2Key": "IMG_20250225_091833.jpg",
+      "title": "IMG 20250225 091833",
+      "alt": "Imagem do Estúdio: IMG 20250225 091833"
+    },
+    {
+      "id": "577e30a06ebaa3a180a5",
+      "project": "577e30a06ebaa3a180a5",
+      "kind": "image",
+      "src": "/api/studio/prints/577e30a06ebaa3a180a5",
+      "r2Key": "IMG_20250413_081303.jpg",
+      "title": "IMG 20250413 081303",
+      "alt": "Imagem do Estúdio: IMG 20250413 081303"
+    },
+    {
+      "id": "7f4af94f87d1e778db5d",
+      "project": "7f4af94f87d1e778db5d",
+      "kind": "image",
+      "src": "/api/studio/prints/7f4af94f87d1e778db5d",
+      "r2Key": "IMG_20250417_130924.jpg",
+      "title": "IMG 20250417 130924",
+      "alt": "Imagem do Estúdio: IMG 20250417 130924"
+    },
+    {
+      "id": "c2e828666c059dd566d6",
+      "project": "c2e828666c059dd566d6",
+      "kind": "image",
+      "src": "/api/studio/prints/c2e828666c059dd566d6",
+      "r2Key": "IMG_20250417_130928.jpg",
+      "title": "IMG 20250417 130928",
+      "alt": "Imagem do Estúdio: IMG 20250417 130928"
+    },
+    {
+      "id": "e4317fea9587b970e29b",
+      "project": "e4317fea9587b970e29b",
+      "kind": "image",
+      "src": "/api/studio/prints/e4317fea9587b970e29b",
+      "r2Key": "IMG_20250417_131017.jpg",
+      "title": "IMG 20250417 131017",
+      "alt": "Imagem do Estúdio: IMG 20250417 131017"
+    },
+    {
+      "id": "1a50fd3f2552dfa542a2",
+      "project": "1a50fd3f2552dfa542a2",
+      "kind": "image",
+      "src": "/api/studio/prints/1a50fd3f2552dfa542a2",
+      "r2Key": "IMG_20250710_141712.jpg",
+      "title": "IMG 20250710 141712",
+      "alt": "Imagem do Estúdio: IMG 20250710 141712"
+    },
+    {
+      "id": "cbf1556058898ec766a4",
+      "project": "cbf1556058898ec766a4",
+      "kind": "image",
+      "src": "/api/studio/prints/cbf1556058898ec766a4",
+      "r2Key": "IMG_20250710_141807.jpg",
+      "title": "IMG 20250710 141807",
+      "alt": "Imagem do Estúdio: IMG 20250710 141807"
+    },
+    {
+      "id": "97cf8258ea0a3734a0b4",
+      "project": "97cf8258ea0a3734a0b4",
+      "kind": "image",
+      "src": "/api/studio/prints/97cf8258ea0a3734a0b4",
+      "r2Key": "IMG_20250825_183802.jpg",
+      "title": "IMG 20250825 183802",
+      "alt": "Imagem do Estúdio: IMG 20250825 183802"
+    },
+    {
+      "id": "0bce25cb79d4056746e5",
+      "project": "0bce25cb79d4056746e5",
+      "kind": "image",
+      "src": "/api/studio/prints/0bce25cb79d4056746e5",
+      "r2Key": "IMG_20250825_184819.jpg",
+      "title": "IMG 20250825 184819",
+      "alt": "Imagem do Estúdio: IMG 20250825 184819"
+    },
+    {
+      "id": "6e85aae8b00e1bccf55f",
+      "project": "6e85aae8b00e1bccf55f",
+      "kind": "image",
+      "src": "/api/studio/prints/6e85aae8b00e1bccf55f",
+      "r2Key": "IMG_20250826_095430.jpg",
+      "title": "IMG 20250826 095430",
+      "alt": "Imagem do Estúdio: IMG 20250826 095430"
+    },
+    {
+      "id": "6549fbc16a32cbaa62f7",
+      "project": "6549fbc16a32cbaa62f7",
+      "kind": "image",
+      "src": "/api/studio/prints/6549fbc16a32cbaa62f7",
+      "r2Key": "IMG_20250826_130319.jpg",
+      "title": "IMG 20250826 130319",
+      "alt": "Imagem do Estúdio: IMG 20250826 130319"
+    },
+    {
+      "id": "ab869670b6cd792a32e9",
+      "project": "ab869670b6cd792a32e9",
+      "kind": "image",
+      "src": "/api/studio/prints/ab869670b6cd792a32e9",
+      "r2Key": "IMG_20250901_143306.jpg",
+      "title": "IMG 20250901 143306",
+      "alt": "Imagem do Estúdio: IMG 20250901 143306"
+    },
+    {
+      "id": "ee4769a38c30ab0f8571",
+      "project": "ee4769a38c30ab0f8571",
+      "kind": "image",
+      "src": "/api/studio/prints/ee4769a38c30ab0f8571",
+      "r2Key": "IMG_20250901_151224.jpg",
+      "title": "IMG 20250901 151224",
+      "alt": "Imagem do Estúdio: IMG 20250901 151224"
+    },
+    {
+      "id": "880b1b17bfad3a301020",
+      "project": "880b1b17bfad3a301020",
+      "kind": "image",
+      "src": "/api/studio/prints/880b1b17bfad3a301020",
+      "r2Key": "IMG_20250905_072221.jpg",
+      "title": "IMG 20250905 072221",
+      "alt": "Imagem do Estúdio: IMG 20250905 072221"
+    },
+    {
+      "id": "791cc4d83c44c2423da5",
+      "project": "791cc4d83c44c2423da5",
+      "kind": "image",
+      "src": "/api/studio/prints/791cc4d83c44c2423da5",
+      "r2Key": "IMG_20250905_073036.jpg",
+      "title": "IMG 20250905 073036",
+      "alt": "Imagem do Estúdio: IMG 20250905 073036"
+    },
+    {
+      "id": "25197a2b0b1b4c0a39d2",
+      "project": "25197a2b0b1b4c0a39d2",
+      "kind": "image",
+      "src": "/api/studio/prints/25197a2b0b1b4c0a39d2",
+      "r2Key": "IMG_20250905_073557.jpg",
+      "title": "IMG 20250905 073557",
+      "alt": "Imagem do Estúdio: IMG 20250905 073557"
+    },
+    {
+      "id": "5c10f462f0068ab8dfd0",
+      "project": "5c10f462f0068ab8dfd0",
+      "kind": "image",
+      "src": "/api/studio/prints/5c10f462f0068ab8dfd0",
+      "r2Key": "IMG_20250905_074057.jpg",
+      "title": "IMG 20250905 074057",
+      "alt": "Imagem do Estúdio: IMG 20250905 074057"
+    },
+    {
+      "id": "54cd86e9bb840fa479e4",
+      "project": "54cd86e9bb840fa479e4",
+      "kind": "image",
+      "src": "/api/studio/prints/54cd86e9bb840fa479e4",
+      "r2Key": "IMG_20250905_075422.jpg",
+      "title": "IMG 20250905 075422",
+      "alt": "Imagem do Estúdio: IMG 20250905 075422"
+    },
+    {
+      "id": "33c9ce7ace307abc88c1",
+      "project": "33c9ce7ace307abc88c1",
+      "kind": "image",
+      "src": "/api/studio/prints/33c9ce7ace307abc88c1",
+      "r2Key": "IMG_20250905_075713.jpg",
+      "title": "IMG 20250905 075713",
+      "alt": "Imagem do Estúdio: IMG 20250905 075713"
+    },
+    {
+      "id": "efe6eec2792a145f1093",
+      "project": "efe6eec2792a145f1093",
+      "kind": "image",
+      "src": "/api/studio/prints/efe6eec2792a145f1093",
+      "r2Key": "IMG_20250905_090549.jpg",
+      "title": "IMG 20250905 090549",
+      "alt": "Imagem do Estúdio: IMG 20250905 090549"
+    },
+    {
+      "id": "adad27ba17db2570e961",
+      "project": "adad27ba17db2570e961",
+      "kind": "image",
+      "src": "/api/studio/prints/adad27ba17db2570e961",
+      "r2Key": "IMG_20250905_100136.jpg",
+      "title": "IMG 20250905 100136",
+      "alt": "Imagem do Estúdio: IMG 20250905 100136"
+    },
+    {
+      "id": "a2c4bca09f01315b939c",
+      "project": "a2c4bca09f01315b939c",
+      "kind": "image",
+      "src": "/api/studio/prints/a2c4bca09f01315b939c",
+      "r2Key": "IMG_20250905_110826.jpg",
+      "title": "IMG 20250905 110826",
+      "alt": "Imagem do Estúdio: IMG 20250905 110826"
+    },
+    {
+      "id": "6379f9477088caaefb48",
+      "project": "6379f9477088caaefb48",
+      "kind": "image",
+      "src": "/api/studio/prints/6379f9477088caaefb48",
+      "r2Key": "IMG_20250905_111248.jpg",
+      "title": "IMG 20250905 111248",
+      "alt": "Imagem do Estúdio: IMG 20250905 111248"
+    },
+    {
+      "id": "3c4c226c0b9f73ac9756",
+      "project": "3c4c226c0b9f73ac9756",
+      "kind": "image",
+      "src": "/api/studio/prints/3c4c226c0b9f73ac9756",
+      "r2Key": "IMG_20250905_111839.jpg",
+      "title": "IMG 20250905 111839",
+      "alt": "Imagem do Estúdio: IMG 20250905 111839"
+    },
+    {
+      "id": "df385f81ebd73fb981cd",
+      "project": "df385f81ebd73fb981cd",
+      "kind": "image",
+      "src": "/api/studio/prints/df385f81ebd73fb981cd",
+      "r2Key": "IMG_20250905_112900.jpg",
+      "title": "IMG 20250905 112900",
+      "alt": "Imagem do Estúdio: IMG 20250905 112900"
+    },
+    {
+      "id": "be437a26aa4d1de1aace",
+      "project": "be437a26aa4d1de1aace",
+      "kind": "image",
+      "src": "/api/studio/prints/be437a26aa4d1de1aace",
+      "r2Key": "IMG_20250905_113205.jpg",
+      "title": "IMG 20250905 113205",
+      "alt": "Imagem do Estúdio: IMG 20250905 113205"
+    },
+    {
+      "id": "972083a64bc87d7036ce",
+      "project": "972083a64bc87d7036ce",
+      "kind": "image",
+      "src": "/api/studio/prints/972083a64bc87d7036ce",
+      "r2Key": "IMG_20250905_114648.jpg",
+      "title": "IMG 20250905 114648",
+      "alt": "Imagem do Estúdio: IMG 20250905 114648"
+    },
+    {
+      "id": "cb51086122c6daf0e263",
+      "project": "cb51086122c6daf0e263",
+      "kind": "image",
+      "src": "/api/studio/prints/cb51086122c6daf0e263",
+      "r2Key": "IMG_20250905_115604.jpg",
+      "title": "IMG 20250905 115604",
+      "alt": "Imagem do Estúdio: IMG 20250905 115604"
+    },
+    {
+      "id": "9e042283a58966f7fb6e",
+      "project": "9e042283a58966f7fb6e",
+      "kind": "image",
+      "src": "/api/studio/prints/9e042283a58966f7fb6e",
+      "r2Key": "IMG_20250905_143816.jpg",
+      "title": "IMG 20250905 143816",
+      "alt": "Imagem do Estúdio: IMG 20250905 143816"
+    },
+    {
+      "id": "544d3325201cffc60550",
+      "project": "544d3325201cffc60550",
+      "kind": "image",
+      "src": "/api/studio/prints/544d3325201cffc60550",
+      "r2Key": "IMG_20250906_074511.jpg",
+      "title": "IMG 20250906 074511",
+      "alt": "Imagem do Estúdio: IMG 20250906 074511"
+    },
+    {
+      "id": "52b325bde769ec9ec1f6",
+      "project": "52b325bde769ec9ec1f6",
+      "kind": "image",
+      "src": "/api/studio/prints/52b325bde769ec9ec1f6",
+      "r2Key": "IMG_20250906_113048.jpg",
+      "title": "IMG 20250906 113048",
+      "alt": "Imagem do Estúdio: IMG 20250906 113048"
+    },
+    {
+      "id": "9d458518692586165369",
+      "project": "9d458518692586165369",
+      "kind": "image",
+      "src": "/api/studio/prints/9d458518692586165369",
+      "r2Key": "IMG_20250906_113136.jpg",
+      "title": "IMG 20250906 113136",
+      "alt": "Imagem do Estúdio: IMG 20250906 113136"
+    },
+    {
+      "id": "640a784461576c143ebe",
+      "project": "640a784461576c143ebe",
+      "kind": "image",
+      "src": "/api/studio/prints/640a784461576c143ebe",
+      "r2Key": "IMG_20250908_101343.jpg",
+      "title": "IMG 20250908 101343",
+      "alt": "Imagem do Estúdio: IMG 20250908 101343"
+    },
+    {
+      "id": "daaa172f34c36a203ad8",
+      "project": "daaa172f34c36a203ad8",
+      "kind": "image",
+      "src": "/api/studio/prints/daaa172f34c36a203ad8",
+      "r2Key": "IMG_20250926_071703.jpg",
+      "title": "IMG 20250926 071703",
+      "alt": "Imagem do Estúdio: IMG 20250926 071703"
+    },
+    {
+      "id": "61250ae746a05e6c9417",
+      "project": "61250ae746a05e6c9417",
+      "kind": "image",
+      "src": "/api/studio/prints/61250ae746a05e6c9417",
+      "r2Key": "IMG_20250926_071903.jpg",
+      "title": "IMG 20250926 071903",
+      "alt": "Imagem do Estúdio: IMG 20250926 071903"
+    },
+    {
+      "id": "447b036aa7df0d66e1ac",
+      "project": "447b036aa7df0d66e1ac",
+      "kind": "image",
+      "src": "/api/studio/prints/447b036aa7df0d66e1ac",
+      "r2Key": "IMG_20250926_071927.jpg",
+      "title": "IMG 20250926 071927",
+      "alt": "Imagem do Estúdio: IMG 20250926 071927"
+    },
+    {
+      "id": "065b02fd158aa635eea4",
+      "project": "065b02fd158aa635eea4",
+      "kind": "image",
+      "src": "/api/studio/prints/065b02fd158aa635eea4",
+      "r2Key": "IMG_20250926_072021.jpg",
+      "title": "IMG 20250926 072021",
+      "alt": "Imagem do Estúdio: IMG 20250926 072021"
+    },
+    {
+      "id": "cab89c580af8fa503378",
+      "project": "cab89c580af8fa503378",
+      "kind": "image",
+      "src": "/api/studio/prints/cab89c580af8fa503378",
+      "r2Key": "IMG_20250926_072047.jpg",
+      "title": "IMG 20250926 072047",
+      "alt": "Imagem do Estúdio: IMG 20250926 072047"
+    },
+    {
+      "id": "63b29c436fcdcdb0e337",
+      "project": "63b29c436fcdcdb0e337",
+      "kind": "image",
+      "src": "/api/studio/prints/63b29c436fcdcdb0e337",
+      "r2Key": "IMG_20251001_151750.jpg",
+      "title": "IMG 20251001 151750",
+      "alt": "Imagem do Estúdio: IMG 20251001 151750"
+    },
+    {
+      "id": "29e45cbba99fffc35c94",
+      "project": "29e45cbba99fffc35c94",
+      "kind": "image",
+      "src": "/api/studio/prints/29e45cbba99fffc35c94",
+      "r2Key": "IMG_20251001_151823.jpg",
+      "title": "IMG 20251001 151823",
+      "alt": "Imagem do Estúdio: IMG 20251001 151823"
+    },
+    {
+      "id": "f41520b72cf4fbd3a37d",
+      "project": "f41520b72cf4fbd3a37d",
+      "kind": "image",
+      "src": "/api/studio/prints/f41520b72cf4fbd3a37d",
+      "r2Key": "IMG_20251001_152010.jpg",
+      "title": "IMG 20251001 152010",
+      "alt": "Imagem do Estúdio: IMG 20251001 152010"
+    },
+    {
+      "id": "2724bc65787e3bf2a15f",
+      "project": "2724bc65787e3bf2a15f",
+      "kind": "image",
+      "src": "/api/studio/prints/2724bc65787e3bf2a15f",
+      "r2Key": "IMG_20251001_164257.jpg",
+      "title": "IMG 20251001 164257",
+      "alt": "Imagem do Estúdio: IMG 20251001 164257"
+    },
+    {
+      "id": "0e26bbed2ecc8a09185a",
+      "project": "0e26bbed2ecc8a09185a",
+      "kind": "image",
+      "src": "/api/studio/prints/0e26bbed2ecc8a09185a",
+      "r2Key": "IMG_20251003_085416.jpg",
+      "title": "IMG 20251003 085416",
+      "alt": "Imagem do Estúdio: IMG 20251003 085416"
+    },
+    {
+      "id": "d0375692dea8f25ea216",
+      "project": "d0375692dea8f25ea216",
+      "kind": "image",
+      "src": "/api/studio/prints/d0375692dea8f25ea216",
+      "r2Key": "IMG_20251004_083904.jpg",
+      "title": "IMG 20251004 083904",
+      "alt": "Imagem do Estúdio: IMG 20251004 083904"
+    },
+    {
+      "id": "3a3bae13f9f68b779d87",
+      "project": "3a3bae13f9f68b779d87",
+      "kind": "image",
+      "src": "/api/studio/prints/3a3bae13f9f68b779d87",
+      "r2Key": "IMG_20251004_084127.jpg",
+      "title": "IMG 20251004 084127",
+      "alt": "Imagem do Estúdio: IMG 20251004 084127"
+    },
+    {
+      "id": "ec3fc98007dcc7889af5",
+      "project": "ec3fc98007dcc7889af5",
+      "kind": "image",
+      "src": "/api/studio/prints/ec3fc98007dcc7889af5",
+      "r2Key": "IMG_20251004_084445.jpg",
+      "title": "IMG 20251004 084445",
+      "alt": "Imagem do Estúdio: IMG 20251004 084445"
+    },
+    {
+      "id": "7a6d4f3d986da1e737a5",
+      "project": "7a6d4f3d986da1e737a5",
+      "kind": "image",
+      "src": "/api/studio/prints/7a6d4f3d986da1e737a5",
+      "r2Key": "IMG_20251005_095929.jpg",
+      "title": "IMG 20251005 095929",
+      "alt": "Imagem do Estúdio: IMG 20251005 095929"
+    },
+    {
+      "id": "8ac4198bab80c710176b",
+      "project": "8ac4198bab80c710176b",
+      "kind": "image",
+      "src": "/api/studio/prints/8ac4198bab80c710176b",
+      "r2Key": "IMG_20251005_095958.jpg",
+      "title": "IMG 20251005 095958",
+      "alt": "Imagem do Estúdio: IMG 20251005 095958"
+    },
+    {
+      "id": "760595a4e5680bc6bffe",
+      "project": "760595a4e5680bc6bffe",
+      "kind": "image",
+      "src": "/api/studio/prints/760595a4e5680bc6bffe",
+      "r2Key": "IMG_20251006_070609.jpg",
+      "title": "IMG 20251006 070609",
+      "alt": "Imagem do Estúdio: IMG 20251006 070609"
+    },
+    {
+      "id": "a105ed7c62070f217c6e",
+      "project": "a105ed7c62070f217c6e",
+      "kind": "image",
+      "src": "/api/studio/prints/a105ed7c62070f217c6e",
+      "r2Key": "IMG_20251006_070720.jpg",
+      "title": "IMG 20251006 070720",
+      "alt": "Imagem do Estúdio: IMG 20251006 070720"
+    },
+    {
+      "id": "e8dacb22ff12dbb26b76",
+      "project": "e8dacb22ff12dbb26b76",
+      "kind": "image",
+      "src": "/api/studio/prints/e8dacb22ff12dbb26b76",
+      "r2Key": "IMG_20251006_070746.jpg",
+      "title": "IMG 20251006 070746",
+      "alt": "Imagem do Estúdio: IMG 20251006 070746"
+    },
+    {
+      "id": "563aa8413fd16c0b4a7f",
+      "project": "563aa8413fd16c0b4a7f",
+      "kind": "image",
+      "src": "/api/studio/prints/563aa8413fd16c0b4a7f",
+      "r2Key": "IMG_20251006_070818.jpg",
+      "title": "IMG 20251006 070818",
+      "alt": "Imagem do Estúdio: IMG 20251006 070818"
+    },
+    {
+      "id": "d7c4ce03bd0321d138ba",
+      "project": "d7c4ce03bd0321d138ba",
+      "kind": "image",
+      "src": "/api/studio/prints/d7c4ce03bd0321d138ba",
+      "r2Key": "IMG_20251006_070849.jpg",
+      "title": "IMG 20251006 070849",
+      "alt": "Imagem do Estúdio: IMG 20251006 070849"
+    },
+    {
+      "id": "0093fae7c852efe2c584",
+      "project": "0093fae7c852efe2c584",
+      "kind": "image",
+      "src": "/api/studio/prints/0093fae7c852efe2c584",
+      "r2Key": "IMG_20251006_070941.jpg",
+      "title": "IMG 20251006 070941",
+      "alt": "Imagem do Estúdio: IMG 20251006 070941"
+    },
+    {
+      "id": "686bece73993b4192f67",
+      "project": "686bece73993b4192f67",
+      "kind": "image",
+      "src": "/api/studio/prints/686bece73993b4192f67",
+      "r2Key": "IMG_20251006_071030.jpg",
+      "title": "IMG 20251006 071030",
+      "alt": "Imagem do Estúdio: IMG 20251006 071030"
+    },
+    {
+      "id": "ffffa358e0e03336c2c0",
+      "project": "ffffa358e0e03336c2c0",
+      "kind": "image",
+      "src": "/api/studio/prints/ffffa358e0e03336c2c0",
+      "r2Key": "IMG_20251007_154443.jpg",
+      "title": "IMG 20251007 154443",
+      "alt": "Imagem do Estúdio: IMG 20251007 154443"
+    },
+    {
+      "id": "8266ae4aaafbb4626ee0",
+      "project": "8266ae4aaafbb4626ee0",
+      "kind": "image",
+      "src": "/api/studio/prints/8266ae4aaafbb4626ee0",
+      "r2Key": "IMG_20251008_143845.jpg",
+      "title": "IMG 20251008 143845",
+      "alt": "Imagem do Estúdio: IMG 20251008 143845"
+    },
+    {
+      "id": "eb88a966bc33bf47fe03",
+      "project": "eb88a966bc33bf47fe03",
+      "kind": "image",
+      "src": "/api/studio/prints/eb88a966bc33bf47fe03",
+      "r2Key": "IMG_20251008_144212.jpg",
+      "title": "IMG 20251008 144212",
+      "alt": "Imagem do Estúdio: IMG 20251008 144212"
+    },
+    {
+      "id": "c5f6fc581b17b5820a90",
+      "project": "c5f6fc581b17b5820a90",
+      "kind": "image",
+      "src": "/api/studio/prints/c5f6fc581b17b5820a90",
+      "r2Key": "IMG_20251009_070401.jpg",
+      "title": "IMG 20251009 070401",
+      "alt": "Imagem do Estúdio: IMG 20251009 070401"
+    },
+    {
+      "id": "ae4a533d3bd90f854eb7",
+      "project": "ae4a533d3bd90f854eb7",
+      "kind": "image",
+      "src": "/api/studio/prints/ae4a533d3bd90f854eb7",
+      "r2Key": "IMG_20251009_070408.jpg",
+      "title": "IMG 20251009 070408",
+      "alt": "Imagem do Estúdio: IMG 20251009 070408"
+    },
+    {
+      "id": "48d252cf842bffca235d",
+      "project": "48d252cf842bffca235d",
+      "kind": "image",
+      "src": "/api/studio/prints/48d252cf842bffca235d",
+      "r2Key": "IMG_20260430_081358.jpg",
+      "title": "IMG 20260430 081358",
+      "alt": "Imagem do Estúdio: IMG 20260430 081358"
+    },
+    {
+      "id": "dc31cba15a0010b6389d",
+      "project": "dc31cba15a0010b6389d",
+      "kind": "image",
+      "src": "/api/studio/prints/dc31cba15a0010b6389d",
+      "r2Key": "IMG_20260430_081409.jpg",
+      "title": "IMG 20260430 081409",
+      "alt": "Imagem do Estúdio: IMG 20260430 081409"
+    },
+    {
+      "id": "9cfa8f4e932dc849f95c",
+      "project": "9cfa8f4e932dc849f95c",
+      "kind": "image",
+      "src": "/api/studio/prints/9cfa8f4e932dc849f95c",
+      "r2Key": "IMG_20260430_081422.jpg",
+      "title": "IMG 20260430 081422",
+      "alt": "Imagem do Estúdio: IMG 20260430 081422"
+    },
+    {
+      "id": "d1d939a3fdea5e78831f",
+      "project": "d1d939a3fdea5e78831f",
+      "kind": "image",
+      "src": "/api/studio/prints/d1d939a3fdea5e78831f",
+      "r2Key": "IMG_20260430_081441.jpg",
+      "title": "IMG 20260430 081441",
+      "alt": "Imagem do Estúdio: IMG 20260430 081441"
+    },
+    {
+      "id": "d0b1086e03ff7bbf8299",
+      "project": "d0b1086e03ff7bbf8299",
+      "kind": "image",
+      "src": "/api/studio/prints/d0b1086e03ff7bbf8299",
+      "r2Key": "IMG_20260526_173919.jpg",
+      "title": "IMG 20260526 173919",
+      "alt": "Imagem do Estúdio: IMG 20260526 173919"
+    },
+    {
+      "id": "bb2ff994ef20bf2a672b",
+      "project": "bb2ff994ef20bf2a672b",
+      "kind": "image",
+      "src": "/api/studio/prints/bb2ff994ef20bf2a672b",
+      "r2Key": "IMG_20260717_100459.jpg",
+      "title": "IMG 20260717 100459",
+      "alt": "Imagem do Estúdio: IMG 20260717 100459"
+    },
+    {
+      "id": "aa89020df000e6fe7b5e",
+      "project": "aa89020df000e6fe7b5e",
+      "kind": "image",
+      "src": "/api/studio/prints/aa89020df000e6fe7b5e",
+      "r2Key": "IMG_20260717_101127.jpg",
+      "title": "IMG 20260717 101127",
+      "alt": "Imagem do Estúdio: IMG 20260717 101127"
+    },
+    {
+      "id": "0d3edde7e3885fc6c7fe",
+      "project": "0d3edde7e3885fc6c7fe",
+      "kind": "image",
+      "src": "/api/studio/prints/0d3edde7e3885fc6c7fe",
+      "r2Key": "IMG_20260717_101510.jpg",
+      "title": "IMG 20260717 101510",
+      "alt": "Imagem do Estúdio: IMG 20260717 101510"
+    },
+    {
+      "id": "c70f14479917a22473fa",
+      "project": "c70f14479917a22473fa",
+      "kind": "image",
+      "src": "/api/studio/prints/c70f14479917a22473fa",
+      "r2Key": "IMG_20260717_123623.jpg",
+      "title": "IMG 20260717 123623",
+      "alt": "Imagem do Estúdio: IMG 20260717 123623"
+    },
+    {
+      "id": "48fb4bd40a9400246c7e",
+      "project": "48fb4bd40a9400246c7e",
+      "kind": "image",
+      "src": "/api/studio/prints/48fb4bd40a9400246c7e",
+      "r2Key": "IMG_20260717_123641.jpg",
+      "title": "IMG 20260717 123641",
+      "alt": "Imagem do Estúdio: IMG 20260717 123641"
+    },
+    {
+      "id": "29fac1bf4dbd6d56be97",
+      "project": "29fac1bf4dbd6d56be97",
+      "kind": "image",
+      "src": "/api/studio/prints/29fac1bf4dbd6d56be97",
+      "r2Key": "IMG_20260717_123651.jpg",
+      "title": "IMG 20260717 123651",
+      "alt": "Imagem do Estúdio: IMG 20260717 123651"
+    },
+    {
+      "id": "d1b5befbef9bd9540692",
+      "project": "d1b5befbef9bd9540692",
+      "kind": "image",
+      "src": "/api/studio/prints/d1b5befbef9bd9540692",
+      "r2Key": "IMG_20260717_131619.jpg",
+      "title": "IMG 20260717 131619",
+      "alt": "Imagem do Estúdio: IMG 20260717 131619"
+    },
+    {
+      "id": "701039d90e9d9a77762e",
+      "project": "701039d90e9d9a77762e",
+      "kind": "image",
+      "src": "/api/studio/prints/701039d90e9d9a77762e",
+      "r2Key": "IMG_20260717_131650.jpg",
+      "title": "IMG 20260717 131650",
+      "alt": "Imagem do Estúdio: IMG 20260717 131650"
+    },
+    {
+      "id": "7c9362512f2d3bf9e014",
+      "project": "7c9362512f2d3bf9e014",
+      "kind": "image",
+      "src": "/api/studio/prints/7c9362512f2d3bf9e014",
+      "r2Key": "IMG_20260717_131725.jpg",
+      "title": "IMG 20260717 131725",
+      "alt": "Imagem do Estúdio: IMG 20260717 131725"
+    },
+    {
+      "id": "1f287c496670a2b2254d",
+      "project": "1f287c496670a2b2254d",
+      "kind": "image",
+      "src": "/api/studio/prints/1f287c496670a2b2254d",
+      "r2Key": "IMG_20260717_132015.jpg",
+      "title": "IMG 20260717 132015",
+      "alt": "Imagem do Estúdio: IMG 20260717 132015"
+    },
+    {
+      "id": "1e2aa57a6568579fc98c",
+      "project": "1e2aa57a6568579fc98c",
+      "kind": "image",
+      "src": "/api/studio/prints/1e2aa57a6568579fc98c",
+      "r2Key": "IMG_20260717_132715.jpg",
+      "title": "IMG 20260717 132715",
+      "alt": "Imagem do Estúdio: IMG 20260717 132715"
+    },
+    {
+      "id": "bfe9d01a0b2b4915540b",
+      "project": "bfe9d01a0b2b4915540b",
+      "kind": "image",
+      "src": "/api/studio/prints/bfe9d01a0b2b4915540b",
+      "r2Key": "IMG_20260717_132803.jpg",
+      "title": "IMG 20260717 132803",
+      "alt": "Imagem do Estúdio: IMG 20260717 132803"
+    },
+    {
+      "id": "c87946a68e0e5093be17",
+      "project": "c87946a68e0e5093be17",
+      "kind": "image",
+      "src": "/api/studio/prints/c87946a68e0e5093be17",
+      "r2Key": "IMG-20250415-WA0013.jpg",
+      "title": "IMG 20250415 WA0013",
+      "alt": "Imagem do Estúdio: IMG 20250415 WA0013"
+    },
+    {
+      "id": "37b4714f994b070e5a44",
+      "project": "37b4714f994b070e5a44",
+      "kind": "image",
+      "src": "/api/studio/prints/37b4714f994b070e5a44",
+      "r2Key": "IMG-20250415-WA0042.jpg",
+      "title": "IMG 20250415 WA0042",
+      "alt": "Imagem do Estúdio: IMG 20250415 WA0042"
+    },
+    {
+      "id": "7efec812a2d20c982575",
+      "project": "7efec812a2d20c982575",
+      "kind": "image",
+      "src": "/api/studio/prints/7efec812a2d20c982575",
+      "r2Key": "IMG-20250814-WA0007.jpg",
+      "title": "IMG 20250814 WA0007",
+      "alt": "Imagem do Estúdio: IMG 20250814 WA0007"
+    },
+    {
+      "id": "1d7caeee36105b1cbda9",
+      "project": "1d7caeee36105b1cbda9",
+      "kind": "image",
+      "src": "/api/studio/prints/1d7caeee36105b1cbda9",
+      "r2Key": "IMG-20250814-WA0009.jpg",
+      "title": "IMG 20250814 WA0009",
+      "alt": "Imagem do Estúdio: IMG 20250814 WA0009"
+    },
+    {
+      "id": "1d7a717c9de34dfa9888",
+      "project": "1d7a717c9de34dfa9888",
+      "kind": "image",
+      "src": "/api/studio/prints/1d7a717c9de34dfa9888",
+      "r2Key": "IMG-20250825-WA0014.jpg",
+      "title": "IMG 20250825 WA0014",
+      "alt": "Imagem do Estúdio: IMG 20250825 WA0014"
     }
   ]
 }

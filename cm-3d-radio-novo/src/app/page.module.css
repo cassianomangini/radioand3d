@@ -1,0 +1,10 @@
+.stage {
+  min-height: 100dvh;
+  background: var(--bg-studio);
+}
+
+.background {
+  display: block;
+  width: 100%;
+  height: auto;
+}

@@ -1,0 +1,67 @@
+:root {
+  --bg-app: #05070b;
+  --bg-studio: #06090e;
+  --bg-radio: #080a13;
+  --bg-panel: #10161f;
+  --bg-raised: #161f2b;
+  --bg-overlay: rgb(3 5 10 / 90%);
+
+  --text-primary: #ffffff;
+  --text-secondary: #d2dce7;
+  --text-muted: #adbac9;
+  --text-on-cyan: #06080c;
+
+  --accent-cyan: #52d6ff;
+  --accent-cyan-hover: #7fe3ff;
+  --accent-violet: #9c78ff;
+  --accent-pink: #f46ac5;
+  --accent-shopee: #c83e20;
+  --focus-ring: #8ddbff;
+  --error: #ff8794;
+  --success: #75dbac;
+
+  --border-default: rgb(255 255 255 / 14%);
+  --border-strong: rgb(255 255 255 / 22%);
+  --border-active: rgb(82 214 255 / 68%);
+
+  --font-heading: var(--font-outfit), Arial, sans-serif;
+  --font-body: var(--font-manrope), Arial, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --radius-photo: 12px;
+  --radius-field: 12px;
+  --radius-card: 16px;
+  --radius-dialog: 18px;
+  --radius-action: 999px;
+
+  --header-height: 72px;
+  --mobile-header-height: 60px;
+  --mobile-player-height: 96px;
+  --radio-panel-width: clamp(360px, 30vw, 600px);
+  --page-gutter: 32px;
+
+  --motion-fast: 140ms;
+  --motion-ui: 220ms;
+  --motion-panel: 260ms;
+  --ease-ui: cubic-bezier(.2, .8, .2, 1);
+
+  --layer-base: 0;
+  --layer-header: 10;
+  --layer-player: 20;
+  --layer-menu: 30;
+  --layer-dialog: 40;
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --page-gutter: 20px;
+  }
+}

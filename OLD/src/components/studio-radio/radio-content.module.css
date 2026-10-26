@@ -525,6 +525,43 @@
   height: 1.15rem;
 }
 
+.shuffleDice [data-die] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.shuffleDice [data-die="left"] {
+  animation: shuffle-die-left 3.2s ease-in-out infinite;
+}
+
+.shuffleDice [data-die="right"] {
+  animation: shuffle-die-right 3.2s ease-in-out infinite;
+}
+
+button:disabled .shuffleDice [data-die] {
+  animation: none;
+}
+
+button:disabled .shuffleDice [data-die="left"] {
+  transform: rotate(-12deg);
+}
+
+button:disabled .shuffleDice [data-die="right"] {
+  transform: rotate(12deg);
+}
+
+@keyframes shuffle-die-left {
+  0%, 38%, 100% { transform: translate(0, 0) rotate(-12deg); }
+  15% { transform: translate(3px, -2px) rotate(12deg); }
+  27% { transform: translate(1px, 0) rotate(-5deg); }
+}
+
+@keyframes shuffle-die-right {
+  0%, 38%, 100% { transform: translate(0, 0) rotate(12deg); }
+  15% { transform: translate(-3px, 2px) rotate(-12deg); }
+  27% { transform: translate(-1px, 0) rotate(5deg); }
+}
+
 .transport .playButton {
   position: relative;
   isolation: isolate;
@@ -1546,6 +1583,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
+.shuffleDice [data-die] {
+    animation: none;
+  }
+
+.shuffleDice [data-die="left"] {
+    transform: rotate(-12deg);
+  }
+
+.shuffleDice [data-die="right"] {
+    transform: rotate(12deg);
+  }
 
 .transport > button,
 .transport .volumeTrigger {

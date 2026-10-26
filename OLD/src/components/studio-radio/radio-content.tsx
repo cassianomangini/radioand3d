@@ -31,7 +31,21 @@ export function Icon({ name }: { name: IconName }) {
     medium: <><rect x="3" y="4" width="18" height="16" rx="1.5" /><path d="M14 4v16" /></>,
     close: <><path d="M5 5l14 14M19 5 5 19" /></>,
     heart: <path d="M20.8 8.6c0 4.2-8.8 10-8.8 10s-8.8-5.8-8.8-10a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z" />,
-    dice: <><rect x="3.5" y="3.5" width="17" height="17" rx="3.5" /><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" /><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" /><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" /><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" /></>,
+    dice: <>
+      <g data-die="left" stroke="none">
+        <rect x="2.5" y="5" width="13" height="13" rx="2.8" fill="#26cfff" />
+        <circle cx="6.25" cy="8.75" r="1.1" fill="white" />
+        <circle cx="9" cy="11.5" r="1.1" fill="white" />
+        <circle cx="11.75" cy="14.25" r="1.1" fill="white" />
+      </g>
+      <g data-die="right" stroke="none">
+        <rect x="16.5" y="6" width="13" height="13" rx="2.8" fill="#ae63ff" />
+        <circle cx="20.25" cy="9.75" r="1.1" fill="white" />
+        <circle cx="25.75" cy="9.75" r="1.1" fill="white" />
+        <circle cx="20.25" cy="15.25" r="1.1" fill="white" />
+        <circle cx="25.75" cy="15.25" r="1.1" fill="white" />
+      </g>
+    </>,
     repeat: <><path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15" /><path d="m7 22-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3" /><path d="m11 11 1-1v5" /></>,
     previous: <><path d="M5 5v14" /><path d="m19 5-11 7 11 7V5Z" fill="currentColor" stroke="none" /></>,
     play: <path d="m8 5 11 7-11 7V5Z" fill="currentColor" stroke="none" />,
@@ -43,7 +57,16 @@ export function Icon({ name }: { name: IconName }) {
     share: <><circle cx="18" cy="5" r="2" /><circle cx="6" cy="12" r="2" /><circle cx="18" cy="19" r="2" /><path d="m8 11 8-5M8 13l8 5" /></>,
     check: <path d="m4 12 5 5L20 6" />
   };
-  return <svg {...common}>{paths[name]}</svg>;
+  return (
+    <svg
+      {...common}
+      viewBox={name === "dice" ? "0 0 32 24" : common.viewBox}
+      className={name === "dice" ? playerStyles.shuffleDice : undefined}
+      style={name === "dice" ? { width: "1.7rem", height: "1.35rem" } : undefined}
+    >
+      {paths[name]}
+    </svg>
+  );
 }
 
 function formatTime(seconds: number) {

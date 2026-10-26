@@ -1,0 +1,107 @@
+# Diagnóstico unificado e caminho de recuperação do site
+
+**Data:** 25/10/2026  
+**Base do código:** `main@b469c565062217b51a5c8ff18e6ba1eabf574f8c`  
+**Origem:** revisão da análise `analise-site-2026-10-25.md`, da auditoria `AUDITORIA_RECUPERACAO_SITE_2026-10-25.md`, da leitura cruzada que também apareceu no diretório, das capturas enviadas por Cassiano e do código correspondente. Este documento reúne as leituras em uma síntese de trabalho.  
+**Limite:** o outro agente registrou observações do servidor aberto em 1440 × 900 e 390 × 844, com movimento reduzido. Nesta revisão eu conferi o código, não reproduzi aquelas telas nem operei o servidor. As observações visuais dele estão identificadas como tal; não são aprovação visual nem diagnóstico de causa de falha de rede. Não executei testes, build ou deploy.
+
+## Decisão
+
+**Não há motivo técnico demonstrado para apagar o repositório e começar do zero. Há motivo forte para reconstruir a experiência pública do Estúdio dentro dele.** A falha é sistêmica na apresentação: conteúdo de bastidor exposto, fotografias sem curadoria, controles desenhados repetidamente, linguagem visual diferente a cada rota e ausência de revisão renderizada antes da entrega. Remendar cada botão isoladamente preservaria essa estrutura.
+
+O motor de áudio persistente, a fila e o catálogo da Rádio, as rotas e fotos dos produtos, a saída para a Shopee, o proxy do R2 e os contratos do orçamento têm valor funcional. Apagar tudo exigiria reconstruí-los e poderia repetir o mesmo problema visual. A intervenção indicada é **trocar a camada de apresentação e o modelo editorial do Estúdio por partes completas**, preservando esses núcleos. Se um piloto real provar que o shell atual impede isso sem quebrar a Rádio, reavaliar a fronteira da aplicação; essa prova ainda não existe.
+
+## O que confirmo na análise do outro agente — e o que ajusto
+
+| Afirmação da análise | Parecer após conferir o código | Consequência |
+| --- | --- | --- |
+| Home e Rádio estão mais inteiras que as páginas do Estúdio. | **Concordo como comparação visual**, não como aceite. A Home tem uma composição própria e a Rádio concentra áudio, busca e fila. A própria análise apontou CTA quebrando no celular, títulos de faixa crus e Favoritos desativado. | Preservar a estrutura e o áudio; revisar texto, mobile e controles expostos. |
+| Cada rota inventou seus botões e sua tipografia. | **Concordo com o resultado, com uma nuance:** serviços já compartilham `PrimaryLink`, e O Estúdio/Materiais compartilham `StudioConversionLinks`; falta um padrão entre esses grupos, o hub, a Home, Produtos e o player. `src/components/ui/button.tsx` aparece só em `/dev/foundation`. O layout carrega quatro fontes. | Definir poucos controles e regras tipográficas reais, aplicados às rotas públicas. O botão de fechar da galeria deve ter um único dono. |
+| A superfície pública exibe peças de protótipo. | **Concordo.** `MediaPlaceholder` imprime “FOTO REAL PENDENTE” e “DIAGRAMA PENDENTE”; O Estúdio e Materiais imprimem “MOCK VISUAL”; o menu mobile mostra “Sobre” desativado embora a rota exista. | Substituir texto de produção por conteúdo para o cliente. Manter mocks necessários claramente identificados, sem apresentá-los como peça produzida. |
+| O hub no desktop veio preto e só no celular mostrou a foto; várias miniaturas e variações não carregaram. | **Aceito como observação visual do outro agente, ainda não reproduzida aqui.** O código contém fonte de mídia, `next/image`, carregamento da foto ativa e pré-carregamento da seguinte. No produto citado, as cinco variantes têm URL. Logo, a causa não pode ser atribuída só à ausência de dados ou ao CSS. | Reproduzir no mesmo SHA e inspecionar respostas da rota R2, transformação de imagem, rede e estado do carrossel antes de escolher correção. Falha de imagem visível é bloqueante para a vitrine. |
+| A galeria é uma grade de oito colunas sem contexto. | **Concordo.** A regra de oito colunas já existe no CSS. O manifesto tem 220 mídias tratadas como 220 projetos isolados, sem dimensões ou descrição editorial; 35 títulos são apenas números. | Manter a densidade solicitada para desktop, mas dar curadoria, ordem, contexto e carga progressiva. Não confundir oito colunas com galeria resolvida. |
+| A leitura cruzada propõe deixar o número de colunas em aberto. | **Discordo desse ponto específico:** Cassiano pediu explicitamente pelo menos oito imagens por fileira no desktop. Oito é uma restrição de projeto, embora a grade atual continue ruim. | Preservar o mínimo de oito no desktop e resolver enquadramento, ritmo, agrupamento, desempenho e versão mobile dentro desse limite. |
+| O detalhe do produto usa uma caixa genérica como desenho de medidas. | **Concordo.** `MeasurementDiagram` desenha o mesmo prisma SVG para medidas de produtos diferentes. Os valores mudam; a silhueta não representa a peça. | Usar medidas textuais confiáveis até haver foto/diagrama específico, ou criar desenho fiel por produto. |
+| Materiais fala de PLA e compostagem em tom de aula. | **Concordo com a crítica de tom e extensão**, preservando a precisão: o texto atual diz que PLA também é plástico e **não** é adequado à compostagem caseira. PETG e TPU têm diferenças úteis explicadas em `src/features/studio/materials.ts`. | Encurtar e aproximar do uso da peça, sem transformar PLA em promessa ambiental enganosa nem sugerir disponibilidade não verificada. |
+| Há 26 CSS, cerca de 8,5 mil linhas e quase 800 cores literais. | **Concordo com a escala.** A leitura estática encontrou 26 arquivos, 8.474 linhas físicas, 394 usos de `var(--`, 519 cores hex e 262 chamadas `rgb`, total de 781 por esse critério; a diferença de uma unidade depende da contagem. Esses números não medem beleza sozinhos. | O problema relevante é a ausência de critérios compartilhados no resultado, não atingir uma meta arbitrária de linhas ou cores. |
+| O aviso vermelho “1 Issue” cobre o logo no `next dev`. | **É uma observação válida do ambiente de desenvolvimento**, mas o selo pertence à ferramenta, não ao produto. A causa do aviso deve ser identificada; redesenhar o logo por causa dele seria um diagnóstico errado. | Tratar o erro de desenvolvimento na etapa técnica, separado da avaliação visual do site. |
+
+O outro agente foi especialmente preciso ao mostrar a distância entre **ter páginas** e **ter uma experiência pronta**. Onde ele chama algumas rotas de “formulário de espera”, leio isso como juízo visual sustentado por fatos concretos: as páginas de Placas, Caixas e Sob demanda repetem o mesmo molde e mostram instruções de produção no espaço onde deveria haver prova da peça. O texto e a fotografia precisam ser refeitos; não é necessário concluir que as rotas ou suas perguntas de negócio devam ser descartadas.
+
+A leitura cruzada também acertou ao separar o vão preto visto ao lado de capturas de página inteira da falha das imagens: o vão é o fundo fora da coluna da Rádio, enquanto o palco/miniaturas pretos dentro da vitrine são observações de carregamento a reproduzir. Não conto o primeiro como defeito de imagem.
+
+## Causas que as duas análises, juntas, revelam
+
+### 1. O bucket entrega arquivos, mas a vitrine precisa de projetos publicáveis
+
+O sincronizador `scripts/sync-studio-prints.mjs` transforma automaticamente cada objeto aceito do R2 em um item. `title` e `alt` derivam do nome do arquivo; `project` recebe o ID da própria mídia. Assim, `1.png` vira projeto “1”. O manifesto tem 220 imagens e 220 IDs de projeto, sem largura e altura; `src/features/studio/catalog.ts` mantém `studioPrints = []`. A curadoria, o agrupamento, a autorização de uso, a relação com produto e a ordem de destaque não fazem parte dessa fonte de dados. Há ainda uma lista fixa de 13 ETags antigas para exclusão: uma decisão editorial embutida em hashes de arquivos.
+
+A página de Impressões usa uma grade de oito colunas, mas mistura enquadramentos e não mostra nome ou contexto nas células. A ampliação da galeria e a ampliação do carrossel são dois diálogos diferentes (`studio-print-gallery.tsx` e `studio-prints-carousel.tsx`), cada qual com CSS e fechamento próprios. Isso explica a correção anterior feita no modal errado. O código recente tenta ajustar o diálogo da galeria ao tamanho da foto, com X e CTA abaixo; **não há prova renderizada nesta revisão de que o resultado atual esteja correto**.
+
+**Decisão proposta:** separar inventário automático de publicação editorial. Cada mídia precisa de ID estável, chave do R2, revisão, dimensões, alt, projeto, ordem e estado de publicação. O destaque do hub deve ser uma seleção explícita do mesmo catálogo. Um único visualizador deve atender galeria e carrossel quando a interação for a mesma: foto central, moldura delicada, X branco em fundo roxo sem contorno, CTA “Quero algo parecido” abaixo e navegação apenas quando houver mais de uma mídia. Miniaturas podem carregar sob demanda; a foto ativa e a próxima recebem prioridade. O código já tenta parte desse carregamento, portanto a falha observada no desktop deve ser diagnosticada antes de reescrever a estratégia.
+
+### 2. Existe CSS, mas não existe uma regra visual efetiva entre as páginas
+
+Hoje convivem `StudioPageShell` (76rem) para serviços e Impressões, páginas editoriais (112rem) para O Estúdio e Materiais, detalhe de produto (92rem) e Orçamento (90rem). A lista de Produtos tem outra moldura. Esses tamanhos poderiam ser variações intencionais, mas não há uma relação perceptível de título, texto, respiro e CTA. O CSS de serviços usa cinza fraco para texto principal, enquanto as páginas recentes usam contraste e escala muito maiores. Um botão de orçamento pode ser pílula, caixa, faixa larga ou retângulo fino conforme a rota.
+
+`src/styles/tokens.css` define valores úteis, mas isso não garante uso coerente: em uma amostra de cinco CSS Modules do Estúdio, havia 133 cores hex e nenhuma referência aos tokens semânticos de superfície, texto, ação, borda ou espaço. O CSS global importa Tailwind, porém os componentes examinados compõem o visual com CSS Modules. Há reuso dentro de alguns grupos de páginas, mas a biblioteca geral de botões só aparece em `/dev/foundation`; nenhum desses reusos estabelece um sistema entre Home, hub, editorial, serviços e Produto.
+
+**Decisão proposta:** estabelecer uma gramática pequena, baseada nas telas reais: até dois níveis de CTA, botão de ícone, escala tipográfica, largura por função, contraste legível, tratamento de foto e regras para Rádio lateral/recolhida/mobile. Implementar componentes apenas quando houver consumidores concretos; substituir CSS anterior ao aplicar o novo padrão, sem empilhar mais especificidade. O problema do X torto deve ser corrigido no componente real e conferido em retrato/paisagem e mobile.
+
+### 3. A redação fala ora com o cliente, ora com quem constrói o site
+
+O outro agente reuniu exemplos convincentes: “Você envia a foto final”, “Uma foto real entra aqui antes do lançamento”, “A seleção permanece local até o envio seguro ser habilitado”, notas sobre estoque e disponibilidade, e repetição de ressalvas da Shopee. São informações de estados e limitações reais, mas parte delas está posicionada como conteúdo principal de venda. Há também promessas amplas (“de qualquer tamanho”, “muito mais”) que não combinam com as ressalvas técnicas, além do “bem vindo” sem hífen na Home. O card de Materiais promete cores e acabamentos; a página não os apresenta.
+
+**Decisão proposta:** escrever primeiro o que a pessoa pode comprar ou pedir, como escolher, o que ela precisa fornecer e o próximo passo. Colocar limitações pertinentes perto da escolha, uma vez, em linguagem direta. Remover mensagens de bastidor das páginas públicas. Material e foto ainda não aprovados devem ser mock/conceito identificados, não vendidos como trabalho realizado. Preservar a precisão das explicações sobre PLA, PETG e TPU.
+
+### 4. O objetivo comercial esbarra num destino inacabado
+
+O foco informado por Cassiano é **comprar na Shopee ou pedir orçamento**. Há nove produtos no catálogo estático, cada um com página e saída para Shopee; isso é uma base comercial aproveitável, embora preço, estoque e atualização do snapshot dependam da plataforma. O orçamento começa com uma pergunta clara, como destacou o outro agente, mas termina com “Enviar projeto para análise” desativado e aviso de que nada é transmitido (`quote-wizard.tsx:1007-1024`). Existem handlers de sessão, anexo e submissão protegidos por `CM_QUOTE_INTAKE_ENABLED`; o wizard público ainda não os conclui. Ativar uma flag sozinha não é entrega segura do fluxo.
+
+O hub põe Orçamentos, Produtos, Materiais e O Estúdio em cartões semelhantes. Ícones de e-mail, Instagram e Shopee no cabeçalho são `<span>`, não links (`site-header.tsx:58-67`). Na primeira etapa do orçamento, o CSS destaca o primeiro cartão quando nenhum está selecionado (`.typeOptions:not(:has(.typeOption[aria-pressed="true"]))`), criando aparência de escolha antes do clique. A página de produto contém o CTA de Shopee, mas o pedido personalizado usa outro desenho e fica distante da compra. Um visual coerente precisa tornar os **dois destinos comerciais** inequívocos sem prometer um envio inexistente.
+
+**Decisão proposta:** definir uma saída funcional e honesta para orçamento, com confirmação, erro, privacidade, anexos e triagem; manter a compra indo ao produto e então à Shopee. Revisar hierarquia e posição desses caminhos em todas as rotas. Não publicar promessa de orçamento recebido enquanto o envio estiver desligado.
+
+### 5. O shell acumula conteúdo de página e estados da Rádio
+
+`src/app/studio/page.tsx` retorna `null`: o hub nasce em `StudioRadioShell` pelo `pathname`. O shell monta Home, hub e conteúdo filho na mesma árvore, controla largura, dock, tela cheia, foco e transições. Seus módulos de estilo e os de `radio-content` são extensos. Isso aumenta a chance de uma mudança de página atingir o player ou uma regra de layout antiga. Ao mesmo tempo, `src/app/layout.tsx` mantém um único `RadioProvider`, preservando o áudio ao navegar — comportamento que não deve ser perdido.
+
+**Decisão proposta:** dar à composição do Estúdio um dono separado da orquestração da Rádio e fixar uma interface clara de largura/estado. Remover estados e CSS antigos só após confirmar consumidores. Não reescrever o motor de áudio como primeira etapa.
+
+### 6. O ciclo de entrega não fechou a verificação visual
+
+Cassiano precisou apontar desalinhamento de um botão e o tamanho indevido do modal por captura, depois de mudanças declaradas. O outro agente registrou telas em desktop/mobile, mas o documento dele não anexou capturas nem respostas de rede que permitam reproduzir as falhas de imagem. Para o SHA atual, a CI consultada falhou no lint do sincronizador de fotos (`console.log` nas linhas 88, 90 e 92); typecheck, testes, build, captura e Playwright ficaram **skipped**, não passaram. Há expectativas antigas de largura da Rádio em testes, mas nenhum teste foi executado nesta revisão. Isso é estado de verificação, não justificativa para mexer em testes agora.
+
+**Decisão proposta:** para cada rota alterada, revisar render desktop/mobile no mesmo SHA, com Rádio lateral e recolhida, verificar carregamento de imagens e comparar com referência aprovada. Registrar falhas de rede e o que realmente executou. Cassiano continua decidindo a aprovação visual; uma captura automática ou CI verde não equivale a isso.
+
+Há ainda instruções antigas concorrendo com o estado atual: `docs/EXPERIENCE.md` descreve Rádio mais estreita no Estúdio, 13 fotos e arraste, enquanto o código usa a largura padrão da Home, 220 mídias no manifesto e já retirou o arraste. O material de desenho anterior também descreve uma abertura de Impressões diferente da grade atual. Essa documentação precisa ser reconciliada **depois** que a interface aprovada estiver definida; criar mais contratos agora aumentaria a divergência. Este diagnóstico não altera os documentos existentes.
+
+## Decisão por superfície
+
+| Superfície | Manter | Refazer ou concluir |
+| --- | --- | --- |
+| Home | Cena principal, integração com a Rádio e caminhos existentes. | Texto, correção de “bem-vindo”, paridade dos CTAs no celular e eventual simplificação da animação de letras. |
+| Rádio | Provider, áudio contínuo, catálogo, fila, busca e controles que funcionam. | Títulos exibidos como nome de arquivo, arte repetida quando inadequada e Favoritos desativado visível. Conferir qualquer mudança sem interromper o áudio. |
+| Hub do Estúdio | Destinos, carrossel e strip de fotos como funções. | Fotografia confiável em desktop/mobile, hierarquia compra/orçamento, imagem/linguagem dos cards e saída dos quatro desenhos concorrentes. |
+| Impressões | Oito colunas no desktop, origem R2 e possibilidade de ampliar. | Modelo editorial, enquadramento, carga progressiva, contexto, visualizador único e CTA abaixo da foto. Conferir a autorização de cada mídia antes de apresentá-la como portfólio. |
+| O Estúdio e Materiais | Conteúdo útil sobre processo e PLA/PETG/TPU; mocks identificados. | Composição e texto, eliminação de repetição de CTA, troca de arte genérica por prova visual ou mock assumido e coerência entre promessa de cores e oferta real. |
+| Placas, Caixas, Sob demanda | Rotas e perguntas específicas de cada serviço. | Páginas com fotos/provas ou conceitos identificados, texto voltado à encomenda e tratamento visual comum; retirar quadros “pendente”. |
+| Produtos e detalhe | Nove itens, fotos vinculadas à Shopee, ficha e link de compra. | Grade, quebras de títulos, carregamento das variações, medidas específicas, redundância de avisos e CTA de personalizado. Não tratar URL cadastrada como prova de que a imagem carregou. |
+| Orçamento | Primeira pergunta e estrutura de coleta já desenhada. | Envio real ou saída comercial explicitamente definida, imagens dos cartões, estados de seleção, redação, confirmação/erro e integração segura com o backend. |
+| Cabeçalho e rotas `/dev` | Marca e navegação principal. | Tornar contato/rede ações reais quando houver destino aprovado; corrigir “Sobre” mobile; decidir acesso às rotas de desenvolvimento antes de publicação. O overlay “1 Issue” é do `next dev`. |
+
+## Ordem de recuperação proposta
+
+1. **Fixar referências e critério comercial.** Selecionar capturas da Home, Rádio e Estúdio que Cassiano quer preservar; definir onde o pedido de orçamento de fato chegará e que ativos são reais, autorizados ou conceitos. A prioridade visual é a experiência de comprar ou pedir, não criar mais páginas.
+2. **Resolver a confiabilidade das fotos.** Reproduzir os pretos do hub/galeria e as variações vazias no mesmo SHA, em desktop e mobile, com respostas de rede. Corrigir a causa. Catalogar mídias R2 com ID, dimensões, autorização, agrupamento e ordem. Carregar miniaturas conforme entram na tela e antecipar apenas a próxima foto relevante; não solicitar 220 originais na abertura.
+3. **Fazer um piloto visual completo em Impressões.** Usar o shell real e o novo catálogo: grade pequena de ao menos oito por fileira no desktop, adaptações legíveis em telas menores, foto com proporção respeitada, modal delicado, X roxo/branco sem borda, sem contador sem sentido, CTA abaixo. Conferir no navegador e obter direção visual de Cassiano antes de replicar o padrão.
+4. **Aplicar o padrão às rotas comerciais.** Hub, Produtos/detalhe e Orçamento primeiro; depois O Estúdio, Materiais e serviços. Em cada rota, substituir código/CSS antigo em vez de somar mais uma variante, revisar textos e conferir a saída para Shopee ou orçamento. Deixar claro quando a foto é mock/conceito.
+5. **Concluir o orçamento e simplificar o shell sem quebrar áudio.** Integrar o envio com os controles existentes ou adotar o destino comercial decidido, com estados completos. Separar responsabilidade de página e player somente na medida necessária. Quando Cassiano liberar verificações técnicas, corrigir o lint atual e alinhar contratos/testes às decisões visuais aprovadas; então executar QA renderizado atual. Publicação é uma decisão separada.
+
+**Critério de avanço:** uma etapa só serve de base para a próxima se a rota funcionar no desktop e no celular, as imagens aparecerem, o controle que Cassiano apontou estiver correto na tela, a Rádio continuar funcionando e o caminho de compra/orçamento estiver explícito. Falha de foto ou CTA sem destino bloqueia declarar a superfície pronta. Um piloto que exija novas exceções espalhadas pelo shell é sinal para rever a fronteira do shell antes de continuar.
+
+## Conclusão
+
+Concordo com o outro agente que o site, fora da Home e da Rádio, está visualmente apresentado como ensaio em várias rotas. A análise dele acrescenta observações concretas de tela, sobretudo imagens que não carregaram, botões inconsistentes, material visual improvisado e texto de bastidor. Minha ressalva principal é de evidência: uma URL existente não prova imagem entregue; uma captura de um estado não prova causa; um mock identificado não é fraude; e contagem de CSS não mede qualidade por si. Também acrescento duas causas que exigem solução junto do visual: as 220 fotos ainda não formam um catálogo editorial, e o orçamento ainda não recebe o pedido.
+
+**O caminho é reconstruir o Estúdio, não deletar o produto.** Fazer uma galeria e um fluxo comercial realmente utilizáveis dará uma referência concreta para refazer as outras páginas com menos improviso. Este documento é diagnóstico e proposta; nenhuma interface nova, aprovação visual, teste ou deploy foi produzido nesta revisão.

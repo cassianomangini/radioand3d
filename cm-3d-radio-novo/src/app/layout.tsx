@@ -1,5 +1,9 @@
+import { randomInt } from "node:crypto";
 import type { Metadata, Viewport } from "next";
 import { Manrope, Outfit } from "next/font/google";
+import { connection } from "next/server";
+import { getRadioTracks } from "@/features/radio/catalog";
+import { RadioProvider } from "@/features/radio/radio-provider";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -28,10 +32,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  await connection();
+  const tracks = await getRadioTracks().catch(() => []);
+  const playlistSeed = randomInt(0, 4294967296);
+
   return (
     <html lang="pt-BR" className={`${outfit.variable} ${manrope.variable}`}>
-      <body>{children}</body>
+      <body>
+        <RadioProvider tracks={tracks} playlistSeed={playlistSeed}>
+          {children}
+        </RadioProvider>
+      </body>
     </html>
   );
 }

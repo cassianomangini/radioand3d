@@ -3,16 +3,24 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "./button";
+import { RadioPanel } from "./radio-panel";
 import { SiteHeader } from "./site-header";
 import styles from "../app/page.module.css";
 
 export function HomeFrame() {
-  const [split, setSplit] = useState(false);
+  const [split, setSplit] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const frameClass = expanded ? styles.expanded : split ? styles.split : styles.single;
 
   return (
     <div className={styles.page}>
-      <SiteHeader onOpenSplit={() => setSplit(true)} />
-      <div className={split ? styles.split : styles.single}>
+      <SiteHeader
+        onOpenSplit={() => {
+          setExpanded(false);
+          setSplit(true);
+        }}
+      />
+      <div className={frameClass}>
         <main className={styles.stage}>
           <Image
             className={styles.background}
@@ -65,13 +73,14 @@ export function HomeFrame() {
           <>
             <div className={styles.bar} />
             <aside className={styles.side}>
-              <button
-                type="button"
-                className={styles.corner}
-                onClick={() => setSplit(false)}
-              >
-                100
-              </button>
+              <RadioPanel
+                expanded={expanded}
+                onClose={() => {
+                  setExpanded(false);
+                  setSplit(false);
+                }}
+                onToggleSize={() => setExpanded((current) => !current)}
+              />
             </aside>
           </>
         ) : null}

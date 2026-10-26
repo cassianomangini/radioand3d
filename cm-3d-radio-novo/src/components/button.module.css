@@ -1,0 +1,28 @@
+.button {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-action);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.primary {
+  border: 0;
+  background: var(--purple-dark);
+  color: var(--text-primary);
+}
+
+.secondary {
+  border: 1px solid var(--accent-violet);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+@media (max-width: 1023px) {
+  .button {
+    padding: var(--space-2) var(--space-2);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}

@@ -1,30 +1,27 @@
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./site-header.module.css";
 
-const links = [
-  { href: "/", label: "Início" },
-  { href: "/studio", label: "Estúdio" },
-  { href: "/studio/orcamento", label: "Orçamentos" },
-  { href: "/radio", label: "Rádio" },
-] as const;
+type SiteHeaderProps = {
+  onOpenSplit: () => void;
+};
 
-export function SiteHeader() {
+export function SiteHeader({ onOpenSplit }: SiteHeaderProps) {
   return (
     <header className={styles.header}>
       <Link className={styles.brand} href="/" aria-label="CM 3D e Rádio, início">
-        CM 3D & Rádio
+        <Image
+          src="/images/cm-3d-radio-logo.png"
+          alt=""
+          width={1983}
+          height={793}
+          priority
+          unoptimized
+        />
       </Link>
-      <nav className={styles.nav} aria-label="Navegação principal">
-        <ul>
-          {links.map((link) => (
-            <li key={link.href}>
-              <Link href={link.href} aria-current={link.href === "/" ? "page" : undefined}>
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <button type="button" className={styles.splitButton} onClick={onOpenSplit}>
+        70/30
+      </button>
     </header>
   );
 }

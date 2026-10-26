@@ -5,15 +5,24 @@
   --bg-panel: #10161f;
   --bg-raised: #161f2b;
   --bg-overlay: rgb(3 5 10 / 90%);
+  --bg-navy: linear-gradient(
+      180deg,
+      rgba(5, 11, 23, 0.765) 0px,
+      rgba(5, 11, 23, 0.689) 170px,
+      rgba(5, 11, 23, 0.94) 280px,
+      #050b17 360px
+  );
 
   --text-primary: #ffffff;
-  --text-secondary: #d2dce7;
+  --text-secondary: #eaebec;
   --text-muted: #adbac9;
   --text-on-cyan: #06080c;
 
   --accent-cyan: #52d6ff;
   --accent-cyan-hover: #7fe3ff;
   --accent-violet: #9c78ff;
+  --purple-dark: #7200c9;
+  --text-cyan-violet: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
   --accent-pink: #f46ac5;
   --accent-shopee: #c83e20;
   --focus-ring: #8ddbff;

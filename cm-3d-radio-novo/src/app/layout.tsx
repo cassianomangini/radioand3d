@@ -2,6 +2,7 @@ import { randomInt } from "node:crypto";
 import type { Metadata, Viewport } from "next";
 import { Manrope, Outfit } from "next/font/google";
 import { connection } from "next/server";
+import { SiteShell } from "@/components/site-shell";
 import { getRadioTracks } from "@/features/radio/catalog";
 import { RadioProvider } from "@/features/radio/radio-provider";
 import "./globals.css";
@@ -41,7 +42,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="pt-BR" className={`${outfit.variable} ${manrope.variable}`}>
       <body>
         <RadioProvider tracks={tracks} playlistSeed={playlistSeed}>
-          {children}
+          <SiteShell>{children}</SiteShell>
         </RadioProvider>
       </body>
     </html>

@@ -9,6 +9,29 @@
 html {
   background: var(--bg-app);
   color: var(--text-primary);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent-violet) 70%, var(--bg-panel)) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 0.45rem;
+  height: 0.45rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: var(--radius-action);
+  background: color-mix(in srgb, var(--accent-violet) 70%, var(--bg-panel));
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-violet);
+  background-clip: padding-box;
 }
 
 body {

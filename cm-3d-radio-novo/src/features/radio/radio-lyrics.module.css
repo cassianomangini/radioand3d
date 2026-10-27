@@ -148,8 +148,6 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       padding: 0.75rem 0.8rem 1rem;
-      scrollbar-width: thin;
-      scrollbar-color: color-mix(in srgb, var(--accent-cyan) 42%, var(--bg-panel)) var(--bg-radio);
     }
 
   :global([data-radio-surface="mobile"]) .lyricsText,
@@ -243,8 +241,6 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       padding: 1rem 0.95rem 1.5rem;
-      scrollbar-width: thin;
-      scrollbar-color: color-mix(in srgb, var(--accent-cyan) 42%, var(--bg-panel)) var(--bg-radio);
     }
 
   :global([data-radio-fullscreen="true"]) .lyricsScroll:focus-visible {
@@ -331,8 +327,6 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--space-3);
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--accent-cyan) 42%, var(--bg-panel)) var(--bg-radio);
 }
 
 .lyricsScroll:focus-visible {

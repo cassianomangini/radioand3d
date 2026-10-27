@@ -29,6 +29,23 @@
   --error: #ff8794;
   --success: #75dbac;
 
+  --seek-track: #18324b;
+  --seek-thumb: #dff9ff;
+  --radio-atmosphere: rgb(24 55 113 / 22%);
+  --lyric-idle: #6f8598;
+  --lyric-near: #8ca1b3;
+  --lyric-sung: #b9d3e1;
+  --radio-control-expand: linear-gradient(145deg, #176bac, #3a42ae 68%, #6232ad);
+  --radio-control-close: linear-gradient(145deg, #733caf, #a4389d 68%, #bc3c85);
+  --radio-control-play: linear-gradient(135deg, #247fff, #6259ff);
+  --radio-control-play-hover: linear-gradient(135deg, #368bff, #756bff);
+  --visualizer-wash: rgb(13 87 160 / 13%);
+  --visualizer-bar: linear-gradient(to top, #07c9ef 4%, #336dff 55%, #c52af0 100%);
+  --visualizer-bass: linear-gradient(to top, #08b9e7 5%, #245fd8 72%, #3947b7 100%);
+  --visualizer-drums: linear-gradient(to top, #12d6ef 4%, #3477ff 58%, #8d43e7 100%);
+  --visualizer-other: linear-gradient(to top, #0dc7eb 4%, #4768f2 55%, #a03ce6 100%);
+  --visualizer-voice: linear-gradient(to top, #2dddf2 4%, #69cfff 58%, #b7a4ff 100%);
+
   --border-default: rgb(255 255 255 / 14%);
   --border-strong: rgb(255 255 255 / 22%);
   --border-active: rgb(82 214 255 / 68%);

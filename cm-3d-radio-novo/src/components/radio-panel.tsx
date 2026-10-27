@@ -5,6 +5,7 @@ import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { RadioLyrics } from "@/features/radio/radio-lyrics";
 import { useRadio } from "@/features/radio/radio-provider";
 import { RadioVisualizer } from "@/features/radio/radio-visualizer";
+import { Button } from "./button";
 import styles from "./radio-panel.module.css";
 
 type IconName = "expand" | "medium" | "close" | "dice" | "repeat" | "previous" | "play" | "pause" | "next" | "volume" | "volumeMute";
@@ -16,17 +17,17 @@ function Icon({ name }: { name: IconName }) {
     close: <><path d="M5 5l14 14M19 5 5 19" /></>,
     dice: <>
       <g stroke="none">
-        <rect x="2.5" y="5" width="13" height="13" rx="2.8" fill="#26cfff" />
-        <circle cx="6.25" cy="8.75" r="1.1" fill="white" />
-        <circle cx="9" cy="11.5" r="1.1" fill="white" />
-        <circle cx="11.75" cy="14.25" r="1.1" fill="white" />
+        <rect x="0.5" y="2.4" width="15" height="15" rx="3.1" fill="var(--accent-cyan)" />
+        <circle cx="4.5" cy="6.2" r="1.65" fill="var(--text-primary)" />
+        <circle cx="8" cy="9.9" r="1.65" fill="var(--text-primary)" />
+        <circle cx="11.5" cy="13.6" r="1.65" fill="var(--text-primary)" />
       </g>
       <g stroke="none">
-        <rect x="16.5" y="6" width="13" height="13" rx="2.8" fill="#ae63ff" />
-        <circle cx="20.25" cy="9.75" r="1.1" fill="white" />
-        <circle cx="25.75" cy="9.75" r="1.1" fill="white" />
-        <circle cx="20.25" cy="15.25" r="1.1" fill="white" />
-        <circle cx="25.75" cy="15.25" r="1.1" fill="white" />
+        <rect x="18.5" y="0.6" width="15" height="15" rx="3.1" fill="var(--accent-violet)" />
+        <circle cx="22.5" cy="4.6" r="1.65" fill="var(--text-primary)" />
+        <circle cx="29.5" cy="4.6" r="1.65" fill="var(--text-primary)" />
+        <circle cx="22.5" cy="11.6" r="1.65" fill="var(--text-primary)" />
+        <circle cx="29.5" cy="11.6" r="1.65" fill="var(--text-primary)" />
       </g>
     </>,
     repeat: <><path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15" /><path d="m7 22-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3" /><path d="m11 11 1-1v5" /></>,
@@ -42,7 +43,7 @@ function Icon({ name }: { name: IconName }) {
     <svg
       width={20}
       height={20}
-      viewBox={name === "dice" ? "0 0 32 24" : "0 0 24 24"}
+      viewBox={name === "dice" ? "0 0 34 18" : "0 0 24 24"}
       fill="none"
       stroke="currentColor"
       strokeWidth={1.8}
@@ -96,7 +97,12 @@ export function RadioPanel({
   }
 
   return (
-    <section className={styles.panel} aria-label="CM Rádio">
+    <section
+      className={styles.panel}
+      aria-label="CM Rádio"
+      data-expanded={expanded ? "true" : undefined}
+      data-radio-fullscreen={expanded ? "true" : undefined}
+    >
       <header className={styles.header}>
         <h2><span>CM</span> RÁDIO</h2>
         <div className={styles.headerActions}>
@@ -174,7 +180,7 @@ export function RadioPanel({
       </div>
 
       <div className={styles.transport} aria-label="Controles da rádio">
-        <button type="button" className={styles.modeButton} onClick={radio.reshuffle} disabled={!canPlay || radio.tracks.length < 2} aria-label="Sortear outra música">
+        <button type="button" className={`${styles.modeButton} ${styles.shuffleButton}`} onClick={radio.reshuffle} disabled={!canPlay || radio.tracks.length < 2} aria-label="Sortear outra música">
           <Icon name="dice" />
         </button>
         <button type="button" className={styles.modeButton} onClick={radio.toggleRepeatOne} disabled={!canPlay} aria-pressed={radio.repeatOne} aria-label="Repetir esta faixa">
@@ -240,15 +246,15 @@ export function RadioPanel({
         ) : null}
       </ol>
 
-      <RadioLyrics trackId={track?.id} title={track?.title} active />
+      <div className={styles.lyrics}>
+        <RadioLyrics trackId={track?.id} title={track?.title} active />
+      </div>
 
       {radio.error ? (
-        <p className={styles.error} role="alert">
-          {radio.error}{" "}
-          <button type="button" onClick={radio.retry}>
-            Tentar novamente
-          </button>
-        </p>
+        <div className={styles.error} role="alert">
+          <p>{radio.error}</p>
+          <Button variant="secondary" onClick={radio.retry}>Tentar novamente</Button>
+        </div>
       ) : null}
       {!radio.error && track?.fixture ? (
         <p className={styles.note}>

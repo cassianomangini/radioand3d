@@ -7,7 +7,7 @@
 
 .section {
   margin: 0.9rem 0 0.2rem;
-  color: #6d8498;
+  color: var(--lyric-idle);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -21,7 +21,7 @@
 .line {
   position: relative;
   margin: 0;
-  color: #6f8598;
+  color: var(--lyric-idle);
   font-size: clamp(0.82rem, 0.95vw, 0.98rem);
   line-height: 1.68;
   opacity: 0.42;
@@ -34,7 +34,7 @@
 
 .line[data-lyric-distance="-1"],
 .line[data-lyric-distance="1"] {
-  color: #8ca1b3;
+  color: var(--lyric-near);
   opacity: 0.68;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .activeLine {
-  color: #edf7ff;
+  color: var(--text-primary);
   font-weight: 620;
   opacity: 1;
   transform: translateX(0.5rem);
@@ -74,12 +74,12 @@
 }
 
 .completedWord {
-  color: #b9d3e1;
+  color: var(--lyric-sung);
 }
 
 .activeWord {
-  color: #74e4ff;
-  text-shadow: 0 0 0.55rem rgb(82 214 255 / 20%);
+  color: var(--accent-cyan-hover);
+  text-shadow: 0 0 0.55rem color-mix(in srgb, var(--accent-cyan) 20%, transparent);
 }
 
 @media (max-width: 34rem) {
@@ -114,8 +114,8 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: #000;
-      border: 1px solid rgb(82 214 255 / 20%);
+      background: var(--bg-radio);
+      border: 1px solid color-mix(in srgb, var(--accent-cyan) 20%, transparent);
       border-radius: 0.5rem;
     }
 
@@ -125,7 +125,7 @@
       align-content: center;
       gap: 0.1rem;
       padding: 0.45rem 0.75rem;
-      border-bottom: 1px solid rgb(82 214 255 / 17%);
+      border-bottom: 1px solid color-mix(in srgb, var(--accent-cyan) 17%, transparent);
     }
 
   :global([data-radio-surface="mobile"]) .lyricsHeader h3 {
@@ -136,7 +136,7 @@
 
   :global([data-radio-surface="mobile"]) .lyricsHeader span {
       overflow: hidden;
-      color: #9fb2c4;
+      color: var(--text-muted);
       font-size: 0.72rem;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -149,20 +149,20 @@
       overscroll-behavior: contain;
       padding: 0.75rem 0.8rem 1rem;
       scrollbar-width: thin;
-      scrollbar-color: #4c7395 #000;
+      scrollbar-color: color-mix(in srgb, var(--accent-cyan) 42%, var(--bg-panel)) var(--bg-radio);
     }
 
   :global([data-radio-surface="mobile"]) .lyricsText,
     :global([data-radio-surface="mobile"]) .lyricsStatus {
       margin: 0;
-      color: #d6e2ed;
+      color: var(--text-secondary);
       font-size: 0.9rem;
       line-height: 1.65;
       white-space: pre-wrap;
     }
 
   :global([data-radio-surface="mobile"]) .lyricsStatus {
-      color: #9fb2c4;
+      color: var(--text-muted);
       white-space: normal;
     }
 
@@ -190,9 +190,9 @@
       width: 2.25rem;
       height: 2.25rem;
       align-self: center;
-      border: 1px solid rgb(82 214 255 / 35%);
+      border: 1px solid color-mix(in srgb, var(--accent-cyan) 35%, transparent);
       border-radius: 0.4rem;
-      background: #091625;
+      background: var(--bg-panel);
       color: var(--accent-cyan);
       font-size: 1.5rem;
       line-height: 1;
@@ -209,8 +209,8 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: #000;
-      border: 1px solid rgb(82 214 255 / 20%);
+      background: var(--bg-radio);
+      border: 1px solid color-mix(in srgb, var(--accent-cyan) 20%, transparent);
       border-radius: 0.5rem;
     }
 
@@ -220,7 +220,7 @@
       align-content: center;
       gap: 0.15rem;
       padding: 0.55rem 0.9rem;
-      border-bottom: 1px solid rgb(82 214 255 / 17%);
+      border-bottom: 1px solid color-mix(in srgb, var(--accent-cyan) 17%, transparent);
     }
 
   :global([data-radio-fullscreen="true"]) .lyricsHeader h3 {
@@ -231,7 +231,7 @@
 
   :global([data-radio-fullscreen="true"]) .lyricsHeader span {
       overflow: hidden;
-      color: #9fb2c4;
+      color: var(--text-muted);
       font-size: 0.72rem;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -244,7 +244,7 @@
       overscroll-behavior: contain;
       padding: 1rem 0.95rem 1.5rem;
       scrollbar-width: thin;
-      scrollbar-color: #4c7395 #000;
+      scrollbar-color: color-mix(in srgb, var(--accent-cyan) 42%, var(--bg-panel)) var(--bg-radio);
     }
 
   :global([data-radio-fullscreen="true"]) .lyricsScroll:focus-visible {
@@ -255,14 +255,14 @@
   :global([data-radio-fullscreen="true"]) .lyricsText,
     :global([data-radio-fullscreen="true"]) .lyricsStatus {
       margin: 0;
-      color: #d6e2ed;
+      color: var(--text-secondary);
       font-size: clamp(0.82rem, 0.95vw, 0.96rem);
       line-height: 1.7;
       white-space: pre-wrap;
     }
 
   :global([data-radio-fullscreen="true"]) .lyricsStatus {
-      color: #9fb2c4;
+      color: var(--text-muted);
       white-space: normal;
     }
 
@@ -302,7 +302,7 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--accent-cyan) 20%, transparent);
   border-radius: var(--radius-photo);
-  background: black;
+  background: var(--bg-radio);
 }
 
 .lyricsHeader {
@@ -332,6 +332,7 @@
   overscroll-behavior: contain;
   padding: var(--space-3);
   scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent-cyan) 42%, var(--bg-panel)) var(--bg-radio);
 }
 
 .lyricsScroll:focus-visible {

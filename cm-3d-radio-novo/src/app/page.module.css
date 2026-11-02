@@ -551,20 +551,18 @@
   .copy > p {
     margin-top: 18px;
     color: var(--text-primary);
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 500;
     line-height: 1.45;
   }
 
   .copy .shopeeLink {
-    color: color-mix(in srgb, var(--accent-shopee) 55%, white);
-    text-decoration: underline;
-    text-decoration-color: color-mix(in srgb, var(--accent-shopee) 65%, transparent);
-    text-underline-offset: 3px;
+    color: #ff742f;
+    text-decoration: none;
   }
 
   .copy .shopeeLink:hover {
-    color: #ffaf96;
+    color: #ff9b66;
   }
 
   /* Respond to the Studio pane, not to the width of the full viewport. */
@@ -572,37 +570,41 @@
     width: min(calc(100% - 16px), max(62%, 540px));
   }
 
-  /* Cap the information cards so they do not advance into the product photo. */
+  /* The split hero uses a deliberately narrower information rail.
+     Restrict the grid and buttons themselves; keep the headline width unchanged. */
   .stage[data-layout-mode="split"] .featureGrid {
-    width: min(100%, 690px);
-    gap: 14px;
+    width: min(100%, 470px);
+    gap: 12px;
   }
 
   .stage[data-layout-mode="split"] .featureCard {
-    min-height: 86px;
-    gap: 10px;
-    padding: 10px 12px;
+    min-height: 76px;
+    gap: 8px;
+    padding: 8px 10px;
   }
 
   .stage[data-layout-mode="split"] .featureIcon,
   .stage[data-layout-mode="split"] .featureIcon svg {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
   }
 
   .stage[data-layout-mode="split"] .featureText strong {
-    font-size: clamp(15px, 1.5cqi, 17px);
+    font-size: 14px;
+    line-height: 1.2;
   }
 
   .stage[data-layout-mode="split"] .featureText small {
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 1.25;
   }
 
   .stage[data-layout-mode="split"] .actions {
-    width: min(100%, 690px);
+    width: min(100%, 470px);
   }
 
   .stage[data-layout-mode="split"] .actions button {
+    flex: 1 1 0;
     min-width: 0;
     padding-inline: 12px;
   }
@@ -624,10 +626,14 @@
     margin-bottom: 20px;
   }
 
-  .featureCard,
-  .stage[data-layout-mode="split"] .featureCard {
+  .featureCard {
     min-height: 78px;
     padding-block: 8px;
+  }
+
+  .stage[data-layout-mode="split"] .featureCard {
+    min-height: 70px;
+    padding-block: 6px;
   }
 
   .actions {

@@ -114,7 +114,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
         <MobileRadioBar active={mobileLayout && !mobileOpen} onOpen={() => setMobileOpen(true)} />
       </div>
       <div className={frameClass}>
-        <main className={styles.stage}>{children}</main>
+        <main className={styles.stage} data-layout-mode={showDesktopRadio ? "split" : "single"}>{children}</main>
         {showDesktopRadio ? (
           <>
             <div className={styles.bar} />

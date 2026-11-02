@@ -55,6 +55,7 @@ type SiteHeaderProps = {
 export function SiteHeader({ radioOpen = false, docked = false, onHome, onOpenRadio, onRestoreRadio }: SiteHeaderProps) {
   const pathname = usePathname();
   const studioPage = pathname === "/estudio";
+  const orcamentosPage = pathname === "/orcamentos";
 
   return (
     <header className={styles.header} data-docked={docked ? "true" : undefined}>
@@ -69,9 +70,9 @@ export function SiteHeader({ radioOpen = false, docked = false, onHome, onOpenRa
         />
       </Link>
       <nav className={styles.nav} aria-label="Navegação principal">
-        <Link href="/" aria-current={!radioOpen && !studioPage ? "page" : undefined} onClick={onHome}>Início</Link>
+        <Link href="/" aria-current={!radioOpen && pathname === "/" ? "page" : undefined} onClick={onHome}>Início</Link>
         <Link href="/estudio" aria-current={!radioOpen && studioPage ? "page" : undefined} onClick={onHome}>Estúdio</Link>
-        <span>Orçamentos</span>
+        <Link href="/orcamentos" aria-current={!radioOpen && orcamentosPage ? "page" : undefined} onClick={onHome}>Orçamentos</Link>
         <button type="button" onClick={onOpenRadio} aria-current={radioOpen ? "page" : undefined}>Rádio</button>
       </nav>
       <div className={styles.actions}>

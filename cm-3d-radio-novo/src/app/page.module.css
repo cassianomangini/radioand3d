@@ -105,8 +105,8 @@
 .homeHero {
   position: relative;
   isolation: isolate;
-  display: flex;
-  align-items: safe center;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto minmax(0, 2fr);
   width: min(100%, 1440px);
   height: 100%;
   min-height: 0;
@@ -130,6 +130,10 @@
 .copy {
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  grid-row: 2;
+  gap: var(--space-6);
   min-width: 0;
   width: min(58%, 700px);
   color: var(--text-primary);
@@ -137,16 +141,16 @@
 
 .copy::before {
   display: block;
+  flex: none;
   width: var(--space-8);
   height: 3px;
-  margin-bottom: var(--space-5);
   background: var(--text-cyan-violet);
   content: "";
 }
 
 .copy h1 {
   width: 100%;
-  margin: 0 0 var(--space-6);
+  margin: 0;
   font-family: var(--font-heading);
   font-size: clamp(2.75rem, 3.6cqi, 3.25rem);
   font-weight: 400;
@@ -162,14 +166,10 @@
 
 .copy p {
   max-width: 62ch;
-  margin: 0 0 var(--space-5);
+  margin: 0;
   color: var(--text-secondary);
   font-size: clamp(1rem, 1.45cqi, 1.25rem);
   line-height: 1.55;
-}
-
-.copy p:last-child {
-  margin-bottom: 0;
 }
 
 .featureGrid {
@@ -260,11 +260,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin: var(--space-6) 0 0;
-}
-
-.actions + p {
-  margin-top: var(--space-5);
+  margin: 0;
 }
 
 .actions button {
@@ -401,11 +397,11 @@
 @container home-stage (max-width: 700px) {
   .copy {
     width: 100%;
+    gap: var(--space-4);
   }
 
   .copy h1 {
     width: 100%;
-    margin-bottom: var(--space-5);
     font-size: clamp(1.875rem, 6.3cqi, 2.75rem);
   }
 
@@ -442,22 +438,13 @@
     padding-block: var(--space-3);
   }
 
-  .copy h1 {
-    margin-bottom: var(--space-5);
-  }
-
-  .copy::before {
-    margin-bottom: var(--space-3);
-  }
-
-  .copy p {
-    margin-bottom: var(--space-4);
+  .copy {
+    gap: var(--space-3);
   }
 
   .actions {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    margin-block: var(--space-3) 0;
   }
 
   .actions > * {
@@ -470,12 +457,8 @@
     padding-block: var(--space-3);
   }
 
-  .copy h1 {
-    margin-bottom: var(--space-3);
-  }
-
-  .copy::before {
-    margin-bottom: var(--space-2);
+  .copy {
+    gap: var(--space-3);
   }
 
   .featureCard {
@@ -483,13 +466,11 @@
     padding-block: var(--space-1);
   }
 
-  .actions + p {
-    margin-top: var(--space-2);
+  .copy p {
     font-size: 0.875rem;
   }
 
   .actions {
     gap: var(--space-2);
-    margin-top: var(--space-2);
   }
 }

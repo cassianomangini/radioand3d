@@ -475,12 +475,8 @@
   }
 }
 
-/* Desktop Home: commercial hierarchy and spacing. Mobile keeps its existing layout. */
+/* Refine the desktop Home without changing its artwork or the mobile layout. */
 @media (min-width: 1024px) {
-  .homeHero {
-    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1.2fr);
-  }
-
   .copy {
     width: min(58%, 700px);
     gap: 0;
@@ -505,7 +501,6 @@
     border-radius: var(--radius-card);
   }
 
-  /* Services first on desktop; preserve the current mobile presentation. */
   .featureCard:nth-child(3),
   .featureCard:nth-child(4) {
     order: -1;
@@ -546,11 +541,11 @@
   }
 
   .actions button:first-child {
-    flex: 0 0 240px;
+    flex: 0 1 240px;
   }
 
   .actions button:last-child {
-    flex: 0 0 265px;
+    flex: 0 1 265px;
   }
 
   .copy > p {
@@ -560,29 +555,19 @@
     line-height: 1.4;
   }
 
-  /* The Studio occupies 70% when the full Radio uses the other 30%. */
+  /* Respond to the Studio pane, not to the width of the full viewport. */
   .stage[data-layout-mode="split"] .copy {
-    width: min(66%, 620px);
+    width: min(calc(100% - 16px), max(62%, 540px));
   }
 
   .stage[data-layout-mode="split"] .featureCard {
+    min-height: 94px;
     gap: 10px;
-    min-height: 96px;
-    padding: 12px 14px;
-  }
-
-  .stage[data-layout-mode="split"] .featureIcon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .stage[data-layout-mode="split"] .featureIcon svg {
-    width: 25px;
-    height: 25px;
+    padding: 12px;
   }
 
   .stage[data-layout-mode="split"] .featureText strong {
-    font-size: clamp(16px, 1.65cqi, 18px);
+    font-size: clamp(15px, 1.7cqi, 18px);
   }
 
   .stage[data-layout-mode="split"] .featureText small {
@@ -590,34 +575,24 @@
   }
 
   .stage[data-layout-mode="split"] .actions button {
-    flex: 1 1 0;
     min-width: 0;
-    padding-inline: 14px;
+    padding-inline: 12px;
   }
 }
 
-@media (min-width: 1024px) and (max-width: 1200px) {
-  .stage[data-layout-mode="split"] .copy {
-    width: min(76%, 580px);
-  }
-}
-
+/* Only compact desktop heights, not mobile. */
 @media (min-width: 1024px) and (max-height: 700px) {
   .copy::before {
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
   .copy h1 {
     margin-bottom: 20px;
   }
 
-  .featureCard {
-    min-height: 86px;
-    padding-block: 9px;
-  }
-
+  .featureCard,
   .stage[data-layout-mode="split"] .featureCard {
-    min-height: 82px;
+    min-height: 78px;
     padding-block: 8px;
   }
 

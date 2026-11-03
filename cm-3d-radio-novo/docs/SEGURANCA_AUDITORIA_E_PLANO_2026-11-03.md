@@ -38,10 +38,10 @@ Status usados: **[IMPLEMENTADO NO PR]** = código/documento proposto, sem valida
 - [x] **01 · Dependências críticas (IMPLEMENTADO NO PR, NÃO PUBLICADO):** atualizado `next` e `eslint-config-next` de 16.3.7 para **16.4.4**, com `pnpm-lock.yaml` gerado pelo próprio pnpm num runner isolado. Lint, typecheck, 9 testes, build e `pnpm audit --prod --audit-level=high` passaram no CI. **Ainda faltam QA em preview e deploy controlado.** A release de segurança de novembro foi anunciada para 04/11/2026; atualizar novamente quando sair.
 - [ ] **02 · Publicação/branch:** escolher a branch de produção após a reconstrução, bloquear deploy de código não revisado e aplicar proteção de branch/revisão. A alteração de branch, merge e produção exige decisão explícita.
 - [x] **03 · CI ativo (IMPLEMENTADO NO PR):** adicionar workflow próprio da nova aplicação, sem secrets, para lint, typecheck, testes e build em PRs. **Workflow executado com sucesso no commit `8217d29` em 03/11/2026.**
-- [ ] **04 · Antirrobô:** Turnstile com validação no servidor antes de criar sessão de orçamento. Configurar chaves somente via variáveis de ambiente e comportamento fail-closed; testar humano, bot, token ausente, expirado e repetido. Não criar desafio que dependa apenas do navegador.
+- [ ] **04 · Antirrobô — CÓDIGO NO PR / NÃO ATIVADO:** Turnstile com validação server-side antes de criar sessão, verificação de ação/hostname e falha fechada, mais widget na última etapa. **Faltam credenciais Cloudflare na Vercel, deploy controlado e teste real**; sem chaves, o intake fica indisponível.
 - [ ] **05 · Abuso em camadas:** manter rate limit transacional e adicionar limites de concorrência, por sessão/identificador de pedido e na borda, com métricas e política de bloqueio; preservar usuários legítimos em NAT compartilhado.
-- [ ] **06 · Capacidade e custo do upload:** instrumentar reservas pendentes/bytes efetivos, alertar antes de saturar, limitar sessões concorrentes, respeitar validade TUS e reconciliar espaço apenas após exclusão confirmada.
-- [ ] **07 · Quarentena:** arquivos recebidos ficam privados e não podem ser abertos/convertidos automaticamente no ambiente operacional até passar por inspeção apropriada; usar antivírus e processamento isolado com limites de recursos.
+- [ ] **06 · Capacidade e custo — MIGRATION PREPARADA / NÃO APLICADA:** guarda transacional limita a 2 reservas ainda não validadas por proprietário de sessão, preservando a quota global já existente. **Faltam aplicar SQL na instância CM, verificação live, métricas e mitigação por IP/borda**. A reserva de 27h continua necessária.
+- [ ] **07 · Quarentena — SCHEMA/WORKER PREPARADOS / NÃO ATIVADOS:** tabela de vereditos inicia tudo como pendente, view de liberação exige scan clean, worker isolado ClamAV com tamanho, tempo e SHA-256, rejeição de infectados e erro fechado. **Faltam migration no CM, host isolado, assinatura atualizada, agendamento, QA e gate de qualquer futuro download administrativo.** A inspeção não é sandbox completa.
 
 ### P1 — Proteção funcional, dados e operação
 
@@ -95,6 +95,19 @@ Status usados: **[IMPLEMENTADO NO PR]** = código/documento proposto, sem valida
 - **CI verificado no commit `8217d29869c3aeaf4e0f7ca123d55e032d9595ae`:** https://github.com/cassianomangini/radioand3d/actions/runs/41709256714. `pnpm install --frozen-lockfile`, ESLint, `next typegen`, `tsc --noEmit`, **9/9 testes**, `next build` e `pnpm audit --prod --audit-level=high` passaram. O auditor não reportou vulnerabilidades conhecidas no limiar configurado.
 - **Aviso da build:** o acesso dinâmico de `local-visualizer-analysis.ts` provoca rastreamento amplo de arquivos pelo Turbopack. Exige análise do artefato; não está classificado como vazamento confirmado.
 - **Sem validação live:** não foram realizados upload TUS externo, teste de ataque, varredura antimalware, leitura da instância Supabase CM ou deploy. O código em PR não protege a produção até ser aprovado, integrado e publicado.
+
+## 6. Incremento de segurança (03/11/2026)
+
+O PR #37 recebeu implementação adicional, sem ativação remota:
+
+- **Cloudflare Turnstile:** `src/server/quote/turnstile.ts`, novo componente de verificação final, teste de token e fail-closed quando faltam credenciais. A API só registra draft após Siteverify; chaves privadas nunca vão ao navegador.
+- **Rate limit IP:** a identidade no Vercel passa a depender de `x-vercel-forwarded-for`, sem fallback em `x-forwarded-for` potencialmente sobrescrito por proxies.
+- **Proteção de quota:** `supabase/migrations/20261103202500_quote_owner_quota_and_quarantine.sql` adiciona limite transacional de 2 autorizações pendentes por sessão e filas de scan. **Arquivo de migração não é estado de banco aplicado.**
+- **Quarentena:** `quote_attachment_scans` e `quote_clean_attachments` separam validação estrutural de liberação após antimalware. Estado inicial `pending` também para dados anteriores. O fluxo recebe o orçamento mesmo enquanto o anexo permanece isolado; nenhuma rota administrativa de download foi criada.
+- **Worker:** `scripts/quote-malware-scan-worker.mjs` prepara o uso de ClamAV fora da Vercel, com lease, leitura de Storage privado, limites, subprocesso sem segredos em ambiente, SHA-256 e veredito. **Ainda não está hospedado nem agendado.**
+- **Testes adicionais:** casos de verificação de desafio, código de saída do scanner, isolamento de segredos e script SQL de quota/scan executado contra um PostgreSQL descartável no CI. Verificar o estado do último workflow antes de declarar o bloco tecnicamente aprovado.
+
+**Rollout obrigatório:** `docs/SEGURANCA_ATIVACAO_ANTIBOT_QUARENTENA.md`. Não modificar o Artesopolis Admin; a conexão Supabase disponível anteriormente não era a do CM e não pode ser usada para aplicar esta migração.
 
 ### Referências primárias
 

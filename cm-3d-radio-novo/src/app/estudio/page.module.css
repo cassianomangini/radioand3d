@@ -185,26 +185,24 @@
 .previewPrevious {
   grid-column: 1;
   justify-self: end;
-  transform-origin: center bottom;
-  transform: translateX(13%) perspective(900px) rotateY(-22deg) rotate(-4deg);
+  transform: translateX(13%) perspective(900px) rotateY(-16deg) rotate(-4deg);
   box-shadow: 0 0 17px rgb(0 205 255 / 65%);
 }
 
 .previewPrevious:hover {
-  transform: translateX(13%) perspective(900px) rotateY(-22deg) rotate(-4deg) scale(1.04);
+  transform: translateX(13%) perspective(900px) rotateY(-16deg) rotate(-4deg) scale(1.04);
 }
 
 .previewNext {
   grid-column: 3;
   justify-self: start;
   border-color: #d76aff;
-  transform-origin: center bottom;
-  transform: translateX(-13%) perspective(900px) rotateY(22deg) rotate(4deg);
+  transform: translateX(-13%) perspective(900px) rotateY(16deg) rotate(4deg);
   box-shadow: 0 0 17px rgb(190 44 255 / 60%);
 }
 
 .previewNext:hover {
-  transform: translateX(-13%) perspective(900px) rotateY(22deg) rotate(4deg) scale(1.04);
+  transform: translateX(-13%) perspective(900px) rotateY(16deg) rotate(4deg) scale(1.04);
 }
 
 .carousel {

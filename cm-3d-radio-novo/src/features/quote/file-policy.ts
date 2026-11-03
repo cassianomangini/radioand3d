@@ -127,3 +127,12 @@ export function validateQuoteFiles(
 export function quoteFilePolicyLabel() {
   return "STL, 3MF, OBJ, STEP/STP, PDF e imagens PNG/JPG/WebP · até 50 MB por arquivo · até 5 arquivos";
 }
+
+/** Checks whether an upload belongs to the declared input field before signing. */
+export function quoteFileRoleAllows(role: string, filename: string): boolean {
+  const dot = filename.lastIndexOf(".");
+  const extension = dot > 0 ? filename.slice(dot).toLowerCase() : "";
+  if (role === "model") return extension === ".stl" || extension === ".3mf";
+  if (!["logo", "qr", "boxLogo", "boxQr", "references"].includes(role)) return false;
+  return [".png", ".jpg", ".jpeg", ".webp", ".pdf"].includes(extension);
+}

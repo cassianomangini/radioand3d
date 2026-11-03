@@ -5,6 +5,11 @@ export function allowedQuoteObjectPath(path) {
   return typeof path === 'string' && SAFE_PATH.test(path);
 }
 
+export function scannerChildEnvironment() {
+  // Never let the parser of an untrusted file inherit Supabase credentials.
+  return { PATH: '/usr/bin:/bin', LANG: 'C' };
+}
+
 export function classifyClamAvExitCode(exitCode) {
   if (exitCode === 0) return 'clean';
   if (exitCode === 1) return 'infected';

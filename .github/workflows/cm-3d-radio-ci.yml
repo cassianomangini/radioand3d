@@ -1,0 +1,52 @@
+name: CM 3D Radio CI
+on:
+  pull_request:
+    paths:
+      - "cm-3d-radio-novo/**"
+      - ".github/workflows/cm-3d-radio-ci.yml"
+  push:
+    branches: [cmc/renew, main]
+    paths:
+      - "cm-3d-radio-novo/**"
+      - ".github/workflows/cm-3d-radio-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cm3d-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: cm-3d-radio-novo
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: cm-3d-radio-novo/pnpm-lock.yaml
+      - name: Install pinned dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Unit tests
+        run: pnpm test
+      - name: Production build
+        run: pnpm build

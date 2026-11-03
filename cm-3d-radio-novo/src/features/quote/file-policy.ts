@@ -5,9 +5,6 @@ export const QUOTE_FILE_POLICY = {
   allowedExtensions: [
     ".stl",
     ".3mf",
-    ".obj",
-    ".step",
-    ".stp",
     ".pdf",
     ".png",
     ".jpg",
@@ -90,7 +87,7 @@ export function validateQuoteFiles(
         code: "unsupported-extension",
         fileName: file.name,
         message:
-          `O formato de “${file.name}” não é aceito. Use STL, 3MF, OBJ, STEP/STP, PDF, PNG, JPG ou WebP.`
+          `O formato de “${file.name}” não é aceito. Use STL, 3MF, PDF, PNG, JPG ou WebP.`
       };
     }
 
@@ -125,7 +122,7 @@ export function validateQuoteFiles(
  * browser-provided MIME types are never trusted as authorization or proof of format.
  */
 export function quoteFilePolicyLabel() {
-  return "STL, 3MF, OBJ, STEP/STP, PDF e imagens PNG/JPG/WebP · até 50 MB por arquivo · até 5 arquivos";
+  return "STL, 3MF, PDF e imagens PNG/JPG/WebP · até 50 MB por arquivo · até 5 arquivos";
 }
 
 /** Checks whether an upload belongs to the declared input field before signing. */

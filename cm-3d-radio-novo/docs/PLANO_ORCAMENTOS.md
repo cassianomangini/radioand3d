@@ -127,11 +127,10 @@ Cada grupo detalhado exige uma resposta ou sua opção explícita de **Não sei/
 4. Integrar sessão, upload privado e registro do pedido; verificar os caminhos de sucesso e erro com arquivos reais.
 5. Conectar os botões de entrada para Orçamentos e liberar o envio somente quando o destino comercial, a configuração do Supabase e a confirmação de ponta a ponta estiverem resolvidos.
 
-## Decisões necessárias antes de liberar o envio
+## Status do envio
 
-- Na Vercel, já estão configurados o endereço `https://rhuypfcvkhfwvaxuorfr.supabase.co`, os segredos de sessão, limite e limpeza, e `CM_QUOTE_INTAKE_ENABLED=false` em produção.
-- O projeto Vercel `radioand3d` teve o diretório raiz corrigido para `cm-3d-radio-novo`; o último build remoto falhava por procurar o `package.json` na raiz do repositório.
-- O projeto Supabase separado **CM 3D & Rádio** foi validado por chamada de servidor com a chave local: tabelas e funções de orçamento responderam, e o bucket `quote-intake` é privado. `CM_SUPABASE_SECRET_KEY` já está salva como segredo de produção na Vercel. A conexão Supabase do plugin continua em outra conta e não é necessária para o formulário.
-- Configurar a senha de aplicativo do Gmail ou um remetente verificado no Resend antes de ativar a flag. O destinatário já é `casman1986@gmail.com`.
-- Como confirmar a disponibilidade de filamentos próximos das cores ou valores RGB informados no pedido.
-- Validar o fluxo completo com arquivo sintético, registro no banco correto, entrega do e-mail e execução da retenção agendada. O formulário atual aceita STL/3MF para arquivo 3D e imagens/PDF nas referências.
+- O projeto Vercel `radioand3d` usa `cm-3d-radio-novo` como diretório raiz. O commit `5b1f336` foi publicado em produção no deployment `dpl_85ikvQMFaPi4zBDBj4qpftmnmKqA`, com alias `radioand3d.vercel.app` e estado `READY`.
+- As variáveis de produção `CM_SUPABASE_URL`, `CM_SUPABASE_SECRET_KEY`, `CM_QUOTE_SESSION_SECRET`, `CM_QUOTE_RATE_LIMIT_SECRET`, `CM_QUOTE_GMAIL_APP_PASSWORD` e `CRON_SECRET` estão configuradas; `CM_QUOTE_INTAKE_ENABLED=true`.
+- O projeto Supabase separado **CM 3D & Rádio** foi validado por chamada de servidor: tabelas e funções de orçamento responderam, e o bucket `quote-intake` é privado. A conexão Supabase do plugin continua em outra conta e não é necessária para o formulário.
+- O Gmail autenticou por SMTP e aceitou o teste. Um pedido sintético sem arquivo foi salvo, notificado e removido. Outro pedido sintético com PNG teve upload privado validado, registro e e-mail confirmados; sua expiração foi adiantada para a limpeza automática após o fim da autorização temporária de upload.
+- A disponibilidade real dos filamentos próximos das cores ou valores RGB informados continua como integração futura. STL/3MF e os demais formatos permitidos não tiveram teste real de ponta a ponta nesta ativação; o caminho de PNG teve.

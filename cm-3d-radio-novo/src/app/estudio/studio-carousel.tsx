@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { RadioIcon } from "@/components/radio-icons";
 import styles from "./page.module.css";
 
@@ -70,13 +70,15 @@ function PlaybackSymbol({ playing }: { playing: boolean }) {
 }
 
 const slideDurationMs = 4800;
+const galleryPageSize = 12;
 
 export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
-  const galleryPageSize = 12;
   const [activeCategory, setActiveCategory] = useState<StudioCategory | null>(null);
   const [index, setIndex] = useState(0);
   const [galleryPage, setGalleryPage] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const [outgoingSlide, setOutgoingSlide] = useState<StudioSlide | null>(null);
+  const [slideDirection, setSlideDirection] = useState<"previous" | "next">("next");
   const [viewerOpen, setViewerOpen] = useState(false);
   const [documentVisible, setDocumentVisible] = useState(true);
   const [inViewport, setInViewport] = useState(true);
@@ -85,32 +87,45 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   const viewerRef = useRef<HTMLDialogElement>(null);
   const remainingRef = useRef(slideDurationMs);
   const timedIndexRef = useRef(0);
+  const outgoingTimerRef = useRef<number | null>(null);
   const visibleSlides = activeCategory === null ? slides : slides.filter((slide) => slide.category === activeCategory);
   const activeCategoryLabel = categories.find((category) => category.id === activeCategory)?.label ?? "Todas";
   const current = visibleSlides[index];
   const canNavigate = visibleSlides.length > 1;
-  const previousSlide = index > 0 ? visibleSlides[index - 1] : null;
-  const nextSlide = index < visibleSlides.length - 1 ? visibleSlides[index + 1] : null;
+  const previousSlide = canNavigate ? visibleSlides[(index - 1 + visibleSlides.length) % visibleSlides.length] : null;
+  const nextSlide = canNavigate ? visibleSlides[(index + 1) % visibleSlides.length] : null;
+  const dotCount = Math.min(5, visibleSlides.length);
+  const firstDot = Math.max(0, Math.min(index - 2, visibleSlides.length - dotCount));
+  const visibleDots = Array.from({ length: dotCount }, (_, offset) => firstDot + offset);
   const galleryPageCount = Math.ceil(visibleSlides.length / galleryPageSize);
   const galleryStart = galleryPage * galleryPageSize;
   const gallerySlides = visibleSlides.slice(galleryStart, galleryStart + galleryPageSize);
   const advancing = canNavigate && playing && documentVisible && inViewport && !viewerOpen;
+
+  const transitionTo = useCallback((requested: number, revealInGallery = true) => {
+    if (!canNavigate) return;
+    const nextIndex = (requested + visibleSlides.length) % visibleSlides.length;
+    if (nextIndex === index) return;
+    setSlideDirection(requested < index ? "previous" : "next");
+    setOutgoingSlide(current ?? null);
+    if (outgoingTimerRef.current !== null) window.clearTimeout(outgoingTimerRef.current);
+    outgoingTimerRef.current = window.setTimeout(() => {
+      setOutgoingSlide(null);
+      outgoingTimerRef.current = null;
+    }, 620);
+    setIndex(nextIndex);
+    if (revealInGallery) setGalleryPage(Math.floor(nextIndex / galleryPageSize));
+  }, [canNavigate, current, index, visibleSlides.length]);
+
+  useEffect(() => () => {
+    if (outgoingTimerRef.current !== null) window.clearTimeout(outgoingTimerRef.current);
+  }, []);
 
   useEffect(() => {
     const update = () => setDocumentVisible(!document.hidden);
     update();
     document.addEventListener("visibilitychange", update);
     return () => document.removeEventListener("visibilitychange", update);
-  }, []);
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => {
-      if (media.matches) setPlaying(false);
-    };
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
@@ -134,16 +149,20 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
     const started = performance.now();
     const timer = window.setTimeout(() => {
       remainingRef.current = slideDurationMs;
-      setIndex((currentIndex) => (currentIndex + 1) % visibleSlides.length);
+      transitionTo(index + 1, false);
     }, remainingRef.current);
 
     return () => {
       window.clearTimeout(timer);
       remainingRef.current = Math.max(0, remainingRef.current - (performance.now() - started));
     };
-  }, [activeCategory, advancing, index, visibleSlides.length]);
+  }, [activeCategory, advancing, index, transitionTo]);
 
   function chooseCategory(category: StudioCategory | null) {
+    if (outgoingTimerRef.current !== null) window.clearTimeout(outgoingTimerRef.current);
+    outgoingTimerRef.current = null;
+    setOutgoingSlide(null);
+    setPlaying(true);
     setActiveCategory(category);
     setIndex(0);
     setGalleryPage(0);
@@ -152,10 +171,7 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   }
 
   function goTo(requested: number, revealInGallery = true) {
-    if (!canNavigate || requested < 0 || requested >= visibleSlides.length) return;
-    const nextIndex = requested;
-    setIndex(nextIndex);
-    if (revealInGallery) setGalleryPage(Math.floor(nextIndex / galleryPageSize));
+    transitionTo(requested, revealInGallery);
   }
 
   function showGalleryPage(page: number) {
@@ -172,9 +188,9 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
 
   return (
     <>
+      <div className={styles.showcase}>
       <div className={styles.categoryColumn}>
         <aside className={styles.categories} aria-label="Categorias do estúdio">
-          <h2>Categorias</h2>
           <ul>
             {categories.map((category) => (
               <li key={category.id ?? "todas"}>
@@ -192,24 +208,32 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
         </aside>
       </div>
       <div className={styles.carouselPane}>
-        {previousSlide ? (
+        {previousSlide && visibleSlides.length > 2 ? (
           <button
+            key={previousSlide.src}
             className={`${styles.preview} ${styles.previewPrevious}`}
             type="button"
             aria-label={`Mostrar foto anterior: ${previousSlide.title}`}
             onClick={() => goTo(index - 1)}
           >
-            <Image src={previousSlide.src} alt="" fill sizes="10vw" />
+            <Image src={previousSlide.src} alt="" fill sizes="24vw" />
           </button>
         ) : null}
         <section
           ref={rootRef}
           className={styles.carousel}
+          data-direction={slideDirection}
           aria-label="Trabalhos reais de impressão 3D"
           aria-roledescription="carrossel"
         >
+          {outgoingSlide ? (
+            <div className={styles.outgoingPhoto} aria-hidden="true">
+              <Image src={outgoingSlide.src} alt="" fill sizes="(max-width: 480px) 58vw, 27vw" />
+            </div>
+          ) : null}
           {current ? (
             <button
+              key={current.src}
               className={styles.photoTrigger}
               type="button"
               aria-label={`Ampliar imagem: ${current.title}`}
@@ -220,15 +244,16 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
                 src={current.src}
                 alt={current.alt}
                 fill
-                sizes="(max-width: 760px) 80vw, (max-width: 1200px) 45vw, 35vw"
+                sizes="(max-width: 480px) 58vw, 27vw"
                 loading="eager"
                 fetchPriority="high"
               />
             </button>
           ) : null}
+        </section>
         {canNavigate ? (
           <div className={styles.controls}>
-            {previousSlide ? <NavigationArrow direction="previous" label="Impressão anterior" className={styles.previous} onClick={() => goTo(index - 1)} /> : null}
+            <NavigationArrow direction="previous" label="Impressão anterior" className={styles.previous} onClick={() => goTo(index - 1)} />
             <button
               className={styles.pause}
               type="button"
@@ -241,18 +266,30 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
             <button className={styles.expand} type="button" aria-label="Ampliar imagem" onClick={openViewer}>
               <RadioIcon name="expand" />
             </button>
-            {nextSlide ? <NavigationArrow direction="next" label="Próxima impressão" className={styles.next} onClick={() => goTo(index + 1)} /> : null}
+            <NavigationArrow direction="next" label="Próxima impressão" className={styles.next} onClick={() => goTo(index + 1)} />
+            <div className={styles.slideDots} role="group" aria-label="Selecionar foto do carrossel">
+              {visibleDots.map((slideIndex) => (
+                <button
+                  key={slideIndex}
+                  className={styles.slideDot}
+                  type="button"
+                  aria-label={`Mostrar foto ${slideIndex + 1} de ${visibleSlides.length}`}
+                  aria-current={slideIndex === index ? "true" : undefined}
+                  onClick={() => goTo(slideIndex)}
+                />
+              ))}
+            </div>
           </div>
         ) : null}
-        </section>
         {nextSlide ? (
           <button
+            key={nextSlide.src}
             className={`${styles.preview} ${styles.previewNext}`}
             type="button"
             aria-label={`Mostrar próxima foto: ${nextSlide.title}`}
             onClick={() => goTo(index + 1)}
           >
-            <Image src={nextSlide.src} alt="" fill sizes="10vw" />
+            <Image src={nextSlide.src} alt="" fill sizes="24vw" />
           </button>
         ) : null}
         <dialog
@@ -286,6 +323,7 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
             </button>
           </div>
         </dialog>
+      </div>
       </div>
       <section
         ref={galleryRef}

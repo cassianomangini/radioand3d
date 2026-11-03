@@ -113,3 +113,23 @@ test('rate-limited clients are rejected before verification', async () => {
   assert.equal(response.status, 429);
   assert.equal(validated, false);
 });
+
+test('Vercel rate-limit identity refuses spoofable forwarding fallback', () => {
+  const { rateLimitHash } = require('../src/server/quote/http.ts');
+  const before = process.env.VERCEL;
+  process.env.VERCEL = '1';
+  try {
+    const req = (headers) => new Request('https://example.com/api/quote/session', { headers });
+    assert.throws(() => rateLimitHash(req({
+      'x-forwarded-for': '198.51.100.7',
+    })), { code: 'quote_network_unavailable' });
+    const trusted = rateLimitHash(req({ 'x-vercel-forwarded-for': '192.0.2.9' }));
+    const spoofed = rateLimitHash(req({
+      'x-vercel-forwarded-for': '192.0.2.9', 'x-forwarded-for': '198.51.100.7',
+    }));
+    assert.equal(spoofed, trusted);
+  } finally {
+    if (before === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = before;
+  }
+});

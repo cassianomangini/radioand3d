@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { requireQuoteEmailConfig } from "@/server/quote/email";
 import { requireQuoteEnabled } from "@/server/quote/http";
 import { quoteServiceConfig } from "@/server/quote/supabase-gateway";
+import { requireQuoteTurnstileConfig } from "@/server/quote/turnstile";
 import { studioPhotoKeyFromId } from "@/features/studio/r2-photos";
 import { QuoteFlow } from "./quote-flow";
 import styles from "./page.module.css";
@@ -25,10 +26,12 @@ export default async function OrcamentosPage({
     } catch { /* Uma referência indisponível não impede o formulário normal. */ }
   }
   let intakeEnabled = false;
+  let turnstileSiteKey: string | null = null;
   try {
     requireQuoteEnabled();
     quoteServiceConfig();
     requireQuoteEmailConfig();
+    turnstileSiteKey = requireQuoteTurnstileConfig().siteKey;
     intakeEnabled = true;
   } catch { /* A interface continua disponível enquanto o envio é configurado. */ }
   return (
@@ -40,7 +43,7 @@ export default async function OrcamentosPage({
         </div>
       </header>
 
-      <QuoteFlow intakeEnabled={intakeEnabled} studioPhotoId={studioPhotoId} />
+      <QuoteFlow intakeEnabled={intakeEnabled} studioPhotoId={studioPhotoId} turnstileSiteKey={turnstileSiteKey} />
     </div>
   );
 }

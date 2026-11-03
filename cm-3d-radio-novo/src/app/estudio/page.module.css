@@ -464,7 +464,7 @@
   background: var(--text-cyan-violet);
   background-clip: text;
   color: transparent;
-  font-size: 1.125rem;
+  font-size: 2rem;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -582,6 +582,10 @@
 }
 
 @container studio (max-width: 800px) {
+  .stripHeader h2 {
+    font-size: 1.6875rem;
+  }
+
   .intro {
     grid-column: 1;
     grid-row: 1;

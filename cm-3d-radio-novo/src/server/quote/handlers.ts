@@ -9,6 +9,7 @@ import { detectQuoteFile } from './file-sniffer';
 import { validate3mfArchive } from './zip-3mf';
 import { parseQuoteAttachments, parseQuoteForm, prepareQuoteForStorage, validateQuoteForm } from './form-contract';
 import { quoteEmailText, requireQuoteEmailConfig, sendQuoteEmail } from './email';
+import { studioPhotoKeyFromId } from '@/features/studio/r2-photos';
 
 const TYPES: readonly string[] = ['impressao', 'placa', 'caixa', 'outro'];
 /** Starts a new draft; a cookie never grants access to another draft ID. */
@@ -166,6 +167,12 @@ export async function handleQuoteSubmit(
     if (!draft || !attachments || !validateQuoteForm(draft, attachments)) {
       throw new QuoteHttpError(400, 'invalid_quote_submit');
     }
+    if (draft.studioPhotoId) {
+      let photoKey: string | null;
+      try { photoKey = studioPhotoKeyFromId(draft.studioPhotoId); }
+      catch { throw new QuoteHttpError(503, 'studio_reference_unavailable'); }
+      if (!photoKey) throw new QuoteHttpError(400, 'invalid_quote_submit');
+    }
     const prepared = prepareQuoteForStorage(draft, attachments);
     const db = gateway ?? createQuoteGateway();
     // A completed operation with the same ownership + submission key is
@@ -186,7 +193,7 @@ export async function handleQuoteSubmit(
     try {
       if (!await db.emailWasSent(receipt.request_id)) {
         const notification = await db.notificationData(receipt.request_id, hash);
-        await mailer(receipt.request_id, quoteEmailText(receipt.request_id, notification));
+        await mailer(receipt.request_id, quoteEmailText(receipt.request_id, notification, new URL(request.url).origin));
         await db.recordEmailSent(receipt.request_id);
       }
     } catch {

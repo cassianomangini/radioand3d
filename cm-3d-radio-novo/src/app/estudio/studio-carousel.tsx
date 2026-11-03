@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { RadioIcon } from "@/components/radio-icons";
@@ -88,8 +89,9 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   const timedIndexRef = useRef(0);
   const transitionRef = useRef<{ skipTransition: () => void } | null>(null);
   const visibleSlides = activeCategory === null ? slides : slides.filter((slide) => slide.category === activeCategory);
-  const activeCategoryLabel = categories.find((category) => category.id === activeCategory)?.label ?? "Todas";
   const current = visibleSlides[index];
+  const currentPhotoId = current?.src.startsWith("/api/studio/photos/")
+    ? current.src.slice("/api/studio/photos/".length) : null;
   const canNavigate = visibleSlides.length > 1;
   const previousIndex = canNavigate ? (index - 1 + visibleSlides.length) % visibleSlides.length : 0;
   const nextIndex = canNavigate ? (index + 1) % visibleSlides.length : 0;
@@ -315,6 +317,17 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
               <span aria-hidden="true">×</span>
             </button>
           </div>
+          {currentPhotoId ? (
+            <div className={styles.viewerFooter}>
+              <Link
+                className={styles.viewerQuoteAction}
+                href={`/orcamentos?referencia=${encodeURIComponent(currentPhotoId)}`}
+                onClick={() => viewerRef.current?.close()}
+              >
+                Quero um orçamento
+              </Link>
+            </div>
+          ) : null}
         </dialog>
       </div>
       </div>
@@ -325,17 +338,22 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
       >
         <div className={styles.stripHeader}>
           <h2>Fotos do estúdio</h2>
-          {activeCategory !== null ? (
-            <button
-              className={styles.clearCategory}
-              type="button"
-              aria-label={`Remover a categoria ${activeCategoryLabel} e mostrar todas as fotos`}
-              onClick={() => chooseCategory(null)}
-            >
-              <span>{activeCategoryLabel}</span>
-              <span className={styles.clearCategoryIcon} aria-hidden="true">×</span>
-            </button>
-          ) : null}
+          <nav className={`${styles.categories} ${styles.galleryCategories}`} aria-label="Filtrar fotos do estúdio por categoria">
+            <ul>
+              {categories.map((category) => (
+                <li key={category.id ?? "todas"}>
+                  <button
+                    className={styles.categoryButton}
+                    type="button"
+                    aria-pressed={activeCategory === category.id}
+                    onClick={() => chooseCategory(category.id)}
+                  >
+                    {category.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
         <div className={styles.stripItems}>
           {gallerySlides.map((slide, offset) => {

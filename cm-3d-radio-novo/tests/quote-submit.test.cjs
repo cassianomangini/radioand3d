@@ -21,7 +21,8 @@ require.extensions['.ts'] = (module, filename) => {
 
 const { handleQuoteSubmit } = require('../src/server/quote/handlers.ts');
 const { newQuoteSession, issueSessionCookie } = require('../src/server/quote/http.ts');
-const { parseQuoteForm, parseQuoteAttachments } = require('../src/server/quote/form-contract.ts');
+const { parseQuoteForm, parseQuoteAttachments, validateQuoteForm } = require('../src/server/quote/form-contract.ts');
+const { studioPhotoSrc } = require('../src/features/studio/r2-photos.ts');
 const { uploadSignedFile } = require('../src/features/quote/client-upload.ts');
 
 process.env.NODE_ENV = 'development';
@@ -30,6 +31,9 @@ process.env.CM_QUOTE_SESSION_SECRET = 'session-secret-for-synthetic-tests-123456
 process.env.CM_QUOTE_RATE_LIMIT_SECRET = 'rate-secret-for-synthetic-tests-1234567';
 process.env.RESEND_API_KEY = 're_synthetic_test_key_123456789';
 process.env.CM_QUOTE_EMAIL_FROM = 'CM 3D <pedidos@example.com>';
+process.env.R2_S3_ENDPOINT = 'https://example.r2.cloudflarestorage.com';
+process.env.R2_ACCESS_KEY_ID = 'synthetic-access-key';
+process.env.R2_SECRET_ACCESS_KEY = 'synthetic-r2-secret-for-photo-reference-tests';
 
 function quickBoxDraft() {
   return {
@@ -104,6 +108,51 @@ test('pedido é salvo uma vez e o e-mail pendente é reenviado a partir do banco
   assert.equal(replay.status, 201);
   assert.equal(submitCount, 1);
   assert.equal(mailCount, 2);
+});
+
+test('foto do Estúdio acompanha a ideia até o banco e o e-mail, e referência adulterada é recusada', async () => {
+  const photoId = studioPhotoSrc({ key: 'Caixas/caixa-azul.png', revision: 'a'.repeat(32) }).split('/').at(-1);
+  const draft = {
+    ...quickBoxDraft(), type: 'outro', boxMode: '', boxQuickDescription: '',
+    otherDescription: 'Quero esta caixa com o meu logo', colorMode: 'indeciso', studioPhotoId: photoId,
+  };
+  const requestId = crypto.randomUUID();
+  const { token } = newQuoteSession();
+  let saved;
+  let email = '';
+  const gateway = {
+    submissionReceipt: async () => null,
+    consumeRate: async () => true,
+    submitQuote: async (input) => {
+      saved = input;
+      return { request_id: requestId, submission_time: '2026-11-03T12:00:00Z' };
+    },
+    emailWasSent: async () => false,
+    notificationData: async () => ({
+      projectType: saved.projectType, project: saved.project, production: saved.production,
+      contactMethod: saved.contactMethod, contactName: saved.contactName,
+      contactValue: saved.contactValue, attachmentNames: [], sourceReference: saved.sourceReference,
+    }),
+    recordEmailSent: async () => {},
+  };
+  const makeRequest = (photoDraft) => new Request('http://localhost:3000/api/quote/submit', {
+    method: 'POST',
+    headers: { origin: 'http://localhost:3000', 'content-type': 'application/json', cookie: issueSessionCookie(token) },
+    body: JSON.stringify({ requestId, submissionKey: crypto.randomUUID(), draft: photoDraft, attachments: [] }),
+  });
+  const response = await handleQuoteSubmit(makeRequest(draft), gateway, async (_id, message) => { email = message; });
+  assert.equal(response.status, 201);
+  assert.equal(saved.sourceOrigin, 'site/estudio');
+  assert.equal(saved.sourceReference, `/api/studio/photos/${photoId}`);
+  assert.match(email, new RegExp(`http://localhost:3000/api/studio/photos/${photoId.replaceAll('.', '\\.')}\\b`));
+  assert.match(email, /Quero esta caixa com o meu logo/);
+
+  const extraReference = { id: crypto.randomUUID(), role: 'references', name: 'logo.png', size: 100, type: 'image/png' };
+  assert.equal(validateQuoteForm({ ...draft, otherDescription: '' }, [extraReference]), false);
+
+  const alteredId = `${photoId.slice(0, -1)}${photoId.endsWith('a') ? 'b' : 'a'}`;
+  const rejected = await handleQuoteSubmit(makeRequest({ ...draft, studioPhotoId: alteredId }), gateway, async () => {});
+  assert.equal(rejected.status, 400);
 });
 
 test('upload privado retoma após perda da resposta de um bloco', async () => {

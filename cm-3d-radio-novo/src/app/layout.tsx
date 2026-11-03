@@ -14,10 +14,10 @@ const outfit = localFont({
   display: "swap",
 });
 
-const manrope = localFont({
-  src: "./fonts/manrope-latin.woff2",
-  weight: "500 700",
-  variable: "--font-manrope",
+const dmSans = localFont({
+  src: "./fonts/dm-sans-latin.woff2",
+  weight: "400 800",
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
@@ -41,7 +41,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const playlistSeed = randomInt(0, 4294967296);
 
   return (
-    <html lang="pt-BR" className={`${outfit.variable} ${manrope.variable}`}>
+    <html lang="pt-BR" className={`${outfit.variable} ${dmSans.variable}`}>
       <body>
         <RadioProvider tracks={tracks} playlistSeed={playlistSeed}>
           <SiteShell>{children}</SiteShell>

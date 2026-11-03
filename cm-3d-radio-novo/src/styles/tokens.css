@@ -51,7 +51,7 @@
   --border-active: rgb(82 214 255 / 68%);
 
   --font-heading: var(--font-outfit), Arial, sans-serif;
-  --font-body: var(--font-manrope), Arial, sans-serif;
+  --font-body: var(--font-dm-sans), Arial, sans-serif;
 
   --space-1: 4px;
   --space-2: 8px;

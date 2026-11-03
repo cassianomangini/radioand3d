@@ -60,6 +60,7 @@ type FieldError = { field: string; message: string } | null;
 type ReviewEditArea = "details" | "contact" | "delivery";
 export type Draft = {
   type: ProjectType | null;
+  studioPhotoId?: string | null;
   boxMode: RequestMode;
   boxQuickDescription: string;
   boxShape: string;
@@ -108,6 +109,7 @@ type SelectedFiles = Record<FileField, File[]>;
 const emptyDimensions = (): Dimensions => ({ width: "", depth: "", height: "" });
 const initialDraft: Draft = {
   type: null,
+  studioPhotoId: null,
   boxMode: "",
   boxQuickDescription: "",
   boxShape: "",
@@ -388,12 +390,16 @@ function SummaryRow({ label, value, onEdit }: { label: string; value: string; on
   );
 }
 
-export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
-  const [step, setStep] = useState(1);
+export function QuoteFlow({ intakeEnabled, studioPhotoId }: { intakeEnabled: boolean; studioPhotoId: string | null }) {
+  const [step, setStep] = useState(studioPhotoId ? 2 : 1);
   const [reviewing, setReviewing] = useState(false);
   const [boxDetailStep, setBoxDetailStep] = useState(0);
   const [plateDetailStep, setPlateDetailStep] = useState(0);
-  const [draft, setDraft] = useState<Draft>(initialDraft);
+  const [draft, setDraft] = useState<Draft>(() => ({
+    ...initialDraft,
+    type: studioPhotoId ? "outro" : null,
+    studioPhotoId,
+  }));
   const [savedContacts, setSavedContacts] = useState({ whatsapp: "", email: "" });
   const [files, setFiles] = useState<SelectedFiles>({ model: [], logo: [], qr: [], boxLogo: [], boxQr: [], references: [] });
   const [error, setError] = useState<FieldError>(null);
@@ -547,6 +553,7 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
     if (draft.type === "arquivo" && files.model.length === 0) return { field: "model", message: "Selecione um arquivo STL ou 3MF para análise." };
     if (draft.type === "arquivo" && !draft.modelScaleUnknown && !draft.modelScale) return { field: "modelScale", message: "Escolha como quer definir o tamanho." };
     if (draft.type === "arquivo" && !draft.modelScaleUnknown && draft.modelScale === "alterar" && (!Object.values(draft.modelDimensions).some((value) => value.trim()) || Object.values(draft.modelDimensions).some((value) => value.trim() && !validDimension(value)))) return { field: "modelDimensions", message: "Informe pelo menos uma medida válida em cm para alterar o tamanho." };
+    if (draft.type === "outro" && draft.studioPhotoId && !draft.otherDescription.trim()) return { field: "otherDescription", message: "Descreva o que você quer mudar na foto de referência." };
     if (draft.type === "outro" && !draft.otherDescription.trim() && files.references.length === 0) return { field: "otherDescription", message: "Descreva a ideia ou anexe uma referência." };
     if (!(draft.type === "caixa" && draft.boxMode === "quick") && !(draft.type === "placa" && draft.plateMode === "quick") && draft.colorMode !== "indeciso" && (draft.colors.length === 0 || draft.colors.length > 4 || !draft.colors.every(hasColor))) return { field: "colors", message: "Preencha cada cor adicionada ou marque Ainda não decidi." };
     return null;
@@ -819,6 +826,22 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
         </div>
       )}
 
+      {draft.studioPhotoId && step > 1 ? (
+        <div className={styles.studioReference} role="group" aria-label="Foto de referência do Estúdio">
+          <Image
+            className={styles.studioReferenceImage}
+            src={`/api/studio/photos/${draft.studioPhotoId}`}
+            alt="Foto escolhida no Estúdio como referência"
+            width={88}
+            height={88}
+          />
+          <div>
+            <strong>Foto do Estúdio selecionada como referência</strong>
+            <p>Descreva o que você quer manter ou mudar nesta peça.</p>
+          </div>
+        </div>
+      ) : null}
+
       {step === 1 ? (
         <fieldset className={styles.options}>
           <legend className={styles.visuallyHidden}>Tipo de projeto</legend>
@@ -1057,7 +1080,17 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
 
           {draft.type === "outro" ? (
             <>
-              <div className={styles.field}><label htmlFor="other-description">O que você gostaria de criar?</label><textarea id="other-description" value={draft.otherDescription} aria-invalid={error?.field === "otherDescription"} onChange={(event) => update("otherDescription", event.target.value)} placeholder="Pode explicar do seu jeito, sem termos técnicos." /><InlineError error={error} field="otherDescription" /></div>
+              <div className={styles.field}>
+                <label htmlFor="other-description">{draft.studioPhotoId ? "O que você quer mudar nesta peça?" : "O que você gostaria de criar?"}</label>
+                <textarea
+                  id="other-description"
+                  value={draft.otherDescription}
+                  aria-invalid={error?.field === "otherDescription"}
+                  onChange={(event) => update("otherDescription", event.target.value)}
+                  placeholder={draft.studioPhotoId ? "Ex.: quero esta caixa com meu logo, ou esta peça com meu nome." : "Pode explicar do seu jeito, sem termos técnicos."}
+                />
+                <InlineError error={error} field="otherDescription" />
+              </div>
               <div className={styles.field}><label htmlFor="other-size">Sabe o tamanho aproximado? <small>Opcional</small></label><input id="other-size" type="text" value={draft.otherSize} onChange={(event) => update("otherSize", event.target.value)} placeholder="Escreva o que souber" /></div>
             </>
           ) : null}
@@ -1213,6 +1246,7 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
               </> : null}
               {draft.type === "outro" ? <>
                 <SummaryRow label="Ideia" value={draft.otherDescription.trim() || "Descrita pela referência"} onEdit={() => beginReviewEdit("details")} />
+                {draft.studioPhotoId ? <SummaryRow label="Referência" value="Foto do Estúdio selecionada" /> : null}
                 {draft.otherSize.trim() ? <SummaryRow label="Tamanho aproximado" value={draft.otherSize.trim()} onEdit={() => beginReviewEdit("details")} /> : null}
               </> : null}
             </dl>

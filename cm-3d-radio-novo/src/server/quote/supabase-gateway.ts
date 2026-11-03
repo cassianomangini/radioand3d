@@ -47,6 +47,7 @@ export type QuoteSubmitInput = {
 
 export type QuoteNotificationData = {
   projectType: QuoteProjectType;
+  sourceReference: string | null;
   production: Record<string, unknown>;
   project: Record<string, unknown>;
   contactMethod: 'whatsapp' | 'email';
@@ -325,8 +326,8 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
       const rows = await readApi<Array<{
         project_type: QuoteProjectType; production: Record<string, unknown>;
         project: Record<string, unknown>; contact_method: 'whatsapp' | 'email';
-        contact_name: string; contact_value: string;
-      }>>(`/rest/v1/quote_requests?id=eq.${requestId}&owner_session_hash=eq.${ownerHash}&select=project_type,production,project,contact_method,contact_name,contact_value&limit=1`);
+        contact_name: string; contact_value: string; source_reference: string | null;
+      }>>(`/rest/v1/quote_requests?id=eq.${requestId}&owner_session_hash=eq.${ownerHash}&select=project_type,production,project,contact_method,contact_name,contact_value,source_reference&limit=1`);
       if (!Array.isArray(rows) || rows.length !== 1 || !rows[0].contact_name || !rows[0].contact_value ||
           !rows[0].production || !rows[0].project) {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
@@ -339,7 +340,8 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
       }
       const row = rows[0];
       return {
-        projectType: row.project_type, production: row.production, project: row.project,
+        projectType: row.project_type, sourceReference: row.source_reference,
+        production: row.production, project: row.project,
         contactMethod: row.contact_method, contactName: row.contact_name,
         contactValue: row.contact_value, attachmentNames: attachments.map(item => item.original_name),
       };

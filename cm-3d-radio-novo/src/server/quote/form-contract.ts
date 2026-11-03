@@ -61,6 +61,9 @@ export function parseQuoteForm(value: unknown): Draft | null {
   if (!object(value) || !oneOf(value.type, ['caixa', 'placa', 'arquivo', 'outro']) ||
       !Number.isSafeInteger(value.quantity) || (value.quantity as number) < 1 ||
       (value.quantity as number) > 10000) return null;
+  if (value.studioPhotoId != null &&
+      (typeof value.studioPhotoId !== 'string' || value.studioPhotoId.length > 260 ||
+       !/^[A-Za-z0-9_-]+\.[a-f0-9]{32}\.[a-f0-9]{32}$/.test(value.studioPhotoId))) return null;
   for (const key of textFields) {
     if (typeof value[key] !== 'string' || value[key].length > 2000) return null;
   }
@@ -157,6 +160,7 @@ export function validateQuoteForm(draft: Draft, files: QuoteAttachmentInput[]): 
             Object.values(draft.modelDimensions).some(value => value.trim() && !validDimension(value))))) return false;
     return hasColors(draft);
   }
+  if (draft.studioPhotoId && !draft.otherDescription.trim()) return false;
   return Boolean((draft.otherDescription.trim() || fileByRole(files, 'references')) && hasColors(draft));
 }
 
@@ -202,8 +206,10 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
     draft.plateContentUnknown || draft.plateUseUnknown || draft.plateFixationUnknown;
   return {
     projectType, noFile: files.length === 0,
-    startingPoints: [mode === 'quick' ? 'pedido rápido' : mode === 'detailed' ? 'formulário detalhado' : 'formulário'],
-    sourceOrigin: 'site/orcamentos', sourceReference: null,
+    startingPoints: [mode === 'quick' ? 'pedido rápido' : mode === 'detailed' ? 'formulário detalhado' : 'formulário',
+      ...(draft.studioPhotoId ? ['foto do estúdio'] : [])],
+    sourceOrigin: draft.studioPhotoId ? 'site/estudio' : 'site/orcamentos',
+    sourceReference: draft.studioPhotoId ? `/api/studio/photos/${draft.studioPhotoId}` : null,
     production, project, contactMethod: draft.contactMethod,
     contactName: draft.name.trim(), contactValue: draft.contact.trim(),
     triageStatus: needsInformation ? 'needs-information' as const : 'ready-for-review' as const,

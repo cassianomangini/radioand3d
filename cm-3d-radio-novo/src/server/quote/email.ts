@@ -23,12 +23,14 @@ function display(value: unknown): string {
   return String(value);
 }
 
-export function quoteEmailText(requestId: string, quote: QuoteNotificationData): string {
+export function quoteEmailText(requestId: string, quote: QuoteNotificationData, siteOrigin: string): string {
   const details = Object.entries(quote.project)
     .filter(([, value]) => value !== null && value !== '' && !(Array.isArray(value) && value.length === 0))
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => `${labels[key] ?? key}: ${display(value)}`);
   const colors = quote.production.colorMode === 'indeciso' ? 'a definir' : display(quote.production.colors ?? []);
+  const studioReference = quote.sourceReference?.startsWith('/api/studio/photos/')
+    ? new URL(quote.sourceReference, siteOrigin).href : null;
   return [
     `Novo pedido de orçamento #${requestId}`,
     `Cliente: ${quote.contactName}`,
@@ -37,6 +39,7 @@ export function quoteEmailText(requestId: string, quote: QuoteNotificationData):
     `Quantidade: ${display(quote.production.quantity)}`,
     `Cores: ${colors}`,
     `Entrega: ${display(quote.production.delivery)}${quote.production.cep ? `, CEP ${display(quote.production.cep)}` : ''}`,
+    ...(studioReference ? [`Foto de referência do Estúdio: ${studioReference}`] : []),
     '', 'Detalhes:', ...details,
     '', `Arquivos: ${quote.attachmentNames.length ? quote.attachmentNames.join(', ') : 'nenhum'}`,
     'Os arquivos ficam no armazenamento privado do pedido; este e-mail não contém anexos.',

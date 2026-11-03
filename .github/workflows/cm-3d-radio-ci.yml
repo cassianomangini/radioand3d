@@ -64,6 +64,10 @@ jobs:
         run: pnpm typecheck
       - name: Unit tests
         run: pnpm test
+      - name: Scanner worker syntax
+        run: |
+          node --check scripts/quote-malware-scan-worker.mjs
+          node --check scripts/lib/quote-scan-core.mjs
       - name: Database quota and quarantine tests
         env:
           PGPASSWORD: postgres

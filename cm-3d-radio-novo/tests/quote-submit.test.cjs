@@ -23,6 +23,7 @@ const { handleQuoteSubmit } = require('../src/server/quote/handlers.ts');
 const { newQuoteSession, issueSessionCookie } = require('../src/server/quote/http.ts');
 const { parseQuoteForm, parseQuoteAttachments, validateQuoteForm } = require('../src/server/quote/form-contract.ts');
 const { studioPhotoSrc } = require('../src/features/studio/r2-photos.ts');
+const { createQuoteGateway } = require('../src/server/quote/supabase-gateway.ts');
 const { uploadSignedFile } = require('../src/features/quote/client-upload.ts');
 
 process.env.NODE_ENV = 'development';
@@ -34,6 +35,8 @@ process.env.CM_QUOTE_EMAIL_FROM = 'CM 3D <pedidos@example.com>';
 process.env.R2_S3_ENDPOINT = 'https://example.r2.cloudflarestorage.com';
 process.env.R2_ACCESS_KEY_ID = 'synthetic-access-key';
 process.env.R2_SECRET_ACCESS_KEY = 'synthetic-r2-secret-for-photo-reference-tests';
+process.env.CM_SUPABASE_URL = 'https://synthetic.supabase.co';
+process.env.CM_SUPABASE_SECRET_KEY = 'sb_secret_synthetic_quote_reference_123456789';
 
 function quickBoxDraft() {
   return {
@@ -153,6 +156,26 @@ test('foto do Estúdio acompanha a ideia até o banco e o e-mail, e referência 
   const alteredId = `${photoId.slice(0, -1)}${photoId.endsWith('a') ? 'b' : 'a'}`;
   const rejected = await handleQuoteSubmit(makeRequest({ ...draft, studioPhotoId: alteredId }), gateway, async () => {});
   assert.equal(rejected.status, 400);
+});
+
+test('notificação lê a foto de referência gravada no pedido', async () => {
+  const requestId = crypto.randomUUID();
+  const sourceReference = '/api/studio/photos/foto-assinada';
+  const requests = [];
+  const gateway = createQuoteGateway(async (url, options) => {
+    requests.push(url);
+    if (url.includes('/quote_requests?')) return Response.json([{
+      project_type: 'outro', source_reference: sourceReference,
+      production: { quantity: 1, colorMode: 'indeciso', delivery: 'retirada' },
+      project: { description: 'Quero personalizar esta peça' },
+      contact_method: 'email', contact_name: 'Cliente', contact_value: 'cliente@example.com',
+    }]);
+    return Response.json([]);
+  });
+  const notification = await gateway.notificationData(requestId, 'a'.repeat(64));
+  assert.equal(notification.sourceReference, sourceReference);
+  assert.ok(requests[0].includes('source_reference'));
+  assert.equal(requests.length, 2);
 });
 
 test('upload privado retoma após perda da resposta de um bloco', async () => {

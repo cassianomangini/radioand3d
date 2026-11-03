@@ -133,3 +133,58 @@ test('upload privado retoma após perda da resposta de um bloco', async () => {
   assert.equal(patches, 2);
   assert.match(metadata, /bucketName cXVvdGUtaW50YWtl/);
 });
+
+test('upload init rejects mismatched roles before touching storage', async () => {
+  const { handleQuoteAttachmentInit } = require('../src/server/quote/handlers.ts');
+  const { token } = newQuoteSession();
+  const makeRequest = (role, name) => new Request('http://localhost:3000/api/quote/attachments/init', {
+    method: 'POST',
+    headers: { origin: 'http://localhost:3000', 'content-type': 'application/json', cookie: issueSessionCookie(token) },
+    body: JSON.stringify({
+      requestId: crypto.randomUUID(), uploadKey: crypto.randomUUID(),
+      role, name, size: 100, type: 'application/octet-stream',
+    }),
+  });
+  const forbiddenGateway = { consumeRate: async () => { throw Error('invalid input reached the database'); } };
+  for (const [role, name] of [
+    ['logo', 'model.stl'], ['model', 'image.pdf'], ['references', 'piece.3mf'],
+    ['unknown', 'image.png'], [undefined, 'model.stl'],
+  ]) {
+    const response = await handleQuoteAttachmentInit(makeRequest(role, name), forbiddenGateway);
+    assert.equal(response.status, 400, `${role}: ${name}`);
+    assert.equal((await response.json()).error, 'invalid_quote_upload');
+  }
+});
+
+test('upload init still signs an allowed model in its own field', async () => {
+  const { handleQuoteAttachmentInit } = require('../src/server/quote/handlers.ts');
+  const { token } = newQuoteSession();
+  let reserved = false;
+  const gateway = {
+    consumeRate: async () => true,
+    reserveAttachment: async input => {
+      reserved = true;
+      assert.equal(input.extension, '.stl');
+      return {
+        attachment_id: crypto.randomUUID(),
+        object_path: 'private/synthetic/model.stl',
+        reservation_expires_at: new Date(Date.now() + 27 * 60 * 60 * 1000).toISOString(),
+      };
+    },
+    signUpload: async () => ({
+      endpoint: 'https://cmtest.storage.supabase.co/storage/v1/upload/resumable/sign',
+      token: 'synthetic-signature',
+    }),
+  };
+  const response = await handleQuoteAttachmentInit(new Request('http://localhost:3000/api/quote/attachments/init', {
+    method: 'POST',
+    headers: { origin: 'http://localhost:3000', 'content-type': 'application/json', cookie: issueSessionCookie(token) },
+    body: JSON.stringify({
+      requestId: crypto.randomUUID(), uploadKey: crypto.randomUUID(),
+      role: 'model', name: 'model.stl', size: 100, type: 'application/octet-stream',
+    }),
+  }), gateway);
+  assert.equal(response.status, 200);
+  assert.equal(reserved, true);
+  assert.equal((await response.json()).tokenHeader, 'x-signature');
+});

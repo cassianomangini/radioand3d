@@ -25,6 +25,7 @@ A `main` ainda contém a aplicação legada. A produção consultada na Vercel e
 | SEC-08 | Média | Notificação de e-mail é processada na requisição; a confirmação não é transacional com o envio. | `emailWasSent` → `send` → `recordEmailSent`. | Outbox/fila idempotente e recuperação. |
 | SEC-09 | Não verificado remotamente | RLS, bucket privado, Storage TUS, CORS e Cron precisam de read-back do Supabase CM e testes E2E. | Migrations versionadas existem; conexão disponível não incluiu o projeto separado CM. | Verificar projeto certo sem tocar no Artesopolis Admin. |
 | SEC-10 | Média, privacidade | Ausência de aviso de privacidade claro no fluxo novo; e-mail replica dados pessoais que podem sobreviver ao expurgo do banco. | Inspeção do fluxo de orçamento e template de e-mail. | Aviso LGPD, minimização e retenção por provedor. |
+| SEC-11 | Requer investigação | Turbopack avisa sobre rastreamento do projeto inteiro devido a acesso dinâmico ao sistema de arquivos em código do visualizador de desenvolvimento. | Aviso observado no build Next.js 16.4.4; não há prova de vazamento público. | Inspecionar o artefato de produção e isolar o código de desenvolvimento do bundle. |
 
 **Proteções já presentes no código:** token de sessão opaco, cookie HttpOnly/Secure/SameSite Strict, verificação de Origin, JSON limitado, rate-limit atômico por IP, reserva de capacidade, URLs de upload assinadas, validação de tamanho/formato, bucket privado definido no SQL, RLS sem acesso anônimo e submissão idempotente. Essas proteções devem ser preservadas e verificadas em produção; não reinventá-las.
 
@@ -34,9 +35,9 @@ Status usados: **[IMPLEMENTADO NO PR]** = código/documento proposto, sem valida
 
 ### P0 — Bloqueios antes de considerar o upload seguro
 
-- [ ] **01 · Dependências críticas:** atualizar `next` e `eslint-config-next` para release corrigida estável, regenerar `pnpm-lock.yaml`, checar advisories de React e transitive dependencies, rodar lint/typecheck/test/build e testar o deploy. Em 03/11/2026, consultar a linha estável 16.4.x, incluindo as correções de novembro; não editar lockfile manualmente.
+- [x] **01 · Dependências críticas (IMPLEMENTADO NO PR, NÃO PUBLICADO):** atualizado `next` e `eslint-config-next` de 16.3.7 para **16.4.4**, com `pnpm-lock.yaml` gerado pelo próprio pnpm num runner isolado. Lint, typecheck, 9 testes, build e `pnpm audit --prod --audit-level=high` passaram no CI. **Ainda faltam QA em preview e deploy controlado.** A release de segurança de novembro foi anunciada para 04/11/2026; atualizar novamente quando sair.
 - [ ] **02 · Publicação/branch:** escolher a branch de produção após a reconstrução, bloquear deploy de código não revisado e aplicar proteção de branch/revisão. A alteração de branch, merge e produção exige decisão explícita.
-- [x] **03 · CI ativo (IMPLEMENTADO NO PR):** adicionar workflow próprio da nova aplicação, sem secrets, para lint, typecheck, testes e build em PRs. **Falta confirmar a execução verde do workflow no GitHub.**
+- [x] **03 · CI ativo (IMPLEMENTADO NO PR):** adicionar workflow próprio da nova aplicação, sem secrets, para lint, typecheck, testes e build em PRs. **Workflow executado com sucesso no commit `8217d29` em 03/11/2026.**
 - [ ] **04 · Antirrobô:** Turnstile com validação no servidor antes de criar sessão de orçamento. Configurar chaves somente via variáveis de ambiente e comportamento fail-closed; testar humano, bot, token ausente, expirado e repetido. Não criar desafio que dependa apenas do navegador.
 - [ ] **05 · Abuso em camadas:** manter rate limit transacional e adicionar limites de concorrência, por sessão/identificador de pedido e na borda, com métricas e política de bloqueio; preservar usuários legítimos em NAT compartilhado.
 - [ ] **06 · Capacidade e custo do upload:** instrumentar reservas pendentes/bytes efetivos, alertar antes de saturar, limitar sessões concorrentes, respeitar validade TUS e reconciliar espaço apenas após exclusão confirmada.
@@ -44,8 +45,9 @@ Status usados: **[IMPLEMENTADO NO PR]** = código/documento proposto, sem valida
 
 ### P1 — Proteção funcional, dados e operação
 
-- [x] **08 · Política por papel de arquivo (IMPLEMENTADO NO PR):** validar no servidor a extensão permitida de `model` (STL/3MF) ou campos de imagem/referência (PNG/JPG/JPEG/WebP/PDF) **antes** da assinatura. Validar conteúdo real continua obrigatório; verificar integração e testes em CI.
+- [x] **08 · Política por papel de arquivo (IMPLEMENTADO NO PR):** validar no servidor a extensão permitida de `model` (STL/3MF) ou campos de imagem/referência (PNG/JPG/JPEG/WebP/PDF) **antes** da assinatura. Validar conteúdo real continua obrigatório; testes de rejeição e autorização permitida passaram no CI (não substituem E2E real).
 - [ ] **09 · Processadores/visualizadores seguros:** limites de arquivo, memória, CPU e decompression ratio; sanitização/reencodificação de imagens e PDFs quando aplicável; parsing de STL/3MF em ambiente isolado; nunca executar instruções enviadas por clientes.
+- [ ] **09b · Revisão do rastreamento de arquivos na build:** investigar aviso de Turbopack em `src/features/radio/local-visualizer-analysis.ts`, causado por `existsSync` com caminho variável. Inspecionar o bundle Vercel e manter conteúdo e ferramentas de desenvolvimento fora da função de produção. O aviso **não prova** que arquivos internos estejam publicamente acessíveis.
 - [ ] **10 · Download/admin:** autenticação, autorização por pedido, acesso temporário, `Content-Disposition` e `nosniff`, auditoria de acesso e proibição de expor credenciais privilegiadas no navegador.
 - [ ] **11 · Firewall/WAF:** verificar regras da Vercel e criar proteções por rota, taxa e sinais de abuso; lembrar que upload TUS é direto ao Supabase e escapa do WAF da Vercel após a emissão da assinatura.
 - [x] **12 · Headers básicos (IMPLEMENTADO NO PR):** `frame-ancestors`, `object-src`, `base-uri`, XFO, nosniff, HSTS sem `includeSubDomains`, Referrer/Permissions-Policy. **Falta QA HTTP/browser.** CSP completa (`script-src`, `connect-src`, `media-src`) deve ser implementada depois com teste da rádio e do upload TUS.
@@ -85,7 +87,14 @@ Status usados: **[IMPLEMENTADO NO PR]** = código/documento proposto, sem valida
 **[VERIFICADO]** A nova aplicação e a `main` ainda são árvores diferentes; o PR não modifica a produção por si só.  
 **[NÃO VERIFICADO]** Ambiente Supabase CM e estado real de RLS/Cron/Storage (organização independente indisponível à conexão usada).  
 **[NÃO EXECUTADO]** Pentest, upload malicioso, alteração de produção, rotação de credenciais, migration ou teste de recuperação.  
-**[NO PR]** Headers e política por papel com regressões locais, além da estrutura de CI. **A aprovação depende do CI e da revisão do diff.**
+**[NO PR]** Dependências 16.4.4 e lockfile gerado pelo pnpm, CI ativo, política por papel e headers. **CI verde** no commit `8217d29`: 9 testes, lint, typecheck, build e audit de produção com limiar alto. **Faltam revisão humana, QA renderizado e teste integrado de Supabase/Vercel.**
+
+## 5. Evidências da primeira execução
+
+- **Pull request:** https://github.com/cassianomangini/radioand3d/pull/37 (rascunho, base `cmc/renew`).
+- **CI verificado no commit `8217d29869c3aeaf4e0f7ca123d55e032d9595ae`:** https://github.com/cassianomangini/radioand3d/actions/runs/41709256714. `pnpm install --frozen-lockfile`, ESLint, `next typegen`, `tsc --noEmit`, **9/9 testes**, `next build` e `pnpm audit --prod --audit-level=high` passaram. O auditor não reportou vulnerabilidades conhecidas no limiar configurado.
+- **Aviso da build:** o acesso dinâmico de `local-visualizer-analysis.ts` provoca rastreamento amplo de arquivos pelo Turbopack. Exige análise do artefato; não está classificado como vazamento confirmado.
+- **Sem validação live:** não foram realizados upload TUS externo, teste de ataque, varredura antimalware, leitura da instância Supabase CM ou deploy. O código em PR não protege a produção até ser aprovado, integrado e publicado.
 
 ### Referências primárias
 

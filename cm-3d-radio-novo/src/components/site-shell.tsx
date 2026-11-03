@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useRadioKeyboard } from "@/features/radio/use-radio-keyboard";
 import { MobileRadioBar } from "./mobile-radio-bar";
@@ -9,6 +9,9 @@ import { SiteHeader } from "./site-header";
 import styles from "../app/page.module.css";
 
 const mobileQuery = "(max-width: 1023px)";
+const subscribeToDocumentBody = () => () => {};
+const getDocumentBody = (): HTMLElement | null => document.body;
+const getServerDocumentBody = (): HTMLElement | null => null;
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const [split, setSplit] = useState(true);
@@ -16,12 +19,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
   const [docked, setDocked] = useState(false);
   const [mobileLayout, setMobileLayout] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileHost, setMobileHost] = useState<HTMLElement | null>(null);
+  const mobileHost = useSyncExternalStore(subscribeToDocumentBody, getDocumentBody, getServerDocumentBody);
   const dialogRef = useRef<HTMLDivElement>(null);
   const expandedRef = useRef(expanded);
   const mobileOpenRef = useRef(mobileOpen);
-  expandedRef.current = expanded;
-  mobileOpenRef.current = mobileOpen;
+  useEffect(() => {
+    expandedRef.current = expanded;
+    mobileOpenRef.current = mobileOpen;
+  }, [expanded, mobileOpen]);
   const frameClass = expanded ? styles.expanded : split ? styles.split : styles.single;
   const showDesktopRadio = split && !mobileLayout;
 
@@ -43,10 +48,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
     apply();
     media.addEventListener("change", apply);
     return () => media.removeEventListener("change", apply);
-  }, []);
-
-  useEffect(() => {
-    setMobileHost(document.body);
   }, []);
 
   useEffect(() => {

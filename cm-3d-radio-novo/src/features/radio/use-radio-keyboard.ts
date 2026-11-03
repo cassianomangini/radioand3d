@@ -7,7 +7,7 @@ import { useRadio } from "./radio-provider";
 export function useRadioKeyboard() {
   const radio = useRadio();
   const radioRef = useRef(radio);
-  radioRef.current = radio;
+  useEffect(() => { radioRef.current = radio; }, [radio]);
 
   useEffect(() => {
     function handleRadioShortcut(event: KeyboardEvent) {

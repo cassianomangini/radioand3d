@@ -9,22 +9,30 @@ import { detectQuoteFile } from './file-sniffer';
 import { validate3mfArchive } from './zip-3mf';
 import { parseQuoteAttachments, parseQuoteForm, prepareQuoteForStorage, validateQuoteForm } from './form-contract';
 import { quoteEmailText, requireQuoteEmailConfig, sendQuoteEmail } from './email';
+import { verifyQuoteTurnstile } from './turnstile';
 
 const TYPES: readonly string[] = ['impressao', 'placa', 'caixa', 'outro'];
 /** Starts a new draft; a cookie never grants access to another draft ID. */
-export async function handleQuoteSession(request: Request, gateway?: QuoteGateway): Promise<Response> {
+export async function handleQuoteSession(
+  request: Request, gateway?: QuoteGateway,
+  verifier: typeof verifyQuoteTurnstile = verifyQuoteTurnstile,
+): Promise<Response> {
   try {
     requireQuoteEnabled();
     requireSameOriginJson(request);
     const data = await readQuoteJson(request);
-    if (!record(data) || !exactKeys(data, ['projectType']) ||
-      typeof data.projectType !== 'string' || !TYPES.includes(data.projectType)) {
+    if (!record(data) || !exactKeys(data, ['projectType', 'turnstileToken']) ||
+      typeof data.projectType !== 'string' || !TYPES.includes(data.projectType) ||
+      typeof data.turnstileToken !== 'string' ||
+      data.turnstileToken.length < 1 || data.turnstileToken.length > 2048) {
       throw new QuoteHttpError(400, 'invalid_project_type');
     }
     const db = gateway ?? createQuoteGateway();
     if (!await db.consumeRate('create', rateLimitHash(request))) {
       throw new QuoteHttpError(429, 'quote_rate_limited');
     }
+    // Rate limit first; invalid/replayed tokens still consume the hourly budget.
+    await verifier(request, data.turnstileToken);
     const previous = existingSessionToken(request);
     const { token, hash } = previous
       ? { token: previous, hash: ownerHash(previous) }

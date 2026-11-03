@@ -661,7 +661,7 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
             attachmentId: string; uploadEndpoint: string; uploadPath: string; uploadToken: string;
           }>("/api/quote/attachments/init", {
             requestId: pending.requestId, uploadKey: upload.uploadKey,
-            name: file.name, size: file.size, type: file.type,
+            name: file.name, size: file.size, type: file.type, role,
           });
           upload.attachmentId = authorization.attachmentId;
           setSubmissionError(`Enviando arquivo ${index + 1} de ${entries.length}: ${file.name}`);

@@ -1,0 +1,36 @@
+name: Temporary Next.js lockfile upgrade preview
+on:
+  push:
+    branches: [security/first-hardening-20261103]
+    paths:
+      - ".github/workflows/next-security-lockfile-preview.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  propose-lockfile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cm-3d-radio-novo
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+          run_install: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - name: Generate lockfile without executing install scripts
+        run: pnpm add -E next@16.4.4 eslint-config-next@16.4.4 --lockfile-only --ignore-scripts
+      - name: Print reproducible package and lockfile patch
+        shell: bash
+        run: |
+          echo CM_NEXT_PATCH_BEGIN
+          git diff --no-ext-diff -- package.json pnpm-lock.yaml
+          echo CM_NEXT_PATCH_END

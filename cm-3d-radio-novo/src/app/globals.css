@@ -75,3 +75,15 @@ a {
     scroll-behavior: auto;
   }
 }
+
+html:has([data-studio-page])::view-transition-group(*),
+html:has([data-studio-page])::view-transition-old(*),
+html:has([data-studio-page])::view-transition-new(*) {
+  animation-duration: 680ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html:has([data-studio-page])::view-transition-old(root),
+html:has([data-studio-page])::view-transition-new(root) {
+  animation-duration: 0s;
+}

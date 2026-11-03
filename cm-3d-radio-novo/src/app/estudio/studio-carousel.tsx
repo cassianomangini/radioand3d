@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { RadioIcon } from "@/components/radio-icons";
 import styles from "./page.module.css";
 
@@ -77,8 +78,6 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   const [index, setIndex] = useState(0);
   const [galleryPage, setGalleryPage] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [outgoingSlide, setOutgoingSlide] = useState<StudioSlide | null>(null);
-  const [slideDirection, setSlideDirection] = useState<"previous" | "next">("next");
   const [viewerOpen, setViewerOpen] = useState(false);
   const [documentVisible, setDocumentVisible] = useState(true);
   const [inViewport, setInViewport] = useState(true);
@@ -87,13 +86,15 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   const viewerRef = useRef<HTMLDialogElement>(null);
   const remainingRef = useRef(slideDurationMs);
   const timedIndexRef = useRef(0);
-  const outgoingTimerRef = useRef<number | null>(null);
+  const transitionRef = useRef<{ skipTransition: () => void } | null>(null);
   const visibleSlides = activeCategory === null ? slides : slides.filter((slide) => slide.category === activeCategory);
   const activeCategoryLabel = categories.find((category) => category.id === activeCategory)?.label ?? "Todas";
   const current = visibleSlides[index];
   const canNavigate = visibleSlides.length > 1;
-  const previousSlide = canNavigate ? visibleSlides[(index - 1 + visibleSlides.length) % visibleSlides.length] : null;
-  const nextSlide = canNavigate ? visibleSlides[(index + 1) % visibleSlides.length] : null;
+  const previousIndex = canNavigate ? (index - 1 + visibleSlides.length) % visibleSlides.length : 0;
+  const nextIndex = canNavigate ? (index + 1) % visibleSlides.length : 0;
+  const previousSlide = canNavigate ? visibleSlides[previousIndex] : null;
+  const nextSlide = canNavigate ? visibleSlides[nextIndex] : null;
   const dotCount = Math.min(5, visibleSlides.length);
   const firstDot = Math.max(0, Math.min(index - 2, visibleSlides.length - dotCount));
   const visibleDots = Array.from({ length: dotCount }, (_, offset) => firstDot + offset);
@@ -104,22 +105,19 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
 
   const transitionTo = useCallback((requested: number, revealInGallery = true) => {
     if (!canNavigate) return;
-    const nextIndex = (requested + visibleSlides.length) % visibleSlides.length;
-    if (nextIndex === index) return;
-    setSlideDirection(requested < index ? "previous" : "next");
-    setOutgoingSlide(current ?? null);
-    if (outgoingTimerRef.current !== null) window.clearTimeout(outgoingTimerRef.current);
-    outgoingTimerRef.current = window.setTimeout(() => {
-      setOutgoingSlide(null);
-      outgoingTimerRef.current = null;
-    }, 620);
-    setIndex(nextIndex);
-    if (revealInGallery) setGalleryPage(Math.floor(nextIndex / galleryPageSize));
-  }, [canNavigate, current, index, visibleSlides.length]);
-
-  useEffect(() => () => {
-    if (outgoingTimerRef.current !== null) window.clearTimeout(outgoingTimerRef.current);
-  }, []);
+    const destination = (requested + visibleSlides.length) % visibleSlides.length;
+    if (destination === index) return;
+    const update = () => {
+      setIndex(destination);
+      if (revealInGallery) setGalleryPage(Math.floor(destination / galleryPageSize));
+    };
+    if (viewerRef.current?.open || !document.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      update();
+      return;
+    }
+    transitionRef.current?.skipTransition();
+    transitionRef.current = document.startViewTransition(() => flushSync(update));
+  }, [canNavigate, index, visibleSlides.length]);
 
   useEffect(() => {
     const update = () => setDocumentVisible(!document.hidden);
@@ -159,9 +157,7 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   }, [activeCategory, advancing, index, transitionTo]);
 
   function chooseCategory(category: StudioCategory | null) {
-    if (outgoingTimerRef.current !== null) window.clearTimeout(outgoingTimerRef.current);
-    outgoingTimerRef.current = null;
-    setOutgoingSlide(null);
+    transitionRef.current?.skipTransition();
     setPlaying(true);
     setActiveCategory(category);
     setIndex(0);
@@ -212,6 +208,7 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
           <button
             key={previousSlide.src}
             className={`${styles.preview} ${styles.previewPrevious}`}
+            style={{ viewTransitionName: `studio-photo-${previousIndex}` }}
             type="button"
             aria-label={`Mostrar foto anterior: ${previousSlide.title}`}
             onClick={() => goTo(index - 1)}
@@ -222,15 +219,10 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
         <section
           ref={rootRef}
           className={styles.carousel}
-          data-direction={slideDirection}
+          style={{ viewTransitionName: current ? `studio-photo-${index}` : "none" }}
           aria-label="Trabalhos reais de impressão 3D"
           aria-roledescription="carrossel"
         >
-          {outgoingSlide ? (
-            <div className={styles.outgoingPhoto} aria-hidden="true">
-              <Image src={outgoingSlide.src} alt="" fill sizes="(max-width: 480px) 58vw, 27vw" />
-            </div>
-          ) : null}
           {current ? (
             <button
               key={current.src}
@@ -285,6 +277,7 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
           <button
             key={nextSlide.src}
             className={`${styles.preview} ${styles.previewNext}`}
+            style={{ viewTransitionName: `studio-photo-${nextIndex}` }}
             type="button"
             aria-label={`Mostrar próxima foto: ${nextSlide.title}`}
             onClick={() => goTo(index + 1)}

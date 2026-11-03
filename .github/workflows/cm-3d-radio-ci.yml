@@ -21,6 +21,20 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cm_quote_security_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     defaults:
       run:
         working-directory: cm-3d-radio-novo
@@ -50,6 +64,20 @@ jobs:
         run: pnpm typecheck
       - name: Unit tests
         run: pnpm test
+      - name: Database quota and quarantine tests
+        env:
+          PGPASSWORD: postgres
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -h 127.0.0.1 -U postgres -d cm_quote_security_ci -v ON_ERROR_STOP=1 \
+            -f tests/sql/quote-security-fixture.sql \
+            -f supabase/migrations/20261103202500_quote_owner_quota_and_quarantine.sql \
+            -f tests/sql/quote-security-assertions.sql
       - name: Production build
         run: pnpm build
       - name: Runtime dependency security audit

@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { requireQuoteEmailConfig } from "@/server/quote/email";
 import { requireQuoteEnabled } from "@/server/quote/http";
 import { quoteServiceConfig } from "@/server/quote/supabase-gateway";
+import { requireQuoteTurnstileConfig } from "@/server/quote/turnstile";
 import { QuoteFlow } from "./quote-flow";
 import styles from "./page.module.css";
 
@@ -13,10 +14,12 @@ export const metadata: Metadata = {
 export default async function OrcamentosPage() {
   await connection();
   let intakeEnabled = false;
+  let turnstileSiteKey: string | null = null;
   try {
     requireQuoteEnabled();
     quoteServiceConfig();
     requireQuoteEmailConfig();
+    turnstileSiteKey = requireQuoteTurnstileConfig().siteKey;
     intakeEnabled = true;
   } catch { /* A interface continua disponível enquanto o envio é configurado. */ }
   return (
@@ -28,7 +31,7 @@ export default async function OrcamentosPage() {
         </div>
       </header>
 
-      <QuoteFlow intakeEnabled={intakeEnabled} />
+      <QuoteFlow intakeEnabled={intakeEnabled} turnstileSiteKey={turnstileSiteKey} />
     </div>
   );
 }

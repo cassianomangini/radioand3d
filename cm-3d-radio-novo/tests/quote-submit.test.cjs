@@ -1,0 +1,135 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const Module = require('node:module');
+const ts = require('typescript');
+
+const originalResolve = Module._resolveFilename;
+Module._resolveFilename = function resolve(request, parent, isMain, options) {
+  const target = request.startsWith('@/') ? path.join(__dirname, '../src', request.slice(2)) : request;
+  return originalResolve.call(this, target, parent, isMain, options);
+};
+require.extensions['.ts'] = (module, filename) => {
+  const source = fs.readFileSync(filename, 'utf8');
+  const output = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
+    fileName: filename,
+  }).outputText;
+  module._compile(output, filename);
+};
+
+const { handleQuoteSubmit } = require('../src/server/quote/handlers.ts');
+const { newQuoteSession, issueSessionCookie } = require('../src/server/quote/http.ts');
+const { parseQuoteForm, parseQuoteAttachments } = require('../src/server/quote/form-contract.ts');
+const { uploadSignedFile } = require('../src/features/quote/client-upload.ts');
+
+process.env.NODE_ENV = 'development';
+process.env.CM_QUOTE_INTAKE_ENABLED = 'true';
+process.env.CM_QUOTE_SESSION_SECRET = 'session-secret-for-synthetic-tests-123456';
+process.env.CM_QUOTE_RATE_LIMIT_SECRET = 'rate-secret-for-synthetic-tests-1234567';
+process.env.RESEND_API_KEY = 're_synthetic_test_key_123456789';
+process.env.CM_QUOTE_EMAIL_FROM = 'CM 3D <pedidos@example.com>';
+
+function quickBoxDraft() {
+  return {
+    type: 'caixa', boxMode: 'quick', boxQuickDescription: 'Caixa azul para presente',
+    boxShape: '', boxShapeOther: '', boxDividers: '', boxDividerCount: '',
+    boxDimensions: { width: '', depth: '', height: '' }, boxUnknown: false,
+    boxBasis: '', boxNoPersonalization: false, boxPersonalization: [],
+    boxText: '', boxQrSource: '', boxQrContent: '',
+    plateMode: '', plateQuickDescription: '', plateContents: [], plateContentUnknown: false,
+    plateText: '', plateQrSource: '', plateQrContent: '', plateUse: '', plateUseUnknown: false,
+    plateFixation: '', plateFixationUnknown: false,
+    plateDimensions: { width: '', depth: '', height: '' }, plateUnknown: false,
+    modelScale: '', modelScaleUnknown: false,
+    modelDimensions: { width: '', depth: '', height: '' }, modelNotes: '',
+    otherDescription: '', otherSize: '', colorMode: '', colors: [{ name: '', rgb: '' }],
+    quantity: 2, name: 'Cliente Teste', contactMethod: 'whatsapp', contact: '11999999999',
+    delivery: 'retirada', cep: '',
+  };
+}
+
+test('contrato recusa payload incompleto e arquivo incompatível com o papel', () => {
+  const draft = quickBoxDraft();
+  assert.ok(parseQuoteForm(draft));
+  assert.equal(parseQuoteForm({ ...draft, quantity: -1 }), null);
+  assert.equal(parseQuoteForm({ ...draft, contactMethod: 'fax' }), null);
+  assert.equal(parseQuoteAttachments([{ id: crypto.randomUUID(), role: 'model', name: 'foto.png', size: 12, type: 'image/png' }]), null);
+});
+
+test('pedido é salvo uma vez e o e-mail pendente é reenviado a partir do banco', async () => {
+  const requestId = crypto.randomUUID();
+  const submissionKey = crypto.randomUUID();
+  const { token } = newQuoteSession();
+  let stored = null;
+  let emailSent = false;
+  let submitCount = 0;
+  let mailCount = 0;
+  const gateway = {
+    submissionReceipt: async () => stored && ({ request_id: requestId, submission_time: '2026-11-03T12:00:00Z' }),
+    consumeRate: async () => true,
+    submitQuote: async (input) => {
+      submitCount++;
+      stored = input;
+      return { request_id: requestId, submission_time: '2026-11-03T12:00:00Z' };
+    },
+    emailWasSent: async () => emailSent,
+    notificationData: async () => ({
+      projectType: stored.projectType, project: stored.project, production: stored.production,
+      contactMethod: stored.contactMethod, contactName: stored.contactName,
+      contactValue: stored.contactValue, attachmentNames: [],
+    }),
+    recordEmailSent: async () => { emailSent = true; },
+  };
+  const request = () => new Request('http://localhost:3000/api/quote/submit', {
+    method: 'POST',
+    headers: { origin: 'http://localhost:3000', 'content-type': 'application/json', cookie: issueSessionCookie(token) },
+    body: JSON.stringify({ requestId, submissionKey, draft: quickBoxDraft(), attachments: [] }),
+  });
+  const mailer = async (_id, message) => {
+    mailCount++;
+    assert.match(message, /Caixa azul para presente/);
+    if (mailCount === 1) throw Error('synthetic email failure');
+  };
+  const first = await handleQuoteSubmit(request(), gateway, mailer);
+  assert.equal(first.status, 202);
+  assert.equal((await first.json()).error, 'quote_email_pending');
+  assert.equal(submitCount, 1);
+  const retry = await handleQuoteSubmit(request(), gateway, mailer);
+  assert.equal(retry.status, 201);
+  assert.equal(submitCount, 1);
+  assert.equal(mailCount, 2);
+  const replay = await handleQuoteSubmit(request(), gateway, mailer);
+  assert.equal(replay.status, 201);
+  assert.equal(submitCount, 1);
+  assert.equal(mailCount, 2);
+});
+
+test('upload privado retoma após perda da resposta de um bloco', async () => {
+  const file = new File([new Uint8Array(6 * 1024 * 1024 + 10)], 'modelo.stl', { type: 'application/octet-stream' });
+  let offset = 0;
+  let patches = 0;
+  let metadata = '';
+  const endpoint = 'https://cmtest.storage.supabase.co/storage/v1/upload/resumable/sign';
+  const fetcher = async (url, options) => {
+    assert.ok(url.startsWith('https://cmtest.storage.supabase.co/'));
+    if (options.method === 'POST') {
+      metadata = options.headers['Upload-Metadata'];
+      return new Response(null, { status: 201, headers: { location: '/storage/v1/upload/resumable/sign/upload-1' } });
+    }
+    if (options.method === 'HEAD') {
+      return new Response(null, { status: 200, headers: { 'upload-offset': String(offset) } });
+    }
+    assert.equal(options.method, 'PATCH');
+    assert.equal(Number(options.headers['Upload-Offset']), offset);
+    patches++;
+    offset += options.body.size;
+    if (patches === 1) throw Error('response lost after the server accepted the block');
+    return new Response(null, { status: 204, headers: { 'upload-offset': String(offset) } });
+  };
+  await uploadSignedFile(file, { uploadEndpoint: endpoint, uploadPath: `${crypto.randomUUID()}/${crypto.randomUUID()}.stl`, uploadToken: 'a.b.c' }, fetcher);
+  assert.equal(offset, file.size);
+  assert.equal(patches, 2);
+  assert.match(metadata, /bucketName cXVvdGUtaW50YWtl/);
+});

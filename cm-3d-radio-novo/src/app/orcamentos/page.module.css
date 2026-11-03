@@ -126,7 +126,7 @@
   padding: var(--space-2);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-card);
-  background: var(--bg-panel);
+  background: transparent;
   cursor: pointer;
   transition: border-color var(--motion-ui) var(--ease-ui), background var(--motion-ui) var(--ease-ui), transform var(--motion-ui) var(--ease-ui);
 }
@@ -138,7 +138,6 @@
 
 .option:has(input:checked) {
   border-color: var(--accent-violet);
-  background: var(--bg-raised);
   box-shadow: 0 0 0 1px rgb(156 120 255 / 24%);
 }
 
@@ -224,6 +223,10 @@
   background: transparent;
 }
 
+.guidedFormPanel {
+  margin-top: var(--space-5);
+}
+
 .boxModeChoices {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -244,6 +247,10 @@
   color: var(--text-primary);
   text-align: left;
   cursor: pointer;
+}
+
+.plateModeChoices button {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .boxModeChoices button:hover,
@@ -313,7 +320,7 @@
 
 .formPanel > .field,
 .formPanel > .fieldSet,
-.formPanel > .summary {
+.formPanel > .reviewSection {
   position: relative;
   padding: var(--space-5);
   border: 1px solid rgb(112 138 201 / 42%);
@@ -628,6 +635,14 @@
   min-width: 0;
 }
 
+.colorEntry {
+  position: relative;
+}
+
+.colorEntry:has(.colorMenu) {
+  z-index: 2;
+}
+
 .colorRow {
   display: flex;
   align-items: center;
@@ -641,36 +656,102 @@
   min-width: 0;
 }
 
-.rgbPicker {
-  position: relative;
-  display: block;
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
-  overflow: hidden;
+.colorPicker {
+  flex: 0 0 34px;
+}
+
+.colorPickerButton {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
   border: 1px solid var(--accent-violet);
   border-radius: 50%;
+  background: transparent;
   cursor: pointer;
 }
 
-.rgbPickerSwatch {
+.colorPickerButton:hover,
+.colorPickerButton[aria-expanded="true"] {
+  background: rgb(100 76 180 / 24%);
+}
+
+.colorPickerButton:disabled {
+  cursor: not-allowed;
+}
+
+.colorPickerPreview {
   display: block;
-  width: 100%;
-  height: 100%;
-  background: conic-gradient(#ff5757, #ffd166, #49db9b, #55c8ff, #a775ff, #ff5757);
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgb(255 255 255 / 60%);
+  border-radius: 50%;
+  background: conic-gradient(#e886ae, #f0cb42, #43a66b, #3578d4, #9366bf, #e886ae);
 }
 
-.rgbPicker input[type="color"] {
+.colorMenu {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  opacity: 0;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 10;
+  width: min(340px, calc(100cqi - var(--space-8)));
+  padding: var(--space-3);
+  border: 1px solid var(--accent-violet);
+  border-radius: var(--radius-card);
+  background: var(--bg-panel);
+  box-shadow: 0 1rem 2rem rgb(0 0 0 / 45%);
+}
+
+.colorMenuTitle {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.colorMenuGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-1);
+  max-height: min(320px, 50vh);
+  overflow-y: auto;
+}
+
+.colorMenuOption {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: var(--space-1);
+  min-height: 68px;
+  padding: var(--space-1);
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  text-align: center;
   cursor: pointer;
 }
 
-.rgbPicker:has(input:focus-visible),
+.colorMenuOption:hover,
+.colorMenuOption[aria-pressed="true"] {
+  border-color: var(--accent-violet);
+  background: var(--bg-raised);
+}
+
+.colorSwatch {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgb(255 255 255 / 60%);
+  border-radius: 50%;
+}
+
+.colorPickerButton:focus-visible,
+.colorMenuOption:focus-visible,
 .colorAdd:focus-visible,
 .colorRemove:focus-visible {
   outline: 3px solid var(--focus-ring);
@@ -697,11 +778,6 @@
 .colorAdd:hover,
 .colorRemove:hover {
   background: rgb(100 76 180 / 24%);
-}
-
-.rgbValue {
-  color: var(--text-muted);
-  font-size: 0.78rem;
 }
 
 .quantity {
@@ -865,12 +941,18 @@
   margin: 0;
 }
 
+.reviewSection h3 {
+  margin: 0 0 var(--space-2);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
 .summaryRow {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-4) 0;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border-default);
 }
 
@@ -878,8 +960,9 @@
   padding-top: 0;
 }
 
-.summaryRow > div {
-  min-width: 0;
+.summaryRow:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .summaryRow dt {
@@ -891,11 +974,38 @@
 }
 
 .summaryRow dd {
-  margin: var(--space-1) 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0;
   color: var(--text-primary);
   font-size: 0.92rem;
   line-height: 1.5;
+}
+
+.summaryRow dd span {
+  min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.summaryRow button {
+  min-width: 64px;
+  min-height: 34px;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-action);
+  background: var(--bg-studio);
+}
+
+.summaryRow button:hover {
+  border-color: var(--accent-cyan);
+  background: var(--bg-raised);
+}
+
+.summaryRow button:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .pendingNotice {
@@ -907,6 +1017,62 @@
   color: var(--text-secondary);
   font-size: 0.84rem;
   line-height: 1.5;
+}
+
+.submissionStatus {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.receiptCard {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--accent-violet);
+  border-radius: var(--radius-card);
+}
+
+.receiptCard strong {
+  color: var(--text-muted);
+  font-size: 0.77rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.receiptCard span {
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(1rem, 2cqi, 1.2rem);
+}
+
+.receiptCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.receiptAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-action);
+  background: var(--purple-dark);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.receiptAction:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 @container orcamentos (max-width: 650px) {
@@ -932,7 +1098,7 @@
 
   .formPanel > .field,
   .formPanel > .fieldSet,
-  .formPanel > .summary {
+  .formPanel > .reviewSection {
     padding: var(--space-4);
   }
 }

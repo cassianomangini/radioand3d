@@ -84,12 +84,22 @@
   gap: 0.125rem;
 }
 
-.social span {
+.social a {
   display: grid;
   place-items: center;
-  width: 1.875rem;
-  height: 1.875rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-action);
   color: var(--text-primary);
+}
+
+.social a:hover {
+  color: var(--accent-cyan);
+}
+
+.social a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .social svg {

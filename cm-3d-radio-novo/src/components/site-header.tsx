@@ -78,9 +78,9 @@ export function SiteHeader({ radioOpen = false, docked = false, onHome, onOpenRa
       <div className={styles.actions}>
         {docked && onRestoreRadio ? <RadioMiniPlayer onRestore={onRestoreRadio} /> : null}
         <div className={styles.social} role="group" aria-label="Contato e redes sociais">
-          <span title="Email" aria-label="Email"><SocialIcon name="email" /></span>
-          <span title="Instagram" aria-label="Instagram"><SocialIcon name="instagram" /></span>
-          <span title="Shopee" aria-label="Shopee"><SocialIcon name="shopee" /></span>
+          <a href="mailto:casman1986@gmail.com" aria-label="Enviar e-mail para casman1986@gmail.com" title="E-mail: casman1986@gmail.com"><SocialIcon name="email" /></a>
+          <a href="https://www.instagram.com/cmangini3d/" aria-label="Instagram do CMangini3D" title="Instagram: @cmangini3d" target="_blank" rel="noopener noreferrer"><SocialIcon name="instagram" /></a>
+          <a href="https://shopee.com.br/artesopolis" aria-label="Loja Artesopolis na Shopee" title="Shopee: artesopolis" target="_blank" rel="noopener noreferrer"><SocialIcon name="shopee" /></a>
         </div>
       </div>
     </header>

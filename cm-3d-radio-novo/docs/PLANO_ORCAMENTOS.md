@@ -47,8 +47,9 @@ Antes dos campos, a pessoa escolhe entre **Pedido rápido** e **Montar passo a p
 3. **Divisórias:** perguntar **Com ou sem divisórias?**, com **Ainda não sei** no topo, separado das respostas. Se a pessoa escolher **Com divisórias**, perguntar **Quantas divisórias serão?** e exigir um número para avançar.
 4. **Medidas:** exigir largura, profundidade e altura em centímetros, todas válidas, ou **Não sei as medidas**. Se informar medidas, exigir a indicação **internas**, **externas** ou **Não sei**.
 5. **Personalização:** escolher **nome ou frase**, **logotipo** e/ou **QR Code**, ou marcar **Não quero** no topo. Se escolher texto, exigir o texto. Para QR Code, usar uma escolha por rádio entre **informar link ou texto** e **anexar QR pronto**; exigir o conteúdo do caminho escolhido. O arquivo do logotipo continua opcional se a pessoa ainda não o tiver.
-6. **Fechamento:** perguntar se a tampa será **de deslizar**, **de encaixar** ou se a caixa será **sem tampa**. Mostrar **de rosquear** somente quando o formato escolhido for **redondo**. Colocar **Ainda não sei** no topo da pergunta, separado das respostas.
-7. **Cores e quantidade:** permitir até **4 cores**, cada uma informada por nome ou pelo seletor visual RGB. Usar um botão redondo **+** para acrescentar outra e permitir removê-la. Exigir que cada cor adicionada esteja preenchida, ou escolher **Ainda não decidi**. Quantidade com controle `− / +` e valor editável.
+6. **Cores e quantidade:** permitir até **4 cores**, cada uma informada por nome ou pela paleta visual. Usar um botão redondo **+** para acrescentar outra e permitir removê-la. Exigir que cada cor adicionada esteja preenchida, ou escolher **Ainda não decidi**. Quantidade com controle `− / +` e valor editável.
+
+O fechamento é definido pelo formato, sem pergunta separada: caixa redonda tem tampa de rosquear, quadrada tem tampa de encaixe e retangular tem tampa de deslizar. Para outro formato, o fechamento fica a definir no orçamento.
 
 No caminho detalhado, cada grupo exige uma resposta ou sua opção explícita de **Não sei/Não quero** antes de avançar. A foto de referência continua opcional. Contato e entrega são informados depois.
 
@@ -56,14 +57,18 @@ No caminho detalhado, cada grupo exige uma resposta ou sua opção explícita de
 
 **Título:** Vamos criar sua placa!
 
-1. **O que vai na placa?** Permitir combinar **nome ou frase**, **logotipo** e **QR Code**. **Ainda não decidi** é uma escolha separada.
-2. Se escolher nome ou frase, pedir o texto. Se escolher logotipo, oferecer anexo da arte.
-3. Se escolher QR Code, exigir a escolha por rádio entre **informar link ou texto** e **anexar QR pronto**, além do conteúdo correspondente. Mostrar apenas o campo escolhido. Quando a finalidade for Pix ou outra aplicação específica, a pessoa poderá explicar a necessidade ou enviar a arte para avaliação.
-4. **Onde a placa será usada e como pretende colocá-la?** Balcão, mesa, parede ou outro uso; fixação opcional.
-5. **Qual tamanho você precisa?** Exigir largura e altura válidas em centímetros ou **Não sei as medidas**.
-6. **Quais cores você prefere?** Até 4 cores por nome ou seletor visual RGB, ou **Ainda não decidi**.
-7. **Quantas placas você precisa?** Controle `− / +`, começando em 1 e com valor editável.
-8. **Tem alguma referência?** Fotos, desenhos ou documentos opcionais.
+Assim como na caixa, a pessoa escolhe entre **Pedido rápido** e **Montar passo a passo**. Pode voltar e mudar de caminho sem perder as respostas já preenchidas.
+
+**Pedido rápido:** mostrar primeiro a foto de referência e depois um campo livre para descrever a placa. Foto **ou** descrição é suficiente para avançar. Pedir a quantidade, sem exigir conteúdo, uso, medidas ou cores neste caminho.
+
+**Montar passo a passo:** apresentar um grupo por vez, com voltar e avançar:
+
+1. **O que vai na placa?** Permitir combinar **nome ou frase**, **logotipo** e **QR Code**, ou marcar **Ainda não decidi**. Se escolher texto, exigir o texto. O anexo do logotipo é opcional. Para QR Code, exigir **informar link ou texto** ou **anexar QR pronto**, com o conteúdo correspondente.
+2. **Onde será usada e como será colocada?** Balcão, mesa, parede ou outro lugar; a pessoa informa a fixação em texto. Cada pergunta tem **Ainda não sei** como escolha separada.
+3. **Qual tamanho você precisa?** Exigir largura e altura válidas em centímetros ou **Não sei as medidas**.
+4. **Cores, quantidade e referências:** até 4 cores por nome ou pela paleta visual, ou **Ainda não decidi**; quantidade no controle `− / +`; fotos, desenhos ou documentos opcionais.
+
+Cada grupo detalhado exige uma resposta ou sua opção explícita de **Não sei/Ainda não decidi** antes de avançar. Os dois caminhos seguem para o mesmo contato e resumo, que mostra apenas os dados do caminho escolhido.
 
 ### Imprimir meu arquivo 3D
 
@@ -91,12 +96,16 @@ No caminho detalhado, cada grupo exige uma resposta ou sua opção explícita de
 1. Pedir o **nome**.
 2. Permitir escolher **WhatsApp ou e-mail** e mostrar somente o campo correspondente. Validar o contato escolhido.
 3. Perguntar se a pessoa prefere **retirar em São Caetano do Sul** ou **receber no meu endereço pela Shopee**. Pedir **CEP somente para envio**. Explicar que os detalhes do envio pela Shopee serão combinados depois do orçamento; não cobrar nem prometer valor nesta etapa.
-4. Mostrar um resumo editável com tipo de projeto, respostas, medidas, cor, quantidade, referências, contato e modalidade de entrega. Editar uma parte não apaga as demais.
+4. Mostrar o resumo em grupos de peça, cores/quantidade/arquivos e contato/entrega, com respostas e medidas legíveis. Cada **Editar** abre diretamente o grupo correspondente. A pessoa pode salvar e voltar ao resumo sem avançar pelas outras perguntas, ou cancelar para restaurar o que estava preenchido antes da edição.
 5. Exibir um aviso curto sobre a finalidade dos dados antes do botão **Solicitar orçamento**.
 
 ## Envio e confirmação
 
+- Destino confirmado pelo proprietário: `casman1986@gmail.com`. A mensagem é composta com os dados já gravados no banco; anexos permanecem no bucket privado.
+- O envio pode usar o próprio Gmail do destinatário com `CM_QUOTE_GMAIL_APP_PASSWORD` (senha de aplicativo de 16 caracteres, com verificação em duas etapas) ou, futuramente, Resend com `RESEND_API_KEY` e `CM_QUOTE_EMAIL_FROM` verificado. Os segredos ficam somente no servidor.
+- O envio só aparece ativo quando `CM_QUOTE_INTAKE_ENABLED=true`, as credenciais do projeto Supabase **CM 3D & Rádio** e as credenciais de e-mail estão configuradas. Não usar os projetos Supabase do Artesopolis Admin.
 - Registrar a solicitação no servidor antes de mostrar sucesso. Não simular envio nem confirmar apenas porque o botão foi clicado.
+- Se o banco confirmar e o e-mail falhar, manter a solicitação e permitir repetir a notificação com a mesma chave; não criar um segundo pedido.
 - Em caso de erro, manter o preenchimento e mostrar uma mensagem compreensível com possibilidade de tentar novamente.
 - Depois da confirmação real, mostrar: **“Recebemos sua solicitação. Vamos analisar seu projeto e retornar pelo contato escolhido.”**
 - Mostrar número de solicitação somente se vier do registro real. Oferecer **Voltar ao início**.
@@ -120,7 +129,9 @@ No caminho detalhado, cada grupo exige uma resposta ou sua opção explícita de
 
 ## Decisões necessárias antes de liberar o envio
 
-- Quem receberá e fará a triagem das solicitações.
+- Na Vercel, já estão configurados o endereço `https://rhuypfcvkhfwvaxuorfr.supabase.co`, os segredos de sessão, limite e limpeza, e `CM_QUOTE_INTAKE_ENABLED=false` em produção.
+- O projeto Vercel `radioand3d` teve o diretório raiz corrigido para `cm-3d-radio-novo`; o último build remoto falhava por procurar o `package.json` na raiz do repositório.
+- Conectar e validar o projeto Supabase separado **CM 3D & Rádio**; a conexão disponível nesta sessão mostra apenas projetos Artesopolis e recusa o ID informado. Conferir as migrações e criar `CM_SUPABASE_SECRET_KEY` na Vercel sem expor o valor.
+- Configurar a senha de aplicativo do Gmail ou um remetente verificado no Resend antes de ativar a flag. O destinatário já é `casman1986@gmail.com`.
 - Como confirmar a disponibilidade de filamentos próximos das cores ou valores RGB informados no pedido.
-- Lista final de formatos 3D aceitos, considerando a proposta STL/3MF e os formatos adicionais aceitos no `OLD`.
-- Configuração e validação do projeto Supabase que receberá os pedidos.
+- Validar o fluxo completo com arquivo sintético, registro no banco correto, entrega do e-mail e execução da retenção agendada. O formulário atual aceita STL/3MF para arquivo 3D e imagens/PDF nas referências.

@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
+import { requireQuoteEmailConfig } from "@/server/quote/email";
+import { requireQuoteEnabled } from "@/server/quote/http";
+import { quoteServiceConfig } from "@/server/quote/supabase-gateway";
 import { QuoteFlow } from "./quote-flow";
 import styles from "./page.module.css";
 
@@ -6,7 +10,15 @@ export const metadata: Metadata = {
   title: "Orçamentos — CM 3D & Rádio",
 };
 
-export default function OrcamentosPage() {
+export default async function OrcamentosPage() {
+  await connection();
+  let intakeEnabled = false;
+  try {
+    requireQuoteEnabled();
+    quoteServiceConfig();
+    requireQuoteEmailConfig();
+    intakeEnabled = true;
+  } catch { /* A interface continua disponível enquanto o envio é configurado. */ }
   return (
     <div className={styles.page}>
       <header className={styles.banner}>
@@ -16,7 +28,7 @@ export default function OrcamentosPage() {
         </div>
       </header>
 
-      <QuoteFlow />
+      <QuoteFlow intakeEnabled={intakeEnabled} />
     </div>
   );
 }

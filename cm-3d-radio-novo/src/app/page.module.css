@@ -263,7 +263,7 @@
   margin: 0;
 }
 
-.actions button {
+.actions a {
   font-size: 0.95rem;
   font-weight: 500;
 }
@@ -532,7 +532,7 @@
     margin-top: 24px;
   }
 
-  .actions button {
+  .actions a {
     height: 58px;
     padding-inline: 22px;
     font-size: 16px;
@@ -540,11 +540,11 @@
     white-space: nowrap;
   }
 
-  .actions button:first-child {
+  .actions a:first-child {
     flex: 0 1 240px;
   }
 
-  .actions button:last-child {
+  .actions a:last-child {
     flex: 0 1 265px;
   }
 
@@ -603,7 +603,7 @@
     width: min(100%, 470px);
   }
 
-  .stage[data-layout-mode="split"] .actions button {
+  .stage[data-layout-mode="split"] .actions a {
     flex: 1 1 0;
     min-width: 0;
     padding-inline: 12px;
@@ -640,7 +640,7 @@
     margin-top: 18px;
   }
 
-  .actions button {
+  .actions a {
     height: 52px;
   }
 

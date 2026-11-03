@@ -16,12 +16,12 @@ type StudioCategory = "decoracao" | "outros" | "natal" | "brinquedos" | "caixas"
 
 const categories: ReadonlyArray<{ id: StudioCategory | null; label: string }> = [
   { id: null, label: "Todas" },
-  { id: "decoracao", label: "Organização e Decoração" },
-  { id: "outros", label: "Outros" },
   { id: "natal", label: "Peças Natalinas" },
-  { id: "brinquedos", label: "Brinquedos Sensoriais" },
+  { id: "decoracao", label: "Organização e Decoração" },
+  { id: "brinquedos", label: "Peças Sensoriais" },
   { id: "caixas", label: "Porta Objetos" },
   { id: "cores", label: "Cores" },
+  { id: "outros", label: "Outros" },
 ];
 
 function Chevron({ direction }: { direction: "previous" | "next" }) {

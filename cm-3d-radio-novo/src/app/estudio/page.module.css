@@ -5,6 +5,7 @@
   overflow-y: auto;
   padding: 0 var(--space-3) var(--space-5);
   scroll-behavior: smooth;
+  background: linear-gradient(160deg, #0b2342 0%, #08182f 42%, #050b17 100%);
 }
 
 .layout {

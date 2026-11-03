@@ -1,22 +1,24 @@
 import { randomInt } from "node:crypto";
 import type { Metadata, Viewport } from "next";
-import { Manrope, Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import { connection } from "next/server";
 import { SiteShell } from "@/components/site-shell";
 import { getRadioTracks } from "@/features/radio/catalog";
 import { RadioProvider } from "@/features/radio/radio-provider";
 import "./globals.css";
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["400", "700", "800"],
+const outfit = localFont({
+  src: "./fonts/outfit-latin.woff2",
+  weight: "400 800",
   variable: "--font-outfit",
+  display: "swap",
 });
 
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+const manrope = localFont({
+  src: "./fonts/manrope-latin.woff2",
+  weight: "500 700",
   variable: "--font-manrope",
+  display: "swap",
 });
 
 export const viewport: Viewport = {

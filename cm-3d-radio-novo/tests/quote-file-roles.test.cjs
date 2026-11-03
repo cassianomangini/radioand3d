@@ -38,3 +38,10 @@ test("visual inputs only permit images and PDF", () => {
   assert.equal(quoteFileRoleAllows("unknown", "file.png"), false);
   assert.equal(quoteFileRoleAllows("model", ""), false);
 });
+
+test("global file policy does not advertise unsupported CAD formats", () => {
+  const { validateQuoteFiles } = loadTypeScript("src/features/quote/file-policy.ts");
+  assert.equal(validateQuoteFiles([{ name: "model.obj", size: 512 }]).ok, false);
+  assert.equal(validateQuoteFiles([{ name: "model.step", size: 512 }]).ok, false);
+  assert.equal(validateQuoteFiles([{ name: "model.stl", size: 512 }]).ok, true);
+});

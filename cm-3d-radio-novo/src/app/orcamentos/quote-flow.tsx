@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
+import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import styles from "./page.module.css";
 
 const projectOptions = [
@@ -388,7 +389,7 @@ function SummaryRow({ label, value, onEdit }: { label: string; value: string; on
   );
 }
 
-export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
+export function QuoteFlow({ intakeEnabled, turnstileSiteKey }: { intakeEnabled: boolean; turnstileSiteKey: string | null }) {
   const [step, setStep] = useState(1);
   const [reviewing, setReviewing] = useState(false);
   const [boxDetailStep, setBoxDetailStep] = useState(0);
@@ -400,6 +401,8 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
   const [openColorMenu, setOpenColorMenu] = useState<number | null>(null);
   const [reviewEdit, setReviewEdit] = useState<ReviewEditArea | null>(null);
   const [sending, setSending] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const [submissionError, setSubmissionError] = useState("");
   const [emailPending, setEmailPending] = useState(false);
   const [submissionLocked, setSubmissionLocked] = useState(false);
@@ -636,9 +639,13 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
       const signature = JSON.stringify(draft) + JSON.stringify(entries.map(({ role, file }) => [role, fileIdentity(file)]));
       let pending = pendingSubmission.current;
       if (!pending || pending.signature !== signature) {
+        pendingSubmission.current = null;
+        if (!turnstileToken) throw new Error("human_verification_required");
         const session = await quoteApi<{ requestId: string }>("/api/quote/session", {
           projectType: draft.type === "arquivo" ? "impressao" : draft.type,
+          turnstileToken,
         });
+        setTurnstileToken("");
         if (!/^[0-9a-f-]{36}$/i.test(session.requestId)) throw new Error("quote_unavailable");
         pending = { signature, requestId: session.requestId, submissionKey: crypto.randomUUID(), uploads: new Map() };
         pendingSubmission.current = pending;
@@ -661,7 +668,7 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
             attachmentId: string; uploadEndpoint: string; uploadPath: string; uploadToken: string;
           }>("/api/quote/attachments/init", {
             requestId: pending.requestId, uploadKey: upload.uploadKey,
-            name: file.name, size: file.size, type: file.type,
+            name: file.name, size: file.size, type: file.type, role,
           });
           upload.attachmentId = authorization.attachmentId;
           setSubmissionError(`Enviando arquivo ${index + 1} de ${entries.length}: ${file.name}`);
@@ -696,12 +703,18 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
       setReceiptId(result.requestId);
     } catch (cause) {
       const code = cause instanceof Error ? cause.message : "quote_unavailable";
+      if (!pendingSubmission.current) {
+        setTurnstileToken("");
+        setTurnstileResetKey((key) => key + 1);
+      }
       if (["quote_not_found", "quote_conflict", "upload_reservation_expiring", "quote_session_invalid"].includes(code)) {
         pendingSubmission.current = null;
         setSubmissionLocked(false);
       }
       if (code === "invalid_quote_submit") setSubmissionLocked(false);
-      setSubmissionError(code === "quote_rate_limited" ? "Muitas tentativas em pouco tempo. Aguarde e tente novamente."
+      setSubmissionError(code === "human_verification_required" ? "Confirme a verificação de segurança para enviar o orçamento."
+        : code === "quote_verification_unavailable" ? "Verificação indisponível. Recarregue e tente novamente."
+        : code === "quote_rate_limited" ? "Muitas tentativas em pouco tempo. Aguarde e tente novamente."
         : code === "quote_upload_unavailable" ? "Não foi possível enviar um arquivo. Confira sua conexão e tente novamente."
         : code === "invalid_quote_submit" ? "Algum dado do pedido precisa ser revisto antes do envio."
         : "Não foi possível concluir o envio. Seu pedido permanece nesta página para tentar novamente.");
@@ -1240,7 +1253,10 @@ export function QuoteFlow({ intakeEnabled }: { intakeEnabled: boolean }) {
               <SummaryRow label="Entrega" value={draft.delivery === "retirada" ? "Retirada em São Caetano do Sul" : `Receber no meu endereço pela Shopee · CEP ${draft.cep}`} onEdit={() => beginReviewEdit("delivery")} />
             </dl>
           </section>
-          <p className={styles.privacyNote}>Seus dados serão usados para analisar esta solicitação e retornar pelo contato escolhido.</p>
+          {intakeEnabled && turnstileSiteKey && !submissionLocked ? (
+            <QuoteTurnstile key={turnstileResetKey} siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
+          ) : null}
+          <p className={styles.privacyNote}>Seus dados serão usados para analisar esta solicitação e retornar pelo contato escolhido. A verificação de segurança utiliza Cloudflare Turnstile.</p>
           {!intakeEnabled ? <p className={styles.pendingNotice} role="status">O envio está em configuração. Nenhuma informação ou arquivo foi transmitido.</p> : null}
           {submissionError ? <p className={emailPending || !sending ? styles.pendingNotice : styles.submissionStatus} role={sending ? "status" : "alert"}>{submissionError}</p> : null}
           <div className={styles.actions}><button type="button" className={styles.secondaryAction} disabled={sending || submissionLocked} onClick={() => setReviewing(false)}><span aria-hidden="true">←</span> Voltar</button><button type="button" className={styles.primaryAction} disabled={!intakeEnabled || sending} onClick={submitQuote}>{sending ? "Enviando..." : submissionLocked ? "Tentar confirmar envio" : "Solicitar orçamento"}</button></div>

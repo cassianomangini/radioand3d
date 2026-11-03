@@ -131,8 +131,8 @@ export function newQuoteSession(): { token: string; hash: string } {
 
 function clientIp(request: Request): string {
   if (process.env.VERCEL === '1') {
-    const forwarded = request.headers.get('x-vercel-forwarded-for')
-      || request.headers.get('x-forwarded-for');
+    // Do not fall back to user-supplied forwarding headers for rate-limit identity.
+    const forwarded = request.headers.get('x-vercel-forwarded-for');
     const first = forwarded?.split(',', 1)[0]?.trim() || '';
     if (!isIP(first)) throw new QuoteHttpError(503, 'quote_network_unavailable');
     return first;

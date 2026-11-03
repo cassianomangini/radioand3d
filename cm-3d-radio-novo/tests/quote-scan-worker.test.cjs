@@ -20,3 +20,11 @@ test('quarantine worker accepts only server-issued UUID object paths', async () 
   assert.equal(allowedQuoteObjectPath('other/path.exe'), false);
   assert.equal(allowedQuoteObjectPath(`${uuid1}/${uuid2}.stl/../../data`), false);
 });
+
+test('scanner subprocess must not inherit storage or database secrets', async () => {
+  const { scannerChildEnvironment } = await import('../scripts/lib/quote-scan-core.mjs');
+  const env = scannerChildEnvironment();
+  assert.deepEqual(Object.keys(env).sort(), ['LANG', 'PATH']);
+  assert.equal(env.PATH, '/usr/bin:/bin');
+  assert.equal(env.LANG, 'C');
+});

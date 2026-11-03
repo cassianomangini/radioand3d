@@ -131,7 +131,7 @@ Cada grupo detalhado exige uma resposta ou sua opção explícita de **Não sei/
 
 - Na Vercel, já estão configurados o endereço `https://rhuypfcvkhfwvaxuorfr.supabase.co`, os segredos de sessão, limite e limpeza, e `CM_QUOTE_INTAKE_ENABLED=false` em produção.
 - O projeto Vercel `radioand3d` teve o diretório raiz corrigido para `cm-3d-radio-novo`; o último build remoto falhava por procurar o `package.json` na raiz do repositório.
-- Conectar e validar o projeto Supabase separado **CM 3D & Rádio**; a conexão disponível nesta sessão mostra apenas projetos Artesopolis e recusa o ID informado. Conferir as migrações e criar `CM_SUPABASE_SECRET_KEY` na Vercel sem expor o valor.
+- O projeto Supabase separado **CM 3D & Rádio** foi validado por chamada de servidor com a chave local: tabelas e funções de orçamento responderam, e o bucket `quote-intake` é privado. `CM_SUPABASE_SECRET_KEY` já está salva como segredo de produção na Vercel. A conexão Supabase do plugin continua em outra conta e não é necessária para o formulário.
 - Configurar a senha de aplicativo do Gmail ou um remetente verificado no Resend antes de ativar a flag. O destinatário já é `casman1986@gmail.com`.
 - Como confirmar a disponibilidade de filamentos próximos das cores ou valores RGB informados no pedido.
 - Validar o fluxo completo com arquivo sintético, registro no banco correto, entrega do e-mail e execução da retenção agendada. O formulário atual aceita STL/3MF para arquivo 3D e imagens/PDF nas referências.

@@ -4,7 +4,7 @@ import {
   requireQuoteEnabled, requireSameOriginJson, responseError, responseJson, uuid,
 } from './http';
 import { createQuoteGateway, type QuoteGateway, type QuoteProjectType } from './supabase-gateway';
-import { validateQuoteFiles } from '../../features/quote/file-policy';
+import { quoteFileRoleAllows, validateQuoteFiles } from '../../features/quote/file-policy';
 import { detectQuoteFile } from './file-sniffer';
 import { validate3mfArchive } from './zip-3mf';
 import { parseQuoteAttachments, parseQuoteForm, prepareQuoteForStorage, validateQuoteForm } from './form-contract';
@@ -48,8 +48,9 @@ export async function handleQuoteAttachmentInit(
     const hash = token && ownerHash(token);
     if (!hash) throw new QuoteHttpError(403, 'quote_session_invalid');
     const body = await readQuoteJson(request);
-    if (!record(body) || !exactKeys(body, ['requestId','uploadKey','name','size','type']) ||
+    if (!record(body) || !exactKeys(body, ['requestId','uploadKey','name','size','type','role']) ||
       !uuid(body.requestId) || !uuid(body.uploadKey) ||
+      typeof body.role !== 'string' ||
       typeof body.name !== 'string' || body.name.length < 1 || body.name.length > 255 ||
       /[\u0000-\u001f\u007f]/.test(body.name) ||
       !Number.isSafeInteger(body.size) || (body.size as number) < 1 || (body.size as number) > 50_000_000 ||
@@ -57,6 +58,9 @@ export async function handleQuoteAttachmentInit(
       throw new QuoteHttpError(400, 'invalid_quote_upload');
     }
     const name = body.name as string;
+    if (!quoteFileRoleAllows(body.role, name)) {
+      throw new QuoteHttpError(400, 'invalid_quote_upload');
+    }
     const extension = name.slice(name.lastIndexOf('.')).toLowerCase();
     const policy = validateQuoteFiles([{ name, size: body.size as number }]);
     if (!policy.ok) throw new QuoteHttpError(400, 'invalid_quote_upload');

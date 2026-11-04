@@ -23,7 +23,10 @@ function display(value: unknown): string {
   return String(value);
 }
 
-export function quoteEmailText(requestId: string, quote: QuoteNotificationData, siteOrigin: string): string {
+type EmailLine = string | { name: string; url: string };
+export type QuoteEmailMessage = { text: string; html: string };
+
+function quoteEmailLines(requestId: string, quote: QuoteNotificationData, siteOrigin: string): EmailLine[] {
   const details = Object.entries(quote.project)
     .filter(([, value]) => value !== null && value !== '' && !(Array.isArray(value) && value.length === 0))
     .sort(([a], [b]) => a.localeCompare(b))
@@ -39,14 +42,34 @@ export function quoteEmailText(requestId: string, quote: QuoteNotificationData, 
     `Quantidade: ${display(quote.production.quantity)}`,
     `Cores: ${colors}`,
     `Entrega: ${display(quote.production.delivery)}${quote.production.cep ? `, CEP ${display(quote.production.cep)}` : ''}`,
-    ...(studioReference ? [`Foto de referência do Estúdio: ${studioReference}`] : []),
+    ...(studioReference ? [{ name: 'Foto de referência do Estúdio', url: studioReference }] : []),
     '', 'Detalhes:', ...details,
     '', 'Arquivos enviados:',
-    ...(quote.attachments.length
-      ? quote.attachments.map(file => `${file.name}: ${file.url}`)
-      : ['nenhum']),
+    ...(quote.attachments.length ? quote.attachments : ['nenhum']),
     ...(quote.attachments.length ? ['Links diretos disponíveis por até 90 dias após o pedido.'] : []),
-  ].join('\n');
+  ];
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[char] ?? char);
+}
+
+export function quoteEmailText(requestId: string, quote: QuoteNotificationData, siteOrigin: string): string {
+  return quoteEmailLines(requestId, quote, siteOrigin)
+    .map(line => typeof line === 'string' ? line : `${line.name}: ${line.url}`).join('\n');
+}
+
+export function quoteEmailMessage(requestId: string, quote: QuoteNotificationData, siteOrigin: string): QuoteEmailMessage {
+  const lines = quoteEmailLines(requestId, quote, siteOrigin);
+  return {
+    text: lines.map(line => typeof line === 'string' ? line : `${line.name}: ${line.url}`).join('\n'),
+    html: `<div style="white-space:pre-wrap;font-family:Arial,sans-serif;line-height:1.5">${lines.map(line =>
+      typeof line === 'string' ? escapeHtml(line) :
+        `<a href="${escapeHtml(line.url)}">${escapeHtml(line.name)}</a>`
+    ).join('\n')}</div>`,
+  };
 }
 
 type EmailConfig = { provider: 'gmail'; password: string } | { provider: 'resend'; key: string; from: string };
@@ -63,8 +86,10 @@ export function requireQuoteEmailConfig(): EmailConfig {
   return { provider: 'resend', key, from };
 }
 
-export async function sendQuoteEmail(requestId: string, message: string, fetcher: typeof fetch = fetch): Promise<void> {
-  if (!uuid(requestId) || message.length > 16000) throw new QuoteHttpError(400, 'invalid_quote_email');
+export async function sendQuoteEmail(requestId: string, message: QuoteEmailMessage, fetcher: typeof fetch = fetch): Promise<void> {
+  if (!uuid(requestId) || message.text.length > 16000 || message.html.length > 24000) {
+    throw new QuoteHttpError(400, 'invalid_quote_email');
+  }
   const config = requireQuoteEmailConfig();
   if (config.provider === 'gmail') {
     const { default: nodemailer } = await import('nodemailer');
@@ -77,7 +102,7 @@ export async function sendQuoteEmail(requestId: string, message: string, fetcher
       const result = await transport.sendMail({
         from: `CM 3D <${recipient}>`, to: recipient,
         subject: `Novo orçamento CM 3D #${requestId.slice(0, 8)}`,
-        text: message, messageId: `<quote-${requestId}@gmail.com>`,
+        text: message.text, html: message.html, messageId: `<quote-${requestId}@gmail.com>`,
       });
       if (!result.accepted.some(address => address.toLowerCase() === recipient)) {
         throw new QuoteHttpError(503, 'quote_email_unavailable');
@@ -101,7 +126,7 @@ export async function sendQuoteEmail(requestId: string, message: string, fetcher
       },
       body: JSON.stringify({
         from, to: [recipient], subject: `Novo orçamento CM 3D #${requestId.slice(0, 8)}`,
-        text: message,
+        text: message.text, html: message.html,
       }),
       cache: 'no-store',
       redirect: 'error',

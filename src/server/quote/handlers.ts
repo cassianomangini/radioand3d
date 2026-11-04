@@ -8,7 +8,7 @@ import { quoteFileRoleAllows, validateQuoteFiles } from '../../features/quote/fi
 import { detectQuoteFile } from './file-sniffer';
 import { validate3mfArchive } from './zip-3mf';
 import { parseQuoteAttachments, parseQuoteForm, prepareQuoteForStorage, validateQuoteForm } from './form-contract';
-import { quoteEmailText, requireQuoteEmailConfig, sendQuoteEmail } from './email';
+import { quoteEmailMessage, requireQuoteEmailConfig, sendQuoteEmail } from './email';
 import { verifyQuoteTurnstile } from './turnstile';
 import { studioPhotoKeyFromId } from '@/features/studio/r2-photos';
 
@@ -205,7 +205,7 @@ export async function handleQuoteSubmit(
     try {
       if (!await db.emailWasSent(receipt.request_id)) {
         const notification = await db.notificationData(receipt.request_id, hash);
-        await mailer(receipt.request_id, quoteEmailText(receipt.request_id, notification, new URL(request.url).origin));
+        await mailer(receipt.request_id, quoteEmailMessage(receipt.request_id, notification, new URL(request.url).origin));
         await db.recordEmailSent(receipt.request_id);
       }
     } catch {

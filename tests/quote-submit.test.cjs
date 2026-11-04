@@ -24,7 +24,7 @@ const { newQuoteSession, issueSessionCookie } = require('../src/server/quote/htt
 const { parseQuoteForm, parseQuoteAttachments, validateQuoteForm } = require('../src/server/quote/form-contract.ts');
 const { studioPhotoSrc } = require('../src/features/studio/r2-photos.ts');
 const { createQuoteGateway } = require('../src/server/quote/supabase-gateway.ts');
-const { quoteEmailText } = require('../src/server/quote/email.ts');
+const { quoteEmailText, quoteEmailMessage } = require('../src/server/quote/email.ts');
 const { uploadSignedFile } = require('../src/features/quote/client-upload.ts');
 
 process.env.NODE_ENV = 'development';
@@ -97,7 +97,8 @@ test('pedido é salvo uma vez e o e-mail pendente é reenviado a partir do banco
   });
   const mailer = async (_id, message) => {
     mailCount++;
-    assert.match(message, /Caixa azul para presente/);
+    assert.match(message.text, /Caixa azul para presente/);
+    assert.match(message.html, /Caixa azul para presente/);
     if (mailCount === 1) throw Error('synthetic email failure');
   };
   const first = await handleQuoteSubmit(request(), gateway, mailer);
@@ -124,6 +125,7 @@ test('foto do Estúdio acompanha a ideia até o banco e o e-mail, e referência 
   const { token } = newQuoteSession();
   let saved;
   let email = '';
+  let html = '';
   const gateway = {
     submissionReceipt: async () => null,
     consumeRate: async () => true,
@@ -144,11 +146,16 @@ test('foto do Estúdio acompanha a ideia até o banco e o e-mail, e referência 
     headers: { origin: 'http://localhost:3000', 'content-type': 'application/json', cookie: issueSessionCookie(token) },
     body: JSON.stringify({ requestId, submissionKey: crypto.randomUUID(), draft: photoDraft, attachments: [] }),
   });
-  const response = await handleQuoteSubmit(makeRequest(draft), gateway, async (_id, message) => { email = message; });
+  const response = await handleQuoteSubmit(makeRequest(draft), gateway, async (_id, message) => {
+    email = message.text;
+    html = message.html;
+  });
   assert.equal(response.status, 201);
   assert.equal(saved.sourceOrigin, 'site/estudio');
   assert.equal(saved.sourceReference, `/api/studio/photos/${photoId}`);
   assert.match(email, new RegExp(`http://localhost:3000/api/studio/photos/${photoId.replaceAll('.', '\\.')}\\b`));
+  assert.match(html, />Foto de referência do Estúdio<\/a>/);
+  assert.doesNotMatch(html, />http:\/\/localhost:3000\/api\/studio\/photos\//);
   assert.match(email, /Quero esta caixa com o meu logo/);
 
   const extraReference = { id: crypto.randomUUID(), role: 'references', name: 'logo.png', size: 100, type: 'image/png' };
@@ -211,6 +218,17 @@ test('e-mail traz links diretos para cada arquivo privado do pedido', async () =
   assert.match(email, /1\.jpeg: https:\/\/synthetic\.supabase\.co\/storage\/v1\/object\/sign\/quote-intake\//);
   assert.match(email, /planta\.pdf: https:\/\/synthetic\.supabase\.co\/storage\/v1\/object\/sign\/quote-intake\//);
   assert.doesNotMatch(email, /este e-mail não contém anexos/);
+  const message = quoteEmailMessage(requestId, notification, 'https://radioand3d.vercel.app');
+  assert.equal(message.text, email);
+  assert.match(message.html, /<a href="https:\/\/synthetic\.supabase\.co\/storage\/v1\/object\/sign\/quote-intake\/[^\"]+">1\.jpeg<\/a>/);
+  assert.match(message.html, />planta\.pdf<\/a>/);
+  assert.doesNotMatch(message.html, />https:\/\/synthetic\.supabase\.co/);
+  const unsafe = quoteEmailMessage(requestId, {
+    ...notification, attachments: [{ name: '<img src=x>.jpeg', url: 'https://example.com/file?token=a&download=x' }],
+  }, 'https://radioand3d.vercel.app');
+  assert.match(unsafe.html, /&lt;img src=x&gt;\.jpeg/);
+  assert.match(unsafe.html, /token=a&amp;download=x/);
+  assert.doesNotMatch(unsafe.html, /<img/);
 });
 
 test('notificação recusa arquivo de outro pedido e link assinado adulterado', async () => {

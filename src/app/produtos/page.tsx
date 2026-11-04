@@ -15,17 +15,18 @@ export default async function ProdutosPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.wrap}>
-        <header className={styles.header}>
-          <p className={styles.eyebrow}>CM 3D · Estúdio</p>
-          <h1>Peças feitas para ficar.</h1>
-          <p>Conheça os produtos do estúdio. Cada peça publicada aqui tem um anúncio próprio na Shopee.</p>
-        </header>
+      <header className={styles.banner}>
+        <div className={styles.bannerContent}>
+          <h1 className={styles.bannerTitle}>Produtos</h1>
+          <p>Conheça as peças do Estúdio CM 3D.</p>
+        </div>
+      </header>
 
+      <div className={styles.wrap}>
         {products.length > 0 ? (
-          <section aria-labelledby="catalog-heading" className={styles.section}>
+          <section aria-labelledby="catalog-heading">
             <div className={styles.sectionHeading}>
-              <h2 id="catalog-heading">Produtos</h2>
+              <h2 id="catalog-heading">Peças no catálogo</h2>
               <span>{products.length} {products.length === 1 ? "peça" : "peças"}</span>
             </div>
             <div className={styles.grid}>

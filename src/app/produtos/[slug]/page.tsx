@@ -24,7 +24,10 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const catalog = await getSiteCatalog();
   if (catalog.state === "unavailable") {
-    return <div className={styles.page}><div className={styles.wrap}><div className={styles.empty}>
+    return <div className={styles.page}><header className={styles.banner}><div className={styles.bannerContent}>
+      <p className={styles.bannerTitle}>Produtos</p>
+      <p>Peças do Estúdio CM 3D.</p>
+    </div></header><div className={styles.wrap}><div className={styles.empty}>
       <h1>Produto temporariamente indisponível</h1>
       <p>Não conseguimos carregar os detalhes agora.</p>
       <Link href="/produtos">Voltar aos produtos</Link>
@@ -35,6 +38,12 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className={styles.page}>
+      <header className={styles.banner}>
+        <div className={styles.bannerContent}>
+          <p className={styles.bannerTitle}>Produtos</p>
+          <p>Peças do Estúdio CM 3D.</p>
+        </div>
+      </header>
       <div className={styles.wrap}>
         <nav className={styles.breadcrumbs} aria-label="Navegação estrutural">
           <Link href="/produtos">Produtos</Link><span aria-hidden="true">/</span><span aria-current="page">{product.name}</span>
@@ -42,7 +51,6 @@ export default async function ProductPage({ params }: Props) {
         <article className={styles.detail}>
           <ProductGallery key={product.slug} name={product.name} images={product.imageUrls} />
           <div className={styles.detailCopy}>
-            <p className={styles.eyebrow}>CM 3D · Estúdio</p>
             <h1>{product.name}</h1>
             <p className={styles.summary}>{product.summary}</p>
             {product.sourceStatus === "NORMAL" && product.shopeeUrl ? (

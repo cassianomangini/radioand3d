@@ -53,7 +53,7 @@ export type QuoteNotificationData = {
   contactMethod: 'whatsapp' | 'email';
   contactName: string;
   contactValue: string;
-  attachmentNames: string[];
+  attachments: Array<{ name: string; url: string }>;
 };
 
 export type QuoteGateway = {
@@ -326,24 +326,57 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
       const rows = await readApi<Array<{
         project_type: QuoteProjectType; production: Record<string, unknown>;
         project: Record<string, unknown>; contact_method: 'whatsapp' | 'email';
-        contact_name: string; contact_value: string; source_reference: string | null;
-      }>>(`/rest/v1/quote_requests?id=eq.${requestId}&owner_session_hash=eq.${ownerHash}&select=project_type,production,project,contact_method,contact_name,contact_value,source_reference&limit=1`);
+        contact_name: string; contact_value: string; source_reference: string | null; no_file: boolean;
+      }>>(`/rest/v1/quote_requests?id=eq.${requestId}&owner_session_hash=eq.${ownerHash}&lifecycle_status=eq.submitted&select=project_type,production,project,contact_method,contact_name,contact_value,source_reference,no_file&limit=1`);
       if (!Array.isArray(rows) || rows.length !== 1 || !rows[0].contact_name || !rows[0].contact_value ||
-          !rows[0].production || !rows[0].project) {
+          !rows[0].production || !rows[0].project || typeof rows[0].no_file !== 'boolean') {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
       }
-      const attachments = await readApi<Array<{ original_name: string }>>(
-        `/rest/v1/quote_attachments?quote_request_id=eq.${requestId}&validation_status=eq.validated&select=original_name&order=created_at.asc`,
+      const attachments = await readApi<Array<{ original_name: string; storage_path: string }>>(
+        `/rest/v1/quote_attachments?quote_request_id=eq.${requestId}&validation_status=eq.validated&quota_released_at=is.null&select=original_name,storage_path&order=created_at.asc`,
       );
-      if (!Array.isArray(attachments) || attachments.some(item => typeof item.original_name !== 'string')) {
+      if (!Array.isArray(attachments) || attachments.length > 5 || attachments.some(item =>
+        typeof item.original_name !== 'string' || item.original_name.length < 1 || item.original_name.length > 255 ||
+        typeof item.storage_path !== 'string' || !acceptedPath.test(item.storage_path) ||
+        !item.storage_path.startsWith(`${requestId}/`))) {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
       }
+      if (rows[0].no_file === (attachments.length > 0)) {
+        throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+      }
+      const uniquePaths = new Set(attachments.map(item => item.storage_path));
+      if (uniquePaths.size !== attachments.length) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+      const signed = attachments.length ? await api<Array<{ path?: string; signedURL?: string; error?: string }>>(
+        '/storage/v1/object/sign/quote-intake',
+        { expiresIn: 90 * 24 * 60 * 60, paths: attachments.map(item => item.storage_path) },
+      ) : [];
+      if (!Array.isArray(signed) || signed.length !== attachments.length) {
+        throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+      }
+      const links = attachments.map((item, index) => {
+        const entry = signed[index];
+        if (entry?.path !== item.storage_path || typeof entry.signedURL !== 'string' || entry.error) {
+          throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+        }
+        let link: URL;
+        try { link = new URL(`/storage/v1${entry.signedURL}`, url); }
+        catch { throw new QuoteHttpError(503, 'quote_upstream_unavailable'); }
+        if (link.origin !== url ||
+            link.pathname !== `/storage/v1/object/sign/quote-intake/${item.storage_path}` ||
+            !link.searchParams.get('token') || link.hash) {
+          throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+        }
+        const name = item.original_name.replace(/[\r\n\t]/g, ' ').trim();
+        if (!name) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+        link.searchParams.set('download', name);
+        return { name, url: link.href };
+      });
       const row = rows[0];
       return {
         projectType: row.project_type, sourceReference: row.source_reference,
         production: row.production, project: row.project,
         contactMethod: row.contact_method, contactName: row.contact_name,
-        contactValue: row.contact_value, attachmentNames: attachments.map(item => item.original_name),
+        contactValue: row.contact_value, attachments: links,
       };
     },
     async emailWasSent(requestId) {

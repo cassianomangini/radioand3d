@@ -41,8 +41,11 @@ export function quoteEmailText(requestId: string, quote: QuoteNotificationData, 
     `Entrega: ${display(quote.production.delivery)}${quote.production.cep ? `, CEP ${display(quote.production.cep)}` : ''}`,
     ...(studioReference ? [`Foto de referência do Estúdio: ${studioReference}`] : []),
     '', 'Detalhes:', ...details,
-    '', `Arquivos: ${quote.attachmentNames.length ? quote.attachmentNames.join(', ') : 'nenhum'}`,
-    'Os arquivos ficam no armazenamento privado do pedido; este e-mail não contém anexos.',
+    '', 'Arquivos enviados:',
+    ...(quote.attachments.length
+      ? quote.attachments.map(file => `${file.name}: ${file.url}`)
+      : ['nenhum']),
+    ...(quote.attachments.length ? ['Links diretos disponíveis por até 90 dias após o pedido.'] : []),
   ].join('\n');
 }
 

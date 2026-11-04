@@ -66,7 +66,7 @@ test('contrato recusa payload incompleto e arquivo incompatível com o papel', (
   assert.equal(parseQuoteAttachments([{ id: crypto.randomUUID(), role: 'model', name: 'foto.png', size: 12, type: 'image/png' }]), null);
 });
 
-test('referência de produto só é aceita para peça publicada e personalizável', async () => {
+test('referência de produto só é aceita para peça ativa', async () => {
   const { token } = newQuoteSession();
   const requestId = crypto.randomUUID();
   const draft = {
@@ -90,13 +90,13 @@ test('referência de produto só é aceita para peça publicada e personalizáve
     body: JSON.stringify({ requestId, submissionKey: crypto.randomUUID(), draft, attachments: [] }),
   });
   const denied = await handleQuoteSubmit(request(), gateway, async () => {}, async () => ({
-    state: 'available', products: [{ slug: 'porta-figurinhas', customizable: false, sourceStatus: 'NORMAL' }],
+    state: 'available', products: [{ slug: 'porta-figurinhas', customizable: false, sourceStatus: 'UNLIST' }],
   }));
   assert.equal(denied.status, 400);
   assert.equal(saved, null);
 
   const accepted = await handleQuoteSubmit(request(), gateway, async () => {}, async () => ({
-    state: 'available', products: [{ slug: 'porta-figurinhas', customizable: true, sourceStatus: 'NORMAL' }],
+    state: 'available', products: [{ slug: 'porta-figurinhas', customizable: false, sourceStatus: 'NORMAL' }],
   }));
   assert.equal(accepted.status, 201);
   assert.equal(saved.sourceOrigin, 'site/produtos');

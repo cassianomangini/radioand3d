@@ -192,7 +192,7 @@ export async function handleQuoteSubmit(
       const catalog = await catalogReader();
       if (catalog.state === 'unavailable') throw new QuoteHttpError(503, 'product_reference_unavailable');
       const product = catalog.products.find((entry) => entry.slug === draft.productSlug);
-      if (!product?.customizable || product.sourceStatus !== 'NORMAL') {
+      if (product?.sourceStatus !== 'NORMAL') {
         throw new QuoteHttpError(400, 'invalid_quote_submit');
       }
     }

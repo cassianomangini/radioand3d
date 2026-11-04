@@ -27,12 +27,12 @@ export default async function OrcamentosPage({
       if (studioPhotoKeyFromId(candidate)) studioPhotoId = candidate;
     } catch { /* Uma referência indisponível não impede o formulário normal. */ }
   }
-  let productReference: { slug: string; name: string } | null = null;
+  let productReference: { slug: string; name: string; imageUrl: string } | null = null;
   if (!studioPhotoId && typeof query.produto === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(query.produto)) {
     const catalog = await getSiteCatalog();
     const product = catalog.products.find((entry) => entry.slug === query.produto);
-    if (product?.customizable && product.sourceStatus === "NORMAL") {
-      productReference = { slug: product.slug, name: product.name };
+    if (product?.sourceStatus === "NORMAL") {
+      productReference = { slug: product.slug, name: product.name, imageUrl: product.imageUrls[0] };
     }
   }
   let intakeEnabled = false;

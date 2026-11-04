@@ -393,7 +393,7 @@ function SummaryRow({ label, value, onEdit }: { label: string; value: string; on
   );
 }
 
-export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turnstileSiteKey }: { intakeEnabled: boolean; studioPhotoId: string | null; productReference: { slug: string; name: string } | null; turnstileSiteKey: string | null }) {
+export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turnstileSiteKey }: { intakeEnabled: boolean; studioPhotoId: string | null; productReference: { slug: string; name: string; imageUrl: string } | null; turnstileSiteKey: string | null }) {
   const [step, setStep] = useState(studioPhotoId || productReference ? 2 : 1);
   const [reviewing, setReviewing] = useState(false);
   const [boxDetailStep, setBoxDetailStep] = useState(0);
@@ -859,6 +859,15 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       ) : null}
       {productReference && draft.productSlug && step > 1 ? (
         <div className={styles.studioReference} role="group" aria-label="Produto de referência">
+          {/* Imagem do catálogo validada no servidor antes de chegar ao formulário. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className={styles.studioReferenceImage}
+            src={productReference.imageUrl}
+            alt={`Imagem do produto ${productReference.name} selecionado como referência`}
+            width="88"
+            height="88"
+          />
           <div>
             <strong>Produto de referência: {productReference.name}</strong>
             <p>Descreva a personalização ou medida diferente que você procura.</p>

@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { visibleProducts } from "@/features/products/catalog-contract";
 import { getSiteCatalog } from "@/server/products/catalog";
+import { getProductCategory } from "./categories";
+import { ProductCatalog } from "./product-catalog";
 import styles from "./products.module.css";
+import { getProductSubtitle } from "./subtitles";
 
 export const metadata: Metadata = {
   title: "Produtos — CM 3D & Rádio",
@@ -12,39 +15,29 @@ export const metadata: Metadata = {
 export default async function ProdutosPage() {
   const catalog = await getSiteCatalog();
   const products = visibleProducts(catalog.products);
+  const cards = products.map((product) => ({
+    slug: product.slug,
+    name: product.name,
+    subtitle: getProductSubtitle(product.slug),
+    imageUrl: product.imageUrls[0],
+    category: getProductCategory(product),
+  }));
 
   return (
     <div className={styles.page}>
       <header className={styles.banner}>
         <div className={styles.bannerContent}>
           <h1 className={styles.bannerTitle}>Produtos</h1>
-          <p>Conheça as peças do Estúdio CM 3D.</p>
+          <p>{catalog.state === "available" && catalog.preview
+            ? "Prévia local com anúncios reais para validar a página."
+            : "Conheça as peças do Estúdio CM 3D."}</p>
         </div>
       </header>
 
       <div className={styles.wrap}>
         {products.length > 0 ? (
           <section aria-labelledby="catalog-heading">
-            <div className={styles.sectionHeading}>
-              <h2 id="catalog-heading">Peças no catálogo</h2>
-              <span>{products.length} {products.length === 1 ? "peça" : "peças"}</span>
-            </div>
-            <div className={styles.grid}>
-              {products.map((product) => (
-                <Link className={styles.card} href={`/produtos/${product.slug}`} key={product.slug}>
-                  <span className={styles.cardImage}>
-                    {/* Imagem comercial remota; a fonte já foi validada no contrato. */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={product.imageUrls[0]} alt={product.name} width="600" height="750" loading="lazy" />
-                  </span>
-                  <span className={styles.cardBody}>
-                    <strong>{product.name}</strong>
-                    <span>{product.summary}</span>
-                    <span className={styles.cardAction}>Ver detalhes <span aria-hidden="true">↗</span></span>
-                  </span>
-                </Link>
-              ))}
-            </div>
+            <ProductCatalog products={cards} />
           </section>
         ) : (
           <section className={styles.empty} aria-labelledby="catalog-heading">

@@ -1,9 +1,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const { readFileSync } = require('node:fs');
 const { pathToFileURL } = require('node:url');
 const { resolve } = require('node:path');
 
 const contract = import(pathToFileURL(resolve('src/features/products/catalog-contract.ts')).href);
+const categories = import(pathToFileURL(resolve('src/app/produtos/categories.ts')).href);
 
 function product(overrides = {}) {
   return {
@@ -47,4 +49,21 @@ test('rejects a private image host, a wrong status link, and duplicate slugs', a
   assert.equal(parseCatalogResponse({ products: [product({ imageUrls: ['https://other.example/file/x'] })] }), null);
   assert.equal(parseCatalogResponse({ products: [product({ sourceStatus: 'UNLIST' })] }), null);
   assert.equal(parseCatalogResponse({ products: [product(), product()] }), null);
+});
+
+test('local preview includes all 27 active listings with a category', async () => {
+  const rows = JSON.parse(readFileSync(resolve('src/server/products/active-catalog-preview.json'), 'utf8'));
+  const { parseCatalogResponse } = await contract;
+  const { getProductCategory } = await categories;
+  const parsed = parseCatalogResponse({ products: rows.map((row) => ({
+    slug: row.slug, name: row.name, summary: row.summary, description: row.description,
+    categorySlug: null, seoTitle: row.name, seoDescription: row.summary,
+    shopeeUrl: `https://shopee.com.br/product/1433140862/${row.id}`,
+    imageUrls: row.imageUrls, material: row.material, dimensions: row.dimensions,
+    customizable: false, variations: row.variations,
+    sourceStatus: 'NORMAL', sourceSyncedAt: row.sourceSyncedAt, contentUpdatedAt: row.sourceSyncedAt,
+  })) });
+  assert.equal(parsed?.length, 27);
+  assert.equal(new Set(rows.map((row) => row.id)).size, 27);
+  assert.ok(parsed.every((entry) => getProductCategory(entry) !== null));
 });

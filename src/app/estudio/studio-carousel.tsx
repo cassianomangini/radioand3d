@@ -16,31 +16,15 @@ export type StudioSlide = {
 
 type StudioCategory = "decoracao" | "outros" | "natal" | "brinquedos" | "caixas" | "cores";
 
-const categories: ReadonlyArray<{ id: StudioCategory | null; label: string }> = [
-  { id: null, label: "Todas" },
-  { id: "natal", label: "Peças Natalinas" },
-  { id: "decoracao", label: "Organização e Decoração" },
-  { id: "brinquedos", label: "Peças Sensoriais" },
-  { id: "caixas", label: "Porta Objetos" },
-  { id: "cores", label: "Cores" },
-  { id: "outros", label: "Outros" },
+const categories: ReadonlyArray<{ id: StudioCategory | null; label: string; icon: string }> = [
+  { id: null, label: "Todas", icon: "/images/categories/todas.png" },
+  { id: "natal", label: "Peças Natalinas", icon: "/images/categories/pecas-natalinas.png" },
+  { id: "decoracao", label: "Organização e Decoração", icon: "/images/categories/organizacao-decoracao.png" },
+  { id: "brinquedos", label: "Peças Sensoriais", icon: "/images/categories/pecas-sensoriais.png" },
+  { id: "caixas", label: "Porta Objetos", icon: "/images/categories/porta-objetos.png" },
+  { id: "cores", label: "Cores", icon: "/images/categories/cores.png" },
+  { id: "outros", label: "Outros", icon: "/images/categories/outros.png" },
 ];
-
-function CategoryMenu({ value, onChange }: { value: StudioCategory | null; onChange: (category: StudioCategory | null) => void }) {
-  return (
-    <label className={styles.categoryMenu}>
-      <span>Categoria</span>
-      <select
-        value={value ?? ""}
-        onChange={(event) => onChange(event.currentTarget.value ? event.currentTarget.value as StudioCategory : null)}
-      >
-        {categories.map((category) => (
-          <option key={category.id ?? "todas"} value={category.id ?? ""}>{category.label}</option>
-        ))}
-      </select>
-    </label>
-  );
-}
 
 function Chevron({ direction }: { direction: "previous" | "next" }) {
   return (
@@ -88,18 +72,18 @@ function PlaybackSymbol({ playing }: { playing: boolean }) {
 }
 
 const slideDurationMs = 4800;
-const galleryPageSize = 12;
+const galleryBatchSize = 12;
 
 export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   const [activeCategory, setActiveCategory] = useState<StudioCategory | null>(null);
   const [index, setIndex] = useState(0);
-  const [galleryPage, setGalleryPage] = useState(0);
+  const [visibleGalleryCount, setVisibleGalleryCount] = useState(galleryBatchSize);
   const [playing, setPlaying] = useState(true);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [documentVisible, setDocumentVisible] = useState(true);
   const [inViewport, setInViewport] = useState(true);
   const rootRef = useRef<HTMLElement>(null);
-  const galleryRef = useRef<HTMLElement>(null);
+  const galleryLoadRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLDialogElement>(null);
   const remainingRef = useRef(slideDurationMs);
   const timedIndexRef = useRef(0);
@@ -116,19 +100,15 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   const dotCount = Math.min(5, visibleSlides.length);
   const firstDot = Math.max(0, Math.min(index - 2, visibleSlides.length - dotCount));
   const visibleDots = Array.from({ length: dotCount }, (_, offset) => firstDot + offset);
-  const galleryPageCount = Math.ceil(visibleSlides.length / galleryPageSize);
-  const galleryStart = galleryPage * galleryPageSize;
-  const gallerySlides = visibleSlides.slice(galleryStart, galleryStart + galleryPageSize);
+  const gallerySlides = visibleSlides.slice(0, visibleGalleryCount);
+  const hasMoreGallerySlides = visibleGalleryCount < visibleSlides.length;
   const advancing = canNavigate && playing && documentVisible && inViewport && !viewerOpen;
 
-  const transitionTo = useCallback((requested: number, revealInGallery = true) => {
+  const transitionTo = useCallback((requested: number) => {
     if (!canNavigate) return;
     const destination = (requested + visibleSlides.length) % visibleSlides.length;
     if (destination === index) return;
-    const update = () => {
-      setIndex(destination);
-      if (revealInGallery) setGalleryPage(Math.floor(destination / galleryPageSize));
-    };
+    const update = () => setIndex(destination);
     if (
       viewerRef.current?.open ||
       !document.startViewTransition ||
@@ -161,6 +141,23 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
   }, []);
 
   useEffect(() => {
+    const trigger = galleryLoadRef.current;
+    if (!trigger || !hasMoreGallerySlides) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisibleGalleryCount(visibleSlides.length);
+      return;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      setVisibleGalleryCount((count) => Math.min(count + galleryBatchSize, visibleSlides.length));
+    }, { rootMargin: "0px 0px 300px 0px" });
+    observer.observe(trigger);
+    return () => observer.disconnect();
+  }, [activeCategory, hasMoreGallerySlides, visibleGalleryCount, visibleSlides.length]);
+
+  useEffect(() => {
     if (timedIndexRef.current !== index) {
       timedIndexRef.current = index;
       remainingRef.current = slideDurationMs;
@@ -170,7 +167,7 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
     const started = performance.now();
     const timer = window.setTimeout(() => {
       remainingRef.current = slideDurationMs;
-      transitionTo(index + 1, false);
+      transitionTo(index + 1);
     }, remainingRef.current);
 
     return () => {
@@ -184,18 +181,13 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
     setPlaying(true);
     setActiveCategory(category);
     setIndex(0);
-    setGalleryPage(0);
+    setVisibleGalleryCount(galleryBatchSize);
     remainingRef.current = slideDurationMs;
     timedIndexRef.current = -1;
   }
 
-  function goTo(requested: number, revealInGallery = true) {
-    transitionTo(requested, revealInGallery);
-  }
-
-  function showGalleryPage(page: number) {
-    setGalleryPage(page);
-    galleryRef.current?.scrollIntoView({ block: "start" });
+  function goTo(requested: number) {
+    transitionTo(requested);
   }
 
   function openViewer() {
@@ -209,7 +201,6 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
     <>
       <div className={styles.showcase}>
       <div className={styles.categoryColumn}>
-        <CategoryMenu value={activeCategory} onChange={chooseCategory} />
         <aside className={styles.categories} aria-label="Categorias do estúdio">
           <ul>
             {categories.map((category) => (
@@ -220,7 +211,8 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
                   aria-pressed={activeCategory === category.id}
                   onClick={() => chooseCategory(category.id)}
                 >
-                  {category.label}
+                  <Image className={styles.categoryIcon} src={category.icon} alt="" width={56} height={56} />
+                  <span className={styles.categoryLabel}>{category.label}</span>
                 </button>
               </li>
             ))}
@@ -354,13 +346,11 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
       </div>
       </div>
       <section
-        ref={galleryRef}
         className={styles.mediaStrip}
         aria-label="Fotos do estúdio"
       >
         <div className={styles.stripHeader}>
           <h2>Fotos do estúdio</h2>
-          <CategoryMenu value={activeCategory} onChange={chooseCategory} />
           <nav className={`${styles.categories} ${styles.galleryCategories}`} aria-label="Filtrar fotos do estúdio por categoria">
             <ul>
               {categories.map((category) => (
@@ -371,7 +361,8 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
                     aria-pressed={activeCategory === category.id}
                     onClick={() => chooseCategory(category.id)}
                   >
-                    {category.label}
+                    <Image className={styles.categoryIcon} src={category.icon} alt="" width={56} height={56} />
+                    <span className={styles.categoryLabel}>{category.label}</span>
                   </button>
                 </li>
               ))}
@@ -379,48 +370,23 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
           </nav>
         </div>
         <div className={styles.stripItems}>
-          {gallerySlides.map((slide, offset) => {
-            const step = galleryStart + offset;
-            return (
-              <button
-                className={styles.thumbnail}
-                key={slide.src}
-                type="button"
-                aria-label={`Mostrar imagem: ${slide.title}`}
-                aria-pressed={step === index}
-                onClick={() => {
-                  goTo(step);
-                  openViewer();
-                }}
-              >
-                <Image src={slide.src} alt="" fill sizes="(max-width: 760px) 46vw, 23vw" />
-              </button>
-            );
-          })}
+          {gallerySlides.map((slide, step) => (
+            <button
+              className={styles.thumbnail}
+              key={slide.src}
+              type="button"
+              aria-label={`Mostrar imagem: ${slide.title}`}
+              aria-pressed={step === index}
+              onClick={() => {
+                goTo(step);
+                openViewer();
+              }}
+            >
+              <Image src={slide.src} alt="" fill sizes="(max-width: 760px) 46vw, 23vw" />
+            </button>
+          ))}
         </div>
-        {galleryPageCount > 1 ? (
-          <nav className={styles.pagination} aria-label="Páginas das fotos do estúdio">
-            <button
-              className={styles.pageStep}
-              type="button"
-              aria-label="Página anterior de fotos"
-              disabled={galleryPage === 0}
-              onClick={() => showGalleryPage(galleryPage - 1)}
-            >
-              <Chevron direction="previous" />
-            </button>
-            <span aria-live="polite">{galleryPage + 1} / {galleryPageCount}</span>
-            <button
-              className={styles.pageStep}
-              type="button"
-              aria-label="Próxima página de fotos"
-              disabled={galleryPage === galleryPageCount - 1}
-              onClick={() => showGalleryPage(galleryPage + 1)}
-            >
-              <Chevron direction="next" />
-            </button>
-          </nav>
-        ) : null}
+        {hasMoreGallerySlides ? <div ref={galleryLoadRef} className={styles.galleryLoadTrigger} aria-hidden="true" /> : null}
       </section>
     </>
   );

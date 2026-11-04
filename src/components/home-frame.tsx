@@ -13,6 +13,15 @@ export function HomeFrame() {
           <br />
           <span className={styles.highlight}>Impressão 3D.</span>
         </h1>
+        <figure className={styles.mobileHomeVisual}>
+          <Image
+            src="/images/studio/fundo_mobile.png"
+            alt="Peças de impressão 3D em diferentes formatos e cores"
+            width={483}
+            height={465}
+            sizes="(max-width: 1023px) 100vw, 1px"
+          />
+        </figure>
         <ul className={styles.featureGrid} aria-label="Informações sobre o CMangini3D">
           <li className={styles.featureCard}>
             <span className={styles.featureIcon} aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" /></svg></span>

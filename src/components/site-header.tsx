@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { RadioMiniPlayer } from "./radio-mini-player";
 import styles from "./site-header.module.css";
 
@@ -56,10 +56,44 @@ export function SiteHeader({ radioOpen = false, docked = false, onHome, onOpenRa
   const pathname = usePathname();
   const studioPage = pathname === "/estudio";
   const orcamentosPage = pathname === "/orcamentos";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!headerRef.current?.contains(event.target as Node)) setMenuOpen(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setMenuOpen(false);
+      menuButtonRef.current?.focus();
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
+
+  function goHome() {
+    setMenuOpen(false);
+    onHome?.();
+  }
+
+  function openRadio() {
+    setMenuOpen(false);
+    onOpenRadio?.();
+  }
 
   return (
-    <header className={styles.header} data-docked={docked ? "true" : undefined}>
-      <Link className={styles.brand} href="/" aria-label="CM 3D e Rádio, início" onClick={onHome}>
+    <header ref={headerRef} className={styles.header} data-docked={docked ? "true" : undefined}>
+      <Link className={styles.brand} href="/" aria-label="CM 3D e Rádio, início" onClick={goHome}>
         <Image
           src="/images/cm-3d-radio-logo.png"
           alt=""
@@ -69,18 +103,33 @@ export function SiteHeader({ radioOpen = false, docked = false, onHome, onOpenRa
           unoptimized
         />
       </Link>
-      <nav className={styles.nav} aria-label="Navegação principal">
-        <Link href="/" aria-current={!radioOpen && pathname === "/" ? "page" : undefined} onClick={onHome}>Início</Link>
-        <Link href="/estudio" aria-current={!radioOpen && studioPage ? "page" : undefined} onClick={onHome}>Estúdio</Link>
-        <Link href="/orcamentos" aria-current={!radioOpen && orcamentosPage ? "page" : undefined} onClick={onHome}>Orçamentos</Link>
-        <button type="button" onClick={onOpenRadio} aria-current={radioOpen ? "page" : undefined}>Rádio</button>
-      </nav>
-      <div className={styles.actions}>
-        {docked && onRestoreRadio ? <RadioMiniPlayer onRestore={onRestoreRadio} /> : null}
-        <div className={styles.social} role="group" aria-label="Contato e redes sociais">
-          <a href="mailto:casman1986@gmail.com" aria-label="Enviar e-mail para casman1986@gmail.com" title="E-mail: casman1986@gmail.com"><SocialIcon name="email" /></a>
-          <a href="https://www.instagram.com/cmangini3d/" aria-label="Instagram do CMangini3D" title="Instagram: @cmangini3d" target="_blank" rel="noopener noreferrer"><SocialIcon name="instagram" /></a>
-          <a href="https://shopee.com.br/artesopolis" aria-label="Loja Artesopolis na Shopee" title="Shopee: artesopolis" target="_blank" rel="noopener noreferrer"><SocialIcon name="shopee" /></a>
+      <button
+        ref={menuButtonRef}
+        className={styles.menuToggle}
+        type="button"
+        aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+        aria-controls="site-menu"
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <path d={menuOpen ? "M5 5l14 14M19 5 5 19" : "M4 6h16M4 12h16M4 18h16"} />
+        </svg>
+      </button>
+      <div id="site-menu" className={styles.menuContent} data-open={menuOpen ? "true" : undefined}>
+        <nav className={styles.nav} aria-label="Navegação principal">
+          <Link href="/" aria-current={!radioOpen && pathname === "/" ? "page" : undefined} onClick={goHome}>Início</Link>
+          <Link href="/estudio" aria-current={!radioOpen && studioPage ? "page" : undefined} onClick={goHome}>Estúdio</Link>
+          <Link href="/orcamentos" aria-current={!radioOpen && orcamentosPage ? "page" : undefined} onClick={goHome}>Orçamentos</Link>
+          <button type="button" onClick={openRadio} aria-current={radioOpen ? "page" : undefined}>Rádio</button>
+        </nav>
+        <div className={styles.actions}>
+          {docked && onRestoreRadio ? <RadioMiniPlayer onRestore={() => { setMenuOpen(false); onRestoreRadio(); }} /> : null}
+          <div className={styles.social} role="group" aria-label="Contato e redes sociais">
+            <a href="mailto:casman1986@gmail.com" aria-label="Enviar e-mail para casman1986@gmail.com" title="E-mail: casman1986@gmail.com" onClick={() => setMenuOpen(false)}><SocialIcon name="email" /></a>
+            <a href="https://www.instagram.com/cmangini3d/" aria-label="Instagram do CMangini3D" title="Instagram: @cmangini3d" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}><SocialIcon name="instagram" /></a>
+            <a href="https://shopee.com.br/artesopolis" aria-label="Loja Artesopolis na Shopee" title="Shopee: artesopolis" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}><SocialIcon name="shopee" /></a>
+          </div>
         </div>
       </div>
     </header>

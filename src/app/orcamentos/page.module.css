@@ -1109,7 +1109,19 @@
 
 @container orcamentos (max-width: 650px) {
   .shapeChoices {
-    grid-template-columns: repeat(2, minmax(0, 112px));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    max-width: 360px;
+    margin-inline: auto;
+  }
+
+  .shapeOption {
+    grid-template-rows: minmax(0, 1fr) auto;
+    aspect-ratio: 1;
+  }
+
+  .shapeOption img {
+    height: 100%;
   }
 
   .options {

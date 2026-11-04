@@ -12,6 +12,14 @@
   border-bottom: 1px solid var(--border-default);
 }
 
+.menuContent {
+  display: contents;
+}
+
+.menuToggle {
+  display: none;
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -145,17 +153,87 @@
 
 @media (max-width: 1023px) {
   .header {
-    position: static;
+    position: relative;
+    z-index: var(--layer-menu);
     grid-template-columns: minmax(0, 1fr) auto;
-    justify-items: start;
-    row-gap: var(--space-2);
-    padding-top: var(--space-2);
-    padding-bottom: var(--space-2);
+    min-height: var(--mobile-header-height);
+    padding-block: 0;
+  }
+
+  .menuToggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-field);
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .menuToggle[aria-expanded="true"] {
+    border-color: var(--border-active);
+  }
+
+  .menuToggle:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .menuToggle svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .menuContent {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    max-height: calc(100dvh - var(--mobile-header-height));
+    overflow-y: auto;
+    padding: var(--space-2) var(--page-gutter) var(--space-4);
+    border-bottom: 1px solid var(--border-default);
+    background: var(--bg-panel);
+  }
+
+  .menuContent[data-open="true"] {
+    display: block;
   }
 
   .nav {
-    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .nav a,
+  .nav button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    font-size: 0.9375rem;
+    text-align: left;
+  }
+
+  .nav a[aria-current="page"],
+  .nav button[aria-current="page"] {
+    color: var(--accent-cyan);
+  }
+
+  .nav a[aria-current="page"]::after,
+  .nav button[aria-current="page"]::after {
+    display: none;
+  }
+
+  .actions {
     justify-content: flex-start;
-    gap: var(--space-3);
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-default);
   }
 }

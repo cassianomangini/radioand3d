@@ -65,6 +65,43 @@ test('contrato recusa payload incompleto e arquivo incompatível com o papel', (
   assert.equal(parseQuoteAttachments([{ id: crypto.randomUUID(), role: 'model', name: 'foto.png', size: 12, type: 'image/png' }]), null);
 });
 
+test('referência de produto só é aceita para peça publicada e personalizável', async () => {
+  const { token } = newQuoteSession();
+  const requestId = crypto.randomUUID();
+  const draft = {
+    ...quickBoxDraft(), type: 'outro', boxMode: '', boxQuickDescription: '',
+    otherDescription: 'Quero outra medida', colorMode: 'indeciso', productSlug: 'porta-figurinhas',
+  };
+  assert.equal(parseQuoteForm({ ...draft, productSlug: '../admin' }), null);
+  let saved = null;
+  const gateway = {
+    submissionReceipt: async () => null,
+    consumeRate: async () => true,
+    submitQuote: async (input) => {
+      saved = input;
+      return { request_id: requestId, submission_time: '2026-11-04T12:00:00Z' };
+    },
+    emailWasSent: async () => true,
+  };
+  const request = () => new Request('http://localhost:3000/api/quote/submit', {
+    method: 'POST',
+    headers: { origin: 'http://localhost:3000', 'content-type': 'application/json', cookie: issueSessionCookie(token) },
+    body: JSON.stringify({ requestId, submissionKey: crypto.randomUUID(), draft, attachments: [] }),
+  });
+  const denied = await handleQuoteSubmit(request(), gateway, async () => {}, async () => ({
+    state: 'available', products: [{ slug: 'porta-figurinhas', customizable: false, sourceStatus: 'NORMAL' }],
+  }));
+  assert.equal(denied.status, 400);
+  assert.equal(saved, null);
+
+  const accepted = await handleQuoteSubmit(request(), gateway, async () => {}, async () => ({
+    state: 'available', products: [{ slug: 'porta-figurinhas', customizable: true, sourceStatus: 'NORMAL' }],
+  }));
+  assert.equal(accepted.status, 201);
+  assert.equal(saved.sourceOrigin, 'site/produtos');
+  assert.equal(saved.sourceReference, '/produtos/porta-figurinhas');
+});
+
 test('pedido é salvo uma vez e o e-mail pendente é reenviado a partir do banco', async () => {
   const requestId = crypto.randomUUID();
   const submissionKey = crypto.randomUUID();

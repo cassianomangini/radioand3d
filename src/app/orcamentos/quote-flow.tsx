@@ -62,6 +62,7 @@ type ReviewEditArea = "details" | "contact" | "delivery";
 export type Draft = {
   type: ProjectType | null;
   studioPhotoId?: string | null;
+  productSlug?: string | null;
   boxMode: RequestMode;
   boxQuickDescription: string;
   boxShape: string;
@@ -111,6 +112,7 @@ const emptyDimensions = (): Dimensions => ({ width: "", depth: "", height: "" })
 const initialDraft: Draft = {
   type: null,
   studioPhotoId: null,
+  productSlug: null,
   boxMode: "",
   boxQuickDescription: "",
   boxShape: "",
@@ -391,15 +393,16 @@ function SummaryRow({ label, value, onEdit }: { label: string; value: string; on
   );
 }
 
-export function QuoteFlow({ intakeEnabled, studioPhotoId, turnstileSiteKey }: { intakeEnabled: boolean; studioPhotoId: string | null; turnstileSiteKey: string | null }) {
-  const [step, setStep] = useState(studioPhotoId ? 2 : 1);
+export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turnstileSiteKey }: { intakeEnabled: boolean; studioPhotoId: string | null; productReference: { slug: string; name: string } | null; turnstileSiteKey: string | null }) {
+  const [step, setStep] = useState(studioPhotoId || productReference ? 2 : 1);
   const [reviewing, setReviewing] = useState(false);
   const [boxDetailStep, setBoxDetailStep] = useState(0);
   const [plateDetailStep, setPlateDetailStep] = useState(0);
   const [draft, setDraft] = useState<Draft>(() => ({
     ...initialDraft,
-    type: studioPhotoId ? "outro" : null,
+    type: studioPhotoId || productReference ? "outro" : null,
     studioPhotoId,
+    productSlug: productReference?.slug ?? null,
   }));
   const [savedContacts, setSavedContacts] = useState({ whatsapp: "", email: "" });
   const [files, setFiles] = useState<SelectedFiles>({ model: [], logo: [], qr: [], boxLogo: [], boxQr: [], references: [] });
@@ -854,13 +857,21 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, turnstileSiteKey }: { 
           </div>
         </div>
       ) : null}
+      {productReference && draft.productSlug && step > 1 ? (
+        <div className={styles.studioReference} role="group" aria-label="Produto de referência">
+          <div>
+            <strong>Produto de referência: {productReference.name}</strong>
+            <p>Descreva a personalização ou medida diferente que você procura.</p>
+          </div>
+        </div>
+      ) : null}
 
       {step === 1 ? (
         <fieldset className={styles.options}>
           <legend className={styles.visuallyHidden}>Tipo de projeto</legend>
           {projectOptions.map((option, index) => (
             <label className={styles.option} key={option.value}>
-              <input type="radio" name="quote-project-type" value={option.value} checked={draft.type === option.value} onClick={() => { update("type", option.value); setStep(2); }} onChange={() => { update("type", option.value); setStep(2); }} />
+              <input type="radio" name="quote-project-type" value={option.value} checked={draft.type === option.value} onClick={() => { update("type", option.value); update("productSlug", null); setStep(2); }} onChange={() => { update("type", option.value); update("productSlug", null); setStep(2); }} />
               <span className={styles.optionCopy}>
                 <span className={styles.optionNumber}>{String(index + 1).padStart(2, "0")}</span>
                 <strong>{option.title}</strong>
@@ -1094,13 +1105,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, turnstileSiteKey }: { 
           {draft.type === "outro" ? (
             <>
               <div className={styles.field}>
-                <label htmlFor="other-description">{draft.studioPhotoId ? "O que você quer mudar nesta peça?" : "O que você gostaria de criar?"}</label>
+                <label htmlFor="other-description">{draft.studioPhotoId || draft.productSlug ? "O que você quer mudar nesta peça?" : "O que você gostaria de criar?"}</label>
                 <textarea
                   id="other-description"
                   value={draft.otherDescription}
                   aria-invalid={error?.field === "otherDescription"}
                   onChange={(event) => update("otherDescription", event.target.value)}
-                  placeholder={draft.studioPhotoId ? "Ex.: quero esta caixa com meu logo, ou esta peça com meu nome." : "Pode explicar do seu jeito, sem termos técnicos."}
+                  placeholder={draft.studioPhotoId || draft.productSlug ? "Ex.: quero esta peça em outra medida ou com meu nome." : "Pode explicar do seu jeito, sem termos técnicos."}
                 />
                 <InlineError error={error} field="otherDescription" />
               </div>
@@ -1260,6 +1271,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, turnstileSiteKey }: { 
               {draft.type === "outro" ? <>
                 <SummaryRow label="Ideia" value={draft.otherDescription.trim() || "Descrita pela referência"} onEdit={() => beginReviewEdit("details")} />
                 {draft.studioPhotoId ? <SummaryRow label="Referência" value="Foto do Estúdio selecionada" /> : null}
+                {productReference && draft.productSlug ? <SummaryRow label="Referência" value={productReference.name} /> : null}
                 {draft.otherSize.trim() ? <SummaryRow label="Tamanho aproximado" value={draft.otherSize.trim()} onEdit={() => beginReviewEdit("details")} /> : null}
               </> : null}
             </dl>

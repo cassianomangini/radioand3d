@@ -11,6 +11,7 @@ import { parseQuoteAttachments, parseQuoteForm, prepareQuoteForStorage, validate
 import { quoteEmailText, requireQuoteEmailConfig, sendQuoteEmail } from './email';
 import { verifyQuoteTurnstile } from './turnstile';
 import { studioPhotoKeyFromId } from '@/features/studio/r2-photos';
+import { getSiteCatalog } from '@/server/products/catalog';
 
 const TYPES: readonly string[] = ['impressao', 'placa', 'caixa', 'outro'];
 /** Starts a new draft; a cookie never grants access to another draft ID. */
@@ -160,7 +161,8 @@ export async function handleQuoteAttachmentComplete(
 
 /** Finalize an owned draft atomically; browser never selects triage classification. */
 export async function handleQuoteSubmit(
-  request: Request, gateway?: QuoteGateway, mailer: typeof sendQuoteEmail = sendQuoteEmail
+  request: Request, gateway?: QuoteGateway, mailer: typeof sendQuoteEmail = sendQuoteEmail,
+  catalogReader: typeof getSiteCatalog = getSiteCatalog,
 ): Promise<Response> {
   try {
     requireQuoteEnabled();
@@ -184,6 +186,15 @@ export async function handleQuoteSubmit(
       try { photoKey = studioPhotoKeyFromId(draft.studioPhotoId); }
       catch { throw new QuoteHttpError(503, 'studio_reference_unavailable'); }
       if (!photoKey) throw new QuoteHttpError(400, 'invalid_quote_submit');
+    }
+    if (draft.productSlug) {
+      if (draft.type !== 'outro') throw new QuoteHttpError(400, 'invalid_quote_submit');
+      const catalog = await catalogReader();
+      if (catalog.state === 'unavailable') throw new QuoteHttpError(503, 'product_reference_unavailable');
+      const product = catalog.products.find((entry) => entry.slug === draft.productSlug);
+      if (!product?.customizable || product.sourceStatus !== 'NORMAL') {
+        throw new QuoteHttpError(400, 'invalid_quote_submit');
+      }
     }
     const prepared = prepareQuoteForStorage(draft, attachments);
     const db = gateway ?? createQuoteGateway();

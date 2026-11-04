@@ -64,6 +64,9 @@ export function parseQuoteForm(value: unknown): Draft | null {
   if (value.studioPhotoId != null &&
       (typeof value.studioPhotoId !== 'string' || value.studioPhotoId.length > 260 ||
        !/^[A-Za-z0-9_-]+\.[a-f0-9]{32}\.[a-f0-9]{32}$/.test(value.studioPhotoId))) return null;
+  if (value.productSlug != null &&
+      (typeof value.productSlug !== 'string' || value.productSlug.length > 120 ||
+       !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value.productSlug) || value.studioPhotoId)) return null;
   for (const key of textFields) {
     if (typeof value[key] !== 'string' || value[key].length > 2000) return null;
   }
@@ -207,9 +210,10 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
   return {
     projectType, noFile: files.length === 0,
     startingPoints: [mode === 'quick' ? 'pedido rápido' : mode === 'detailed' ? 'formulário detalhado' : 'formulário',
-      ...(draft.studioPhotoId ? ['foto do estúdio'] : [])],
-    sourceOrigin: draft.studioPhotoId ? 'site/estudio' : 'site/orcamentos',
-    sourceReference: draft.studioPhotoId ? `/api/studio/photos/${draft.studioPhotoId}` : null,
+      ...(draft.studioPhotoId ? ['foto do estúdio'] : []),
+      ...(draft.productSlug ? ['produto do catálogo'] : [])],
+    sourceOrigin: draft.studioPhotoId ? 'site/estudio' : draft.productSlug ? 'site/produtos' : 'site/orcamentos',
+    sourceReference: draft.studioPhotoId ? `/api/studio/photos/${draft.studioPhotoId}` : draft.productSlug ? `/produtos/${draft.productSlug}` : null,
     production, project, contactMethod: draft.contactMethod,
     contactName: draft.name.trim(), contactValue: draft.contact.trim(),
     triageStatus: needsInformation ? 'needs-information' as const : 'ready-for-review' as const,

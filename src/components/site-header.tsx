@@ -56,6 +56,7 @@ export function SiteHeader({ radioOpen = false, docked = false, onHome, onOpenRa
   const pathname = usePathname();
   const studioPage = pathname === "/estudio";
   const orcamentosPage = pathname === "/orcamentos";
+  const produtosPage = pathname.startsWith("/produtos");
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -120,6 +121,7 @@ export function SiteHeader({ radioOpen = false, docked = false, onHome, onOpenRa
         <nav className={styles.nav} aria-label="Navegação principal">
           <Link href="/" aria-current={!radioOpen && pathname === "/" ? "page" : undefined} onClick={goHome}>Início</Link>
           <Link href="/estudio" aria-current={!radioOpen && studioPage ? "page" : undefined} onClick={goHome}>Estúdio</Link>
+          <Link href="/produtos" aria-current={!radioOpen && produtosPage ? "page" : undefined} onClick={goHome}>Produtos</Link>
           <Link href="/orcamentos" aria-current={!radioOpen && orcamentosPage ? "page" : undefined} onClick={goHome}>Orçamentos</Link>
           <button type="button" onClick={openRadio} aria-current={radioOpen ? "page" : undefined}>Rádio</button>
         </nav>

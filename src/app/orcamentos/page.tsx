@@ -5,6 +5,7 @@ import { requireQuoteEnabled } from "@/server/quote/http";
 import { quoteServiceConfig } from "@/server/quote/supabase-gateway";
 import { requireQuoteTurnstileConfig } from "@/server/quote/turnstile";
 import { studioPhotoKeyFromId } from "@/features/studio/r2-photos";
+import { getSiteCatalog } from "@/server/products/catalog";
 import { QuoteFlow } from "./quote-flow";
 import styles from "./page.module.css";
 
@@ -15,15 +16,24 @@ export const metadata: Metadata = {
 export default async function OrcamentosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ referencia?: string | string[] }>;
+  searchParams: Promise<{ referencia?: string | string[]; produto?: string | string[] }>;
 }) {
   await connection();
-  const candidate = (await searchParams).referencia;
+  const query = await searchParams;
+  const candidate = query.referencia;
   let studioPhotoId: string | null = null;
   if (typeof candidate === "string" && candidate.length <= 260) {
     try {
       if (studioPhotoKeyFromId(candidate)) studioPhotoId = candidate;
     } catch { /* Uma referência indisponível não impede o formulário normal. */ }
+  }
+  let productReference: { slug: string; name: string } | null = null;
+  if (!studioPhotoId && typeof query.produto === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(query.produto)) {
+    const catalog = await getSiteCatalog();
+    const product = catalog.products.find((entry) => entry.slug === query.produto);
+    if (product?.customizable && product.sourceStatus === "NORMAL") {
+      productReference = { slug: product.slug, name: product.name };
+    }
   }
   let intakeEnabled = false;
   let turnstileSiteKey: string | null = null;
@@ -43,7 +53,7 @@ export default async function OrcamentosPage({
         </div>
       </header>
 
-      <QuoteFlow intakeEnabled={intakeEnabled} studioPhotoId={studioPhotoId} turnstileSiteKey={turnstileSiteKey} />
+      <QuoteFlow intakeEnabled={intakeEnabled} studioPhotoId={studioPhotoId} productReference={productReference} turnstileSiteKey={turnstileSiteKey} />
     </div>
   );
 }

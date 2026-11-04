@@ -164,6 +164,10 @@
   text-wrap: balance;
 }
 
+.categoryMenu {
+  display: none;
+}
+
 .carouselPane {
   position: relative;
   display: grid;
@@ -647,6 +651,32 @@
 }
 
 @media (max-width: 1023px) {
+  .categories {
+    display: none;
+  }
+
+  .categoryMenu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    width: 100%;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .categoryMenu select {
+    width: 100%;
+    min-height: 48px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-field);
+    padding-inline: var(--space-3);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    color-scheme: dark;
+    font-size: 15px;
+  }
+
   .page {
     width: 100%;
     min-width: 0;

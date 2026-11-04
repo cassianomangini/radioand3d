@@ -49,6 +49,17 @@ export function ProductCatalog({ products }: { products: ProductCard[] }) {
             ))}
           </ul>
         </nav>
+        <label className={styles.categoryMenu}>
+          <span>Categoria</span>
+          <select
+            value={activeCategory ?? ""}
+            onChange={(event) => setActiveCategory(event.currentTarget.value ? event.currentTarget.value as ProductCategory : null)}
+          >
+            {filters.map((filter) => (
+              <option key={filter.id ?? "todas"} value={filter.id ?? ""}>{filter.label}</option>
+            ))}
+          </select>
+        </label>
       </div>
       {visible.length > 0 ? (
         <div className={styles.grid}>

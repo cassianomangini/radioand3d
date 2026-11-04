@@ -26,6 +26,22 @@ const categories: ReadonlyArray<{ id: StudioCategory | null; label: string; icon
   { id: "outros", label: "Outros", icon: "/images/categories/outros.png" },
 ];
 
+function CategoryMenu({ value, onChange }: { value: StudioCategory | null; onChange: (category: StudioCategory | null) => void }) {
+  return (
+    <label className={styles.categoryMenu}>
+      <span>Categoria</span>
+      <select
+        value={value ?? ""}
+        onChange={(event) => onChange(event.currentTarget.value ? event.currentTarget.value as StudioCategory : null)}
+      >
+        {categories.map((category) => (
+          <option key={category.id ?? "todas"} value={category.id ?? ""}>{category.label}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 function Chevron({ direction }: { direction: "previous" | "next" }) {
   return (
     <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -201,6 +217,7 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
     <>
       <div className={styles.showcase}>
       <div className={styles.categoryColumn}>
+        <CategoryMenu value={activeCategory} onChange={chooseCategory} />
         <aside className={styles.categories} aria-label="Categorias do estúdio">
           <ul>
             {categories.map((category) => (
@@ -351,6 +368,7 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
       >
         <div className={styles.stripHeader}>
           <h2>Fotos do estúdio</h2>
+          <CategoryMenu value={activeCategory} onChange={chooseCategory} />
           <nav className={`${styles.categories} ${styles.galleryCategories}`} aria-label="Filtrar fotos do estúdio por categoria">
             <ul>
               {categories.map((category) => (

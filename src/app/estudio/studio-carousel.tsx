@@ -129,7 +129,12 @@ export function StudioCarousel({ slides }: { slides: readonly StudioSlide[] }) {
       setIndex(destination);
       if (revealInGallery) setGalleryPage(Math.floor(destination / galleryPageSize));
     };
-    if (viewerRef.current?.open || !document.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      viewerRef.current?.open ||
+      !document.startViewTransition ||
+      window.matchMedia("(max-width: 1023px)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       update();
       return;
     }

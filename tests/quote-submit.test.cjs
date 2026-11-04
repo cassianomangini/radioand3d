@@ -24,6 +24,7 @@ const { newQuoteSession, issueSessionCookie } = require('../src/server/quote/htt
 const { parseQuoteForm, parseQuoteAttachments, validateQuoteForm } = require('../src/server/quote/form-contract.ts');
 const { studioPhotoSrc } = require('../src/features/studio/r2-photos.ts');
 const { createQuoteGateway } = require('../src/server/quote/supabase-gateway.ts');
+const { quoteEmailText, quoteEmailMessage } = require('../src/server/quote/email.ts');
 const { uploadSignedFile } = require('../src/features/quote/client-upload.ts');
 
 process.env.NODE_ENV = 'development';
@@ -85,7 +86,7 @@ test('pedido é salvo uma vez e o e-mail pendente é reenviado a partir do banco
     notificationData: async () => ({
       projectType: stored.projectType, project: stored.project, production: stored.production,
       contactMethod: stored.contactMethod, contactName: stored.contactName,
-      contactValue: stored.contactValue, attachmentNames: [],
+      contactValue: stored.contactValue, attachments: [],
     }),
     recordEmailSent: async () => { emailSent = true; },
   };
@@ -96,7 +97,8 @@ test('pedido é salvo uma vez e o e-mail pendente é reenviado a partir do banco
   });
   const mailer = async (_id, message) => {
     mailCount++;
-    assert.match(message, /Caixa azul para presente/);
+    assert.match(message.text, /Caixa azul para presente/);
+    assert.match(message.html, /Caixa azul para presente/);
     if (mailCount === 1) throw Error('synthetic email failure');
   };
   const first = await handleQuoteSubmit(request(), gateway, mailer);
@@ -123,6 +125,7 @@ test('foto do Estúdio acompanha a ideia até o banco e o e-mail, e referência 
   const { token } = newQuoteSession();
   let saved;
   let email = '';
+  let html = '';
   const gateway = {
     submissionReceipt: async () => null,
     consumeRate: async () => true,
@@ -134,7 +137,7 @@ test('foto do Estúdio acompanha a ideia até o banco e o e-mail, e referência 
     notificationData: async () => ({
       projectType: saved.projectType, project: saved.project, production: saved.production,
       contactMethod: saved.contactMethod, contactName: saved.contactName,
-      contactValue: saved.contactValue, attachmentNames: [], sourceReference: saved.sourceReference,
+      contactValue: saved.contactValue, attachments: [], sourceReference: saved.sourceReference,
     }),
     recordEmailSent: async () => {},
   };
@@ -143,11 +146,16 @@ test('foto do Estúdio acompanha a ideia até o banco e o e-mail, e referência 
     headers: { origin: 'http://localhost:3000', 'content-type': 'application/json', cookie: issueSessionCookie(token) },
     body: JSON.stringify({ requestId, submissionKey: crypto.randomUUID(), draft: photoDraft, attachments: [] }),
   });
-  const response = await handleQuoteSubmit(makeRequest(draft), gateway, async (_id, message) => { email = message; });
+  const response = await handleQuoteSubmit(makeRequest(draft), gateway, async (_id, message) => {
+    email = message.text;
+    html = message.html;
+  });
   assert.equal(response.status, 201);
   assert.equal(saved.sourceOrigin, 'site/estudio');
   assert.equal(saved.sourceReference, `/api/studio/photos/${photoId}`);
   assert.match(email, new RegExp(`http://localhost:3000/api/studio/photos/${photoId.replaceAll('.', '\\.')}\\b`));
+  assert.match(html, />Foto de referência do Estúdio<\/a>/);
+  assert.doesNotMatch(html, />http:\/\/localhost:3000\/api\/studio\/photos\//);
   assert.match(email, /Quero esta caixa com o meu logo/);
 
   const extraReference = { id: crypto.randomUUID(), role: 'references', name: 'logo.png', size: 100, type: 'image/png' };
@@ -162,10 +170,10 @@ test('notificação lê a foto de referência gravada no pedido', async () => {
   const requestId = crypto.randomUUID();
   const sourceReference = '/api/studio/photos/foto-assinada';
   const requests = [];
-  const gateway = createQuoteGateway(async (url, options) => {
+  const gateway = createQuoteGateway(async (url) => {
     requests.push(url);
     if (url.includes('/quote_requests?')) return Response.json([{
-      project_type: 'outro', source_reference: sourceReference,
+      project_type: 'outro', source_reference: sourceReference, no_file: true,
       production: { quantity: 1, colorMode: 'indeciso', delivery: 'retirada' },
       project: { description: 'Quero personalizar esta peça' },
       contact_method: 'email', contact_name: 'Cliente', contact_value: 'cliente@example.com',
@@ -176,6 +184,83 @@ test('notificação lê a foto de referência gravada no pedido', async () => {
   assert.equal(notification.sourceReference, sourceReference);
   assert.ok(requests[0].includes('source_reference'));
   assert.equal(requests.length, 2);
+});
+
+test('e-mail traz links diretos para cada arquivo privado do pedido', async () => {
+  const requestId = crypto.randomUUID();
+  const firstId = crypto.randomUUID();
+  const secondId = crypto.randomUUID();
+  const paths = [`${requestId}/${firstId}.jpeg`, `${requestId}/${secondId}.pdf`];
+  const calls = [];
+  const gateway = createQuoteGateway(async (url, options) => {
+    calls.push({ url, options });
+    if (url.includes('/quote_requests?')) return Response.json([{
+      project_type: 'outro', source_reference: null, no_file: false,
+      production: { quantity: 1, colorMode: 'indeciso', delivery: 'retirada' },
+      project: { description: 'Peça personalizada' },
+      contact_method: 'email', contact_name: 'Cliente', contact_value: 'cliente@example.com',
+    }]);
+    if (url.includes('/quote_attachments?')) return Response.json([
+      { original_name: '1.jpeg', storage_path: paths[0] },
+      { original_name: 'planta.pdf', storage_path: paths[1] },
+    ]);
+    if (url.endsWith('/storage/v1/object/sign/quote-intake')) {
+      const body = JSON.parse(options.body);
+      assert.deepEqual(body.paths, paths);
+      assert.equal(body.expiresIn, 90 * 24 * 60 * 60);
+      return Response.json(paths.map((path) => ({ path, signedURL: `/object/sign/quote-intake/${path}?token=synthetic` })));
+    }
+    throw Error(`unexpected request: ${url}`);
+  });
+  const notification = await gateway.notificationData(requestId, 'a'.repeat(64));
+  assert.equal(calls.length, 3);
+  const email = quoteEmailText(requestId, notification, 'https://radioand3d.vercel.app');
+  assert.match(email, /1\.jpeg: https:\/\/synthetic\.supabase\.co\/storage\/v1\/object\/sign\/quote-intake\//);
+  assert.match(email, /planta\.pdf: https:\/\/synthetic\.supabase\.co\/storage\/v1\/object\/sign\/quote-intake\//);
+  assert.doesNotMatch(email, /este e-mail não contém anexos/);
+  const message = quoteEmailMessage(requestId, notification, 'https://radioand3d.vercel.app');
+  assert.equal(message.text, email);
+  assert.match(message.html, /<a href="https:\/\/synthetic\.supabase\.co\/storage\/v1\/object\/sign\/quote-intake\/[^\"]+">1\.jpeg<\/a>/);
+  assert.match(message.html, />planta\.pdf<\/a>/);
+  assert.doesNotMatch(message.html, />https:\/\/synthetic\.supabase\.co/);
+  const unsafe = quoteEmailMessage(requestId, {
+    ...notification, attachments: [{ name: '<img src=x>.jpeg', url: 'https://example.com/file?token=a&download=x' }],
+  }, 'https://radioand3d.vercel.app');
+  assert.match(unsafe.html, /&lt;img src=x&gt;\.jpeg/);
+  assert.match(unsafe.html, /token=a&amp;download=x/);
+  assert.doesNotMatch(unsafe.html, /<img/);
+});
+
+test('notificação recusa arquivo de outro pedido e link assinado adulterado', async () => {
+  const requestId = crypto.randomUUID();
+  const otherRequestId = crypto.randomUUID();
+  const attachmentId = crypto.randomUUID();
+  const ownedPath = `${requestId}/${attachmentId}.jpeg`;
+  const quoteRow = {
+    project_type: 'outro', source_reference: null, no_file: false,
+    production: { quantity: 1 }, project: { description: 'Peça' },
+    contact_method: 'email', contact_name: 'Cliente', contact_value: 'cliente@example.com',
+  };
+  let signed = false;
+  const wrongOwner = createQuoteGateway(async (url) => {
+    if (url.includes('/quote_requests?')) return Response.json([quoteRow]);
+    if (url.includes('/quote_attachments?')) return Response.json([
+      { original_name: 'imagem.jpeg', storage_path: `${otherRequestId}/${attachmentId}.jpeg` },
+    ]);
+    signed = true;
+    throw Error('signing must not happen');
+  });
+  await assert.rejects(() => wrongOwner.notificationData(requestId, 'a'.repeat(64)));
+  assert.equal(signed, false);
+
+  const wrongLink = createQuoteGateway(async (url) => {
+    if (url.includes('/quote_requests?')) return Response.json([quoteRow]);
+    if (url.includes('/quote_attachments?')) return Response.json([
+      { original_name: 'imagem.jpeg', storage_path: ownedPath },
+    ]);
+    return Response.json([{ path: ownedPath, signedURL: `/object/sign/quote-intake/${otherRequestId}/${attachmentId}.jpeg?token=synthetic` }]);
+  });
+  await assert.rejects(() => wrongLink.notificationData(requestId, 'a'.repeat(64)));
 });
 
 test('upload privado retoma após perda da resposta de um bloco', async () => {

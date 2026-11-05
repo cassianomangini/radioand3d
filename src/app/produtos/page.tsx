@@ -28,9 +28,7 @@ export default async function ProdutosPage() {
       <header className={styles.banner}>
         <div className={styles.bannerContent}>
           <h1 className={styles.bannerTitle}>Produtos</h1>
-          <p>{catalog.state === "available" && catalog.preview
-            ? "Prévia local com anúncios reais para validar a página."
-            : "Conheça as peças do Estúdio CM 3D."}</p>
+          <p>Conheça as peças do Estúdio CM 3D.</p>
         </div>
       </header>
 

@@ -73,7 +73,7 @@ export default async function ProductPage({ params }: Props) {
       <header className={styles.banner}>
         <div className={styles.bannerContent}>
           <p className={styles.bannerTitle}>Produtos</p>
-          <p>{catalog.preview ? "Prévia local dos anúncios sincronizados da Shopee." : "Peças do Estúdio CM 3D."}</p>
+          <p>Peças do Estúdio CM 3D.</p>
         </div>
       </header>
       <div className={styles.wrap}>

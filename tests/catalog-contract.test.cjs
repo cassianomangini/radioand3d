@@ -51,8 +51,8 @@ test('rejects a private image host, a wrong status link, and duplicate slugs', a
   assert.equal(parseCatalogResponse({ products: [product(), product()] }), null);
 });
 
-test('local preview includes all 27 active listings with a category', async () => {
-  const rows = JSON.parse(readFileSync(resolve('src/server/products/active-catalog-preview.json'), 'utf8'));
+test('published snapshot includes all 27 active listings with a category', async () => {
+  const rows = JSON.parse(readFileSync(resolve('src/server/products/published-catalog-snapshot.json'), 'utf8'));
   const { parseCatalogResponse } = await contract;
   const { getProductCategory } = await categories;
   const parsed = parseCatalogResponse({ products: rows.map((row) => ({

@@ -18,7 +18,7 @@ require.extensions['.ts'] = (module, filename) => {
   }).outputText, filename);
 };
 
-const { validModelItems, modelUnits } = require('../src/features/quote/model-items.ts');
+const { validModelItems, restorableModelItems, modelUnits } = require('../src/features/quote/model-items.ts');
 const { parseQuoteForm, parseQuoteAttachments, validateQuoteForm, prepareQuoteForStorage } = require('../src/server/quote/form-contract.ts');
 const { validateQuoteFiles } = require('../src/features/quote/file-policy.ts');
 const { quoteEmailMessage } = require('../src/server/quote/email.ts');
@@ -138,4 +138,17 @@ test('legacy single-model quote still passes validation without modelItems', () 
   legacy.modelScale = 'original';
   assert.ok(parseQuoteForm(legacy));
   assert.equal(validateQuoteForm(legacy, []), true);
+});
+
+test('incomplete model changes are restorable but not submittable', () => {
+  const item = model('link', 12345);
+  item.link = 'https://makerworld.com/pt/models/';
+  item.colorMode = 'tenho';
+  item.colors = [{ name: '', rgb: '' }];
+  item.scale = 'alterar';
+  item.dimensions.width = '';
+  assert.equal(restorableModelItems([item]), true);
+  assert.equal(validModelItems([item]), false);
+  assert.equal(restorableModelItems(Array.from({ length: 21 }, () => item)), false);
+  assert.equal(restorableModelItems([{ ...item, id: 'bad-id' }]), false);
 });

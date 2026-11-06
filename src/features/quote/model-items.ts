@@ -82,7 +82,7 @@ export function restorableModelItems(value: unknown): value is ModelItem[] {
     if (typeof item.link !== 'string' || item.link.length > MODEL_LINK_MAX_LENGTH ||
         typeof item.fileName !== 'string' || item.fileName.length > 255 ||
         typeof item.notes !== 'string' || item.notes.length > MODEL_NOTES_MAX_LENGTH ||
-        /[\\u0000-\\u001f\\u007f]/.test(item.fileName)) return false;
+        /[\u0000-\u001f\u007f]/.test(item.fileName)) return false;
     if (item.source === 'file' && !fileName.test(item.fileName)) return false;
     if (!Number.isSafeInteger(item.quantity) || (item.quantity as number) < 1 ||
         (item.quantity as number) > 10000) return false;

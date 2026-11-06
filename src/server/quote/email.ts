@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { QuoteHttpError, uuid } from './http';
 import type { QuoteNotificationData } from './supabase-gateway';
 import { validModelLink } from '@/features/quote/model-link';
@@ -114,6 +115,30 @@ export async function sendQuoteEmail(requestId: string, message: QuoteEmailMessa
   if (!uuid(requestId) || message.text.length > 60000 || message.html.length > 100000) {
     throw new QuoteHttpError(400, 'invalid_quote_email');
   }
+  return sendNotification(
+    `Novo orçamento CM 3D #${requestId.slice(0, 8)}`,
+    `quote/${requestId}`, `<quote-${requestId}@gmail.com>`, message, fetcher,
+  );
+}
+
+/** Aggregate operational alert only; no names, file paths or quote contents. */
+export async function sendQuoteOperationsAlert(dayUtc: string, lines: string[], fetcher: typeof fetch = fetch): Promise<void> {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dayUtc) || lines.length > 20 ||
+      lines.some(line => line.length > 200 || /[\r\n<>]/.test(line))) {
+    throw new QuoteHttpError(400, 'invalid_quote_email');
+  }
+  const text = ['Alerta operacional dos orçamentos CM 3D', `Dia UTC: ${dayUtc}`, '', ...lines].join('\n');
+  const digest = createHash('sha256').update(text).digest('hex').slice(0, 16);
+  await sendNotification(
+    `Alerta operacional de orçamentos CM 3D (${dayUtc})`,
+    `quote/operations/${dayUtc}/${digest}`, `<quote-operations-${dayUtc}-${digest}@gmail.com>`,
+    { text, html: `<div style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(text)}</div>` },
+    fetcher,
+  );
+}
+
+async function sendNotification(subject: string, idempotencyKey: string, messageId: string,
+  message: QuoteEmailMessage, fetcher: typeof fetch): Promise<void> {
   const config = requireQuoteEmailConfig();
   if (config.provider === 'gmail') {
     const { default: nodemailer } = await import('nodemailer');
@@ -125,8 +150,7 @@ export async function sendQuoteEmail(requestId: string, message: QuoteEmailMessa
     try {
       const result = await transport.sendMail({
         from: `CM 3D <${recipient}>`, to: recipient,
-        subject: `Novo orçamento CM 3D #${requestId.slice(0, 8)}`,
-        text: message.text, html: message.html, messageId: `<quote-${requestId}@gmail.com>`,
+        subject, text: message.text, html: message.html, messageId,
       });
       if (!result.accepted.some(address => address.toLowerCase() === recipient)) {
         throw new QuoteHttpError(503, 'quote_email_unavailable');
@@ -146,10 +170,10 @@ export async function sendQuoteEmail(requestId: string, message: QuoteEmailMessa
       headers: {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
-        'Idempotency-Key': `quote/${requestId}`,
+        'Idempotency-Key': idempotencyKey,
       },
       body: JSON.stringify({
-        from, to: [recipient], subject: `Novo orçamento CM 3D #${requestId.slice(0, 8)}`,
+        from, to: [recipient], subject,
         text: message.text, html: message.html,
       }),
       cache: 'no-store',

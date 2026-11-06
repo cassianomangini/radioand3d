@@ -127,10 +127,30 @@ Cada grupo detalhado exige uma resposta ou sua opção explícita de **Não sei/
 4. Integrar sessão, upload privado e registro do pedido; verificar os caminhos de sucesso e erro com arquivos reais.
 5. Conectar os botões de entrada para Orçamentos e liberar o envio somente quando o destino comercial, a configuração do Supabase e a confirmação de ponta a ponta estiverem resolvidos.
 
-## Status do envio
+## Status do envio e próximos passos
 
-- O projeto Vercel `radioand3d` usa `cm-3d-radio-novo` como diretório raiz. O commit `5b1f336` foi publicado em produção no deployment `dpl_85ikvQMFaPi4zBDBj4qpftmnmKqA`, com alias `radioand3d.vercel.app` e estado `READY`.
-- As variáveis de produção `CM_SUPABASE_URL`, `CM_SUPABASE_SECRET_KEY`, `CM_QUOTE_SESSION_SECRET`, `CM_QUOTE_RATE_LIMIT_SECRET`, `CM_QUOTE_GMAIL_APP_PASSWORD` e `CRON_SECRET` estão configuradas; `CM_QUOTE_INTAKE_ENABLED=true`.
-- O projeto Supabase separado **CM 3D & Rádio** foi validado por chamada de servidor: tabelas e funções de orçamento responderam, e o bucket `quote-intake` é privado. A conexão Supabase do plugin continua em outra conta e não é necessária para o formulário.
-- O Gmail autenticou por SMTP e aceitou o teste. Um pedido sintético sem arquivo foi salvo, notificado e removido. Outro pedido sintético com PNG teve upload privado validado, registro e e-mail confirmados; sua expiração foi adiantada para a limpeza automática após o fim da autorização temporária de upload.
-- A disponibilidade real dos filamentos próximos das cores ou valores RGB informados continua como integração futura. STL/3MF e os demais formatos permitidos não tiveram teste real de ponta a ponta nesta ativação; o caminho de PNG teve.
+**Regra de atualização:** após cada mudança em orçamentos, registrar aqui a data, o que foi feito, o que foi apenas verificado, o que está publicado e os próximos passos. Ordenar os próximos passos com **trabalho de código primeiro**; publicação e aceite vêm depois. Não tratar código na `main`, deploy `READY` ou consulta ao banco como prova de envio completo. Push, deploy e alterações remotas ficam a cargo do proprietário.
+
+### Estado em 06/11/2026
+
+**Feito**
+- O P0 de múltiplos modelos foi integrado à `main` no PR #44 (`dc78380`): lista de até 20 modelos por links/arquivos, especificações por item, limites de anexos, gravação e e-mail associados a um pedido. As migrações `20261106122659` e `20261106134500` constam como aplicadas no Supabase do CM.
+- A colagem de links passou a mostrar a linha e o motivo de cada erro; links válidos são adicionados e excedentes permanecem no campo. Arquivos de modelo que não sejam STL/3MF são recusados ao selecionar; o aviso de reanexo permanece até todos os arquivos locais necessários serem recuperados (`5f9124c`).
+- A rotina de retenção passou a reconhecer uma reserva vencida cujo objeto já não existe no Storage, mantendo a checagem final do banco antes de liberar espaço (`a4013ee`). Uma limpeza manual **autorizada** liberou o único anexo vencido encontrado; a consulta posterior retornou zero anexos vencidos pendentes. Isso não substitui a verificação da próxima execução automática do cron.
+- No banco do projeto CM, foram configurados `max_bytes=500000000`, `max_daily_bytes=250000000` e `storage_reviewed_at` para `quote-intake`. Esses são tetos operacionais de proteção, não dados de demanda comercial.
+- Nesta revisão local, a migração `20261106190000_quote_observability.sql` passou a definir um retrato agregado de bytes físicos, bytes contabilizados/reservados, uso diário, autorizações de upload aceitas/bloqueadas e resultado da retenção. O servidor registra apenas o resultado e uma categoria fixa para cada autorização de upload; recusas por rate limit não viram eventos persistentes para evitar crescimento sem limite. O cron registra métricas sem dados de cliente e envia alerta ao endereço do estúdio quando há falha de limpeza, bloqueio por cota, objetos sem tamanho conhecido ou uso de pelo menos 80% dos tetos. A rota interna reservou até 60 segundos para limpeza e aviso. Falha de observabilidade retorna 503 sem desfazer a limpeza já concluída.
+- Foi feita revisão estática dos caminhos P0.1–P0.4 no formulário, contrato servidor, SQL e e-mail: lista/ordem e preferências por modelo, associação de anexos ao rascunho, limite do corpo, idempotência e mensagem única ao estúdio. Nenhuma lacuna adicional apareceu nos trechos revisados; isso não comprova execução de pedido real.
+- O proprietário informou que aplicou a migração de observabilidade. A aplicação remota não foi consultada nesta revisão; o código desta entrega permanece somente nos arquivos locais.
+- TypeScript, ESLint dos arquivos alterados e `git diff --check` passaram. Nenhum pedido real de múltiplos modelos foi enviado nesta revisão; não foram abertas telas nem criados testes.
+
+**Publicado e configuração atual**
+- O commit `a4013ee` foi enviado à `main` e o deploy manual `dpl_GdEBEZmw2osYRayhG72KLH1W8GNk` ficou `READY`. O deploy seguinte, `dpl_2T6ezpJW8SddFZM8SmXZx1nmT4s5`, foi **cancelado**.
+- `CM_QUOTE_INTAKE_ENABLED=true`; `CM_QUOTE_MULTIMODEL_ENABLED=false` em produção. Portanto, a interface de múltiplos modelos **não está ativada**. A configuração de cotas retirou o bloqueio de novas reservas de upload no banco, mas não há confirmação de um envio real após essa mudança.
+
+### Próximos passos
+
+1. **Arquivos locais:** manter este status e os próximos passos atualizados se surgir outra lacuna concreta na revisão do P0; fazer a correção de código antes de propor publicação. A migração de observabilidade e os arquivos de servidor desta entrega ainda precisam ser incluídos no próximo push do proprietário.
+2. **Publicação pelo proprietário:** enviar os arquivos e fazer o deploy; então decidir quando ativar `CM_QUOTE_MULTIMODEL_ENABLED=true`. A aplicação informada da migração não publica o código do servidor.
+3. **Aceite após publicação:** conferir a execução automática da retenção, as métricas e alertas, e um pedido misto com links e STL/3MF. Nenhum desses resultados foi confirmado nesta revisão local.
+
+**Histórico anterior:** a integração inicial registrou pedidos sintéticos sem arquivo e com PNG, com gravação, e-mail e upload privado. Isso validou o fluxo anterior de um modelo; STL/3MF e o pedido com múltiplos modelos não foram confirmados de ponta a ponta naquela ocasião.

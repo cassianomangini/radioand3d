@@ -1,11 +1,44 @@
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { responseJson } from './http';
-import { createRetentionGateway, type RetentionGateway } from './retention-gateway';
+import { sendQuoteOperationsAlert } from './email';
+import { createRetentionGateway, type QuoteObservabilitySnapshot, type RetentionGateway } from './retention-gateway';
 
 const MAX_RUN_MS = 25_000;
 const PER_BATCH = 12;
 const MAX_BATCHES = 4;
 const SWEEP_LIMIT = 200;
+
+async function reportOperations(db: RetentionGateway, failedObjects: number): Promise<void> {
+  if (!db.snapshot) return;
+  const metrics: QuoteObservabilitySnapshot = await db.snapshot();
+  // Numeric aggregates only. Never log paths, request IDs or source errors.
+  console.info('[quote-observability]', JSON.stringify(metrics));
+  const alerts: string[] = [];
+  if (metrics.accountedBytes / metrics.maxBytes >= 0.8 ||
+      metrics.occupiedBytes / metrics.maxBytes >= 0.8) {
+    alerts.push(`Storage: ${metrics.occupiedBytes} bytes ocupados; ${metrics.reservedBytes} bytes reservados; ${metrics.accountedBytes}/${metrics.maxBytes} bytes contabilizados.`);
+  }
+  if (metrics.dailyReservedBytes / metrics.maxDailyBytes >= 0.8) {
+    alerts.push(`Cota diária: ${metrics.dailyReservedBytes}/${metrics.maxDailyBytes} bytes reservados.`);
+  }
+  if (metrics.capacityBlockedToday > 0) {
+    alerts.push(`${metrics.capacityBlockedToday} autorizações de upload bloqueadas pela cota hoje.`);
+  }
+  if (metrics.unknownSizeObjects > 0) {
+    alerts.push(`${metrics.unknownSizeObjects} objetos sem tamanho conhecido no Storage.`);
+  }
+  if (failedObjects > 0 || metrics.retentionFailedObjects > 0) {
+    alerts.push(`${Math.max(failedObjects, metrics.retentionFailedObjects)} falhas de limpeza na última execução.`);
+  }
+  if (metrics.retentionLastFailureAt &&
+      (!metrics.retentionLastSuccessAt || metrics.retentionLastFailureAt > metrics.retentionLastSuccessAt)) {
+    alerts.push('A última execução da retenção falhou.');
+  }
+  if (alerts.length) {
+    alerts.push(`Autorizações hoje: ${metrics.acceptedUploadsToday} aceitas, ${metrics.blockedUploadsToday} bloqueadas.`);
+    await sendQuoteOperationsAlert(new Date().toISOString().slice(0, 10), alerts);
+  }
+}
 
 function authorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
@@ -101,10 +134,18 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
       events: counters.events,
     });
     if (!finished) throw Error('retention_lease_expired');
+    let observationUnavailable = false;
+    try { await reportOperations(db, counters.failedObjects); }
+    catch {
+      observationUnavailable = true;
+      console.error('[quote-observability] snapshot_or_alert_unavailable');
+    }
     if (!fullySuccessful) {
       return responseJson({ error: 'retention_partial_failure', ...counters,
-        backlogMayRemain: true }, 503);
+        backlogMayRemain: true, observationUnavailable }, 503);
     }
+    if (observationUnavailable) return responseJson({ error: 'quote_observability_unavailable',
+      ...counters, backlogMayRemain }, 503);
     return responseJson({ status: 'ok', ...counters, backlogMayRemain });
   } catch {
     // Never expose paths, contact details, SQL messages or secrets.
@@ -112,6 +153,12 @@ export async function handleQuoteRetention(request: Request, gateway?: Retention
       try { await db.finish(token, false, {
         objects: counters.objects, bytes: counters.bytes,
       }); } catch { /* Lease expiry is repaired by the next run. */ }
+    }
+    if (acquired) {
+      try {
+        await sendQuoteOperationsAlert(new Date().toISOString().slice(0, 10),
+          ['A rotina de retenção falhou antes de concluir a limpeza.']);
+      } catch { console.error('[quote-observability] retention_alert_unavailable'); }
     }
     return responseJson({ error: 'retention_unavailable' }, 503);
   }

@@ -51,6 +51,7 @@ export async function handleQuoteSession(
 export async function handleQuoteAttachmentInit(
   request: Request, gateway?: QuoteGateway
 ): Promise<Response> {
+  let metricGateway: QuoteGateway | undefined;
   try {
     requireQuoteEnabled();
     requireSameOriginJson(request);
@@ -75,6 +76,7 @@ export async function handleQuoteAttachmentInit(
     const policy = validateQuoteFiles([{ name, size: body.size as number }]);
     if (!policy.ok) throw new QuoteHttpError(400, 'invalid_quote_upload');
     const db = gateway ?? createQuoteGateway();
+    metricGateway = db;
     if (!await db.consumeRate('upload', rateLimitHash(request))) {
       throw new QuoteHttpError(429, 'quote_rate_limited');
     }
@@ -93,6 +95,8 @@ export async function handleQuoteAttachmentInit(
       throw new QuoteHttpError(409, 'upload_reservation_expiring');
     }
     const signed = await db.signUpload(reserved.object_path);
+    try { await db.recordUploadOutcome?.('accepted', 'signed'); }
+    catch { console.error('[quote-observability] upload_metric_unavailable'); }
     return responseJson({
       attachmentId: reserved.attachment_id,
       uploadEndpoint: signed.endpoint,
@@ -103,7 +107,21 @@ export async function handleQuoteAttachmentInit(
       uploadTokenExpiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
       reservationExpiresAt: reserved.reservation_expires_at,
     }, 200, { 'Set-Cookie': issueSessionCookie(token) });
-  } catch (error) { return responseError(error); }
+  } catch (error) {
+    if (metricGateway && error instanceof QuoteHttpError) {
+      // Do not persist repeated rate-limit denials: an attacker could grow
+      // quote_events without ever passing the upload rate window.
+      const reason = error.code === 'quote_storage_budget_reached' ? 'capacity'
+        : error.code === 'quote_file_limit_reached' ? 'request_limit'
+        : ['quote_conflict', 'upload_reservation_expiring'].includes(error.code) ? 'reservation'
+        : null;
+      if (reason) {
+        try { await metricGateway.recordUploadOutcome?.('blocked', reason); }
+        catch { console.error('[quote-observability] upload_metric_unavailable'); }
+      }
+    }
+    return responseError(error);
+  }
 }
 
 /** Confirm Storage existence + bounded signature read before a database transition. */

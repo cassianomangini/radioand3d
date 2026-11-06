@@ -3,7 +3,8 @@
 **Projeto:** CM 3D & Rádio  
 **Área:** /orcamentos  
 **Referência:** docs/PLANO_ORCAMENTOS.md e implementação vigente na main  
-**Tipo:** especificação de próximas entregas; não é código implementado  
+**Tipo:** especificação e critérios de aceite; andamento, evidências e próximos passos em `docs/PLANO_ORCAMENTOS.md`
+
 **Direção aprovada:** o fluxo é permanente, sem formulário exclusivo de Natal. Campanhas sazonais alteram apresentação e chamadas, não o contrato central do pedido.  
 **Ordem:** finalizar e validar o ticket de correções em andamento → P0 → P1 → P2 → Futuro.
 
@@ -47,7 +48,7 @@ Não reabrir nem duplicar como nova entrega:
 - Mostrar contagem dos modelos e unidades no resumo. Não mostrar “20 arquivos disponíveis” quando o limite de upload for menor.
 - **Exigir entre 1 e 20 modelos por solicitação** (limite inicial comercial, revisável após dados de uso).
 
-**Política de uploads proposta para P0 (substitui os limites atuais; ainda precisa ser implementada):**
+**Política de uploads do P0 (implementada no código; ativação e aceite acompanhados em `docs/PLANO_ORCAMENTOS.md`):**
 - **Até 20 modelos no orçamento**, com links e arquivos combinados. Um **link** é apenas texto/URL validada, sem baixar, copiar, processar ou armazenar seu conteúdo no Supabase Storage.
 - **Máximo de 5 arquivos por orçamento inteiro**, **somando todas as funções** de upload: STL/3MF, fotos, imagens, PDFs, logotipos, QR Codes e referências. **Não são 20 fotos ou 20 arquivos**. A regra de 5 arquivos também se aplica aos demais tipos de orçamento.
 - **Até 5 MB por arquivo de referência**: fotos PNG/JPG/WebP, PDF, logotipos e imagens/QR. Não elevar o limite por envolver apenas uma imagem.

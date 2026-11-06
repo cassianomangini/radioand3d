@@ -58,6 +58,7 @@ export type QuoteNotificationData = {
 
 export type QuoteGateway = {
   consumeRate(action: QuoteAction, keyHash: string): Promise<boolean>;
+  recordUploadOutcome?(outcome: 'accepted' | 'blocked', reason: string): Promise<void>;
   createDraft(ownerSessionHash: string, projectType: QuoteProjectType): Promise<DraftCreated>;
   reserveAttachment(input: UploadInput): Promise<UploadReservation>;
   signUpload(path: string): Promise<{ token: string; endpoint: string }>;
@@ -169,6 +170,16 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
     if (!acceptedPath.test(path)) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
   };
   return {
+    async recordUploadOutcome(outcome, reason) {
+      if (!['accepted', 'blocked'].includes(outcome) ||
+        !['signed', 'capacity', 'request_limit', 'reservation'].includes(reason)) {
+        throw new QuoteHttpError(400, 'invalid_quote_upload');
+      }
+      await api<Array<{ id: number }>>('/rest/v1/quote_events?select=id', {
+        quote_request_id: null, event_type: 'upload_authorization',
+        event_status: outcome, metadata: { reason },
+      }, { Prefer: 'return=representation' });
+    },
     async consumeRate(action, keyHash) {
       const result = await api<boolean>('/rest/v1/rpc/quote_consume_rate_limit',
         { p_action: action, p_key_hash: keyHash });

@@ -14,6 +14,23 @@ export type RetentionSweep = {
   events_deleted: number;
 };
 
+export type QuoteObservabilitySnapshot = {
+  maxBytes: number;
+  maxDailyBytes: number;
+  accountedBytes: number;
+  reservedBytes: number;
+  occupiedBytes: number;
+  unknownSizeObjects: number;
+  dailyReservedBytes: number;
+  acceptedUploadsToday: number;
+  blockedUploadsToday: number;
+  capacityBlockedToday: number;
+  retentionFailedObjects: number;
+  retentionLastStartedAt: string | null;
+  retentionLastSuccessAt: string | null;
+  retentionLastFailureAt: string | null;
+};
+
 export type RetentionGateway = {
   acquire(runToken: string): Promise<boolean>;
   scrubExpiredPrivateData(runToken: string, limit: number): Promise<number>;
@@ -22,6 +39,7 @@ export type RetentionGateway = {
   finalizeAttachment(runToken: string, attachmentId: string): Promise<number>;
   sweep(runToken: string, limit: number): Promise<RetentionSweep>;
   finish(runToken: string, success: boolean, counts: Record<string, number>): Promise<boolean>;
+  snapshot?(): Promise<QuoteObservabilitySnapshot>;
 };
 
 const PATH = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}\/[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}\.(?:stl|3mf|obj|step|stp|pdf|png|jpg|jpeg|webp)$/i;
@@ -63,6 +81,25 @@ export function createRetentionGateway(fetcher: typeof fetch = fetch): Retention
   }
 
   return {
+    async snapshot() {
+      const result = await rpc<QuoteObservabilitySnapshot>('quote_observability_snapshot', {});
+      const fields: Array<keyof QuoteObservabilitySnapshot> = [
+        'maxBytes', 'maxDailyBytes', 'accountedBytes', 'reservedBytes',
+        'occupiedBytes', 'unknownSizeObjects', 'dailyReservedBytes',
+        'acceptedUploadsToday', 'blockedUploadsToday', 'capacityBlockedToday',
+        'retentionFailedObjects',
+      ];
+      const dates: Array<keyof QuoteObservabilitySnapshot> = [
+        'retentionLastStartedAt', 'retentionLastSuccessAt', 'retentionLastFailureAt',
+      ];
+      if (!result || fields.some(field => !Number.isSafeInteger(result[field]) ||
+          (result[field] as number) < 0) ||
+          dates.some(field => result[field] !== null &&
+            (typeof result[field] !== 'string' || !Number.isFinite(Date.parse(result[field] as string))))) {
+        return unavailable();
+      }
+      return result;
+    },
     async acquire(runToken) {
       if (!uuid(runToken)) return unavailable();
       const result = await rpc<boolean>('quote_retention_acquire', { p_token: runToken });

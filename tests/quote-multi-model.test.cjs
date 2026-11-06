@@ -21,7 +21,7 @@ require.extensions['.ts'] = (module, filename) => {
 const { validModelItems, modelUnits } = require('../src/features/quote/model-items.ts');
 const { parseQuoteForm, parseQuoteAttachments, validateQuoteForm, prepareQuoteForStorage } = require('../src/server/quote/form-contract.ts');
 const { validateQuoteFiles } = require('../src/features/quote/file-policy.ts');
-const { quoteEmailText, quoteEmailMessage } = require('../src/server/quote/email.ts');
+const { quoteEmailMessage } = require('../src/server/quote/email.ts');
 
 function model(source, identifier) {
   return {

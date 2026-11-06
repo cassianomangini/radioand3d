@@ -950,6 +950,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         : code === "quote_verification_unavailable" ? "A verificação está temporariamente indisponível. Tente novamente sem refazer o pedido."
         : code === "quote_rate_limited" ? "Muitas tentativas em pouco tempo. Aguarde e tente novamente."
         : code === "quote_upload_unavailable" ? "Não foi possível enviar um arquivo. Confira sua conexão e tente novamente."
+        : code === "quote_storage_budget_reached" ? "O envio de arquivos está temporariamente indisponível por limite de armazenamento. Você pode remover os arquivos e enviar links dos modelos ou solicitar ajuda pelo contato do Estúdio."
+        : code === "quote_file_limit_reached" ? "Os anexos ultrapassam os limites permitidos. Remova ou substitua alguns arquivos."
         : code === "invalid_quote_submit" ? "Algum dado do pedido precisa ser revisto antes do envio."
         : "Não foi possível concluir o envio. Seu pedido permanece nesta página para tentar novamente.");
     } finally {

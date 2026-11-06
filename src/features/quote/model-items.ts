@@ -65,6 +65,41 @@ export function validModelItems(value: unknown): value is ModelItem[] {
   return true;
 }
 
+/**
+ * Draft restoration is intentionally more tolerant than submission validation:
+ * a customer can reload while typing an incomplete link, color or dimension.
+ * Only bounded, shape-safe data is restored; validateModelItems still controls submit.
+ */
+export function restorableModelItems(value: unknown): value is ModelItem[] {
+  if (!Array.isArray(value) || value.length > MODEL_ITEM_LIMIT) return false;
+  const seen = new Set<string>();
+  for (const raw of value) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return false;
+    const item = raw as Record<string, unknown>;
+    if (typeof item.id !== 'string' || !uuid.test(item.id) || seen.has(item.id)) return false;
+    seen.add(item.id);
+    if (item.source !== 'link' && item.source !== 'file') return false;
+    if (typeof item.link !== 'string' || item.link.length > MODEL_LINK_MAX_LENGTH ||
+        typeof item.fileName !== 'string' || item.fileName.length > 255 ||
+        typeof item.notes !== 'string' || item.notes.length > MODEL_NOTES_MAX_LENGTH ||
+        /[\\u0000-\\u001f\\u007f]/.test(item.fileName)) return false;
+    if (item.source === 'file' && !fileName.test(item.fileName)) return false;
+    if (!Number.isSafeInteger(item.quantity) || (item.quantity as number) < 1 ||
+        (item.quantity as number) > 10000) return false;
+    if (item.colorMode !== 'tenho' && item.colorMode !== 'indeciso') return false;
+    if (!Array.isArray(item.colors) || item.colors.length > 4 ||
+        !item.colors.every(c => c && typeof c === 'object' &&
+          typeof c.name === 'string' && c.name.length <= 48 &&
+          typeof c.rgb === 'string' && (c.rgb === '' || /^#[0-9a-f]{6}$/i.test(c.rgb)))) return false;
+    if (!['original','alterar','nao-sei'].includes(item.scale as string)) return false;
+    if (!item.dimensions || typeof item.dimensions !== 'object' || Array.isArray(item.dimensions)) return false;
+    if (!['width','depth','height'].every(key =>
+      typeof (item.dimensions as Record<string, unknown>)[key] === 'string' &&
+      ((item.dimensions as Record<string, string>)[key]).length <= 24)) return false;
+  }
+  return true;
+}
+
 export function modelUnits(items: readonly ModelItem[]): number {
   return items.reduce((total, item) => total + item.quantity, 0);
 }

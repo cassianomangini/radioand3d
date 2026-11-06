@@ -7,7 +7,7 @@ import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import { validModelLink } from "@/features/quote/model-link";
 import { validModelItems, restorableModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
-import { validateQuoteFiles, quoteFilePolicyLabel } from "@/features/quote/file-policy";
+import { validateQuoteFiles, quoteFilePolicyLabel, quoteFileRoleAllows } from "@/features/quote/file-policy";
 import styles from "./page.module.css";
 
 const projectOptions = [
@@ -250,6 +250,21 @@ function newModelItem(source: ModelItem["source"], value: string): ModelItem {
     quantity: 1, colorMode: "indeciso", colors: [],
     scale: "original", dimensions: emptyDimensions(), notes: "",
   };
+}
+
+function modelLinkIssue(link: string): string | null {
+  if (link.length > MODEL_LINK_MAX_LENGTH) return `excede ${MODEL_LINK_MAX_LENGTH} caracteres.`;
+  if (/\s|[\u0000-\u001f\u007f]/.test(link)) return "contém espaços ou caracteres inválidos.";
+  let url: URL;
+  try { url = new URL(link); }
+  catch { return "não é uma URL válida."; }
+  if (url.protocol !== "https:") return "use um link HTTPS.";
+  if (url.username || url.password || url.port) return "remova login, senha ou porta do link.";
+  if (!["makerworld.com", "www.makerworld.com", "share.bambulab.com"].includes(url.hostname)) {
+    return "o domínio deve ser MakerWorld ou Bambu Handy.";
+  }
+  if (!validModelLink(link)) return "o endereço não aponta para uma página de modelo válida.";
+  return null;
 }
 
 function dimensionsText(dimensions: Dimensions, unknown = false, depth = false) {
@@ -593,40 +608,55 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   function addModelLinks() {
-    const lines = modelLinksInput.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    const lines = modelLinksInput.split(/\r?\n/).map((value, index) => ({
+      number: index + 1, link: value.trim(),
+    })).filter(line => line.link);
     if (!lines.length) return setError({ field: "modelLinks", message: "Cole um ou mais links, um por linha." });
-    const invalid = lines.filter(link => link.length > MODEL_LINK_MAX_LENGTH || !validModelLink(link));
-    const valid = lines.filter(link => link.length <= MODEL_LINK_MAX_LENGTH && validModelLink(link));
+    const checked = lines.map(line => ({ ...line, issue: modelLinkIssue(line.link) }));
+    const invalid = checked.filter(line => line.issue);
+    const valid = checked.filter(line => !line.issue);
     const capacity = MODEL_ITEM_LIMIT - draft.modelItems.length;
     const accepted = valid.slice(0, capacity);
-    if (accepted.length) update("modelItems", [...draft.modelItems, ...accepted.map(link => newModelItem("link", link))]);
-    setModelLinksInput(invalid.join("\n"));
-    if (invalid.length || valid.length > capacity) setError({ field: "modelLinks",
-      message: `${accepted.length} link(s) adicionado(s). ${invalid.length} inválido(s), ${Math.max(0, valid.length - capacity)} excederam o limite de ${MODEL_ITEM_LIMIT} modelos.` });
+    const overflow = valid.slice(capacity);
+    if (accepted.length) update("modelItems", [...draft.modelItems, ...accepted.map(({ link }) => newModelItem("link", link))]);
+    setModelLinksInput(checked.filter(line => invalid.includes(line) || overflow.includes(line))
+      .map(({ link }) => link).join("\n"));
+    if (invalid.length || overflow.length) setError({ field: "modelLinks", message: [
+      `${accepted.length} link(s) adicionado(s).`,
+      ...invalid.map(({ number, issue }) => `Linha ${number}: ${issue}`),
+      ...overflow.map(({ number }) => `Linha ${number}: excede o limite de ${MODEL_ITEM_LIMIT} modelos.`),
+    ].join("\n") });
   }
 
   function addModelFiles(incoming: File[]) {
     if (!incoming.length) return;
     const capacity = MODEL_ITEM_LIMIT - draft.modelItems.length;
     if (incoming.length > capacity) return setError({ field: "modelFiles", message: `Máximo de ${MODEL_ITEM_LIMIT} modelos no orçamento.` });
+    const invalid = incoming.find(file => !quoteFileRoleAllows("model", file.name));
+    if (invalid) return setError({ field: "modelFiles", message: `Escolha STL ou 3MF para o modelo “${invalid.name}”.` });
     const currently = Object.values(modelFiles);
     const result = validateQuoteFiles([...currently, ...incoming]);
     if (!result.ok) return setError({ field: "modelFiles", message: result.message });
     const additions = incoming.map(file => ({ item: newModelItem("file", file.name), file }));
     setModelFiles(current => ({ ...current, ...Object.fromEntries(additions.map(({ item, file }) => [item.id, file])) }));
     update("modelItems", [...draft.modelItems, ...additions.map(({ item }) => item)]);
-    setFileReattach(current => current.filter(role => role !== "model"));
+    if (draft.modelItems.filter(item => item.source === "file").every(item => modelFiles[item.id])) {
+      setFileReattach(current => current.filter(role => role !== "model"));
+    }
   }
 
   function replaceModelFile(id: string, file: File) {
     const result = validateQuoteFiles([...Object.entries(modelFiles)
       .filter(([key]) => key !== id).map(([, existing]) => existing), file]);
     if (!result.ok) return setError({ field: "modelFiles", message: result.message });
-    if (!/\.(stl|3mf)$/i.test(file.name)) return setError({ field: "modelFiles", message: "Escolha STL ou 3MF." });
+    if (!quoteFileRoleAllows("model", file.name)) return setError({ field: "modelFiles", message: "Escolha STL ou 3MF." });
     setModelFiles(current => ({ ...current, [id]: file }));
     setDraft(current => ({ ...current, modelItems: current.modelItems.map(item =>
       item.id === id ? { ...item, fileName: file.name } : item) }));
-    setFileReattach(current => current.filter(role => role !== "model"));
+    if (draft.modelItems.filter(item => item.source === "file")
+      .every(item => item.id === id || modelFiles[item.id])) {
+      setFileReattach(current => current.filter(role => role !== "model"));
+    }
     setError(null);
   }
 

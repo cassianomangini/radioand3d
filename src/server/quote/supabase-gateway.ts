@@ -105,7 +105,21 @@ function makeSupabaseRequest(fetcher: typeof fetch) {
     if (!response.ok) {
       // Never return raw Supabase errors, which can contain object paths and metadata.
       let errorCode: unknown;
-      try { errorCode = (await response.json() as {code?: unknown}).code; } catch { /* ignore */ }
+      let errorReason: unknown;
+      try {
+        const payload = await response.json() as { code?: unknown; message?: unknown };
+        errorCode = payload.code;
+        errorReason = payload.message;
+      } catch { /* ignore */ }
+      // Only return whitelisted public error codes, never raw database messages.
+      if (errorCode === '23514' && [
+        'quote_upload_daily_capacity_exceeded',
+        'quote_storage_capacity_exceeded',
+        'quote_upload_budget_not_approved',
+      ].includes(String(errorReason))) throw new QuoteHttpError(409, 'quote_storage_budget_reached');
+      if (errorCode === '23514' && errorReason === 'quote_request_attachment_budget_exceeded') {
+        throw new QuoteHttpError(409, 'quote_file_limit_reached');
+      }
       if (errorCode === '23514' || errorCode === '23505') throw new QuoteHttpError(409, 'quote_conflict');
       if (errorCode === 'P0001') throw new QuoteHttpError(404, 'quote_not_found');
       if (errorCode === '22023') throw new QuoteHttpError(400, 'invalid_quote_upload');

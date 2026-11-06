@@ -53,7 +53,7 @@ export type QuoteNotificationData = {
   contactMethod: 'whatsapp' | 'email';
   contactName: string;
   contactValue: string;
-  attachments: Array<{ name: string; url: string }>;
+  attachments: Array<{ name: string; url: string; id?: string }>;
 };
 
 export type QuoteGateway = {
@@ -105,7 +105,21 @@ function makeSupabaseRequest(fetcher: typeof fetch) {
     if (!response.ok) {
       // Never return raw Supabase errors, which can contain object paths and metadata.
       let errorCode: unknown;
-      try { errorCode = (await response.json() as {code?: unknown}).code; } catch { /* ignore */ }
+      let errorReason: unknown;
+      try {
+        const payload = await response.json() as { code?: unknown; message?: unknown };
+        errorCode = payload.code;
+        errorReason = payload.message;
+      } catch { /* ignore */ }
+      // Only return whitelisted public error codes, never raw database messages.
+      if (errorCode === '23514' && [
+        'quote_upload_daily_capacity_exceeded',
+        'quote_storage_capacity_exceeded',
+        'quote_upload_budget_not_approved',
+      ].includes(String(errorReason))) throw new QuoteHttpError(409, 'quote_storage_budget_reached');
+      if (errorCode === '23514' && errorReason === 'quote_request_attachment_budget_exceeded') {
+        throw new QuoteHttpError(409, 'quote_file_limit_reached');
+      }
       if (errorCode === '23514' || errorCode === '23505') throw new QuoteHttpError(409, 'quote_conflict');
       if (errorCode === 'P0001') throw new QuoteHttpError(404, 'quote_not_found');
       if (errorCode === '22023') throw new QuoteHttpError(400, 'invalid_quote_upload');
@@ -332,11 +346,11 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
           !rows[0].production || !rows[0].project || typeof rows[0].no_file !== 'boolean') {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
       }
-      const attachments = await readApi<Array<{ original_name: string; storage_path: string }>>(
-        `/rest/v1/quote_attachments?quote_request_id=eq.${requestId}&validation_status=eq.validated&quota_released_at=is.null&select=original_name,storage_path&order=created_at.asc`,
+      const attachments = await readApi<Array<{ id?: string; original_name: string; storage_path: string }>>(
+        `/rest/v1/quote_attachments?quote_request_id=eq.${requestId}&validation_status=eq.validated&quota_released_at=is.null&select=id,original_name,storage_path&order=created_at.asc`,
       );
       if (!Array.isArray(attachments) || attachments.length > 5 || attachments.some(item =>
-        typeof item.original_name !== 'string' || item.original_name.length < 1 || item.original_name.length > 255 ||
+        (item.id !== undefined && !uuid(item.id)) || typeof item.original_name !== 'string' || item.original_name.length < 1 || item.original_name.length > 255 ||
         typeof item.storage_path !== 'string' || !acceptedPath.test(item.storage_path) ||
         !item.storage_path.startsWith(`${requestId}/`))) {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
@@ -369,7 +383,7 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
         const name = item.original_name.replace(/[\r\n\t]/g, ' ').trim();
         if (!name) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
         link.searchParams.set('download', name);
-        return { name, url: link.href };
+        return { id: item.id, name, url: link.href };
       });
       const row = rows[0];
       return {

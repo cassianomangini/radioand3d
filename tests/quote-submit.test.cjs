@@ -50,7 +50,7 @@ function quickBoxDraft() {
     plateText: '', plateQrSource: '', plateQrContent: '', plateUse: '', plateUseUnknown: false,
     plateFixation: '', plateFixationUnknown: false,
     plateDimensions: { width: '', depth: '', height: '' }, plateUnknown: false,
-    modelScale: '', modelScaleUnknown: false,
+    modelScale: '', modelSource: 'file', modelLink: '', modelScaleUnknown: false,
     modelDimensions: { width: '', depth: '', height: '' }, modelNotes: '',
     otherDescription: '', otherSize: '', colorMode: '', colors: [{ name: '', rgb: '' }],
     quantity: 2, name: 'Cliente Teste', contactMethod: 'whatsapp', contact: '11999999999',

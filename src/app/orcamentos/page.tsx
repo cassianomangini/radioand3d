@@ -53,7 +53,7 @@ export default async function OrcamentosPage({
         </div>
       </header>
 
-      <QuoteFlow intakeEnabled={intakeEnabled} studioPhotoId={studioPhotoId} productReference={productReference} turnstileSiteKey={turnstileSiteKey} />
+      <QuoteFlow intakeEnabled={intakeEnabled} studioPhotoId={studioPhotoId} productReference={productReference} turnstileSiteKey={turnstileSiteKey} multiModelEnabled={process.env.CM_QUOTE_MULTIMODEL_ENABLED === 'true'} />
     </div>
   );
 }

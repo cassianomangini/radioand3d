@@ -1,0 +1,78 @@
+name: Quote P0 verification
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "supabase/migrations/**"
+      - ".github/workflows/quote-p0-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cm_quote_p0_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          version: 10.30.3
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      # Full-repo lint is currently blocked by the pre-existing
+      # react-hooks/set-state-in-effect finding in studio-carousel.tsx on main.
+      # All P0 code files are linted here; track the baseline separately.
+      - name: ESLint (quote P0 changes)
+        run: >-
+          pnpm exec eslint
+          src/app/orcamentos/quote-flow.tsx src/app/orcamentos/page.tsx
+          src/features/quote/model-items.ts src/features/quote/file-policy.ts
+          src/server/quote/handlers.ts src/server/quote/form-contract.ts
+          src/server/quote/email.ts src/server/quote/supabase-gateway.ts
+          tests/quote-multi-model.test.cjs
+      - name: Next route types
+        run: pnpm exec next typegen
+      - name: TypeScript
+        run: pnpm typecheck
+      - name: Unit and integration tests
+        run: pnpm test
+      - name: SQL quota/reservation tests
+        env:
+          PGPASSWORD: postgres
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -h 127.0.0.1 -U postgres -d cm_quote_p0_ci -v ON_ERROR_STOP=1             -f tests/sql/quote-multi-model-fixture.sql             -f supabase/migrations/20261106134500_quote_multi_model_upload_budget.sql             -f tests/sql/quote-multi-model-post-migration.sql -f tests/sql/quote-multi-model-assertions.sql
+      - name: Production build
+        run: pnpm build

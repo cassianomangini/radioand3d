@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import { validModelLink } from "@/features/quote/model-link";
+import { validModelItems, restorableModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
+import { validateQuoteFiles, quoteFilePolicyLabel } from "@/features/quote/file-policy";
 import styles from "./page.module.css";
 
 const projectOptions = [
@@ -97,6 +99,7 @@ export type Draft = {
   modelDimensions: Dimensions;
   modelLink: string;
   modelNotes: string;
+  modelItems: ModelItem[];
   otherDescription: string;
   otherSize: string;
   colorMode: "" | "tenho" | "indeciso";
@@ -149,6 +152,7 @@ const initialDraft: Draft = {
   modelDimensions: emptyDimensions(),
   modelLink: "",
   modelNotes: "",
+  modelItems: [],
   otherDescription: "",
   otherSize: "",
   colorMode: "",
@@ -174,7 +178,7 @@ function fileIdentity(file: File) {
   return `${file.name}:${file.size}:${file.lastModified}`;
 }
 
-type UploadedFile = { id: string; role: FileField; name: string; size: number; type: string };
+type UploadedFile = { id: string; role: FileField; name: string; size: number; type: string; modelItemId?: string };
 type PendingUpload = { uploadKey: string; attachmentId?: string; complete?: boolean };
 type PendingSubmission = {
   signature: string;
@@ -191,10 +195,13 @@ function restorableDraft(value: unknown): value is Draft {
   const candidate = value as Record<string, unknown>;
   if (candidate.type !== null && !projectOptions.some((option) => option.value === candidate.type)) return false;
   if (candidate.modelSource !== "file" && candidate.modelSource !== "link") return false;
+  if (candidate.modelItems === undefined) candidate.modelItems = [];
   return Object.entries(initialDraft).every(([key, template]) => {
     const field = candidate[key];
     if (Array.isArray(template)) {
-      if (!Array.isArray(field) || field.length > 12) return false;
+      if (!Array.isArray(field)) return false;
+      if (key === "modelItems") return restorableModelItems(field);
+      if (field.length > 12) return false;
       return key === "colors" ? field.every((color) => color && typeof color.name === "string" && typeof color.rgb === "string")
         : field.every((item) => typeof item === "string");
     }
@@ -214,7 +221,11 @@ function restorableConfirmation(value: unknown): value is PendingConfirmation {
       typeof file.name === "string" && typeof file.size === "number" && typeof file.type === "string");
 }
 
-function visibleFileEntries(files: SelectedFiles, draft: Draft): Array<{ role: FileField; file: File }> {
+function visibleFileEntries(files: SelectedFiles, draft: Draft, modelFiles: Record<string, File> = {}): Array<{ role: FileField; file: File; modelItemId?: string }> {
+  if (draft.type === "arquivo" && draft.modelItems?.length) {
+    return draft.modelItems.flatMap((item) => item.source === "file" && modelFiles[item.id]
+      ? [{ role: "model" as const, file: modelFiles[item.id], modelItemId: item.id }] : []);
+  }
   const activeRoles: FileField[] = draft.type === "arquivo" ? ["model"]
     : draft.type === "caixa" ? [
       ...(draft.boxMode === "detailed" && !draft.boxNoPersonalization && draft.boxPersonalization.includes("Logotipo") ? ["boxLogo" as const] : []),
@@ -228,8 +239,17 @@ function visibleFileEntries(files: SelectedFiles, draft: Draft): Array<{ role: F
   return activeRoles.flatMap((role) => files[role].map((file) => ({ role, file })));
 }
 
-function visibleFiles(files: SelectedFiles, draft: Draft): File[] {
-  return visibleFileEntries(files, draft).map(({ file }) => file);
+function visibleFiles(files: SelectedFiles, draft: Draft, modelFiles: Record<string, File> = {}): File[] {
+  return visibleFileEntries(files, draft, modelFiles).map(({ file }) => file);
+}
+
+function newModelItem(source: ModelItem["source"], value: string): ModelItem {
+  return {
+    id: crypto.randomUUID(), source,
+    link: source === "link" ? value : "", fileName: source === "file" ? value : "",
+    quantity: 1, colorMode: "indeciso", colors: [],
+    scale: "original", dimensions: emptyDimensions(), notes: "",
+  };
 }
 
 function dimensionsText(dimensions: Dimensions, unknown = false, depth = false) {
@@ -429,7 +449,7 @@ function SummaryRow({ label, value, url, onEdit }: { label: string; value: strin
   );
 }
 
-export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turnstileSiteKey }: { intakeEnabled: boolean; studioPhotoId: string | null; productReference: { slug: string; name: string; imageUrl: string } | null; turnstileSiteKey: string | null }) {
+export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turnstileSiteKey, multiModelEnabled }: { intakeEnabled: boolean; studioPhotoId: string | null; productReference: { slug: string; name: string; imageUrl: string } | null; turnstileSiteKey: string | null; multiModelEnabled: boolean }) {
   const [step, setStep] = useState(studioPhotoId || productReference ? 2 : 1);
   const [reviewing, setReviewing] = useState(false);
   const [boxDetailStep, setBoxDetailStep] = useState(0);
@@ -442,6 +462,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }));
   const [savedContacts, setSavedContacts] = useState({ whatsapp: "", email: "" });
   const [files, setFiles] = useState<SelectedFiles>({ model: [], logo: [], qr: [], boxLogo: [], boxQr: [], references: [] });
+  const [modelFiles, setModelFiles] = useState<Record<string, File>>({});
+  const [modelLinksInput, setModelLinksInput] = useState("");
   const [error, setError] = useState<FieldError>(null);
   const [openColorMenu, setOpenColorMenu] = useState<number | null>(null);
   const [reviewEdit, setReviewEdit] = useState<ReviewEditArea | null>(null);
@@ -458,7 +480,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const headingRef = useRef<HTMLHeadingElement>(null);
   const formStepRef = useRef<HTMLElement>(null);
   const colorPickerButtons = useRef<(HTMLButtonElement | null)[]>([]);
-  const reviewSnapshot = useRef<{ draft: Draft; files: SelectedFiles; savedContacts: Record<"whatsapp" | "email", string> } | null>(null);
+  const reviewSnapshot = useRef<{ draft: Draft; files: SelectedFiles; modelFiles: Record<string, File>; savedContacts: Record<"whatsapp" | "email", string> } | null>(null);
   const pendingSubmission = useRef<PendingSubmission | null>(null);
 
   useEffect(() => {
@@ -471,7 +493,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         const reference = studioPhotoId ?? productReference?.slug ?? null;
         if (stored && stored.reference === reference && typeof stored.savedAt === "number" &&
             Date.now() - stored.savedAt >= 0 && Date.now() - stored.savedAt < DRAFT_TTL_MS && restorableDraft(stored.draft)) {
-          const savedDraft = stored.draft;
+          const savedDraft = stored.draft as Draft;
+          if (!Array.isArray(savedDraft.modelItems)) savedDraft.modelItems = [];
           setDraft(savedDraft);
           setStep(typeof stored.step === "number" && [1, 2, 3].includes(stored.step) ? stored.step : 1);
           setBoxDetailStep(typeof stored.boxDetailStep === "number" ? Math.min(4, Math.max(0, stored.boxDetailStep)) : 0);
@@ -483,7 +506,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           }
           const missing = Array.isArray(stored.fileRoles) ? stored.fileRoles.filter((role): role is FileField =>
             typeof role === "string" && Object.hasOwn(allowedExtensions, role)) : [];
-          setFileReattach(missing);
+          setFileReattach(savedDraft.modelItems.some(item => item.source === "file") ?
+            [...new Set([...missing, "model" as FileField])] : missing);
           if (restorableConfirmation(stored.pendingConfirmation)) {
             setPendingConfirmation(stored.pendingConfirmation);
             setSubmissionLocked(true);
@@ -508,11 +532,12 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({
         savedAt: Date.now(), reference: studioPhotoId ?? productReference?.slug ?? null,
         step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts,
-        fileRoles: [...new Set([...fileReattach, ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
+        fileRoles: [...new Set([...fileReattach, ...(Object.keys(modelFiles).length ? ["model" as FileField] : []),
+          ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
         pendingConfirmation,
       }));
     } catch { /* Storage may be disabled or full. */ }
-  }, [hydrated, receiptId, studioPhotoId, productReference?.slug, step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts, files, fileReattach, pendingConfirmation]);
+  }, [hydrated, receiptId, studioPhotoId, productReference?.slug, step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts, files, modelFiles, fileReattach, pendingConfirmation]);
 
   useEffect(() => { headingRef.current?.focus(); }, [step, reviewing, reviewEdit, draft.boxMode, draft.plateMode]);
   useEffect(() => {
@@ -550,13 +575,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (!incoming.length) return;
     const unique = new Map([...files.references, ...incoming].map((file) => [fileIdentity(file), file]));
     const next = { ...files, [field]: field === "references" ? [...unique.values()] : incoming.slice(0, 1) };
-    const active = visibleFiles(next, draft);
+    const active = visibleFiles(next, draft, modelFiles);
     const invalid = incoming.find((file) => !allowedExtensions[field].includes(file.name.split(".").pop()?.toLowerCase() ?? ""));
     if (invalid) return setError({ field, message: `Formato não aceito: ${invalid.name}.` });
     if (active.some((file) => file.size <= 0)) return setError({ field, message: "O arquivo está vazio. Escolha outro arquivo." });
     if (active.length > 5) return setError({ field, message: "Selecione no máximo 5 arquivos por pedido." });
-    if (active.some((file) => file.size > 50_000_000)) return setError({ field, message: "Cada arquivo pode ter até 50 MB." });
-    if (active.reduce((total, file) => total + file.size, 0) > 100_000_000) return setError({ field, message: "O pedido pode ter até 100 MB de arquivos." });
+    const check = validateQuoteFiles(active);
+    if (!check.ok) return setError({ field, message: check.message });
     setFiles(next);
     setFileReattach((current) => current.filter((role) => role !== field));
     setError(null);
@@ -564,6 +589,76 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
 
   function removeFile(field: FileField, index: number) {
     setFiles((current) => ({ ...current, [field]: current[field].filter((_, fileIndex) => fileIndex !== index) }));
+    setError(null);
+  }
+
+  function addModelLinks() {
+    const lines = modelLinksInput.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    if (!lines.length) return setError({ field: "modelLinks", message: "Cole um ou mais links, um por linha." });
+    const invalid = lines.filter(link => link.length > MODEL_LINK_MAX_LENGTH || !validModelLink(link));
+    const valid = lines.filter(link => link.length <= MODEL_LINK_MAX_LENGTH && validModelLink(link));
+    const capacity = MODEL_ITEM_LIMIT - draft.modelItems.length;
+    const accepted = valid.slice(0, capacity);
+    if (accepted.length) update("modelItems", [...draft.modelItems, ...accepted.map(link => newModelItem("link", link))]);
+    setModelLinksInput(invalid.join("\n"));
+    if (invalid.length || valid.length > capacity) setError({ field: "modelLinks",
+      message: `${accepted.length} link(s) adicionado(s). ${invalid.length} inválido(s), ${Math.max(0, valid.length - capacity)} excederam o limite de ${MODEL_ITEM_LIMIT} modelos.` });
+  }
+
+  function addModelFiles(incoming: File[]) {
+    if (!incoming.length) return;
+    const capacity = MODEL_ITEM_LIMIT - draft.modelItems.length;
+    if (incoming.length > capacity) return setError({ field: "modelFiles", message: `Máximo de ${MODEL_ITEM_LIMIT} modelos no orçamento.` });
+    const currently = Object.values(modelFiles);
+    const result = validateQuoteFiles([...currently, ...incoming]);
+    if (!result.ok) return setError({ field: "modelFiles", message: result.message });
+    const additions = incoming.map(file => ({ item: newModelItem("file", file.name), file }));
+    setModelFiles(current => ({ ...current, ...Object.fromEntries(additions.map(({ item, file }) => [item.id, file])) }));
+    update("modelItems", [...draft.modelItems, ...additions.map(({ item }) => item)]);
+    setFileReattach(current => current.filter(role => role !== "model"));
+  }
+
+  function replaceModelFile(id: string, file: File) {
+    const result = validateQuoteFiles([...Object.entries(modelFiles)
+      .filter(([key]) => key !== id).map(([, existing]) => existing), file]);
+    if (!result.ok) return setError({ field: "modelFiles", message: result.message });
+    if (!/\.(stl|3mf)$/i.test(file.name)) return setError({ field: "modelFiles", message: "Escolha STL ou 3MF." });
+    setModelFiles(current => ({ ...current, [id]: file }));
+    setDraft(current => ({ ...current, modelItems: current.modelItems.map(item =>
+      item.id === id ? { ...item, fileName: file.name } : item) }));
+    setFileReattach(current => current.filter(role => role !== "model"));
+    setError(null);
+  }
+
+  function removeModelItem(id: string) {
+    setDraft(current => ({ ...current, modelItems: current.modelItems.filter(item => item.id !== id) }));
+    setModelFiles(current => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)));
+    setError(null);
+  }
+
+  function changeModelItem(id: string, patch: Partial<ModelItem>) {
+    setDraft(current => ({ ...current, modelItems: current.modelItems.map(item =>
+      item.id === id ? { ...item, ...patch } : item) }));
+    setError(null);
+  }
+
+  function applyModelDefaults() {
+    const colors = draft.colorMode === "tenho" ? draft.colors : [];
+    if (draft.colorMode === "tenho" && (!colors.length || !colors.every(hasColor))) {
+      return setError({ field: "colors", message: "Preencha as cores padrão antes de aplicá-las." });
+    }
+    if (!draft.modelScaleUnknown && draft.modelScale === "alterar" &&
+      (!Object.values(draft.modelDimensions).some(value => value.trim()) ||
+       Object.values(draft.modelDimensions).some(value => value.trim() && !validDimension(value)))) {
+      return setError({ field: "modelDimensions", message: "Informe ao menos uma medida válida para aplicar." });
+    }
+    setDraft(current => ({ ...current, modelItems: current.modelItems.map(item => ({
+      ...item, colorMode: current.colorMode === "tenho" ? "tenho" as const : "indeciso" as const,
+      colors: current.colorMode === "tenho" ? current.colors.map(color => ({ ...color })) : [],
+      scale: current.modelScaleUnknown ? "nao-sei" as const :
+        current.modelScale === "alterar" ? "alterar" as const : "original" as const,
+      dimensions: { ...current.modelDimensions },
+    })) }));
     setError(null);
   }
 
@@ -643,19 +738,29 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   function validateDetails(): FieldError {
-    const activeFiles = visibleFiles(files, draft);
-    if (activeFiles.length > 5 || activeFiles.reduce((total, file) => total + file.size, 0) > 100_000_000) {
-      return { field: draft.type === "arquivo" ? "model" : "references", message: "Revise os arquivos: máximo de 5 e 100 MB no total." };
+    const activeFiles = visibleFiles(files, draft, modelFiles);
+    const fileCheck = validateQuoteFiles(activeFiles);
+    if (!fileCheck.ok) return { field: draft.type === "arquivo" ? "modelFiles" : "references", message: fileCheck.message };
+    if (draft.type === "arquivo" && multiModelEnabled) {
+      if (!validModelItems(draft.modelItems)) return { field: "modelItems", message: `Adicione de 1 a ${MODEL_ITEM_LIMIT} modelos válidos e confira suas preferências.` };
+      if (draft.modelItems.some(item => item.source === "file" && !modelFiles[item.id])) {
+        return { field: "modelFiles", message: "Anexe novamente os arquivos pendentes antes de continuar." };
+      }
+      return null;
     }
     if (draft.type === "caixa" && draft.boxMode === "quick" && !draft.boxQuickDescription.trim() && files.references.length === 0) return { field: "boxQuickDescription", message: "Descreva sua ideia ou envie uma foto de referência." };
     if (draft.type === "placa" && draft.plateMode === "quick" && !draft.plateQuickDescription.trim() && files.references.length === 0) return { field: "plateQuickDescription", message: "Descreva sua ideia ou envie uma foto de referência." };
-    if (draft.type === "arquivo" && draft.modelSource === "file" && files.model.length === 0) return { field: "model", message: "Selecione um arquivo STL ou 3MF para análise." };
-    if (draft.type === "arquivo" && draft.modelSource === "link" && !validModelLink(draft.modelLink)) return { field: "modelLink", message: "Informe um link HTTPS válido do modelo no MakerWorld ou compartilhado pelo Bambu Handy." };
-    if (draft.type === "arquivo" && !draft.modelScaleUnknown && !draft.modelScale) return { field: "modelScale", message: "Escolha como quer definir o tamanho." };
-    if (draft.type === "arquivo" && !draft.modelScaleUnknown && draft.modelScale === "alterar" && (!Object.values(draft.modelDimensions).some((value) => value.trim()) || Object.values(draft.modelDimensions).some((value) => value.trim() && !validDimension(value)))) return { field: "modelDimensions", message: "Informe pelo menos uma medida válida em cm para alterar o tamanho." };
+    if (draft.type === "arquivo" && !multiModelEnabled) {
+      if (draft.modelSource === "file" && files.model.length === 0) return { field: "model", message: "Selecione um arquivo STL ou 3MF." };
+      if (draft.modelSource === "link" && !validModelLink(draft.modelLink)) return { field: "modelLink", message: "Informe um link HTTPS válido do MakerWorld ou Bambu Handy." };
+      if (!draft.modelScaleUnknown && !draft.modelScale) return { field: "modelScale", message: "Escolha como definir o tamanho." };
+      if (!draft.modelScaleUnknown && draft.modelScale === "alterar" &&
+        (!Object.values(draft.modelDimensions).some(value => value.trim()) ||
+         Object.values(draft.modelDimensions).some(value => value.trim() && !validDimension(value)))) return { field: "modelDimensions", message: "Informe uma medida válida." };
+    }
     if (draft.type === "outro" && draft.studioPhotoId && !draft.otherDescription.trim()) return { field: "otherDescription", message: "Descreva o que você quer mudar na foto de referência." };
     if (draft.type === "outro" && !draft.otherDescription.trim() && files.references.length === 0) return { field: "otherDescription", message: "Descreva a ideia ou anexe uma referência." };
-    if (!(draft.type === "caixa" && draft.boxMode === "quick") && !(draft.type === "placa" && draft.plateMode === "quick") && draft.colorMode !== "indeciso" && (draft.colors.length === 0 || draft.colors.length > 4 || !draft.colors.every(hasColor))) return { field: "colors", message: "Preencha cada cor adicionada ou marque Ainda não decidi." };
+    if (!(draft.type === "caixa" && draft.boxMode === "quick") && !(draft.type === "placa" && draft.plateMode === "quick") && !(draft.type === "arquivo" && multiModelEnabled) && draft.colorMode !== "indeciso" && (draft.colors.length === 0 || draft.colors.length > 4 || !draft.colors.every(hasColor))) return { field: "colors", message: "Preencha cada cor adicionada ou marque Ainda não decidi." };
     return null;
   }
 
@@ -739,7 +844,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({
         savedAt: Date.now(), reference: studioPhotoId ?? productReference?.slug ?? null,
         step: 3, reviewing: true, boxDetailStep, plateDetailStep, draft: confirmation.draft,
-        savedContacts, fileRoles: [...new Set([...fileReattach, ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
+        savedContacts, fileRoles: [...new Set([...fileReattach, ...(Object.keys(modelFiles).length ? ["model" as FileField] : []),
+          ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
         pendingConfirmation: confirmation,
       }));
     } catch { /* The in-memory idempotency key still protects this page. */ }
@@ -775,8 +881,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         await confirmQuote(pendingConfirmation);
         return;
       }
-      const entries = visibleFileEntries(files, draft);
-      const signature = JSON.stringify(draft) + JSON.stringify(entries.map(({ role, file }) => [role, fileIdentity(file)]));
+      const entries = visibleFileEntries(files, draft, modelFiles);
+      const signature = JSON.stringify(draft) + JSON.stringify(entries.map(({ role, file, modelItemId }) => [role, modelItemId, fileIdentity(file)]));
       let pending = pendingSubmission.current;
       if (!pending || pending.signature !== signature) {
         pendingSubmission.current = null;
@@ -791,8 +897,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         pendingSubmission.current = pending;
       }
       for (let index = 0; index < entries.length; index += 1) {
-        const { role, file } = entries[index];
-        const key = `${role}:${fileIdentity(file)}`;
+        const { role, file, modelItemId } = entries[index];
+        const key = `${role}:${modelItemId ?? ""}:${fileIdentity(file)}`;
         const upload = pending.uploads.get(key) ?? { uploadKey: crypto.randomUUID() };
         pending.uploads.set(key, upload);
         if (!upload.complete && upload.attachmentId) {
@@ -820,10 +926,11 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         }
       }
       setSubmissionError("Registrando pedido e enviando e-mail...");
-      const attachments: UploadedFile[] = entries.map(({ role, file }) => {
-        const uploaded = pending!.uploads.get(`${role}:${fileIdentity(file)}`);
+      const attachments: UploadedFile[] = entries.map(({ role, file, modelItemId }) => {
+        const uploaded = pending!.uploads.get(`${role}:${modelItemId ?? ""}:${fileIdentity(file)}`);
         if (!uploaded?.attachmentId || !uploaded.complete) throw new Error("quote_upload_unavailable");
-        return { id: uploaded.attachmentId, role, name: file.name, size: file.size, type: file.type };
+        return { id: uploaded.attachmentId, role, name: file.name, size: file.size, type: file.type,
+          ...(modelItemId ? { modelItemId } : {}) };
       });
       await confirmQuote({ requestId: pending.requestId, submissionKey: pending.submissionKey, draft, attachments });
     } catch (cause) {
@@ -843,6 +950,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         : code === "quote_verification_unavailable" ? "A verificação está temporariamente indisponível. Tente novamente sem refazer o pedido."
         : code === "quote_rate_limited" ? "Muitas tentativas em pouco tempo. Aguarde e tente novamente."
         : code === "quote_upload_unavailable" ? "Não foi possível enviar um arquivo. Confira sua conexão e tente novamente."
+        : code === "quote_storage_budget_reached" ? "O envio de arquivos está temporariamente indisponível por limite de armazenamento. Você pode remover os arquivos e enviar links dos modelos ou solicitar ajuda pelo contato do Estúdio."
+        : code === "quote_file_limit_reached" ? "Os anexos ultrapassam os limites permitidos. Remova ou substitua alguns arquivos."
         : code === "invalid_quote_submit" ? "Algum dado do pedido precisa ser revisto antes do envio."
         : "Não foi possível concluir o envio. Seu pedido permanece nesta página para tentar novamente.");
     } finally {
@@ -851,7 +960,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   function beginReviewEdit(area: ReviewEditArea, detailStage = 0) {
-    reviewSnapshot.current = { draft, files, savedContacts };
+    reviewSnapshot.current = { draft, files, modelFiles, savedContacts };
     setReviewEdit(area);
     setReviewing(false);
     setError(null);
@@ -866,6 +975,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (reviewSnapshot.current) {
       setDraft(reviewSnapshot.current.draft);
       setFiles(reviewSnapshot.current.files);
+      setModelFiles(reviewSnapshot.current.modelFiles);
       setSavedContacts(reviewSnapshot.current.savedContacts);
     }
     reviewSnapshot.current = null;
@@ -919,12 +1029,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const showingGuidedForm = step === 2 && ((draft.type === "caixa" && draft.boxMode !== "") || (draft.type === "placa" && draft.plateMode !== ""));
   const showingColorChoices = (draft.type === "caixa" && draft.boxMode === "detailed" && boxDetailStep === 4)
     || (draft.type === "placa" && draft.plateMode === "detailed" && plateDetailStep === 3)
-    || (draft.type !== "caixa" && draft.type !== "placa");
-  const showingQuantity = showingColorChoices || (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick");
-  const showingFilePolicy = draft.type === "caixa" ? Boolean(draft.boxMode) : draft.type === "placa" ? Boolean(draft.plateMode) : true;
-  const quantitySummary = `${draft.quantity} ${draft.quantity === 1 ? "unidade" : "unidades"}`;
+    || draft.type === "outro" || (draft.type === "arquivo" && (!multiModelEnabled || draft.modelItems.length > 1));
+  const showingQuantity = (draft.type !== "arquivo" || !multiModelEnabled) && (showingColorChoices || (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick"));
+  const showingFilePolicy = draft.type === "caixa" ? Boolean(draft.boxMode) : draft.type === "placa" ? Boolean(draft.plateMode) : !multiModelEnabled;
+  const currentQuantity = draft.type === "arquivo" && multiModelEnabled ? modelUnits(draft.modelItems) : draft.quantity;
+  const quantitySummary = `${currentQuantity} ${currentQuantity === 1 ? "unidade" : "unidades"}`;
   const colorsSummary = draft.colorMode === "indeciso" ? "Cores a decidir" : draft.colors.map(colorText).filter(Boolean).join(", ") || "Cores não informadas";
-  const activeFiles = visibleFiles(files, draft);
+  const activeFiles = visibleFiles(files, draft, modelFiles);
   const quickRequest = (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick");
 
   if (receiptId) return (
@@ -1214,34 +1325,179 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
             </>
           ) : null}
 
-          {draft.type === "arquivo" ? (
+          {draft.type === "arquivo" && multiModelEnabled ? (
+            <>
+              <div className={styles.modelCollection}>
+                <div className={styles.modelCollectionHeading}>
+                  <div>
+                    <h3>Adicione seus modelos</h3>
+                    <p>Envie vários links do MakerWorld/Bambu Handy ou arquivos STL/3MF no mesmo pedido. Cada modelo pode ter uma cor, tamanho e quantidade diferente.</p>
+                  </div>
+                  <span className={styles.modelCounter}>{draft.modelItems.length} de {MODEL_ITEM_LIMIT} modelos</span>
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="quote-model-links">Cole links dos modelos, um por linha</label>
+                  <textarea id="quote-model-links" className={styles.modelLinksInput} rows={3}
+                    value={modelLinksInput} onChange={event => setModelLinksInput(event.target.value)}
+                    placeholder={"https://makerworld.com/pt/models/12345\nhttps://makerworld.com/pt/models/67890"}
+                    aria-invalid={error?.field === "modelLinks"} />
+                  <button className={styles.modelAddAction} type="button" disabled={!modelLinksInput.trim() || draft.modelItems.length >= MODEL_ITEM_LIMIT}
+                    onClick={addModelLinks}>Adicionar links à lista</button>
+                  <InlineError error={error} field="modelLinks" />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="quote-model-files">Ou adicione arquivos STL/3MF</label>
+                  <input id="quote-model-files" className={styles.fileInput} type="file" accept=".stl,.3mf" multiple
+                    disabled={draft.modelItems.length >= MODEL_ITEM_LIMIT}
+                    onChange={event => { addModelFiles(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
+                  <p className={styles.fieldHint}>Até 5 arquivos no pedido inteiro. Arquivos 3D: 30 MB cada. Total de anexos: 50 MB. Os links não ocupam armazenamento.</p>
+                  <InlineError error={error} field="modelFiles" />
+                  <InlineError error={error} field="modelItems" />
+                </div>
+                {draft.modelItems.length ? (
+                  <ol className={styles.modelList} aria-label="Modelos do orçamento">
+                    {draft.modelItems.map((item, index) => (
+                      <li className={styles.modelItem} key={item.id}>
+                        <div className={styles.modelItemHeader}>
+                          <div>
+                            <strong>Modelo {String(index + 1).padStart(2, "0")}</strong>
+                            <span>{item.source === "link" ? "Link do modelo" : item.fileName}</span>
+                          </div>
+                          <button type="button" className={styles.modelRemove} aria-label={`Remover modelo ${index + 1}`}
+                            onClick={() => removeModelItem(item.id)}>Remover</button>
+                        </div>
+                        {item.source === "link" ? (
+                          <div className={styles.field}>
+                            <label htmlFor={`model-url-${item.id}`}>Link</label>
+                            <input id={`model-url-${item.id}`} type="url" value={item.link} maxLength={MODEL_LINK_MAX_LENGTH}
+                              onChange={event => changeModelItem(item.id, { link: event.target.value })} />
+                            {validModelLink(item.link) ? <a href={item.link} target="_blank" rel="noopener noreferrer" className={styles.modelExternal}>Abrir modelo em outra aba</a> : <small>Confira o link HTTPS do MakerWorld/Bambu Handy.</small>}
+                            {draft.modelItems.filter(other => other.id !== item.id && other.source === "link" && other.link === item.link).length > 0 ? <small>Este link também aparece em outro item. Você pode manter configurações diferentes.</small> : null}
+                          </div>
+                        ) : !modelFiles[item.id] ? (
+                          <div className={styles.field}>
+                            <label htmlFor={`model-reupload-${item.id}`}>Anexe novamente {item.fileName}</label>
+                            <input id={`model-reupload-${item.id}`} type="file" className={styles.fileInput} accept=".stl,.3mf"
+                              onChange={event => { const file = event.target.files?.[0]; if (file) replaceModelFile(item.id, file); event.target.value = ""; }} />
+                            <small>O navegador não preserva arquivos após recarregar a página.</small>
+                          </div>
+                        ) : null}
+                        <div className={styles.modelItemGrid}>
+                          <div className={styles.field}>
+                            <label htmlFor={`model-quantity-${item.id}`}>Quantidade</label>
+                            <input id={`model-quantity-${item.id}`} type="number" min={1} max={10000} inputMode="numeric"
+                              value={item.quantity} onChange={event => changeModelItem(item.id,
+                                { quantity: Math.max(1, Math.min(10000, Math.floor(Number(event.target.value) || 1))) })} />
+                          </div>
+                          <div className={styles.field}>
+                            <label htmlFor={`model-scale-${item.id}`}>Tamanho</label>
+                            <select id={`model-scale-${item.id}`} value={item.scale}
+                              onChange={event => changeModelItem(item.id, { scale: event.target.value as ModelItem["scale"] })}>
+                              <option value="original">Tamanho original</option>
+                              <option value="alterar">Alterar medidas</option>
+                              <option value="nao-sei">Ainda não sei</option>
+                            </select>
+                          </div>
+                          <div className={styles.field}>
+                            <label htmlFor={`model-colors-${item.id}`}>Cores</label>
+                            <select id={`model-colors-${item.id}`} value={item.colorMode}
+                              onChange={event => changeModelItem(item.id, {
+                                colorMode: event.target.value as ModelItem["colorMode"],
+                                colors: event.target.value === "tenho" ? item.colors.length ? item.colors : [{ name: "", rgb: "" }] : [],
+                              })}>
+                              <option value="indeciso">Ainda não decidi</option>
+                              <option value="tenho">Escolher cores</option>
+                            </select>
+                          </div>
+                        </div>
+                        {item.scale === "alterar" ? (
+                          <div className={styles.modelItemGrid}>
+                            {(["width", "depth", "height"] as const).map((dimension) => (
+                              <div className={styles.field} key={dimension}>
+                                <label htmlFor={`model-${item.id}-${dimension}`}>{dimension === "width" ? "Largura" : dimension === "depth" ? "Profundidade" : "Altura"} (cm)</label>
+                                <input id={`model-${item.id}-${dimension}`} type="text" inputMode="decimal"
+                                  value={item.dimensions[dimension]} onChange={event => changeModelItem(item.id,
+                                    { dimensions: { ...item.dimensions, [dimension]: event.target.value } })} placeholder="Ex.: 12" />
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                        {item.colorMode === "tenho" ? (
+                          <div className={styles.modelColorList}>
+                            {item.colors.map((color, colorIndex) => (
+                              <div className={styles.modelColorEntry} key={colorIndex}>
+                                <input type="text" list="quote-model-color-suggestions" maxLength={48}
+                                  aria-label={`Modelo ${index + 1}, cor ${colorIndex + 1}`}
+                                  value={color.name} placeholder={`Cor ${colorIndex + 1}, ex.: branco`}
+                                  onChange={event => changeModelItem(item.id, { colors: item.colors.map((current, i) =>
+                                    i === colorIndex ? { name: event.target.value, rgb: "" } : current) })} />
+                                <button type="button" aria-label={`Remover cor ${colorIndex + 1} do modelo ${index + 1}`}
+                                  onClick={() => changeModelItem(item.id, { colors: item.colors.filter((_, i) => i !== colorIndex) })}>×</button>
+                              </div>
+                            ))}
+                            {item.colors.length < 4 ? <button type="button" className={styles.modelTextAction} onClick={() =>
+                              changeModelItem(item.id, { colors: [...item.colors, { name: "", rgb: "" }] })}>+ Outra cor</button> : null}
+                          </div>
+                        ) : null}
+                        <div className={styles.field}>
+                          <label htmlFor={`model-note-${item.id}`}>Observações deste modelo (opcional)</label>
+                          <input id={`model-note-${item.id}`} type="text" maxLength={MODEL_NOTES_MAX_LENGTH}
+                            value={item.notes} onChange={event => changeModelItem(item.id, { notes: event.target.value })}
+                            placeholder="Ex.: precisa encaixar em outra peça" />
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                ) : <p className={styles.modelEmpty}>Seus modelos aparecerão aqui. Pode colar 10 ou 15 links de uma vez.</p>}
+                <datalist id="quote-model-color-suggestions">{colorOptions.map(color => <option key={color.name} value={color.name} />)}</datalist>
+              </div>
+              {draft.modelItems.length > 1 ? (
+                <div className={styles.modelDefaults}>
+                  <h3>Aplicar as mesmas preferências a todos</h3>
+                  <p>Use as escolhas de tamanho e cores abaixo como padrão. Cada modelo poderá ser editado individualmente depois.</p>
+                  <div className={styles.choiceButtons} role="group" aria-label="Tamanho padrão">
+                    {[["original", "Manter tamanho original"], ["alterar", "Informar medidas"]].map(([value, label]) =>
+                      <button type="button" key={value} aria-pressed={!draft.modelScaleUnknown && draft.modelScale === value}
+                        onClick={() => { update("modelScale", value); update("modelScaleUnknown", false); }}>{label}</button>)}
+                    <button type="button" aria-pressed={draft.modelScaleUnknown} onClick={() => update("modelScaleUnknown", !draft.modelScaleUnknown)}>Não sei</button>
+                  </div>
+                  {draft.modelScale === "alterar" && !draft.modelScaleUnknown ?
+                    <DimensionFields id="model" value={draft.modelDimensions} onChange={(dimension, value) =>
+                      updateDimension("modelDimensions", dimension, value)} unknown={false}
+                      onUnknown={() => undefined} allowUnknown={false} depth error={error} /> : null}
+                </div>
+              ) : null}
+            </>
+          ) : null}
+
+          {draft.type === "arquivo" && !multiModelEnabled ? (
             <>
               <div className={styles.field}>
                 <span id="model-source-label" className={styles.fieldLabel}>Como quer enviar o modelo?</span>
                 <div className={styles.qrSourceChoices} role="radiogroup" aria-labelledby="model-source-label">
                   <label><input type="radio" name="model-source" checked={draft.modelSource === "file"} onChange={() => { update("modelSource", "file"); update("modelLink", ""); }} /><span>Enviar arquivo 3D</span></label>
-                  <label><input type="radio" name="model-source" checked={draft.modelSource === "link"} onChange={() => { update("modelSource", "link"); setFiles((current) => ({ ...current, model: [] })); setFileReattach((current) => current.filter((role) => role !== "model")); }} /><span>Informar link do modelo</span></label>
+                  <label><input type="radio" name="model-source" checked={draft.modelSource === "link"} onChange={() => { update("modelSource", "link"); setFiles(current => ({ ...current, model: [] })); }} /><span>Informar link do modelo</span></label>
                 </div>
               </div>
-              {draft.modelSource === "file" ? <FilePicker id="model" label="Envie seu arquivo 3D" accept=".stl,.3mf" files={files.model} onAdd={addFiles} onRemove={removeFile} error={error} /> : (
+              {draft.modelSource === "file" ? <FilePicker id="model" label="Envie seu arquivo 3D" accept=".stl,.3mf" files={files.model} onAdd={addFiles} onRemove={removeFile} error={error} /> :
                 <div className={styles.field}>
                   <label htmlFor="model-link">Link do modelo no MakerWorld ou Bambu Handy</label>
-                  <input id="model-link" type="url" inputMode="url" value={draft.modelLink} onChange={(event) => update("modelLink", event.target.value)} placeholder="https://makerworld.com/en/models/..." aria-invalid={error?.field === "modelLink"} />
+                  <input id="model-link" type="url" value={draft.modelLink} onChange={event => update("modelLink", event.target.value)} placeholder="https://makerworld.com/en/models/..." />
                   <InlineError error={error} field="modelLink" />
-                </div>
-              )}
-              <div className={`${styles.field} ${draft.modelScaleUnknown ? styles.fieldSkipped : ""}`}>
+                </div>}
+              <div className={styles.field}>
                 <div className={styles.fieldHeading}>
                   <span className={styles.fieldLabel}>Quer alterar o tamanho?</span>
                   <button className={styles.skipButton} type="button" aria-pressed={draft.modelScaleUnknown} onClick={() => update("modelScaleUnknown", !draft.modelScaleUnknown)}>Não sei</button>
                 </div>
                 <div className={styles.choiceButtons} role="group" aria-label="Tamanho da impressão">
-                  {[["original", "Manter original"], ["alterar", "Informar outro tamanho"]].map(([value, label]) => <button type="button" key={value} disabled={draft.modelScaleUnknown} aria-pressed={draft.modelScale === value} onClick={() => update("modelScale", value)}>{label}</button>)}
+                  {[["original", "Manter original"], ["alterar", "Informar outro tamanho"]].map(([value, label]) =>
+                    <button type="button" key={value} disabled={draft.modelScaleUnknown} aria-pressed={draft.modelScale === value} onClick={() => update("modelScale", value)}>{label}</button>)}
                 </div>
                 <InlineError error={error} field="modelScale" />
               </div>
               {!draft.modelScaleUnknown && draft.modelScale === "alterar" ? <DimensionFields id="model" value={draft.modelDimensions} onChange={(dimension, value) => updateDimension("modelDimensions", dimension, value)} unknown={false} onUnknown={() => undefined} allowUnknown={false} depth error={error} /> : null}
-              <div className={styles.field}><label htmlFor="model-notes">Alguma exigência importante? <small>Opcional</small></label><textarea id="model-notes" value={draft.modelNotes} onChange={(event) => update("modelNotes", event.target.value)} placeholder="Ex.: encaixe, resistência ou outra observação." /></div>
+              <div className={styles.field}><label htmlFor="model-notes">Alguma exigência importante? <small>Opcional</small></label><textarea id="model-notes" value={draft.modelNotes} onChange={event => update("modelNotes", event.target.value)} placeholder="Ex.: encaixe, resistência ou outra observação." /></div>
             </>
           ) : null}
 
@@ -1267,7 +1523,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           {showingColorChoices ? (
             <div className={`${styles.field} ${draft.colorMode === "indeciso" ? styles.fieldSkipped : ""}`}>
               <div className={styles.fieldHeading}>
-                <span className={styles.fieldLabel}>Quais cores você prefere?</span>
+                <span className={styles.fieldLabel}>{draft.type === "arquivo" ? "Quais cores quer aplicar em todos os modelos?" : "Quais cores você prefere?"}</span>
                 <button className={styles.skipButton} type="button" aria-pressed={draft.colorMode === "indeciso"} onClick={() => { setOpenColorMenu(null); update("colorMode", draft.colorMode === "indeciso" ? (draft.colors.some(hasColor) ? "tenho" : "") : "indeciso"); }}>Ainda não decidi</button>
               </div>
               <p className={styles.fieldHint}>Escolha até 4 cores no menu ao lado de cada campo ou escreva o nome. A disponibilidade será confirmada no orçamento.</p>
@@ -1335,8 +1591,14 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
             </div>
           ) : null}
 
+          {draft.type === "arquivo" && draft.modelItems.length > 1 ? (
+            <div className={styles.modelDefaultsAction}>
+              <button className={styles.modelAddAction} type="button" onClick={applyModelDefaults}>Aplicar tamanho e cores a todos os modelos</button>
+              <p>Esta ação substitui as preferências individuais atuais. Você pode alterar cada modelo depois.</p>
+            </div>
+          ) : null}
           {showingQuantity ? <QuantityPicker value={draft.quantity} onChange={(value) => update("quantity", value)} /> : null}
-          {showingFilePolicy ? <p className={styles.filePolicy}>Arquivos selecionados ficam neste navegador. Limite: 5 arquivos, até 50 MB cada e 100 MB no total.</p> : null}
+          {showingFilePolicy ? <p className={styles.filePolicy}>Os arquivos permanecem privados e precisam ser reenviados se a página for atualizada. {quoteFilePolicyLabel()}.</p> : null}
           {reviewEdit === "details" ? (
             <div className={styles.actions}>
               <button type="button" className={styles.secondaryAction} onClick={cancelReviewEdit}>Cancelar alteração</button>
@@ -1407,8 +1669,26 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 <SummaryRow label="Colocação" value={draft.plateFixationUnknown ? "A definir" : draft.plateFixation.trim()} onEdit={() => beginReviewEdit("details", 1)} />
                 <SummaryRow label="Medidas" value={dimensionsText(draft.plateDimensions, draft.plateUnknown)} onEdit={() => beginReviewEdit("details", 2)} />
               </> : null}
-              {draft.type === "arquivo" ? <>
-                {draft.modelSource === "link" && validModelLink(draft.modelLink) ? <SummaryRow label="Link do modelo" value={draft.modelLink.trim()} url={draft.modelLink.trim()} onEdit={() => beginReviewEdit("details")} /> : <SummaryRow label="Arquivo 3D" value={files.model[0]?.name ?? pendingConfirmation?.attachments.find((file) => file.role === "model")?.name ?? "Pendente de anexo"} onEdit={() => beginReviewEdit("details")} />}
+              {draft.type === "arquivo" && multiModelEnabled ? <>
+                <SummaryRow label="Total" value={`${draft.modelItems.length} modelos · ${quantitySummary}`} onEdit={() => beginReviewEdit("details")} />
+                {draft.modelItems.map((item, index) => (
+                  <div className={styles.modelReviewEntry} key={item.id}>
+                    <SummaryRow label={`Modelo ${String(index + 1).padStart(2, "0")}`}
+                      value={item.source === "link" ? item.link :
+                        modelFiles[item.id]?.name ??
+                          pendingConfirmation?.attachments.find(file => file.modelItemId === item.id)?.name ??
+                          `${item.fileName} (reanexar arquivo)`}
+                      url={item.source === "link" && validModelLink(item.link) ? item.link : undefined}
+                      onEdit={() => beginReviewEdit("details")} />
+                    <SummaryRow label="Configuração"
+                      value={`${item.quantity} un. · ${item.colorMode === "indeciso" ? "cores a definir" : item.colors.map(colorText).join(", ")} · ${item.scale === "nao-sei" ? "tamanho a definir" : item.scale === "alterar" ? dimensionsText(item.dimensions, false, true) : "tamanho original"}${item.notes.trim() ? ` · ${item.notes.trim()}` : ""}`}
+                      onEdit={() => beginReviewEdit("details")} />
+                  </div>
+                ))}
+              </> : null}
+              {draft.type === "arquivo" && !multiModelEnabled ? <>
+                {draft.modelSource === "link" && validModelLink(draft.modelLink) ? <SummaryRow label="Link do modelo" value={draft.modelLink.trim()} url={draft.modelLink.trim()} onEdit={() => beginReviewEdit("details")} /> :
+                  <SummaryRow label="Arquivo 3D" value={files.model[0]?.name ?? pendingConfirmation?.attachments.find(file => file.role === "model")?.name ?? "Pendente de anexo"} onEdit={() => beginReviewEdit("details")} />}
                 <SummaryRow label="Tamanho" value={draft.modelScaleUnknown ? "A definir" : draft.modelScale === "alterar" ? dimensionsText(draft.modelDimensions, false, true) : "Tamanho original"} onEdit={() => beginReviewEdit("details")} />
                 {draft.modelNotes.trim() ? <SummaryRow label="Observações" value={draft.modelNotes.trim()} onEdit={() => beginReviewEdit("details")} /> : null}
               </> : null}
@@ -1424,10 +1704,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           <section className={styles.reviewSection} aria-labelledby="review-preferences-title" inert={sending || submissionLocked}>
             <h3 id="review-preferences-title">{quickRequest ? (activeFiles.length ? "Quantidade e arquivos" : "Quantidade") : (activeFiles.length ? "Cores, quantidade e arquivos" : "Cores e quantidade")}</h3>
             <dl className={styles.summary}>
-              {!quickRequest ? <SummaryRow label="Cores" value={colorsSummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} /> : null}
+              {!quickRequest && !(draft.type === "arquivo" && multiModelEnabled) ? <SummaryRow label="Cores" value={colorsSummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} /> : null}
               <SummaryRow label="Quantidade" value={quantitySummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} />
               {draft.type !== "placa" && draft.type !== "arquivo" && activeFiles.length ? <SummaryRow label="Arquivos" value={activeFiles.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 3 : 0)} /> : null}
-              {draft.type === "arquivo" && activeFiles.length ? <SummaryRow label="Arquivo 3D" value={activeFiles.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details")} /> : null}
+
               {draft.type === "placa" && draft.plateMode === "quick" && activeFiles.length ? <SummaryRow label="Referências" value={activeFiles.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details")} /> : null}
               {draft.type === "placa" && draft.plateMode === "detailed" && !draft.plateContentUnknown && draft.plateContents.includes("Logotipo") && files.logo.length ? <SummaryRow label="Logotipo anexado" value={files.logo.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details", 0)} /> : null}
               {draft.type === "placa" && draft.plateMode === "detailed" && !draft.plateContentUnknown && draft.plateContents.includes("QR Code") && draft.plateQrSource === "file" && files.qr.length ? <SummaryRow label="QR anexado" value={files.qr.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details", 0)} /> : null}

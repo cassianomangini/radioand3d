@@ -1,5 +1,6 @@
 import { QuoteHttpError, uuid } from './http';
 import type { QuoteNotificationData } from './supabase-gateway';
+import { validModelLink } from '@/features/quote/model-link';
 
 const recipient = 'casman1986@gmail.com';
 
@@ -11,7 +12,7 @@ const labels: Record<string, string> = {
   personalization: 'Personalização', text: 'Texto', qrSource: 'Origem do QR Code',
   qrContent: 'Conteúdo do QR Code', contentsUnknown: 'Conteúdo a definir',
   contents: 'Conteúdo', use: 'Uso', fixation: 'Colocação', scale: 'Escala',
-  notes: 'Observações', size: 'Tamanho aproximado',
+  notes: 'Observações', size: 'Tamanho aproximado', modelLink: 'Link do modelo',
 };
 
 function display(value: unknown): string {
@@ -30,7 +31,9 @@ function quoteEmailLines(requestId: string, quote: QuoteNotificationData, siteOr
   const details = Object.entries(quote.project)
     .filter(([, value]) => value !== null && value !== '' && !(Array.isArray(value) && value.length === 0))
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => `${labels[key] ?? key}: ${display(value)}`);
+    .map(([key, value]): EmailLine => key === 'modelLink' && typeof value === 'string' && validModelLink(value)
+      ? { name: 'Link do modelo', url: value.trim() }
+      : `${labels[key] ?? key}: ${display(value)}`);
   const colors = quote.production.colorMode === 'indeciso' ? 'a definir' : display(quote.production.colors ?? []);
   const studioReference = quote.sourceReference?.startsWith('/api/studio/photos/')
     ? new URL(quote.sourceReference, siteOrigin).href : null;

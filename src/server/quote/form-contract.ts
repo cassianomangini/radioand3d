@@ -1,5 +1,6 @@
 import type { Draft } from '@/app/orcamentos/quote-flow';
 import { validateQuoteFiles } from '@/features/quote/file-policy';
+import { validModelLink } from '@/features/quote/model-link';
 import { uuid } from './http';
 import type { QuoteProjectType } from './supabase-gateway';
 
@@ -15,7 +16,7 @@ const textFields = [
   'boxMode', 'boxQuickDescription', 'boxShape', 'boxShapeOther', 'boxDividers',
   'boxDividerCount', 'boxBasis', 'boxText', 'boxQrSource', 'boxQrContent',
   'plateMode', 'plateQuickDescription', 'plateText', 'plateQrSource', 'plateQrContent',
-  'plateUse', 'plateFixation', 'modelScale', 'modelNotes', 'otherDescription',
+  'plateUse', 'plateFixation', 'modelScale', 'modelSource', 'modelLink', 'modelNotes', 'otherDescription',
   'otherSize', 'colorMode', 'name', 'contactMethod', 'contact', 'delivery', 'cep',
 ] as const;
 const booleanFields = [
@@ -85,6 +86,7 @@ export function parseQuoteForm(value: unknown): Draft | null {
       !oneOf(value.delivery, ['retirada', 'envio']) ||
       !oneOf(value.boxMode, ['', 'quick', 'detailed']) ||
       !oneOf(value.plateMode, ['', 'quick', 'detailed']) ||
+      !oneOf(value.modelSource, ['file', 'link']) ||
       !oneOf(value.boxDividers, ['', 'com', 'sem', 'nao-sei']) ||
       !oneOf(value.colorMode, ['', 'tenho', 'indeciso']) ||
       !oneOf(value.boxQrSource, ['', 'content', 'file']) ||
@@ -157,7 +159,9 @@ export function validateQuoteForm(draft: Draft, files: QuoteAttachmentInput[]): 
     return hasColors(draft);
   }
   if (draft.type === 'arquivo') {
-    if (!fileByRole(files, 'model') || (!draft.modelScaleUnknown && !oneOf(draft.modelScale, ['original', 'alterar'])) ||
+    if ((draft.modelSource === 'file' && (!fileByRole(files, 'model') || draft.modelLink.trim())) ||
+        (draft.modelSource === 'link' && (fileByRole(files, 'model') || !validModelLink(draft.modelLink))) ||
+        (!draft.modelScaleUnknown && !oneOf(draft.modelScale, ['original', 'alterar'])) ||
         (!draft.modelScaleUnknown && draft.modelScale === 'alterar' &&
           (!Object.values(draft.modelDimensions).some(value => value.trim()) ||
             Object.values(draft.modelDimensions).some(value => value.trim() && !validDimension(value))))) return false;
@@ -201,6 +205,7 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
     dimensions: mode === 'detailed' && !draft.plateUnknown ? draft.plateDimensions : null,
   } : draft.type === 'arquivo' ? {
     kind: 'impressao', scale: draft.modelScaleUnknown ? 'a definir' : draft.modelScale,
+    modelLink: draft.modelLink.trim() || null,
     dimensions: !draft.modelScaleUnknown && draft.modelScale === 'alterar' ? draft.modelDimensions : null,
     notes: draft.modelNotes.trim(),
   } : { kind: 'outro', description: draft.otherDescription.trim(), size: draft.otherSize.trim() };

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
+import { validModelLink } from "@/features/quote/model-link";
 import styles from "./page.module.css";
 
 const projectOptions = [
@@ -91,8 +92,10 @@ export type Draft = {
   plateDimensions: Dimensions;
   plateUnknown: boolean;
   modelScale: string;
+  modelSource: "file" | "link";
   modelScaleUnknown: boolean;
   modelDimensions: Dimensions;
+  modelLink: string;
   modelNotes: string;
   otherDescription: string;
   otherSize: string;
@@ -141,8 +144,10 @@ const initialDraft: Draft = {
   plateDimensions: emptyDimensions(),
   plateUnknown: false,
   modelScale: "",
+  modelSource: "file",
   modelScaleUnknown: false,
   modelDimensions: emptyDimensions(),
+  modelLink: "",
   modelNotes: "",
   otherDescription: "",
   otherSize: "",
@@ -177,6 +182,37 @@ type PendingSubmission = {
   submissionKey: string;
   uploads: Map<string, PendingUpload>;
 };
+type PendingConfirmation = { requestId: string; submissionKey: string; draft: Draft; attachments: UploadedFile[] };
+const DRAFT_STORAGE_KEY = "cm-quote-draft-v1";
+const DRAFT_TTL_MS = 24 * 60 * 60 * 1000;
+
+function restorableDraft(value: unknown): value is Draft {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const candidate = value as Record<string, unknown>;
+  if (candidate.type !== null && !projectOptions.some((option) => option.value === candidate.type)) return false;
+  if (candidate.modelSource !== "file" && candidate.modelSource !== "link") return false;
+  return Object.entries(initialDraft).every(([key, template]) => {
+    const field = candidate[key];
+    if (Array.isArray(template)) {
+      if (!Array.isArray(field) || field.length > 12) return false;
+      return key === "colors" ? field.every((color) => color && typeof color.name === "string" && typeof color.rgb === "string")
+        : field.every((item) => typeof item === "string");
+    }
+    if (template && typeof template === "object") return field !== null && typeof field === "object" &&
+      Object.keys(template).every((part) => typeof (field as Record<string, unknown>)[part] === "string");
+    return template === null ? field === null || typeof field === "string" : typeof field === typeof template;
+  });
+}
+
+function restorableConfirmation(value: unknown): value is PendingConfirmation {
+  if (!value || typeof value !== "object") return false;
+  const pending = value as Partial<PendingConfirmation>;
+  return typeof pending.requestId === "string" && /^[0-9a-f-]{36}$/i.test(pending.requestId) &&
+    typeof pending.submissionKey === "string" && /^[0-9a-f-]{36}$/i.test(pending.submissionKey) &&
+    restorableDraft(pending.draft) && Array.isArray(pending.attachments) && pending.attachments.length <= 5 &&
+    pending.attachments.every((file) => file && typeof file.id === "string" && typeof file.role === "string" &&
+      typeof file.name === "string" && typeof file.size === "number" && typeof file.type === "string");
+}
 
 function visibleFileEntries(files: SelectedFiles, draft: Draft): Array<{ role: FileField; file: File }> {
   const activeRoles: FileField[] = draft.type === "arquivo" ? ["model"]
@@ -381,12 +417,12 @@ function FilePicker({
   );
 }
 
-function SummaryRow({ label, value, onEdit }: { label: string; value: string; onEdit?: () => void }) {
+function SummaryRow({ label, value, url, onEdit }: { label: string; value: string; url?: string; onEdit?: () => void }) {
   return (
     <div className={styles.summaryRow}>
       <dt>{label}</dt>
       <dd>
-        <span>{value}</span>
+        {url ? <a href={url} target="_blank" rel="noopener noreferrer">{value}</a> : <span>{value}</span>}
         {onEdit ? <button type="button" aria-label={`Editar ${label.toLowerCase()}`} onClick={onEdit}>Editar</button> : null}
       </dd>
     </div>
@@ -416,11 +452,67 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const [emailPending, setEmailPending] = useState(false);
   const [submissionLocked, setSubmissionLocked] = useState(false);
   const [receiptId, setReceiptId] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+  const [fileReattach, setFileReattach] = useState<FileField[]>([]);
+  const [pendingConfirmation, setPendingConfirmation] = useState<PendingConfirmation | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const formStepRef = useRef<HTMLElement>(null);
   const colorPickerButtons = useRef<(HTMLButtonElement | null)[]>([]);
   const reviewSnapshot = useRef<{ draft: Draft; files: SelectedFiles; savedContacts: Record<"whatsapp" | "email", string> } | null>(null);
   const pendingSubmission = useRef<PendingSubmission | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      try {
+        const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+        const stored = raw ? JSON.parse(raw) as Record<string, unknown> : null;
+        const reference = studioPhotoId ?? productReference?.slug ?? null;
+        if (stored && stored.reference === reference && typeof stored.savedAt === "number" &&
+            Date.now() - stored.savedAt >= 0 && Date.now() - stored.savedAt < DRAFT_TTL_MS && restorableDraft(stored.draft)) {
+          const savedDraft = stored.draft;
+          setDraft(savedDraft);
+          setStep(typeof stored.step === "number" && [1, 2, 3].includes(stored.step) ? stored.step : 1);
+          setBoxDetailStep(typeof stored.boxDetailStep === "number" ? Math.min(4, Math.max(0, stored.boxDetailStep)) : 0);
+          setPlateDetailStep(typeof stored.plateDetailStep === "number" ? Math.min(3, Math.max(0, stored.plateDetailStep)) : 0);
+          setReviewing(stored.reviewing === true);
+          if (stored.savedContacts && typeof stored.savedContacts === "object") {
+            const contacts = stored.savedContacts as Record<string, unknown>;
+            setSavedContacts({ whatsapp: typeof contacts.whatsapp === "string" ? contacts.whatsapp : "", email: typeof contacts.email === "string" ? contacts.email : "" });
+          }
+          const missing = Array.isArray(stored.fileRoles) ? stored.fileRoles.filter((role): role is FileField =>
+            typeof role === "string" && Object.hasOwn(allowedExtensions, role)) : [];
+          setFileReattach(missing);
+          if (restorableConfirmation(stored.pendingConfirmation)) {
+            setPendingConfirmation(stored.pendingConfirmation);
+            setSubmissionLocked(true);
+            setStep(3);
+            setReviewing(true);
+            setSubmissionError("O envio pode já ter sido registrado. Use Tentar confirmar envio para verificar o mesmo pedido.");
+          }
+        } else if (raw) sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch { /* Storage may be unavailable; the form remains usable. */ }
+      setHydrated(true);
+    });
+    return () => { cancelled = true; };
+  }, [studioPhotoId, productReference?.slug]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      if (receiptId) {
+        sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+        return;
+      }
+      sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({
+        savedAt: Date.now(), reference: studioPhotoId ?? productReference?.slug ?? null,
+        step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts,
+        fileRoles: [...new Set([...fileReattach, ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
+        pendingConfirmation,
+      }));
+    } catch { /* Storage may be disabled or full. */ }
+  }, [hydrated, receiptId, studioPhotoId, productReference?.slug, step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts, files, fileReattach, pendingConfirmation]);
 
   useEffect(() => { headingRef.current?.focus(); }, [step, reviewing, reviewEdit, draft.boxMode, draft.plateMode]);
   useEffect(() => {
@@ -466,6 +558,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (active.some((file) => file.size > 50_000_000)) return setError({ field, message: "Cada arquivo pode ter até 50 MB." });
     if (active.reduce((total, file) => total + file.size, 0) > 100_000_000) return setError({ field, message: "O pedido pode ter até 100 MB de arquivos." });
     setFiles(next);
+    setFileReattach((current) => current.filter((role) => role !== field));
     setError(null);
   }
 
@@ -556,7 +649,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     }
     if (draft.type === "caixa" && draft.boxMode === "quick" && !draft.boxQuickDescription.trim() && files.references.length === 0) return { field: "boxQuickDescription", message: "Descreva sua ideia ou envie uma foto de referência." };
     if (draft.type === "placa" && draft.plateMode === "quick" && !draft.plateQuickDescription.trim() && files.references.length === 0) return { field: "plateQuickDescription", message: "Descreva sua ideia ou envie uma foto de referência." };
-    if (draft.type === "arquivo" && files.model.length === 0) return { field: "model", message: "Selecione um arquivo STL ou 3MF para análise." };
+    if (draft.type === "arquivo" && draft.modelSource === "file" && files.model.length === 0) return { field: "model", message: "Selecione um arquivo STL ou 3MF para análise." };
+    if (draft.type === "arquivo" && draft.modelSource === "link" && !validModelLink(draft.modelLink)) return { field: "modelLink", message: "Informe um link HTTPS válido do modelo no MakerWorld ou compartilhado pelo Bambu Handy." };
     if (draft.type === "arquivo" && !draft.modelScaleUnknown && !draft.modelScale) return { field: "modelScale", message: "Escolha como quer definir o tamanho." };
     if (draft.type === "arquivo" && !draft.modelScaleUnknown && draft.modelScale === "alterar" && (!Object.values(draft.modelDimensions).some((value) => value.trim()) || Object.values(draft.modelDimensions).some((value) => value.trim() && !validDimension(value)))) return { field: "modelDimensions", message: "Informe pelo menos uma medida válida em cm para alterar o tamanho." };
     if (draft.type === "outro" && draft.studioPhotoId && !draft.otherDescription.trim()) return { field: "otherDescription", message: "Descreva o que você quer mudar na foto de referência." };
@@ -637,14 +731,50 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     setReviewing(true);
   }
 
+  async function confirmQuote(confirmation: PendingConfirmation) {
+    setSubmissionLocked(true);
+    setPendingConfirmation(confirmation);
+    // Save before the request: a refresh during an uncertain response must retry the same key.
+    try {
+      sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({
+        savedAt: Date.now(), reference: studioPhotoId ?? productReference?.slug ?? null,
+        step: 3, reviewing: true, boxDetailStep, plateDetailStep, draft: confirmation.draft,
+        savedContacts, fileRoles: [...new Set([...fileReattach, ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
+        pendingConfirmation: confirmation,
+      }));
+    } catch { /* The in-memory idempotency key still protects this page. */ }
+    const response = await fetch("/api/quote/submit", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(confirmation), cache: "no-store",
+    });
+    const result = await response.json().catch(() => null) as { requestId?: string; error?: string } | null;
+    if (response.status === 202 && result?.error === "quote_email_pending") {
+      setEmailPending(true);
+      setSubmissionError("O pedido foi salvo no banco, mas o aviso por e-mail ainda não foi confirmado. Tente novamente.");
+      return;
+    }
+    if (!response.ok || !result?.requestId) throw new Error(result?.error || "quote_unavailable");
+    setEmailPending(false);
+    setSubmissionError("");
+    setPendingConfirmation(null);
+    pendingSubmission.current = null;
+    setReceiptId(result.requestId);
+  }
+
   async function submitQuote() {
     if (!intakeEnabled || sending || !draft.type) return;
-    if (!validateProject()) return;
-    const contactError = validateContact();
-    if (contactError) return setError(contactError);
+    if (!pendingConfirmation) {
+      if (!validateProject()) return;
+      const contactError = validateContact();
+      if (contactError) return setError(contactError);
+    }
     setSubmissionError("");
     setSending(true);
     try {
+      if (pendingConfirmation) {
+        await confirmQuote(pendingConfirmation);
+        return;
+      }
       const entries = visibleFileEntries(files, draft);
       const signature = JSON.stringify(draft) + JSON.stringify(entries.map(({ role, file }) => [role, fileIdentity(file)]));
       let pending = pendingSubmission.current;
@@ -695,35 +825,22 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         if (!uploaded?.attachmentId || !uploaded.complete) throw new Error("quote_upload_unavailable");
         return { id: uploaded.attachmentId, role, name: file.name, size: file.size, type: file.type };
       });
-      setSubmissionLocked(true);
-      const response = await fetch("/api/quote/submit", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId: pending.requestId, submissionKey: pending.submissionKey, draft, attachments }),
-        cache: "no-store",
-      });
-      const result = await response.json().catch(() => null) as { requestId?: string; error?: string } | null;
-      if (response.status === 202 && result?.error === "quote_email_pending") {
-        setEmailPending(true);
-        setSubmissionError("O pedido foi salvo no banco, mas o aviso por e-mail ainda não foi confirmado. Tente novamente.");
-        return;
-      }
-      if (!response.ok || !result?.requestId) throw new Error(result?.error || "quote_unavailable");
-      setEmailPending(false);
-      setSubmissionError("");
-      setReceiptId(result.requestId);
+      await confirmQuote({ requestId: pending.requestId, submissionKey: pending.submissionKey, draft, attachments });
     } catch (cause) {
       const code = cause instanceof Error ? cause.message : "quote_unavailable";
-      if (!pendingSubmission.current) {
+      if (!pendingSubmission.current && !pendingConfirmation) {
         setTurnstileToken("");
         setTurnstileResetKey((key) => key + 1);
       }
       if (["quote_not_found", "quote_conflict", "upload_reservation_expiring", "quote_session_invalid"].includes(code)) {
         pendingSubmission.current = null;
+        setPendingConfirmation(null);
         setSubmissionLocked(false);
       }
-      if (code === "invalid_quote_submit") setSubmissionLocked(false);
+      if (code === "invalid_quote_submit") { setPendingConfirmation(null); setSubmissionLocked(false); }
       setSubmissionError(code === "human_verification_required" ? "Confirme a verificação de segurança para enviar o orçamento."
-        : code === "quote_verification_unavailable" ? "Verificação indisponível. Recarregue e tente novamente."
+        : code === "human_verification_expired" ? "A verificação expirou. Tente novamente no quadro de segurança."
+        : code === "quote_verification_unavailable" ? "A verificação está temporariamente indisponível. Tente novamente sem refazer o pedido."
         : code === "quote_rate_limited" ? "Muitas tentativas em pouco tempo. Aguarde e tente novamente."
         : code === "quote_upload_unavailable" ? "Não foi possível enviar um arquivo. Confira sua conexão e tente novamente."
         : code === "invalid_quote_submit" ? "Algum dado do pedido precisa ser revisto antes do envio."
@@ -841,6 +958,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           <p>{reviewEdit ? "Altere o que precisar e volte diretamente ao resumo." : step === 1 ? "Escolha uma opção para começar." : step === 2 ? "Responda do seu jeito. Você pode voltar e ajustar depois." : reviewing ? "Veja se está tudo certo antes de solicitar o orçamento." : "Só precisamos dos seus dados para preparar o pedido."}</p>
         </div>
       )}
+
+      {fileReattach.length > 0 && !pendingConfirmation && step > 1 ? (
+        <p className={styles.pendingNotice} role="status">O rascunho foi recuperado. Arquivos selecionados antes da atualização precisam ser anexados novamente.</p>
+      ) : null}
 
       {draft.studioPhotoId && step > 1 ? (
         <div className={styles.studioReference} role="group" aria-label="Foto de referência do Estúdio">
@@ -1095,7 +1216,20 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
 
           {draft.type === "arquivo" ? (
             <>
-              <FilePicker id="model" label="Envie seu arquivo 3D" accept=".stl,.3mf" files={files.model} onAdd={addFiles} onRemove={removeFile} error={error} />
+              <div className={styles.field}>
+                <span id="model-source-label" className={styles.fieldLabel}>Como quer enviar o modelo?</span>
+                <div className={styles.qrSourceChoices} role="radiogroup" aria-labelledby="model-source-label">
+                  <label><input type="radio" name="model-source" checked={draft.modelSource === "file"} onChange={() => { update("modelSource", "file"); update("modelLink", ""); }} /><span>Enviar arquivo 3D</span></label>
+                  <label><input type="radio" name="model-source" checked={draft.modelSource === "link"} onChange={() => { update("modelSource", "link"); setFiles((current) => ({ ...current, model: [] })); setFileReattach((current) => current.filter((role) => role !== "model")); }} /><span>Informar link do modelo</span></label>
+                </div>
+              </div>
+              {draft.modelSource === "file" ? <FilePicker id="model" label="Envie seu arquivo 3D" accept=".stl,.3mf" files={files.model} onAdd={addFiles} onRemove={removeFile} error={error} /> : (
+                <div className={styles.field}>
+                  <label htmlFor="model-link">Link do modelo no MakerWorld ou Bambu Handy</label>
+                  <input id="model-link" type="url" inputMode="url" value={draft.modelLink} onChange={(event) => update("modelLink", event.target.value)} placeholder="https://makerworld.com/en/models/..." aria-invalid={error?.field === "modelLink"} />
+                  <InlineError error={error} field="modelLink" />
+                </div>
+              )}
               <div className={`${styles.field} ${draft.modelScaleUnknown ? styles.fieldSkipped : ""}`}>
                 <div className={styles.fieldHeading}>
                   <span className={styles.fieldLabel}>Quer alterar o tamanho?</span>
@@ -1274,6 +1408,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 <SummaryRow label="Medidas" value={dimensionsText(draft.plateDimensions, draft.plateUnknown)} onEdit={() => beginReviewEdit("details", 2)} />
               </> : null}
               {draft.type === "arquivo" ? <>
+                {draft.modelSource === "link" && validModelLink(draft.modelLink) ? <SummaryRow label="Link do modelo" value={draft.modelLink.trim()} url={draft.modelLink.trim()} onEdit={() => beginReviewEdit("details")} /> : <SummaryRow label="Arquivo 3D" value={files.model[0]?.name ?? pendingConfirmation?.attachments.find((file) => file.role === "model")?.name ?? "Pendente de anexo"} onEdit={() => beginReviewEdit("details")} />}
                 <SummaryRow label="Tamanho" value={draft.modelScaleUnknown ? "A definir" : draft.modelScale === "alterar" ? dimensionsText(draft.modelDimensions, false, true) : "Tamanho original"} onEdit={() => beginReviewEdit("details")} />
                 {draft.modelNotes.trim() ? <SummaryRow label="Observações" value={draft.modelNotes.trim()} onEdit={() => beginReviewEdit("details")} /> : null}
               </> : null}

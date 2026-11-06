@@ -42,9 +42,16 @@ export async function verifyQuoteTurnstile(
   try { body = await result.json(); }
   catch { throw new QuoteHttpError(503, 'quote_verification_unavailable'); }
 
-  const payload = body as { success?: unknown; action?: unknown; hostname?: unknown } | null;
+  const payload = body as { success?: unknown; action?: unknown; hostname?: unknown; 'error-codes'?: unknown } | null;
   if (!payload || payload.success !== true || payload.action !== 'quote_intake' ||
       payload.hostname !== new URL(request.url).hostname) {
-    throw new QuoteHttpError(403, 'human_verification_required');
+    const codes = Array.isArray(payload?.['error-codes'])
+      ? payload['error-codes'].filter((code): code is string => typeof code === 'string').slice(0, 5) : [];
+    console.warn('[quote-turnstile] siteverify rejected', {
+      codes, action: payload?.action, hostname: payload?.hostname,
+      expectedHostname: new URL(request.url).hostname,
+    });
+    throw new QuoteHttpError(403,
+      codes.includes('timeout-or-duplicate') ? 'human_verification_expired' : 'human_verification_required');
   }
 }

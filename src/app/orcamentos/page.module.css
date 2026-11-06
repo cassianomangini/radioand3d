@@ -1016,9 +1016,20 @@
   line-height: 1.5;
 }
 
-.summaryRow dd span {
+.summaryRow dd span,
+.summaryRow dd a {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.summaryRow dd a {
+  color: var(--accent-cyan);
+  text-decoration: underline;
+}
+
+.summaryRow dd a:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .summaryRow button {

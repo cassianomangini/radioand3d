@@ -53,7 +53,7 @@ export type QuoteNotificationData = {
   contactMethod: 'whatsapp' | 'email';
   contactName: string;
   contactValue: string;
-  attachments: Array<{ name: string; url: string }>;
+  attachments: Array<{ name: string; url: string; id?: string }>;
 };
 
 export type QuoteGateway = {
@@ -332,11 +332,11 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
           !rows[0].production || !rows[0].project || typeof rows[0].no_file !== 'boolean') {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
       }
-      const attachments = await readApi<Array<{ original_name: string; storage_path: string }>>(
-        `/rest/v1/quote_attachments?quote_request_id=eq.${requestId}&validation_status=eq.validated&quota_released_at=is.null&select=original_name,storage_path&order=created_at.asc`,
+      const attachments = await readApi<Array<{ id?: string; original_name: string; storage_path: string }>>(
+        `/rest/v1/quote_attachments?quote_request_id=eq.${requestId}&validation_status=eq.validated&quota_released_at=is.null&select=id,original_name,storage_path&order=created_at.asc`,
       );
       if (!Array.isArray(attachments) || attachments.length > 5 || attachments.some(item =>
-        typeof item.original_name !== 'string' || item.original_name.length < 1 || item.original_name.length > 255 ||
+        (item.id !== undefined && !uuid(item.id)) || typeof item.original_name !== 'string' || item.original_name.length < 1 || item.original_name.length > 255 ||
         typeof item.storage_path !== 'string' || !acceptedPath.test(item.storage_path) ||
         !item.storage_path.startsWith(`${requestId}/`))) {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');
@@ -369,7 +369,7 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
         const name = item.original_name.replace(/[\r\n\t]/g, ' ').trim();
         if (!name) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
         link.searchParams.set('download', name);
-        return { name, url: link.href };
+        return { id: item.id, name, url: link.href };
       });
       const row = rows[0];
       return {

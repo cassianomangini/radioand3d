@@ -13,7 +13,12 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   async headers() {
-    return [{ source: "/:path*", headers: [...securityHeaders] }];
+    const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
+    return [
+      { source: "/:path*", headers: [...securityHeaders] },
+      { source: "/api/:path*", headers: noIndexHeaders },
+      { source: "/dev/:path*", headers: noIndexHeaders },
+    ];
   },
 };
 

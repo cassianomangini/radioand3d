@@ -9,8 +9,14 @@ import { getSiteCatalog } from "@/server/products/catalog";
 import { QuoteFlow } from "./quote-flow";
 import styles from "./page.module.css";
 
+const title = "Orçamento de Impressão 3D | CM 3D & Rádio";
+const description = "Solicite orçamento para caixas sob medida, placas personalizadas ou impressão 3D por encomenda. Conte sua ideia em poucos passos.";
+
 export const metadata: Metadata = {
-  title: "Orçamentos — CM 3D & Rádio",
+  title,
+  description,
+  alternates: { canonical: "/orcamentos" },
+  openGraph: { title, description, url: "/orcamentos", type: "website" },
 };
 
 export default async function OrcamentosPage({

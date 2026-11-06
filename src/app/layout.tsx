@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { connection } from "next/server";
 import { SiteShell } from "@/components/site-shell";
+import { isIndexableDeployment, SITE_URL } from "@/lib/site-seo";
 import { getRadioTracks } from "@/features/radio/catalog";
 import { RadioProvider } from "@/features/radio/radio-provider";
 import "./globals.css";
@@ -27,11 +28,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "CM 3D & Rádio",
-  description: "Estúdio de impressão 3D e rádio de músicas autorais.",
+  description: "Caixas sob medida, placas personalizadas e impressão 3D por encomenda. Estúdio em São Caetano do Sul, com envio para todo o Brasil.",
   robots: {
-    index: false,
-    follow: false,
+    index: isIndexableDeployment(),
+    follow: isIndexableDeployment(),
   },
 };
 

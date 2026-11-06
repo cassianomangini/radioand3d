@@ -4,8 +4,14 @@ import { getStudioPhotos, studioPhotoSrc } from "@/features/studio/r2-photos";
 import { StudioCarousel, type StudioSlide } from "./studio-carousel";
 import styles from "./page.module.css";
 
+const title = "Estúdio de Impressão 3D | CM 3D & Rádio";
+const description = "Conheça o estúdio CM 3D, em São Caetano do Sul, e veja peças e trabalhos reais de impressão 3D.";
+
 export const metadata: Metadata = {
-  title: "Estúdio — CM 3D & Rádio",
+  title,
+  description,
+  alternates: { canonical: "/estudio" },
+  openGraph: { title, description, url: "/estudio", type: "website" },
 };
 
 function shufflePhotos<T>(items: readonly T[]) {

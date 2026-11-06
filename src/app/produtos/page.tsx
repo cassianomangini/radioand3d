@@ -7,9 +7,14 @@ import { ProductCatalog } from "./product-catalog";
 import styles from "./products.module.css";
 import { getProductSubtitle } from "./subtitles";
 
+const title = "Produtos Impressos em 3D | CM 3D & Rádio";
+const description = "Conheça caixas, organizadores, peças decorativas e outros produtos reais impressos em 3D pelo estúdio CM 3D, com compra pela Shopee.";
+
 export const metadata: Metadata = {
-  title: "Produtos — CM 3D & Rádio",
-  description: "Peças impressas em 3D do estúdio CM 3D.",
+  title,
+  description,
+  alternates: { canonical: "/produtos" },
+  openGraph: { title, description, url: "/produtos", type: "website" },
 };
 
 export default async function ProdutosPage() {

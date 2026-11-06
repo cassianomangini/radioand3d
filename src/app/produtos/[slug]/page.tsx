@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSiteCatalog } from "@/server/products/catalog";
+import { visibleProducts } from "@/features/products/catalog-contract";
+import { isIndexableDeployment } from "@/lib/site-seo";
 import { ProductGallery } from "../product-gallery";
 import styles from "../products.module.css";
 import { getProductSubtitle } from "../subtitles";
@@ -41,13 +43,25 @@ const breadcrumbNames: Record<string, string> = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const catalog = await getSiteCatalog();
-  const product = catalog.products.find((entry) => entry.slug === slug);
-  if (!product) return { title: "Produto — CM 3D & Rádio", robots: { index: false } };
+  const product = catalog.state === "available"
+    ? visibleProducts(catalog.products).find((entry) => entry.slug === slug)
+    : undefined;
+  if (!product) {
+    return { title: "Produto indisponível | CM 3D & Rádio", robots: { index: false, follow: false } };
+  }
+
   return {
     title: product.seoTitle,
     description: product.seoDescription,
-    robots: { index: false, follow: false },
-    openGraph: { title: product.seoTitle, description: product.seoDescription, images: [product.imageUrls[0]] },
+    alternates: { canonical: `/produtos/${product.slug}` },
+    robots: { index: isIndexableDeployment(), follow: isIndexableDeployment() },
+    openGraph: {
+      title: product.seoTitle,
+      description: product.seoDescription,
+      url: `/produtos/${product.slug}`,
+      type: "website",
+      images: [{ url: product.imageUrls[0], alt: product.name }],
+    },
   };
 }
 

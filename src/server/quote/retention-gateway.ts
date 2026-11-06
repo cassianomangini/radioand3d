@@ -96,13 +96,19 @@ export function createRetentionGateway(fetcher: typeof fetch = fetch): Retention
     },
     async removeAndConfirm(path) {
       if (!PATH.test(path)) return unavailable();
+      const infoPath = '/storage/v1/object/info/quote-intake/' + path;
+      const before = await call(infoPath, 'GET');
+      // A reservation may remain after its object has already disappeared.
+      // Finalization rechecks storage.objects before releasing the quota.
+      if (before.status === 404) return;
+      if (!before.ok) return unavailable();
       // Exactly storage-js remove(): DELETE /object/{bucketName} {prefixes}.
       // Never DELETE storage.objects via SQL: bytes would become orphaned.
       const removed = await call('/storage/v1/object/quote-intake', 'DELETE', { prefixes: [path] });
       if (!removed.ok && removed.status !== 404) return unavailable();
       // An object may never have finished uploading. A Storage 404 on a
       // subsequent info request is required before releasing the reservation.
-      const check = await call('/storage/v1/object/info/quote-intake/' + path, 'GET');
+      const check = await call(infoPath, 'GET');
       if (check.status !== 404) return unavailable();
     },
     async finalizeAttachment(runToken, attachmentId) {

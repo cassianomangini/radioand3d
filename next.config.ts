@@ -14,10 +14,17 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   async headers() {
     const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
+    // Nao aplicar noindex a imagens publicas servidas por /api/studio/photos
+    // ou /api/orcamentos/photos. Outras APIs nao sao paginas indexaveis.
+    const privateRoutes = [
+      "/api/internal/:path*",
+      "/api/quote/:path*",
+      "/api/radio/:path*",
+      "/dev/:path*",
+    ];
     return [
       { source: "/:path*", headers: [...securityHeaders] },
-      { source: "/api/:path*", headers: noIndexHeaders },
-      { source: "/dev/:path*", headers: noIndexHeaders },
+      ...privateRoutes.map((source) => ({ source, headers: noIndexHeaders })),
     ];
   },
 };

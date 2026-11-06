@@ -21,12 +21,17 @@ function loadTypeScript(relativePath, stubs = {}) {
 }
 
 const seo = loadTypeScript("src/lib/site-seo.ts");
-const contracts = loadTypeScript("src/features/products/catalog-contract.ts");
+const approval = loadTypeScript("src/features/products/search-approval.ts");
 
-function loadSitemap(indexable, catalog) {
+function loadSitemap(indexable, catalog, approvedSlugs = []) {
+  const approved = new Set(approvedSlugs);
   return loadTypeScript("src/app/sitemap.ts", {
     "@/lib/site-seo": { ...seo, isIndexableDeployment: () => indexable },
-    "@/features/products/catalog-contract": contracts,
+    "@/features/products/search-approval": {
+      hasSearchApprovedProducts: () => approved.size > 0,
+      searchApprovedProducts: (products) =>
+        products.filter((item) => item.sourceStatus === "NORMAL" && approved.has(item.slug)),
+    },
     "@/server/products/catalog": { getSiteCatalog: async () => catalog },
   }).default;
 }
@@ -53,34 +58,76 @@ test("somente o deploy de producao pode ser indexado", () => {
   }
 });
 
-test("previews bloqueiam robos e nao publicam URLs no sitemap", async () => {
+test("nenhum slug esta aprovado automaticamente para indexacao", () => {
+  assert.equal(approval.hasSearchApprovedProducts(), false);
+  assert.deepEqual(approval.searchApprovedProducts([
+    { slug: "produto-normal", sourceStatus: "NORMAL" },
+    { slug: "produto-bloqueado", sourceStatus: "BANNED" },
+  ]), []);
+});
+
+test("previews bloqueiam todos os rastreadores e nao publicam sitemap", async () => {
   assert.equal(loadRobots(false).rules.disallow, "/");
-  assert.deepEqual(await loadSitemap(false, { state: "unavailable", products: [] })(), []);
+  assert.deepEqual(await loadSitemap(false, { state: "available", products: [] }, ["exemplo"])(), []);
 });
 
-test("producao permite paginas publicas e exclui API e dev", () => {
-  const rules = loadRobots(true);
-  assert.deepEqual(rules.rules.disallow, ["/api/", "/dev/"]);
-  assert.equal(rules.sitemap, "https://cmangini3d.com.br/sitemap.xml");
+test("producao nao bloqueia fotos publicas", () => {
+  const robots = loadRobots(true);
+  assert.deepEqual(robots.rules.disallow, ["/api/", "/dev/"]);
+  assert.ok(robots.rules.allow.includes("/api/studio/photos/"));
+  assert.ok(robots.rules.allow.includes("/api/orcamentos/photos/"));
+  assert.equal(robots.sitemap, "https://cmangini3d.com.br/sitemap.xml");
 });
 
-test("sitemap lista apenas produtos publicados e ativos", async () => {
+test("headers noindex nao cobrem imagens publicas", async () => {
+  const config = loadTypeScript("next.config.ts").default;
+  const routes = await config.headers();
+  const blocked = routes.filter((route) => route.headers.some((header) =>
+    header.key.toLowerCase() === "x-robots-tag"));
+  assert.ok(blocked.some((route) => route.source === "/api/quote/:path*"));
+  assert.ok(blocked.some((route) => route.source === "/api/internal/:path*"));
+  assert.ok(blocked.some((route) => route.source === "/dev/:path*"));
+  assert.ok(!blocked.some((route) => route.source === "/api/:path*"));
+  assert.ok(!blocked.some((route) => route.source.includes("/api/studio/photos")));
+  assert.ok(!blocked.some((route) => route.source.includes("/api/orcamentos/photos")));
+});
+
+test("sem revisao editorial sitemap lista apenas quatro paginas publicas", async () => {
+  const sitemap = loadSitemap(true, { state: "available", products: [
+    { slug: "produto-normal", sourceStatus: "NORMAL" },
+  ] });
+  const urls = await sitemap();
+  assert.deepEqual(urls.map((item) => item.url), [
+    "https://cmangini3d.com.br/",
+    "https://cmangini3d.com.br/estudio",
+    "https://cmangini3d.com.br/produtos",
+    "https://cmangini3d.com.br/orcamentos",
+  ]);
+  assert.ok(urls.every((item) => !Object.hasOwn(item, "priority") && !Object.hasOwn(item, "changeFrequency")));
+});
+
+test("somente produtos ativos e editorialmente aprovados entram no sitemap", async () => {
   const catalog = {
     state: "available",
     products: [
-      { slug: "caixa-ativa", sourceStatus: "NORMAL", contentUpdatedAt: "2026-11-05T12:00:00.000Z" },
-      { slug: "caixa-desativada", sourceStatus: "UNLIST", contentUpdatedAt: "2026-11-05T12:00:00.000Z" },
-      { slug: "caixa-excluida", sourceStatus: "SELLER_DELETE", contentUpdatedAt: "2026-11-05T12:00:00.000Z" },
+      { slug: "caixa-ativa", sourceStatus: "NORMAL" },
+      { slug: "caixa-nao-revisada", sourceStatus: "NORMAL" },
+      { slug: "caixa-desativada", sourceStatus: "UNLIST" },
+      { slug: "caixa-excluida", sourceStatus: "SELLER_DELETE" },
     ],
   };
-  const urls = await loadSitemap(true, catalog)();
+  const urls = await loadSitemap(true, catalog, [
+    "caixa-ativa", "caixa-desativada", "caixa-excluida",
+  ])();
   assert.equal(urls.length, 5);
-  assert.equal(urls[0].url, "https://cmangini3d.com.br/");
   assert.ok(urls.some((item) => item.url.endsWith("/produtos/caixa-ativa")));
-  assert.ok(!urls.some((item) => item.url.includes("desativada") || item.url.includes("excluida")));
+  assert.ok(!urls.some((item) => item.url.includes("nao-revisada")
+    || item.url.includes("desativada") || item.url.includes("excluida")));
 });
 
-test("falha de catalogo nao fabrica links de produto", async () => {
-  const urls = await loadSitemap(true, { state: "unavailable", products: [] })();
-  assert.equal(urls.length, 4);
+test("com produtos aprovados uma falha de catalogo nao entrega sitemap truncado", async () => {
+  await assert.rejects(
+    () => loadSitemap(true, { state: "unavailable", products: [] }, ["caixa-ativa"])(),
+    /site_catalog_unavailable_for_sitemap/,
+  );
 });

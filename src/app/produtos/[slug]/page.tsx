@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSiteCatalog } from "@/server/products/catalog";
-import { visibleProducts } from "@/features/products/catalog-contract";
+import { isSearchApprovedProduct } from "@/features/products/search-approval";
 import { isIndexableDeployment } from "@/lib/site-seo";
 import { ProductGallery } from "../product-gallery";
 import styles from "../products.module.css";
@@ -43,9 +43,10 @@ const breadcrumbNames: Record<string, string> = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const catalog = await getSiteCatalog();
-  const product = catalog.state === "available"
-    ? visibleProducts(catalog.products).find((entry) => entry.slug === slug)
-    : undefined;
+  if (catalog.state === "unavailable") {
+    throw new Error("site_catalog_unavailable_for_product_metadata");
+  }
+  const product = catalog.products.find((entry) => entry.slug === slug);
   if (!product) {
     return { title: "Produto indisponível | CM 3D & Rádio", robots: { index: false, follow: false } };
   }
@@ -54,7 +55,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: product.seoTitle,
     description: product.seoDescription,
     alternates: { canonical: `/produtos/${product.slug}` },
-    robots: { index: isIndexableDeployment(), follow: isIndexableDeployment() },
+    robots: {
+      index: isIndexableDeployment() && isSearchApprovedProduct(product),
+      follow: isIndexableDeployment(),
+    },
     openGraph: {
       title: product.seoTitle,
       description: product.seoDescription,
@@ -69,14 +73,7 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const catalog = await getSiteCatalog();
   if (catalog.state === "unavailable") {
-    return <div className={styles.page}><header className={styles.banner}><div className={styles.bannerContent}>
-      <p className={styles.bannerTitle}>Produtos</p>
-      <p>Peças do Estúdio CM 3D.</p>
-    </div></header><div className={styles.wrap}><div className={styles.empty}>
-      <h1>Produto temporariamente indisponível</h1>
-      <p>Não conseguimos carregar os detalhes agora.</p>
-      <Link href="/produtos">Voltar aos produtos</Link>
-    </div></div></div>;
+    throw new Error("site_catalog_unavailable_for_product_detail");
   }
   const product = catalog.products.find((entry) => entry.slug === slug);
   if (!product || product.sourceStatus === "SELLER_DELETE") notFound();

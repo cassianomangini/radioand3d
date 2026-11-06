@@ -1017,9 +1017,9 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const showingGuidedForm = step === 2 && ((draft.type === "caixa" && draft.boxMode !== "") || (draft.type === "placa" && draft.plateMode !== ""));
   const showingColorChoices = (draft.type === "caixa" && draft.boxMode === "detailed" && boxDetailStep === 4)
     || (draft.type === "placa" && draft.plateMode === "detailed" && plateDetailStep === 3)
-    || (draft.type !== "caixa" && draft.type !== "placa");
+    || draft.type === "outro" || (draft.type === "arquivo" && draft.modelItems.length > 1);
   const showingQuantity = draft.type !== "arquivo" && (showingColorChoices || (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick"));
-  const showingFilePolicy = draft.type === "caixa" ? Boolean(draft.boxMode) : draft.type === "placa" ? Boolean(draft.plateMode) : true;
+  const showingFilePolicy = draft.type === "caixa" ? Boolean(draft.boxMode) : draft.type === "placa" ? Boolean(draft.plateMode) : draft.type !== "arquivo";
   const currentQuantity = draft.type === "arquivo" ? modelUnits(draft.modelItems) : draft.quantity;
   const quantitySummary = `${currentQuantity} ${currentQuantity === 1 ? "unidade" : "unidades"}`;
   const colorsSummary = draft.colorMode === "indeciso" ? "Cores a decidir" : draft.colors.map(colorText).filter(Boolean).join(", ") || "Cores não informadas";
@@ -1480,7 +1480,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           {showingColorChoices ? (
             <div className={`${styles.field} ${draft.colorMode === "indeciso" ? styles.fieldSkipped : ""}`}>
               <div className={styles.fieldHeading}>
-                <span className={styles.fieldLabel}>Quais cores você prefere?</span>
+                <span className={styles.fieldLabel}>{draft.type === "arquivo" ? "Quais cores quer aplicar em todos os modelos?" : "Quais cores você prefere?"}</span>
                 <button className={styles.skipButton} type="button" aria-pressed={draft.colorMode === "indeciso"} onClick={() => { setOpenColorMenu(null); update("colorMode", draft.colorMode === "indeciso" ? (draft.colors.some(hasColor) ? "tenho" : "") : "indeciso"); }}>Ainda não decidi</button>
               </div>
               <p className={styles.fieldHint}>Escolha até 4 cores no menu ao lado de cada campo ou escreva o nome. A disponibilidade será confirmada no orçamento.</p>
@@ -1548,8 +1548,14 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
             </div>
           ) : null}
 
+          {draft.type === "arquivo" && draft.modelItems.length > 1 ? (
+            <div className={styles.modelDefaultsAction}>
+              <button className={styles.modelAddAction} type="button" onClick={applyModelDefaults}>Aplicar tamanho e cores a todos os modelos</button>
+              <p>Esta ação substitui as preferências individuais atuais. Você pode alterar cada modelo depois.</p>
+            </div>
+          ) : null}
           {showingQuantity ? <QuantityPicker value={draft.quantity} onChange={(value) => update("quantity", value)} /> : null}
-          {showingFilePolicy ? <p className={styles.filePolicy}>Arquivos selecionados ficam neste navegador. Limite: 5 arquivos, até 50 MB cada e 100 MB no total.</p> : null}
+          {showingFilePolicy ? <p className={styles.filePolicy}>Os arquivos permanecem privados e precisam ser reenviados se a página for atualizada. {quoteFilePolicyLabel()}.</p> : null}
           {reviewEdit === "details" ? (
             <div className={styles.actions}>
               <button type="button" className={styles.secondaryAction} onClick={cancelReviewEdit}>Cancelar alteração</button>
@@ -1621,9 +1627,21 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 <SummaryRow label="Medidas" value={dimensionsText(draft.plateDimensions, draft.plateUnknown)} onEdit={() => beginReviewEdit("details", 2)} />
               </> : null}
               {draft.type === "arquivo" ? <>
-                {draft.modelSource === "link" && validModelLink(draft.modelLink) ? <SummaryRow label="Link do modelo" value={draft.modelLink.trim()} url={draft.modelLink.trim()} onEdit={() => beginReviewEdit("details")} /> : <SummaryRow label="Arquivo 3D" value={files.model[0]?.name ?? pendingConfirmation?.attachments.find((file) => file.role === "model")?.name ?? "Pendente de anexo"} onEdit={() => beginReviewEdit("details")} />}
-                <SummaryRow label="Tamanho" value={draft.modelScaleUnknown ? "A definir" : draft.modelScale === "alterar" ? dimensionsText(draft.modelDimensions, false, true) : "Tamanho original"} onEdit={() => beginReviewEdit("details")} />
-                {draft.modelNotes.trim() ? <SummaryRow label="Observações" value={draft.modelNotes.trim()} onEdit={() => beginReviewEdit("details")} /> : null}
+                <SummaryRow label="Total" value={`${draft.modelItems.length} modelos · ${quantitySummary}`} onEdit={() => beginReviewEdit("details")} />
+                {draft.modelItems.map((item, index) => (
+                  <div className={styles.modelReviewEntry} key={item.id}>
+                    <SummaryRow label={`Modelo ${String(index + 1).padStart(2, "0")}`}
+                      value={item.source === "link" ? item.link :
+                        modelFiles[item.id]?.name ??
+                          pendingConfirmation?.attachments.find(file => file.modelItemId === item.id)?.name ??
+                          `${item.fileName} (reanexar arquivo)`}
+                      url={item.source === "link" && validModelLink(item.link) ? item.link : undefined}
+                      onEdit={() => beginReviewEdit("details")} />
+                    <SummaryRow label="Configuração"
+                      value={`${item.quantity} un. · ${item.colorMode === "indeciso" ? "cores a definir" : item.colors.map(colorText).join(", ")} · ${item.scale === "nao-sei" ? "tamanho a definir" : item.scale === "alterar" ? dimensionsText(item.dimensions, false, true) : "tamanho original"}${item.notes.trim() ? ` · ${item.notes.trim()}` : ""}`}
+                      onEdit={() => beginReviewEdit("details")} />
+                  </div>
+                ))}
               </> : null}
               {draft.type === "outro" ? <>
                 <SummaryRow label="Ideia" value={draft.otherDescription.trim() || "Descrita pela referência"} onEdit={() => beginReviewEdit("details")} />
@@ -1637,10 +1655,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           <section className={styles.reviewSection} aria-labelledby="review-preferences-title" inert={sending || submissionLocked}>
             <h3 id="review-preferences-title">{quickRequest ? (activeFiles.length ? "Quantidade e arquivos" : "Quantidade") : (activeFiles.length ? "Cores, quantidade e arquivos" : "Cores e quantidade")}</h3>
             <dl className={styles.summary}>
-              {!quickRequest ? <SummaryRow label="Cores" value={colorsSummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} /> : null}
+              {!quickRequest && draft.type !== "arquivo" ? <SummaryRow label="Cores" value={colorsSummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} /> : null}
               <SummaryRow label="Quantidade" value={quantitySummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} />
               {draft.type !== "placa" && draft.type !== "arquivo" && activeFiles.length ? <SummaryRow label="Arquivos" value={activeFiles.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 3 : 0)} /> : null}
-              {draft.type === "arquivo" && activeFiles.length ? <SummaryRow label="Arquivo 3D" value={activeFiles.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details")} /> : null}
+
               {draft.type === "placa" && draft.plateMode === "quick" && activeFiles.length ? <SummaryRow label="Referências" value={activeFiles.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details")} /> : null}
               {draft.type === "placa" && draft.plateMode === "detailed" && !draft.plateContentUnknown && draft.plateContents.includes("Logotipo") && files.logo.length ? <SummaryRow label="Logotipo anexado" value={files.logo.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details", 0)} /> : null}
               {draft.type === "placa" && draft.plateMode === "detailed" && !draft.plateContentUnknown && draft.plateContents.includes("QR Code") && draft.plateQrSource === "file" && files.qr.length ? <SummaryRow label="QR anexado" value={files.qr.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details", 0)} /> : null}

@@ -140,6 +140,10 @@ export async function handleQuoteAttachmentComplete(
     if (actualSize !== owned.reported_size_bytes) {
       throw new QuoteHttpError(409, 'quote_file_size_mismatch');
     }
+    // The signed upload URL must not turn an oversized object into a validated attachment.
+    if (!validateQuoteFiles([{ name: owned.original_name, size: actualSize }]).ok) {
+      throw new QuoteHttpError(409, 'quote_file_invalid');
+    }
     const detected = owned.extension === '.3mf'
       ? (await validate3mfArchive(
           actualSize,

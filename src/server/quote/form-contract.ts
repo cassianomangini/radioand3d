@@ -86,7 +86,8 @@ export function parseQuoteForm(value: unknown): Draft | null {
         typeof color.rgb === 'string' && (color.rgb === '' || /^#[0-9a-f]{6}$/i.test(color.rgb)))) return null;
   if ('modelItems' in value && (!Array.isArray(value.modelItems) ||
       (value.modelItems.length > 0 && !validModelItems(value.modelItems)))) return null;
-  if (value.type !== 'arquivo' && Array.isArray(value.modelItems) && value.modelItems.length > 0) return null;
+  // Hidden answers from another project type are not submitted or stored in project JSON.
+  // Keep them in the draft so switching project types does not erase the customer work.
   if (!oneOf(value.contactMethod, ['whatsapp', 'email']) ||
       !oneOf(value.delivery, ['retirada', 'envio']) ||
       !oneOf(value.boxMode, ['', 'quick', 'detailed']) ||

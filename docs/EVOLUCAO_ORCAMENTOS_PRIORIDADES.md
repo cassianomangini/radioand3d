@@ -33,7 +33,7 @@ Não reabrir nem duplicar como nova entrega:
 
 **Objetivo:** permitir que um cliente envie, por exemplo, 15 links do MakerWorld com quantidades e cores diferentes e conclua **um único orçamento**, sem repetir cadastro e entrega 15 vezes.
 
-**Escopo:** somente o tipo “Imprimir meu arquivo 3D”. Os outros três tipos permanecem com o comportamento atual, salvo compatibilidade de componentes compartilhados.
+**Escopo funcional:** múltiplos modelos somente no tipo “Imprimir meu arquivo 3D”. Os outros três tipos mantêm suas jornadas; **as proteções mais restritivas de armazenamento/upload de P0 se aplicam a todos os quatro tipos**, inclusive fotos e referências de caixas, placas e outros projetos.
 
 ### P0.1 — Lista de modelos: links e arquivos no mesmo orçamento
 
@@ -47,10 +47,16 @@ Não reabrir nem duplicar como nova entrega:
 - Mostrar contagem dos modelos e unidades no resumo. Não mostrar “20 arquivos disponíveis” quando o limite de upload for menor.
 - **Exigir entre 1 e 20 modelos por solicitação** (limite inicial comercial, revisável após dados de uso).
 
-**Limites de arquivo a preservar inicialmente**
-- Manter **até 5 arquivos por pedido, 50 MB por arquivo e 100 MB no total**, conforme política atual. Os demais itens, até completar 20 modelos, podem ser links.
-- Os limites valem para o pedido inteiro, não para cada item. A UI deve explicar separadamente “até 20 modelos” e “até 5 arquivos”.
-- Não elevar limites de upload sem revisar cotas, reservas, armazenamento, validação, limpeza, rate limit, retenção e custo; se for necessário receber 15 arquivos STL/3MF, isso constitui decisão e implementação separadas.
+**Política de uploads proposta para P0 (substitui os limites atuais; ainda precisa ser implementada):**
+- **Até 20 modelos no orçamento**, com links e arquivos combinados. Um **link** é apenas texto/URL validada, sem baixar, copiar, processar ou armazenar seu conteúdo no Supabase Storage.
+- **Máximo de 5 arquivos por orçamento inteiro**, **somando todas as funções** de upload: STL/3MF, fotos, imagens, PDFs, logotipos, QR Codes e referências. **Não são 20 fotos ou 20 arquivos**. A regra de 5 arquivos também se aplica aos demais tipos de orçamento.
+- **Até 5 MB por arquivo de referência**: fotos PNG/JPG/WebP, PDF, logotipos e imagens/QR. Não elevar o limite por envolver apenas uma imagem.
+- **Até 30 MB por STL ou 3MF**.
+- **Até 50 MB somados de todos os arquivos** do orçamento, independentemente da quantidade, função e combinação. Ex.: 2 modelos STL de 30 MB cada **não** são aceitos no mesmo pedido, pois ultrapassam 50 MB.
+- Os limites devem ser impostos **no cliente, no servidor antes de reservar/assinar upload e na verificação efetiva após upload**; alterar a política atual de 50 MB por arquivo / 100 MB totais somente quando backend, frontend, banco/armazenamento e testes estiverem compatíveis.
+- A UI deve explicar de forma honesta: “até 20 modelos por orçamento; até 5 arquivos enviados; imagens até 5 MB, STL/3MF até 30 MB e 50 MB no total”. Não anunciar 20 anexos.
+- Quando o cliente tiver mais arquivos ou arquivos maiores, orientar contato para análise manual, **sem criar rota pública de upload ilimitado**. Não ampliar tetos sem aprovação específica e análise de capacidade/custo.
+- **Gatilho de publicação:** não habilitar uploads múltiplos antes de verificar capacidade disponível real no Supabase, instalar cotas globais e rotina de limpeza/expiração descritas em P0.3a.
 
 **Links**
 - Partir dos domínios/caminhos já aceitos no código vigente (MakerWorld e compartilhamento Bambu Lab); não adicionar domínios ou encurtadores genéricos por suposição.
@@ -88,7 +94,24 @@ Cada modelo terá:
 - Evitar carregar arquivos em sessionStorage/localStorage. Não persistir tokens Turnstile.
 - Validar limites de payload, comprimento por campo, total de texto e número de entradas **antes** de gravar ou enviar e-mail; garantir que 20 itens válidos não sejam rejeitados por limite interno de tamanho da mensagem.
 - Tratar links/textos de clientes como dados não confiáveis: escapar HTML no e-mail e no resumo, não inserir conteúdo bruto como HTML, validar URL de destino antes de transformá-la em link clicável.
-- Preservar regras atuais de reserva, inspeção de arquivos, armazenamento privado, rate limiting e expiração; não criar atalho de upload para suportar múltiplos itens.
+- Preservar regras atuais de reserva, inspeção de arquivos, armazenamento privado, rate limiting e expiração; **endurecer os limites de tamanho e quantidades** conforme P0.1; não criar atalho de upload para suportar múltiplos itens.
+
+### P0.3a — Proteção de capacidade do Supabase Storage e limpeza (bloqueante para P0)
+
+**Objetivo:** impedir que muitos orçamentos, inclusive pedidos maliciosos ou abandonados, esgotem a cota de armazenamento ou gerem custo inesperado.
+
+**Antes de implementar/habilitar uploads múltiplos**
+1. Conferir **no projeto correto do Supabase CM 3D & Rádio**, com evidência do painel/métricas, a capacidade contratada, o uso real de Storage, eventual cobrança de tráfego/operações e os limites técnicos. **Não assumir que o plano é gratuito nem inventar espaço livre**. A conexão Supabase de outra organização/projeto não serve como medição.
+2. Definir e documentar **um teto global configurável de bytes armazenados/reservados pelo fluxo de orçamentos**, com margem de segurança em relação à capacidade efetivamente disponível, mais **um orçamento máximo diário de bytes aceitos para upload**. Escolher os valores concretos **somente após aferir uso/capacidade e obter aprovação do proprietário**; não fixar 1 GB ou outro número arbitrário.
+3. Antes de emitir autorização de upload, verificar limite por arquivo, total por pedido, teto global e orçamento diário. **Reservar os bytes atomicamente** incluindo uploads simultâneos/pendentes. O orçamento disponível deve descontar **reservas ativas**, não apenas objetos já persistidos. Se a reserva ou a verificação de cota falhar, **negar novo upload com mensagem recuperável**, preservando o formulário e permitindo concluir orçamentos somente com links, se aplicável.
+4. Reconciliar tamanho validado no Storage com tamanho reservado; impedir que substituições, reenvios, upload multipart/TUS, tentativas repetidas ou condições de corrida ultrapassem limites. Expirar/liberar reservas canceladas, rejeitadas, falhas ou abandonadas, com reconciliação periódica e sem liberar crédito enquanto o objeto ainda existir.
+5. Manter bucket **privado**, arquivos associados ao dono/sessão, inspeção de conteúdo, rate limiting por origem/sessão, validade curta de permissões e bloqueio de acesso a anexos de outros pedidos. A cota global **complementa**, não substitui, controles antiabuso.
+6. Implementar rotina automática idempotente para limpar arquivos de **rascunhos expirados/abandonados**, anexos rejeitados, uploads incompletos e arquivos de pedidos finalizados após o prazo de retenção aprovado. **Definir expressamente a retenção operacional antes de liberar P0**; não apagar solicitações ativas nem metadados comerciais do banco junto com os binários sem política própria. Registrar falhas de limpeza e permitir reprocessamento.
+7. Revisar o prazo informado nos e-mails e links de anexo: hoje existem mensagens/contratos históricos de acesso por até **90 dias**; o prazo comunicado ao estúdio deve corresponder à política de retenção **realmente implementada**, sem prometer acesso a arquivo já excluído.
+8. Gerar métricas agregadas e alertas para **bytes ocupados**, **bytes reservados**, **uploads aceitos/bloqueados**, **falhas de limpeza** e aproximação de teto, sem expor nomes, contato, conteúdo dos arquivos ou URLs privadas nos eventos.
+9. Reduzir risco de “ataque de armazenamento”: validar cotas antes de assinar upload, bloquear novas reservas quando não houver folga e manter a infraestrutura de orçamentos por **links (sem upload)** funcionando. Não usar apenas limite de 50 MB por pedido como proteção do projeto inteiro.
+
+**Política de falha:** na dúvida sobre cota, concorrência, reserva ou autorização, **não conceder novo upload**. Informar o problema sem apagar os links/descrições já preenchidos. Nunca desligar essa proteção automaticamente para “fazer funcionar”.
 
 ### P0.4 — Revisão, e-mail e confirmação
 
@@ -115,7 +138,13 @@ Cada modelo terá:
 - [ ] Uma linha inválida na colagem em massa mostra erro localizado e não elimina os links válidos.
 - [ ] É possível adicionar, editar, remover e manter conscientemente um link duplicado com configurações diferentes.
 - [ ] Quantidade, cor e tamanho por modelo não interferem nas configurações de outros itens.
-- [ ] Limites de 20 modelos e 5 arquivos, 50 MB por arquivo e 100 MB totais são aplicados no cliente e servidor.
+- [ ] Limites de **20 modelos**, **5 arquivos totais no pedido**, **5 MB por imagem/PDF/referência**, **30 MB por STL/3MF** e **50 MB de anexos somados** são aplicados no cliente, no backend, no sistema de reserva e na verificação pós-upload.
+- [ ] Um pedido com **20 links e nenhum upload** não consome Supabase Storage; um pedido de caixa com **6 fotos** é rejeitado sem liberar upload extra.
+- [ ] Arquivos excedendo o limite individual, total ou o teto global/diário não recebem autorização de upload; o estado do pedido é preservado.
+- [ ] A capacidade do Supabase correto foi medida; há teto global e diário aprovados, com contabilização atômica de reservas simultâneas e falha fechada quando o orçamento disponível é insuficiente.
+- [ ] Limpeza automática de rascunhos e anexos expirados é executada e verificada; não deixa arquivos órfãos ou reserva contabilizada incorretamente.
+- [ ] Alertas e métricas de ocupação/reservas/limpeza estão ativos, e os prazos comunicados por e-mail refletem a retenção real.
+- [ ] Testes adversariais cobrem 5 arquivos mistos, dois STL/3MF de 30 MB (excedem o total), múltiplas sessões em paralelo, cancelamentos, retries e orçamentos abandonados.
 - [ ] Não é possível referenciar anexo de outro pedido ou criar itens sem origem válida.
 - [ ] Rascunho recupera dados textuais de múltiplos itens após reload e avisa sobre necessidade de selecionar novamente arquivos locais.
 - [ ] Reenvio/retry de um pedido já finalizado não cria duplicidade.
@@ -123,7 +152,7 @@ Cada modelo terá:
 - [ ] Um pedido antigo com modelo único continua legível.
 - [ ] Caixa, placa e outro projeto não sofrem regressão; validar desktop e mobile (incluindo ~390 px), teclado, erros e estados vazios.
 
-**Entregas recomendadas em PRs pequenos:** P0-A (modelo/contrato/servidor/compatibilidade), P0-B (lista e UX de múltiplos itens), P0-C (resumo/e-mail/testes de ponta a ponta). Só concluir P0 com os três integrados, sem fragmentar funcionalidade visível pela metade.
+**Entregas recomendadas em PRs pequenos:** P0-A (modelo/contrato/servidor/compatibilidade **e política de cotas/reservas/limpeza**), P0-B (lista e UX de múltiplos itens), P0-C (resumo/e-mail/testes de ponta a ponta). **A capacidade real do Storage, os tetos globais aprovados, a proteção de concorrência e a limpeza automática são gates antes de ativar P0 em produção.** Só concluir P0 com os três integrados, sem fragmentar funcionalidade visível pela metade.
 
 ## P1 — Condições direcionadas, prazo, entrega e refinamento de UX
 
@@ -222,7 +251,7 @@ Cada modelo terá:
 | Marco | Resultado que precisa existir antes de avançar |
 | --- | --- |
 | Ticket anterior | Fluxo básico funcional; Turnstile recuperável, rascunho recuperável, um link ou arquivo aceito; evidência de testes |
-| P0 | Pedido de 15 links/itens mistos enviado como **um** orçamento com especificações e notificação completas; segurança e compatibilidade verificadas |
+| P0 | Pedido de 15 links/itens mistos enviado como **um** orçamento com especificações e notificação completas; **máximo 5 uploads por pedido / imagem 5 MB / modelo 30 MB / total 50 MB**, **cota global e diária + limpeza automática verificadas**, segurança e compatibilidade comprovadas |
 | P1 | Condições direcionadas, prazo opcional, entrega simples e quatro jornadas revisadas sem novos atritos |
 | P2 | Campanha reversível que usa o mesmo formulário |
 | Futuro | Somente após métricas, necessidade operacional e validação de integrações |

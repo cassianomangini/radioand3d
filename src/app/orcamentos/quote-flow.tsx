@@ -617,7 +617,6 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   function replaceModelFile(id: string, file: File) {
-    const old = modelFiles[id];
     const result = validateQuoteFiles([...Object.entries(modelFiles)
       .filter(([key]) => key !== id).map(([, existing]) => existing), file]);
     if (!result.ok) return setError({ field: "modelFiles", message: result.message });
@@ -737,19 +736,21 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   function validateDetails(): FieldError {
-    const activeFiles = visibleFiles(files, draft);
-    if (activeFiles.length > 5 || activeFiles.reduce((total, file) => total + file.size, 0) > 100_000_000) {
-      return { field: draft.type === "arquivo" ? "model" : "references", message: "Revise os arquivos: máximo de 5 e 100 MB no total." };
+    const activeFiles = visibleFiles(files, draft, modelFiles);
+    const fileCheck = validateQuoteFiles(activeFiles);
+    if (!fileCheck.ok) return { field: draft.type === "arquivo" ? "modelFiles" : "references", message: fileCheck.message };
+    if (draft.type === "arquivo") {
+      if (!validModelItems(draft.modelItems)) return { field: "modelItems", message: `Adicione de 1 a ${MODEL_ITEM_LIMIT} modelos válidos e confira suas preferências.` };
+      if (draft.modelItems.some(item => item.source === "file" && !modelFiles[item.id])) {
+        return { field: "modelFiles", message: "Anexe novamente os arquivos pendentes antes de continuar." };
+      }
+      return null;
     }
     if (draft.type === "caixa" && draft.boxMode === "quick" && !draft.boxQuickDescription.trim() && files.references.length === 0) return { field: "boxQuickDescription", message: "Descreva sua ideia ou envie uma foto de referência." };
     if (draft.type === "placa" && draft.plateMode === "quick" && !draft.plateQuickDescription.trim() && files.references.length === 0) return { field: "plateQuickDescription", message: "Descreva sua ideia ou envie uma foto de referência." };
-    if (draft.type === "arquivo" && draft.modelSource === "file" && files.model.length === 0) return { field: "model", message: "Selecione um arquivo STL ou 3MF para análise." };
-    if (draft.type === "arquivo" && draft.modelSource === "link" && !validModelLink(draft.modelLink)) return { field: "modelLink", message: "Informe um link HTTPS válido do modelo no MakerWorld ou compartilhado pelo Bambu Handy." };
-    if (draft.type === "arquivo" && !draft.modelScaleUnknown && !draft.modelScale) return { field: "modelScale", message: "Escolha como quer definir o tamanho." };
-    if (draft.type === "arquivo" && !draft.modelScaleUnknown && draft.modelScale === "alterar" && (!Object.values(draft.modelDimensions).some((value) => value.trim()) || Object.values(draft.modelDimensions).some((value) => value.trim() && !validDimension(value)))) return { field: "modelDimensions", message: "Informe pelo menos uma medida válida em cm para alterar o tamanho." };
     if (draft.type === "outro" && draft.studioPhotoId && !draft.otherDescription.trim()) return { field: "otherDescription", message: "Descreva o que você quer mudar na foto de referência." };
     if (draft.type === "outro" && !draft.otherDescription.trim() && files.references.length === 0) return { field: "otherDescription", message: "Descreva a ideia ou anexe uma referência." };
-    if (!(draft.type === "caixa" && draft.boxMode === "quick") && !(draft.type === "placa" && draft.plateMode === "quick") && draft.colorMode !== "indeciso" && (draft.colors.length === 0 || draft.colors.length > 4 || !draft.colors.every(hasColor))) return { field: "colors", message: "Preencha cada cor adicionada ou marque Ainda não decidi." };
+    if (!(draft.type === "caixa" && draft.boxMode === "quick") && !(draft.type === "placa" && draft.plateMode === "quick") && draft.type !== "arquivo" && draft.colorMode !== "indeciso" && (draft.colors.length === 0 || draft.colors.length > 4 || !draft.colors.every(hasColor))) return { field: "colors", message: "Preencha cada cor adicionada ou marque Ainda não decidi." };
     return null;
   }
 
@@ -870,8 +871,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         await confirmQuote(pendingConfirmation);
         return;
       }
-      const entries = visibleFileEntries(files, draft);
-      const signature = JSON.stringify(draft) + JSON.stringify(entries.map(({ role, file }) => [role, fileIdentity(file)]));
+      const entries = visibleFileEntries(files, draft, modelFiles);
+      const signature = JSON.stringify(draft) + JSON.stringify(entries.map(({ role, file, modelItemId }) => [role, modelItemId, fileIdentity(file)]));
       let pending = pendingSubmission.current;
       if (!pending || pending.signature !== signature) {
         pendingSubmission.current = null;
@@ -886,8 +887,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         pendingSubmission.current = pending;
       }
       for (let index = 0; index < entries.length; index += 1) {
-        const { role, file } = entries[index];
-        const key = `${role}:${fileIdentity(file)}`;
+        const { role, file, modelItemId } = entries[index];
+        const key = `${role}:${modelItemId ?? ""}:${fileIdentity(file)}`;
         const upload = pending.uploads.get(key) ?? { uploadKey: crypto.randomUUID() };
         pending.uploads.set(key, upload);
         if (!upload.complete && upload.attachmentId) {
@@ -915,10 +916,11 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         }
       }
       setSubmissionError("Registrando pedido e enviando e-mail...");
-      const attachments: UploadedFile[] = entries.map(({ role, file }) => {
-        const uploaded = pending!.uploads.get(`${role}:${fileIdentity(file)}`);
+      const attachments: UploadedFile[] = entries.map(({ role, file, modelItemId }) => {
+        const uploaded = pending!.uploads.get(`${role}:${modelItemId ?? ""}:${fileIdentity(file)}`);
         if (!uploaded?.attachmentId || !uploaded.complete) throw new Error("quote_upload_unavailable");
-        return { id: uploaded.attachmentId, role, name: file.name, size: file.size, type: file.type };
+        return { id: uploaded.attachmentId, role, name: file.name, size: file.size, type: file.type,
+          ...(modelItemId ? { modelItemId } : {}) };
       });
       await confirmQuote({ requestId: pending.requestId, submissionKey: pending.submissionKey, draft, attachments });
     } catch (cause) {
@@ -946,7 +948,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   function beginReviewEdit(area: ReviewEditArea, detailStage = 0) {
-    reviewSnapshot.current = { draft, files, savedContacts };
+    reviewSnapshot.current = { draft, files, modelFiles, savedContacts };
     setReviewEdit(area);
     setReviewing(false);
     setError(null);
@@ -961,6 +963,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (reviewSnapshot.current) {
       setDraft(reviewSnapshot.current.draft);
       setFiles(reviewSnapshot.current.files);
+      setModelFiles(reviewSnapshot.current.modelFiles);
       setSavedContacts(reviewSnapshot.current.savedContacts);
     }
     reviewSnapshot.current = null;
@@ -1015,11 +1018,12 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const showingColorChoices = (draft.type === "caixa" && draft.boxMode === "detailed" && boxDetailStep === 4)
     || (draft.type === "placa" && draft.plateMode === "detailed" && plateDetailStep === 3)
     || (draft.type !== "caixa" && draft.type !== "placa");
-  const showingQuantity = showingColorChoices || (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick");
+  const showingQuantity = draft.type !== "arquivo" && (showingColorChoices || (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick"));
   const showingFilePolicy = draft.type === "caixa" ? Boolean(draft.boxMode) : draft.type === "placa" ? Boolean(draft.plateMode) : true;
-  const quantitySummary = `${draft.quantity} ${draft.quantity === 1 ? "unidade" : "unidades"}`;
+  const currentQuantity = draft.type === "arquivo" ? modelUnits(draft.modelItems) : draft.quantity;
+  const quantitySummary = `${currentQuantity} ${currentQuantity === 1 ? "unidade" : "unidades"}`;
   const colorsSummary = draft.colorMode === "indeciso" ? "Cores a decidir" : draft.colors.map(colorText).filter(Boolean).join(", ") || "Cores não informadas";
-  const activeFiles = visibleFiles(files, draft);
+  const activeFiles = visibleFiles(files, draft, modelFiles);
   const quickRequest = (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick");
 
   if (receiptId) return (

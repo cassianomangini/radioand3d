@@ -188,3 +188,16 @@ test('storage quota failures return a fixed public code, not the database messag
     originalName: 'modelo.stl', extension: '.stl', reportedMime: null, sizeBytes: 100,
   }), err => err.code === 'quote_storage_budget_reached' && err.status === 409);
 });
+
+test('switching quote type preserves hidden draft data without storing model items in box quote', () => {
+  const selected = model('link', 12345);
+  const box = {
+    ...draft([selected]), type: 'caixa', boxMode: 'quick',
+    boxQuickDescription: 'Caixa pequena para presente',
+  };
+  assert.ok(parseQuoteForm(box));
+  assert.equal(validateQuoteForm(box, []), true);
+  const payload = prepareQuoteForStorage(box, []);
+  assert.equal(payload.project.kind, 'caixa');
+  assert.equal('items' in payload.project, false);
+});

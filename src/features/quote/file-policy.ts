@@ -1,7 +1,8 @@
 export const QUOTE_FILE_POLICY = {
   maxFiles: 5,
-  maxBytesPerFile: 50_000_000,
-  maxTotalBytes: 100_000_000,
+  maxBytesPerModel: 30_000_000,
+  maxBytesPerReference: 5_000_000,
+  maxTotalBytes: 50_000_000,
   allowedExtensions: [
     ".stl",
     ".3mf",
@@ -91,12 +92,14 @@ export function validateQuoteFiles(
       };
     }
 
-    if (file.size > QUOTE_FILE_POLICY.maxBytesPerFile) {
+    const maximum = extension === '.stl' || extension === '.3mf'
+      ? QUOTE_FILE_POLICY.maxBytesPerModel : QUOTE_FILE_POLICY.maxBytesPerReference;
+    if (file.size > maximum) {
       return {
         ok: false,
         code: "file-too-large",
         fileName: file.name,
-        message: `O arquivo “${file.name}” ultrapassa o limite de 50 MB.`
+        message: `O arquivo “${file.name}” ultrapassa o limite de ${maximum / 1_000_000} MB.`
       };
     }
 
@@ -107,7 +110,7 @@ export function validateQuoteFiles(
     return {
       ok: false,
       code: "total-too-large",
-      message: "O conjunto de arquivos ultrapassa o limite total de 100 MB."
+      message: "O conjunto de arquivos ultrapassa o limite total de 50 MB."
     };
   }
 
@@ -122,7 +125,7 @@ export function validateQuoteFiles(
  * browser-provided MIME types are never trusted as authorization or proof of format.
  */
 export function quoteFilePolicyLabel() {
-  return "STL, 3MF, PDF e imagens PNG/JPG/WebP · até 50 MB por arquivo · até 5 arquivos";
+  return "Até 5 arquivos no pedido · imagens e PDF até 5 MB · STL/3MF até 30 MB · total 50 MB";
 }
 
 /** Checks whether an upload belongs to the declared input field before signing. */

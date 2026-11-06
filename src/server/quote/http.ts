@@ -17,7 +17,9 @@ export class QuoteHttpError extends Error {
   }
 }
 
-const BODY_LIMIT = 16_384;
+// A full 20-model quote with descriptions and per-item colors can exceed 16 KB.
+// This is still a bounded JSON payload; uploads use the separate private TUS flow.
+const BODY_LIMIT = 48_000;
 const NO_CACHE = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
 
 export function responseJson(value: unknown, status = 200, extra?: HeadersInit): Response {

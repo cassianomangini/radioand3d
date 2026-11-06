@@ -1315,32 +1315,146 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
 
           {draft.type === "arquivo" ? (
             <>
-              <div className={styles.field}>
-                <span id="model-source-label" className={styles.fieldLabel}>Como quer enviar o modelo?</span>
-                <div className={styles.qrSourceChoices} role="radiogroup" aria-labelledby="model-source-label">
-                  <label><input type="radio" name="model-source" checked={draft.modelSource === "file"} onChange={() => { update("modelSource", "file"); update("modelLink", ""); }} /><span>Enviar arquivo 3D</span></label>
-                  <label><input type="radio" name="model-source" checked={draft.modelSource === "link"} onChange={() => { update("modelSource", "link"); setFiles((current) => ({ ...current, model: [] })); setFileReattach((current) => current.filter((role) => role !== "model")); }} /><span>Informar link do modelo</span></label>
+              <div className={styles.modelCollection}>
+                <div className={styles.modelCollectionHeading}>
+                  <div>
+                    <h3>Adicione seus modelos</h3>
+                    <p>Envie vários links do MakerWorld/Bambu Handy ou arquivos STL/3MF no mesmo pedido. Cada modelo pode ter uma cor, tamanho e quantidade diferente.</p>
+                  </div>
+                  <span className={styles.modelCounter}>{draft.modelItems.length} de {MODEL_ITEM_LIMIT} modelos</span>
                 </div>
-              </div>
-              {draft.modelSource === "file" ? <FilePicker id="model" label="Envie seu arquivo 3D" accept=".stl,.3mf" files={files.model} onAdd={addFiles} onRemove={removeFile} error={error} /> : (
                 <div className={styles.field}>
-                  <label htmlFor="model-link">Link do modelo no MakerWorld ou Bambu Handy</label>
-                  <input id="model-link" type="url" inputMode="url" value={draft.modelLink} onChange={(event) => update("modelLink", event.target.value)} placeholder="https://makerworld.com/en/models/..." aria-invalid={error?.field === "modelLink"} />
-                  <InlineError error={error} field="modelLink" />
+                  <label htmlFor="quote-model-links">Cole links dos modelos, um por linha</label>
+                  <textarea id="quote-model-links" className={styles.modelLinksInput} rows={3}
+                    value={modelLinksInput} onChange={event => setModelLinksInput(event.target.value)}
+                    placeholder={"https://makerworld.com/pt/models/12345\nhttps://makerworld.com/pt/models/67890"}
+                    aria-invalid={error?.field === "modelLinks"} />
+                  <button className={styles.modelAddAction} type="button" disabled={!modelLinksInput.trim() || draft.modelItems.length >= MODEL_ITEM_LIMIT}
+                    onClick={addModelLinks}>Adicionar links à lista</button>
+                  <InlineError error={error} field="modelLinks" />
                 </div>
-              )}
-              <div className={`${styles.field} ${draft.modelScaleUnknown ? styles.fieldSkipped : ""}`}>
-                <div className={styles.fieldHeading}>
-                  <span className={styles.fieldLabel}>Quer alterar o tamanho?</span>
-                  <button className={styles.skipButton} type="button" aria-pressed={draft.modelScaleUnknown} onClick={() => update("modelScaleUnknown", !draft.modelScaleUnknown)}>Não sei</button>
+                <div className={styles.field}>
+                  <label htmlFor="quote-model-files">Ou adicione arquivos STL/3MF</label>
+                  <input id="quote-model-files" className={styles.fileInput} type="file" accept=".stl,.3mf" multiple
+                    disabled={draft.modelItems.length >= MODEL_ITEM_LIMIT}
+                    onChange={event => { addModelFiles(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
+                  <p className={styles.fieldHint}>Até 5 arquivos no pedido inteiro. Arquivos 3D: 30 MB cada. Total de anexos: 50 MB. Os links não ocupam armazenamento.</p>
+                  <InlineError error={error} field="modelFiles" />
+                  <InlineError error={error} field="modelItems" />
                 </div>
-                <div className={styles.choiceButtons} role="group" aria-label="Tamanho da impressão">
-                  {[["original", "Manter original"], ["alterar", "Informar outro tamanho"]].map(([value, label]) => <button type="button" key={value} disabled={draft.modelScaleUnknown} aria-pressed={draft.modelScale === value} onClick={() => update("modelScale", value)}>{label}</button>)}
-                </div>
-                <InlineError error={error} field="modelScale" />
+                {draft.modelItems.length ? (
+                  <ol className={styles.modelList} aria-label="Modelos do orçamento">
+                    {draft.modelItems.map((item, index) => (
+                      <li className={styles.modelItem} key={item.id}>
+                        <div className={styles.modelItemHeader}>
+                          <div>
+                            <strong>Modelo {String(index + 1).padStart(2, "0")}</strong>
+                            <span>{item.source === "link" ? "Link do modelo" : item.fileName}</span>
+                          </div>
+                          <button type="button" className={styles.modelRemove} aria-label={`Remover modelo ${index + 1}`}
+                            onClick={() => removeModelItem(item.id)}>Remover</button>
+                        </div>
+                        {item.source === "link" ? (
+                          <div className={styles.field}>
+                            <label htmlFor={`model-url-${item.id}`}>Link</label>
+                            <input id={`model-url-${item.id}`} type="url" value={item.link} maxLength={MODEL_LINK_MAX_LENGTH}
+                              onChange={event => changeModelItem(item.id, { link: event.target.value })} />
+                            {validModelLink(item.link) ? <a href={item.link} target="_blank" rel="noopener noreferrer" className={styles.modelExternal}>Abrir modelo em outra aba</a> : <small>Confira o link HTTPS do MakerWorld/Bambu Handy.</small>}
+                            {draft.modelItems.filter(other => other.id !== item.id && other.source === "link" && other.link === item.link).length > 0 ? <small>Este link também aparece em outro item. Você pode manter configurações diferentes.</small> : null}
+                          </div>
+                        ) : !modelFiles[item.id] ? (
+                          <div className={styles.field}>
+                            <label htmlFor={`model-reupload-${item.id}`}>Anexe novamente {item.fileName}</label>
+                            <input id={`model-reupload-${item.id}`} type="file" className={styles.fileInput} accept=".stl,.3mf"
+                              onChange={event => { const file = event.target.files?.[0]; if (file) replaceModelFile(item.id, file); event.target.value = ""; }} />
+                            <small>O navegador não preserva arquivos após recarregar a página.</small>
+                          </div>
+                        ) : null}
+                        <div className={styles.modelItemGrid}>
+                          <div className={styles.field}>
+                            <label htmlFor={`model-quantity-${item.id}`}>Quantidade</label>
+                            <input id={`model-quantity-${item.id}`} type="number" min={1} max={10000} inputMode="numeric"
+                              value={item.quantity} onChange={event => changeModelItem(item.id,
+                                { quantity: Math.max(1, Math.min(10000, Math.floor(Number(event.target.value) || 1))) })} />
+                          </div>
+                          <div className={styles.field}>
+                            <label htmlFor={`model-scale-${item.id}`}>Tamanho</label>
+                            <select id={`model-scale-${item.id}`} value={item.scale}
+                              onChange={event => changeModelItem(item.id, { scale: event.target.value as ModelItem["scale"] })}>
+                              <option value="original">Tamanho original</option>
+                              <option value="alterar">Alterar medidas</option>
+                              <option value="nao-sei">Ainda não sei</option>
+                            </select>
+                          </div>
+                          <div className={styles.field}>
+                            <label htmlFor={`model-colors-${item.id}`}>Cores</label>
+                            <select id={`model-colors-${item.id}`} value={item.colorMode}
+                              onChange={event => changeModelItem(item.id, {
+                                colorMode: event.target.value as ModelItem["colorMode"],
+                                colors: event.target.value === "tenho" ? item.colors.length ? item.colors : [{ name: "", rgb: "" }] : [],
+                              })}>
+                              <option value="indeciso">Ainda não decidi</option>
+                              <option value="tenho">Escolher cores</option>
+                            </select>
+                          </div>
+                        </div>
+                        {item.scale === "alterar" ? (
+                          <div className={styles.modelItemGrid}>
+                            {(["width", "depth", "height"] as const).map((dimension) => (
+                              <div className={styles.field} key={dimension}>
+                                <label htmlFor={`model-${item.id}-${dimension}`}>{dimension === "width" ? "Largura" : dimension === "depth" ? "Profundidade" : "Altura"} (cm)</label>
+                                <input id={`model-${item.id}-${dimension}`} type="text" inputMode="decimal"
+                                  value={item.dimensions[dimension]} onChange={event => changeModelItem(item.id,
+                                    { dimensions: { ...item.dimensions, [dimension]: event.target.value } })} placeholder="Ex.: 12" />
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                        {item.colorMode === "tenho" ? (
+                          <div className={styles.modelColorList}>
+                            {item.colors.map((color, colorIndex) => (
+                              <div className={styles.modelColorEntry} key={colorIndex}>
+                                <input type="text" list="quote-model-color-suggestions" maxLength={48}
+                                  aria-label={`Modelo ${index + 1}, cor ${colorIndex + 1}`}
+                                  value={color.name} placeholder={`Cor ${colorIndex + 1}, ex.: branco`}
+                                  onChange={event => changeModelItem(item.id, { colors: item.colors.map((current, i) =>
+                                    i === colorIndex ? { name: event.target.value, rgb: "" } : current) })} />
+                                <button type="button" aria-label={`Remover cor ${colorIndex + 1} do modelo ${index + 1}`}
+                                  onClick={() => changeModelItem(item.id, { colors: item.colors.filter((_, i) => i !== colorIndex) })}>×</button>
+                              </div>
+                            ))}
+                            {item.colors.length < 4 ? <button type="button" className={styles.modelTextAction} onClick={() =>
+                              changeModelItem(item.id, { colors: [...item.colors, { name: "", rgb: "" }] })}>+ Outra cor</button> : null}
+                          </div>
+                        ) : null}
+                        <div className={styles.field}>
+                          <label htmlFor={`model-note-${item.id}`}>Observações deste modelo (opcional)</label>
+                          <input id={`model-note-${item.id}`} type="text" maxLength={MODEL_NOTES_MAX_LENGTH}
+                            value={item.notes} onChange={event => changeModelItem(item.id, { notes: event.target.value })}
+                            placeholder="Ex.: precisa encaixar em outra peça" />
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                ) : <p className={styles.modelEmpty}>Seus modelos aparecerão aqui. Pode colar 10 ou 15 links de uma vez.</p>}
+                <datalist id="quote-model-color-suggestions">{colorOptions.map(color => <option key={color.name} value={color.name} />)}</datalist>
               </div>
-              {!draft.modelScaleUnknown && draft.modelScale === "alterar" ? <DimensionFields id="model" value={draft.modelDimensions} onChange={(dimension, value) => updateDimension("modelDimensions", dimension, value)} unknown={false} onUnknown={() => undefined} allowUnknown={false} depth error={error} /> : null}
-              <div className={styles.field}><label htmlFor="model-notes">Alguma exigência importante? <small>Opcional</small></label><textarea id="model-notes" value={draft.modelNotes} onChange={(event) => update("modelNotes", event.target.value)} placeholder="Ex.: encaixe, resistência ou outra observação." /></div>
+              {draft.modelItems.length > 1 ? (
+                <div className={styles.modelDefaults}>
+                  <h3>Aplicar as mesmas preferências a todos</h3>
+                  <p>Use as escolhas de tamanho e cores abaixo como padrão. Cada modelo poderá ser editado individualmente depois.</p>
+                  <div className={styles.choiceButtons} role="group" aria-label="Tamanho padrão">
+                    {[["original", "Manter tamanho original"], ["alterar", "Informar medidas"]].map(([value, label]) =>
+                      <button type="button" key={value} aria-pressed={!draft.modelScaleUnknown && draft.modelScale === value}
+                        onClick={() => { update("modelScale", value); update("modelScaleUnknown", false); }}>{label}</button>)}
+                    <button type="button" aria-pressed={draft.modelScaleUnknown} onClick={() => update("modelScaleUnknown", !draft.modelScaleUnknown)}>Não sei</button>
+                  </div>
+                  {draft.modelScale === "alterar" && !draft.modelScaleUnknown ?
+                    <DimensionFields id="model" value={draft.modelDimensions} onChange={(dimension, value) =>
+                      updateDimension("modelDimensions", dimension, value)} unknown={false}
+                      onUnknown={() => undefined} allowUnknown={false} depth error={error} /> : null}
+                </div>
+              ) : null}
             </>
           ) : null}
 

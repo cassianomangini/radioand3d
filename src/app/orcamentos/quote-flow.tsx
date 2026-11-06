@@ -199,8 +199,9 @@ function restorableDraft(value: unknown): value is Draft {
   return Object.entries(initialDraft).every(([key, template]) => {
     const field = candidate[key];
     if (Array.isArray(template)) {
-      if (!Array.isArray(field) || field.length > 12) return false;
+      if (!Array.isArray(field)) return false;
       if (key === "modelItems") return field.length === 0 || validModelItems(field);
+      if (field.length > 12) return false;
       return key === "colors" ? field.every((color) => color && typeof color.name === "string" && typeof color.rgb === "string")
         : field.every((item) => typeof item === "string");
     }

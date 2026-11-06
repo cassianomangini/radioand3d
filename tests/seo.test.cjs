@@ -67,12 +67,12 @@ test("nenhum slug esta aprovado automaticamente para indexacao", () => {
 });
 
 test("previews bloqueiam todos os rastreadores e nao publicam sitemap", async () => {
-  assert.equal(loadRobots(false).rules.disallow, "/");
+  assert.equal(loadRobots(false)().rules.disallow, "/");
   assert.deepEqual(await loadSitemap(false, { state: "available", products: [] }, ["exemplo"])(), []);
 });
 
 test("producao nao bloqueia fotos publicas", () => {
-  const robots = loadRobots(true);
+  const robots = loadRobots(true)();
   assert.deepEqual(robots.rules.disallow, ["/api/", "/dev/"]);
   assert.ok(robots.rules.allow.includes("/api/studio/photos/"));
   assert.ok(robots.rules.allow.includes("/api/orcamentos/photos/"));

@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import { validModelLink } from "@/features/quote/model-link";
+import { validModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
+import { validateQuoteFiles, quoteFilePolicyLabel } from "@/features/quote/file-policy";
 import styles from "./page.module.css";
 
 const projectOptions = [
@@ -97,6 +99,7 @@ export type Draft = {
   modelDimensions: Dimensions;
   modelLink: string;
   modelNotes: string;
+  modelItems: ModelItem[];
   otherDescription: string;
   otherSize: string;
   colorMode: "" | "tenho" | "indeciso";
@@ -149,6 +152,7 @@ const initialDraft: Draft = {
   modelDimensions: emptyDimensions(),
   modelLink: "",
   modelNotes: "",
+  modelItems: [],
   otherDescription: "",
   otherSize: "",
   colorMode: "",
@@ -174,7 +178,7 @@ function fileIdentity(file: File) {
   return `${file.name}:${file.size}:${file.lastModified}`;
 }
 
-type UploadedFile = { id: string; role: FileField; name: string; size: number; type: string };
+type UploadedFile = { id: string; role: FileField; name: string; size: number; type: string; modelItemId?: string };
 type PendingUpload = { uploadKey: string; attachmentId?: string; complete?: boolean };
 type PendingSubmission = {
   signature: string;
@@ -195,6 +199,7 @@ function restorableDraft(value: unknown): value is Draft {
     const field = candidate[key];
     if (Array.isArray(template)) {
       if (!Array.isArray(field) || field.length > 12) return false;
+      if (key === "modelItems") return field.length === 0 || validModelItems(field);
       return key === "colors" ? field.every((color) => color && typeof color.name === "string" && typeof color.rgb === "string")
         : field.every((item) => typeof item === "string");
     }
@@ -214,7 +219,11 @@ function restorableConfirmation(value: unknown): value is PendingConfirmation {
       typeof file.name === "string" && typeof file.size === "number" && typeof file.type === "string");
 }
 
-function visibleFileEntries(files: SelectedFiles, draft: Draft): Array<{ role: FileField; file: File }> {
+function visibleFileEntries(files: SelectedFiles, draft: Draft, modelFiles: Record<string, File> = {}): Array<{ role: FileField; file: File; modelItemId?: string }> {
+  if (draft.type === "arquivo" && draft.modelItems?.length) {
+    return draft.modelItems.flatMap((item) => item.source === "file" && modelFiles[item.id]
+      ? [{ role: "model" as const, file: modelFiles[item.id], modelItemId: item.id }] : []);
+  }
   const activeRoles: FileField[] = draft.type === "arquivo" ? ["model"]
     : draft.type === "caixa" ? [
       ...(draft.boxMode === "detailed" && !draft.boxNoPersonalization && draft.boxPersonalization.includes("Logotipo") ? ["boxLogo" as const] : []),
@@ -228,8 +237,17 @@ function visibleFileEntries(files: SelectedFiles, draft: Draft): Array<{ role: F
   return activeRoles.flatMap((role) => files[role].map((file) => ({ role, file })));
 }
 
-function visibleFiles(files: SelectedFiles, draft: Draft): File[] {
-  return visibleFileEntries(files, draft).map(({ file }) => file);
+function visibleFiles(files: SelectedFiles, draft: Draft, modelFiles: Record<string, File> = {}): File[] {
+  return visibleFileEntries(files, draft, modelFiles).map(({ file }) => file);
+}
+
+function newModelItem(source: ModelItem["source"], value: string): ModelItem {
+  return {
+    id: crypto.randomUUID(), source,
+    link: source === "link" ? value : "", fileName: source === "file" ? value : "",
+    quantity: 1, colorMode: "indeciso", colors: [],
+    scale: "original", dimensions: emptyDimensions(), notes: "",
+  };
 }
 
 function dimensionsText(dimensions: Dimensions, unknown = false, depth = false) {
@@ -442,6 +460,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }));
   const [savedContacts, setSavedContacts] = useState({ whatsapp: "", email: "" });
   const [files, setFiles] = useState<SelectedFiles>({ model: [], logo: [], qr: [], boxLogo: [], boxQr: [], references: [] });
+  const [modelFiles, setModelFiles] = useState<Record<string, File>>({});
+  const [modelLinksInput, setModelLinksInput] = useState("");
   const [error, setError] = useState<FieldError>(null);
   const [openColorMenu, setOpenColorMenu] = useState<number | null>(null);
   const [reviewEdit, setReviewEdit] = useState<ReviewEditArea | null>(null);
@@ -458,7 +478,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const headingRef = useRef<HTMLHeadingElement>(null);
   const formStepRef = useRef<HTMLElement>(null);
   const colorPickerButtons = useRef<(HTMLButtonElement | null)[]>([]);
-  const reviewSnapshot = useRef<{ draft: Draft; files: SelectedFiles; savedContacts: Record<"whatsapp" | "email", string> } | null>(null);
+  const reviewSnapshot = useRef<{ draft: Draft; files: SelectedFiles; modelFiles: Record<string, File>; savedContacts: Record<"whatsapp" | "email", string> } | null>(null);
   const pendingSubmission = useRef<PendingSubmission | null>(null);
 
   useEffect(() => {
@@ -471,7 +491,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         const reference = studioPhotoId ?? productReference?.slug ?? null;
         if (stored && stored.reference === reference && typeof stored.savedAt === "number" &&
             Date.now() - stored.savedAt >= 0 && Date.now() - stored.savedAt < DRAFT_TTL_MS && restorableDraft(stored.draft)) {
-          const savedDraft = stored.draft;
+          const savedDraft = stored.draft as Draft;
+          if (!Array.isArray(savedDraft.modelItems)) savedDraft.modelItems = [];
           setDraft(savedDraft);
           setStep(typeof stored.step === "number" && [1, 2, 3].includes(stored.step) ? stored.step : 1);
           setBoxDetailStep(typeof stored.boxDetailStep === "number" ? Math.min(4, Math.max(0, stored.boxDetailStep)) : 0);
@@ -483,7 +504,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           }
           const missing = Array.isArray(stored.fileRoles) ? stored.fileRoles.filter((role): role is FileField =>
             typeof role === "string" && Object.hasOwn(allowedExtensions, role)) : [];
-          setFileReattach(missing);
+          setFileReattach(savedDraft.modelItems.some(item => item.source === "file") ?
+            [...new Set([...missing, "model" as FileField])] : missing);
           if (restorableConfirmation(stored.pendingConfirmation)) {
             setPendingConfirmation(stored.pendingConfirmation);
             setSubmissionLocked(true);
@@ -508,11 +530,12 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({
         savedAt: Date.now(), reference: studioPhotoId ?? productReference?.slug ?? null,
         step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts,
-        fileRoles: [...new Set([...fileReattach, ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
+        fileRoles: [...new Set([...fileReattach, ...(Object.keys(modelFiles).length ? ["model" as FileField] : []),
+          ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
         pendingConfirmation,
       }));
     } catch { /* Storage may be disabled or full. */ }
-  }, [hydrated, receiptId, studioPhotoId, productReference?.slug, step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts, files, fileReattach, pendingConfirmation]);
+  }, [hydrated, receiptId, studioPhotoId, productReference?.slug, step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts, files, modelFiles, fileReattach, pendingConfirmation]);
 
   useEffect(() => { headingRef.current?.focus(); }, [step, reviewing, reviewEdit, draft.boxMode, draft.plateMode]);
   useEffect(() => {
@@ -550,13 +573,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (!incoming.length) return;
     const unique = new Map([...files.references, ...incoming].map((file) => [fileIdentity(file), file]));
     const next = { ...files, [field]: field === "references" ? [...unique.values()] : incoming.slice(0, 1) };
-    const active = visibleFiles(next, draft);
+    const active = visibleFiles(next, draft, modelFiles);
     const invalid = incoming.find((file) => !allowedExtensions[field].includes(file.name.split(".").pop()?.toLowerCase() ?? ""));
     if (invalid) return setError({ field, message: `Formato não aceito: ${invalid.name}.` });
     if (active.some((file) => file.size <= 0)) return setError({ field, message: "O arquivo está vazio. Escolha outro arquivo." });
     if (active.length > 5) return setError({ field, message: "Selecione no máximo 5 arquivos por pedido." });
-    if (active.some((file) => file.size > 50_000_000)) return setError({ field, message: "Cada arquivo pode ter até 50 MB." });
-    if (active.reduce((total, file) => total + file.size, 0) > 100_000_000) return setError({ field, message: "O pedido pode ter até 100 MB de arquivos." });
+    const check = validateQuoteFiles(active);
+    if (!check.ok) return setError({ field, message: check.message });
     setFiles(next);
     setFileReattach((current) => current.filter((role) => role !== field));
     setError(null);
@@ -564,6 +587,77 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
 
   function removeFile(field: FileField, index: number) {
     setFiles((current) => ({ ...current, [field]: current[field].filter((_, fileIndex) => fileIndex !== index) }));
+    setError(null);
+  }
+
+  function addModelLinks() {
+    const lines = modelLinksInput.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    if (!lines.length) return setError({ field: "modelLinks", message: "Cole um ou mais links, um por linha." });
+    const invalid = lines.filter(link => link.length > MODEL_LINK_MAX_LENGTH || !validModelLink(link));
+    const valid = lines.filter(link => link.length <= MODEL_LINK_MAX_LENGTH && validModelLink(link));
+    const capacity = MODEL_ITEM_LIMIT - draft.modelItems.length;
+    const accepted = valid.slice(0, capacity);
+    if (accepted.length) update("modelItems", [...draft.modelItems, ...accepted.map(link => newModelItem("link", link))]);
+    setModelLinksInput(invalid.join("\n"));
+    if (invalid.length || valid.length > capacity) setError({ field: "modelLinks",
+      message: `${accepted.length} link(s) adicionado(s). ${invalid.length} inválido(s), ${Math.max(0, valid.length - capacity)} excederam o limite de ${MODEL_ITEM_LIMIT} modelos.` });
+  }
+
+  function addModelFiles(incoming: File[]) {
+    if (!incoming.length) return;
+    const capacity = MODEL_ITEM_LIMIT - draft.modelItems.length;
+    if (incoming.length > capacity) return setError({ field: "modelFiles", message: `Máximo de ${MODEL_ITEM_LIMIT} modelos no orçamento.` });
+    const currently = Object.values(modelFiles);
+    const result = validateQuoteFiles([...currently, ...incoming]);
+    if (!result.ok) return setError({ field: "modelFiles", message: result.message });
+    const additions = incoming.map(file => ({ item: newModelItem("file", file.name), file }));
+    setModelFiles(current => ({ ...current, ...Object.fromEntries(additions.map(({ item, file }) => [item.id, file])) }));
+    update("modelItems", [...draft.modelItems, ...additions.map(({ item }) => item)]);
+    setFileReattach(current => current.filter(role => role !== "model"));
+  }
+
+  function replaceModelFile(id: string, file: File) {
+    const old = modelFiles[id];
+    const result = validateQuoteFiles([...Object.entries(modelFiles)
+      .filter(([key]) => key !== id).map(([, existing]) => existing), file]);
+    if (!result.ok) return setError({ field: "modelFiles", message: result.message });
+    if (!/\.(stl|3mf)$/i.test(file.name)) return setError({ field: "modelFiles", message: "Escolha STL ou 3MF." });
+    setModelFiles(current => ({ ...current, [id]: file }));
+    setDraft(current => ({ ...current, modelItems: current.modelItems.map(item =>
+      item.id === id ? { ...item, fileName: file.name } : item) }));
+    setFileReattach(current => current.filter(role => role !== "model"));
+    setError(null);
+  }
+
+  function removeModelItem(id: string) {
+    setDraft(current => ({ ...current, modelItems: current.modelItems.filter(item => item.id !== id) }));
+    setModelFiles(current => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)));
+    setError(null);
+  }
+
+  function changeModelItem(id: string, patch: Partial<ModelItem>) {
+    setDraft(current => ({ ...current, modelItems: current.modelItems.map(item =>
+      item.id === id ? { ...item, ...patch } : item) }));
+    setError(null);
+  }
+
+  function applyModelDefaults() {
+    const colors = draft.colorMode === "tenho" ? draft.colors : [];
+    if (draft.colorMode === "tenho" && (!colors.length || !colors.every(hasColor))) {
+      return setError({ field: "colors", message: "Preencha as cores padrão antes de aplicá-las." });
+    }
+    if (!draft.modelScaleUnknown && draft.modelScale === "alterar" &&
+      (!Object.values(draft.modelDimensions).some(value => value.trim()) ||
+       Object.values(draft.modelDimensions).some(value => value.trim() && !validDimension(value)))) {
+      return setError({ field: "modelDimensions", message: "Informe ao menos uma medida válida para aplicar." });
+    }
+    setDraft(current => ({ ...current, modelItems: current.modelItems.map(item => ({
+      ...item, colorMode: current.colorMode === "tenho" ? "tenho" as const : "indeciso" as const,
+      colors: current.colorMode === "tenho" ? current.colors.map(color => ({ ...color })) : [],
+      scale: current.modelScaleUnknown ? "nao-sei" as const :
+        current.modelScale === "alterar" ? "alterar" as const : "original" as const,
+      dimensions: { ...current.modelDimensions },
+    })) }));
     setError(null);
   }
 
@@ -739,7 +833,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({
         savedAt: Date.now(), reference: studioPhotoId ?? productReference?.slug ?? null,
         step: 3, reviewing: true, boxDetailStep, plateDetailStep, draft: confirmation.draft,
-        savedContacts, fileRoles: [...new Set([...fileReattach, ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
+        savedContacts, fileRoles: [...new Set([...fileReattach, ...(Object.keys(modelFiles).length ? ["model" as FileField] : []),
+          ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
         pendingConfirmation: confirmation,
       }));
     } catch { /* The in-memory idempotency key still protects this page. */ }

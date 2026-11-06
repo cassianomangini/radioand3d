@@ -22,6 +22,8 @@ const { validModelItems, restorableModelItems, modelUnits } = require('../src/fe
 const { parseQuoteForm, parseQuoteAttachments, validateQuoteForm, prepareQuoteForStorage } = require('../src/server/quote/form-contract.ts');
 const { validateQuoteFiles } = require('../src/features/quote/file-policy.ts');
 const { quoteEmailMessage } = require('../src/server/quote/email.ts');
+const { readQuoteJson, requireSameOriginJson } = require('../src/server/quote/http.ts');
+const { createQuoteGateway } = require('../src/server/quote/supabase-gateway.ts');
 
 function model(source, identifier) {
   return {
@@ -151,4 +153,38 @@ test('incomplete model changes are restorable but not submittable', () => {
   assert.equal(validModelItems([item]), false);
   assert.equal(restorableModelItems(Array.from({ length: 21 }, () => item)), false);
   assert.equal(restorableModelItems([{ ...item, id: 'bad-id' }]), false);
+});
+
+test('twenty near-limit model entries fit the bounded JSON request body', async () => {
+  const items = Array.from({ length: 20 }, (_, i) => model('link', i + 10000));
+  items.forEach(item => {
+    const prefix = item.link + '?ref=';
+    item.link = prefix + 'x'.repeat(350 - prefix.length);
+    item.notes = 'x'.repeat(140);
+    item.colorMode = 'tenho';
+    item.colors = Array.from({ length: 4 }, () => ({ name: 'V'.repeat(48), rgb: '' }));
+  });
+  assert.equal(validModelItems(items), true);
+  const payload = JSON.stringify({ draft: draft(items), attachments: [] });
+  assert.ok(Buffer.byteLength(payload, 'utf8') > 16384);
+  assert.ok(Buffer.byteLength(payload, 'utf8') < 48000);
+  const req = new Request('https://example.com/api/quote/submit', {
+    method: 'POST', headers: { origin: 'https://example.com', 'content-type': 'application/json' },
+    body: payload,
+  });
+  requireSameOriginJson(req);
+  const parsed = await readQuoteJson(req);
+  assert.equal(parsed.draft.modelItems.length, 20);
+});
+
+test('storage quota failures return a fixed public code, not the database message', async () => {
+  process.env.CM_SUPABASE_URL = 'https://synthetic.supabase.co';
+  process.env.CM_SUPABASE_SECRET_KEY = 'sb_secret_synthetic_quote_reference_123456789';
+  const gateway = createQuoteGateway(async () => Response.json({
+    code: '23514', message: 'quote_storage_capacity_exceeded',
+  }, { status: 409 }));
+  await assert.rejects(() => gateway.reserveAttachment({
+    requestId: crypto.randomUUID(), ownerHash: 'a'.repeat(64), uploadKey: crypto.randomUUID(),
+    originalName: 'modelo.stl', extension: '.stl', reportedMime: null, sizeBytes: 100,
+  }), err => err.code === 'quote_storage_budget_reached' && err.status === 409);
 });

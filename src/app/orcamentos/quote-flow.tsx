@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import { validModelLink } from "@/features/quote/model-link";
-import { validModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
+import { validModelItems, restorableModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
 import { validateQuoteFiles, quoteFilePolicyLabel } from "@/features/quote/file-policy";
 import styles from "./page.module.css";
 
@@ -200,7 +200,7 @@ function restorableDraft(value: unknown): value is Draft {
     const field = candidate[key];
     if (Array.isArray(template)) {
       if (!Array.isArray(field)) return false;
-      if (key === "modelItems") return field.length === 0 || validModelItems(field);
+      if (key === "modelItems") return restorableModelItems(field);
       if (field.length > 12) return false;
       return key === "colors" ? field.every((color) => color && typeof color.name === "string" && typeof color.rgb === "string")
         : field.every((item) => typeof item === "string");

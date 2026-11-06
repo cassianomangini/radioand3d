@@ -227,6 +227,7 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
     modelLink: files.length === 0 ? draft.modelItems.find(item => item.source === 'link')?.link ?? null : null,
     items: draft.modelItems.map(item => ({
       id: item.id, source: item.source, link: item.source === 'link' ? item.link.trim() : null,
+      title: item.title?.trim() || null,
       attachmentId: item.source === 'file' ? files.find(file => file.modelItemId === item.id)?.id ?? null : null,
       fileName: item.source === 'file' ? item.fileName : null,
       quantity: item.quantity, colorMode: item.colorMode,

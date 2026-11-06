@@ -44,6 +44,7 @@ function quoteEmailLines(requestId: string, quote: QuoteNotificationData, siteOr
     for (const [index, item] of items.entries()) {
       const quantity = Number(item.quantity);
       modelLines.push('', `Modelo ${String(index + 1).padStart(2, '0')} · ${quantity} unidade(s)`);
+      if (typeof item.title === 'string' && item.title.trim()) modelLines.push(`Nome: ${item.title.trim()}`);
       if (item.source === 'link' && typeof item.link === 'string' && validModelLink(item.link)) {
         modelLines.push({ name: 'Abrir modelo no MakerWorld/Bambu', url: item.link });
       } else if (item.source === 'file') {

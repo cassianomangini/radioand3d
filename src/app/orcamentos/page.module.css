@@ -1285,6 +1285,8 @@
 .modelAddAction:disabled { opacity: 0.5; cursor: not-allowed; }
 .modelAddAction:focus-visible,
 .modelTextAction:focus-visible,
+.modelMove:focus-visible,
+.modelEdit:focus-visible,
 .modelRemove:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
 
 .modelList {
@@ -1306,6 +1308,9 @@
 .modelItemHeader > div { display: grid; min-width: 0; gap: 3px; }
 .modelItemHeader strong { color: var(--text-primary); font-size: 1rem; }
 .modelItemHeader span { overflow-wrap: anywhere; color: var(--text-muted); font-size: 0.8rem; }
+.modelItemHeader > .modelItemActions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.modelMove,
+.modelEdit,
 .modelRemove {
   flex: none;
   min-height: 40px;
@@ -1317,6 +1322,9 @@
   font-weight: 700;
   cursor: pointer;
 }
+.modelMove:disabled { opacity: 0.4; cursor: not-allowed; }
+.modelMove:hover:not(:disabled) { color: var(--accent-cyan); }
+.modelEdit:hover { color: var(--accent-cyan); }
 .modelRemove:hover { color: var(--error); }
 .modelExternal { overflow-wrap: anywhere; color: var(--accent-cyan); font-size: 0.8rem; font-weight: 700; }
 .modelItemGrid {

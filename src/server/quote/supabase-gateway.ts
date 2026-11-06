@@ -352,7 +352,7 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
         project_type: QuoteProjectType; production: Record<string, unknown>;
         project: Record<string, unknown>; contact_method: 'whatsapp' | 'email';
         contact_name: string; contact_value: string; source_reference: string | null; no_file: boolean;
-      }>>(`/rest/v1/quote_requests?id=eq.${requestId}&owner_session_hash=eq.${ownerHash}&lifecycle_status=eq.submitted&select=project_type,production,project,contact_method,contact_name,contact_value,source_reference,no_file&limit=1`);
+      }>>(`/rest/v1/quote_requests?id=eq.${requestId}&owner_session_hash=eq.${ownerHash}&lifecycle_status=in.(submitted,reviewing,closed)&select=project_type,production,project,contact_method,contact_name,contact_value,source_reference,no_file&limit=1`);
       if (!Array.isArray(rows) || rows.length !== 1 || !rows[0].contact_name || !rows[0].contact_value ||
           !rows[0].production || !rows[0].project || typeof rows[0].no_file !== 'boolean') {
         throw new QuoteHttpError(503, 'quote_upstream_unavailable');

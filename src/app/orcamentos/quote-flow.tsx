@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import { validModelLink } from "@/features/quote/model-link";
-import { validModelItems, restorableModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
+import { validModelItems, restorableModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, MODEL_TITLE_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
 import { validateQuoteFiles, quoteFilePolicyLabel, quoteFileRoleAllows } from "@/features/quote/file-policy";
 import styles from "./page.module.css";
 
@@ -246,7 +246,7 @@ function visibleFiles(files: SelectedFiles, draft: Draft, modelFiles: Record<str
 function newModelItem(source: ModelItem["source"], value: string): ModelItem {
   return {
     id: crypto.randomUUID(), source,
-    link: source === "link" ? value : "", fileName: source === "file" ? value : "",
+    link: source === "link" ? value : "", fileName: source === "file" ? value : "", title: "",
     quantity: 1, colorMode: "indeciso", colors: [],
     scale: "original", dimensions: emptyDimensions(), notes: "",
   };
@@ -496,6 +496,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const formStepRef = useRef<HTMLElement>(null);
   const colorPickerButtons = useRef<(HTMLButtonElement | null)[]>([]);
   const reviewSnapshot = useRef<{ draft: Draft; files: SelectedFiles; modelFiles: Record<string, File>; savedContacts: Record<"whatsapp" | "email", string> } | null>(null);
+  const reviewModelFocus = useRef<string | null>(null);
   const pendingSubmission = useRef<PendingSubmission | null>(null);
 
   useEffect(() => {
@@ -555,6 +556,11 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }, [hydrated, receiptId, studioPhotoId, productReference?.slug, step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts, files, modelFiles, fileReattach, pendingConfirmation]);
 
   useEffect(() => { headingRef.current?.focus(); }, [step, reviewing, reviewEdit, draft.boxMode, draft.plateMode]);
+  useEffect(() => {
+    if (step !== 2 || reviewEdit !== "details" || !reviewModelFocus.current) return;
+    document.getElementById(reviewModelFocus.current)?.focus();
+    reviewModelFocus.current = null;
+  }, [step, reviewEdit]);
   useEffect(() => {
     if (step === 2 && ((draft.type === "caixa" && draft.boxMode === "detailed") || (draft.type === "placa" && draft.plateMode === "detailed"))) formStepRef.current?.scrollIntoView({ block: "start" });
   }, [boxDetailStep, plateDetailStep, draft.boxMode, draft.plateMode, draft.type, step]);
@@ -663,6 +669,18 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   function removeModelItem(id: string) {
     setDraft(current => ({ ...current, modelItems: current.modelItems.filter(item => item.id !== id) }));
     setModelFiles(current => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)));
+    setError(null);
+  }
+
+  function moveModelItem(id: string, direction: -1 | 1) {
+    setDraft(current => {
+      const index = current.modelItems.findIndex(item => item.id === id);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= current.modelItems.length) return current;
+      const modelItems = [...current.modelItems];
+      [modelItems[index], modelItems[target]] = [modelItems[target], modelItems[index]];
+      return { ...current, modelItems };
+    });
     setError(null);
   }
 
@@ -898,7 +916,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   async function submitQuote() {
-    if (!intakeEnabled || sending || !draft.type) return;
+    if ((!intakeEnabled && !pendingConfirmation) || sending || !draft.type) return;
     if (!pendingConfirmation) {
       if (!validateProject()) return;
       const contactError = validateContact();
@@ -979,6 +997,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         : code === "human_verification_expired" ? "A verificação expirou. Tente novamente no quadro de segurança."
         : code === "quote_verification_unavailable" ? "A verificação está temporariamente indisponível. Tente novamente sem refazer o pedido."
         : code === "quote_rate_limited" ? "Muitas tentativas em pouco tempo. Aguarde e tente novamente."
+        : code === "quote_multimodel_unavailable" ? "O envio de múltiplos modelos está pausado. Seu pedido permanece salvo nesta página para tentar novamente quando o serviço voltar."
+        : code === "quote_not_available" ? "O recebimento de novos pedidos está pausado. Se este pedido já foi registrado, tente confirmar novamente mais tarde."
         : code === "quote_upload_unavailable" ? "Não foi possível enviar um arquivo. Confira sua conexão e tente novamente."
         : code === "quote_storage_budget_reached" ? "O envio de arquivos está temporariamente indisponível por limite de armazenamento. Você pode remover os arquivos e enviar links dos modelos ou solicitar ajuda pelo contato do Estúdio."
         : code === "quote_file_limit_reached" ? "Os anexos ultrapassam os limites permitidos. Remova ou substitua alguns arquivos."
@@ -989,8 +1009,9 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     }
   }
 
-  function beginReviewEdit(area: ReviewEditArea, detailStage = 0) {
+  function beginReviewEdit(area: ReviewEditArea, detailStage = 0, modelFieldId?: string) {
     reviewSnapshot.current = { draft, files, modelFiles, savedContacts };
+    reviewModelFocus.current = modelFieldId ?? null;
     setReviewEdit(area);
     setReviewing(false);
     setError(null);
@@ -1062,7 +1083,9 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     || draft.type === "outro" || (draft.type === "arquivo" && (!multiModelEnabled || draft.modelItems.length > 1));
   const showingQuantity = (draft.type !== "arquivo" || !multiModelEnabled) && (showingColorChoices || (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick"));
   const showingFilePolicy = draft.type === "caixa" ? Boolean(draft.boxMode) : draft.type === "placa" ? Boolean(draft.plateMode) : !multiModelEnabled;
-  const currentQuantity = draft.type === "arquivo" && multiModelEnabled ? modelUnits(draft.modelItems) : draft.quantity;
+  const reviewingMultiModel = draft.type === "arquivo" &&
+    (multiModelEnabled || (submissionLocked && Boolean(pendingConfirmation?.draft.modelItems?.length)));
+  const currentQuantity = reviewingMultiModel ? modelUnits(draft.modelItems) : draft.quantity;
   const quantitySummary = `${currentQuantity} ${currentQuantity === 1 ? "unidade" : "unidades"}`;
   const colorsSummary = draft.colorMode === "indeciso" ? "Cores a decidir" : draft.colors.map(colorText).filter(Boolean).join(", ") || "Cores não informadas";
   const activeFiles = visibleFiles(files, draft, modelFiles);
@@ -1380,7 +1403,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                   <input id="quote-model-files" className={styles.fileInput} type="file" accept=".stl,.3mf" multiple
                     disabled={draft.modelItems.length >= MODEL_ITEM_LIMIT}
                     onChange={event => { addModelFiles(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
-                  <p className={styles.fieldHint}>Até 5 arquivos no pedido inteiro. Arquivos 3D: 30 MB cada. Total de anexos: 50 MB. Os links não ocupam armazenamento.</p>
+                  <p className={styles.fieldHint}>Até 5 arquivos no pedido inteiro. Arquivos 3D: 30 MB cada. Total de anexos: 50 MB. Os links não ocupam armazenamento. Se precisar enviar mais arquivos ou maiores, fale com o Estúdio para uma análise manual.</p>
                   <InlineError error={error} field="modelFiles" />
                   <InlineError error={error} field="modelItems" />
                 </div>
@@ -1391,10 +1414,19 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                         <div className={styles.modelItemHeader}>
                           <div>
                             <strong>Modelo {String(index + 1).padStart(2, "0")}</strong>
+                            {item.title?.trim() ? <span>{item.title.trim()}</span> : null}
                             <span>{item.source === "link" ? "Link do modelo" : item.fileName}</span>
                           </div>
-                          <button type="button" className={styles.modelRemove} aria-label={`Remover modelo ${index + 1}`}
-                            onClick={() => removeModelItem(item.id)}>Remover</button>
+                          <div className={styles.modelItemActions}>
+                            <button type="button" className={styles.modelMove} aria-label={`Mover modelo ${index + 1} para cima`}
+                              disabled={index === 0} onClick={() => moveModelItem(item.id, -1)}>↑</button>
+                            <button type="button" className={styles.modelMove} aria-label={`Mover modelo ${index + 1} para baixo`}
+                              disabled={index === draft.modelItems.length - 1} onClick={() => moveModelItem(item.id, 1)}>↓</button>
+                            <button type="button" className={styles.modelEdit} aria-label={`Editar modelo ${index + 1}`}
+                              onClick={() => document.getElementById(item.source === "link" ? `model-url-${item.id}` : `model-quantity-${item.id}`)?.focus()}>Editar</button>
+                            <button type="button" className={styles.modelRemove} aria-label={`Remover modelo ${index + 1}`}
+                              onClick={() => removeModelItem(item.id)}>Remover</button>
+                          </div>
                         </div>
                         {item.source === "link" ? (
                           <div className={styles.field}>
@@ -1404,14 +1436,22 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                             {validModelLink(item.link) ? <a href={item.link} target="_blank" rel="noopener noreferrer" className={styles.modelExternal}>Abrir modelo em outra aba</a> : <small>Confira o link HTTPS do MakerWorld/Bambu Handy.</small>}
                             {draft.modelItems.filter(other => other.id !== item.id && other.source === "link" && other.link === item.link).length > 0 ? <small>Este link também aparece em outro item. Você pode manter configurações diferentes.</small> : null}
                           </div>
-                        ) : !modelFiles[item.id] ? (
+                        ) : (
                           <div className={styles.field}>
-                            <label htmlFor={`model-reupload-${item.id}`}>Anexe novamente {item.fileName}</label>
+                            <label htmlFor={`model-reupload-${item.id}`}>
+                              {modelFiles[item.id] ? `Substituir arquivo ${item.fileName}` : `Anexe novamente ${item.fileName}`}
+                            </label>
                             <input id={`model-reupload-${item.id}`} type="file" className={styles.fileInput} accept=".stl,.3mf"
                               onChange={event => { const file = event.target.files?.[0]; if (file) replaceModelFile(item.id, file); event.target.value = ""; }} />
-                            <small>O navegador não preserva arquivos após recarregar a página.</small>
+                            {!modelFiles[item.id] ? <small>O navegador não preserva arquivos após recarregar a página.</small> : null}
                           </div>
-                        ) : null}
+                        )}
+                        <div className={styles.field}>
+                          <label htmlFor={`model-title-${item.id}`}>Nome do modelo (opcional)</label>
+                          <input id={`model-title-${item.id}`} type="text" maxLength={MODEL_TITLE_MAX_LENGTH}
+                            value={item.title ?? ""} onChange={event => changeModelItem(item.id, { title: event.target.value })}
+                            placeholder="Ex.: suporte da luminária" />
+                        </div>
                         <div className={styles.modelItemGrid}>
                           <div className={styles.field}>
                             <label htmlFor={`model-quantity-${item.id}`}>Quantidade</label>
@@ -1699,24 +1739,26 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 <SummaryRow label="Colocação" value={draft.plateFixationUnknown ? "A definir" : draft.plateFixation.trim()} onEdit={() => beginReviewEdit("details", 1)} />
                 <SummaryRow label="Medidas" value={dimensionsText(draft.plateDimensions, draft.plateUnknown)} onEdit={() => beginReviewEdit("details", 2)} />
               </> : null}
-              {draft.type === "arquivo" && multiModelEnabled ? <>
+              {reviewingMultiModel ? <>
                 <SummaryRow label="Total" value={`${draft.modelItems.length} modelos · ${quantitySummary}`} onEdit={() => beginReviewEdit("details")} />
                 {draft.modelItems.map((item, index) => (
                   <div className={styles.modelReviewEntry} key={item.id}>
+                    {item.title?.trim() ? <SummaryRow label="Nome" value={item.title.trim()}
+                      onEdit={() => beginReviewEdit("details", 0, `model-title-${item.id}`)} /> : null}
                     <SummaryRow label={`Modelo ${String(index + 1).padStart(2, "0")}`}
                       value={item.source === "link" ? item.link :
                         modelFiles[item.id]?.name ??
                           pendingConfirmation?.attachments.find(file => file.modelItemId === item.id)?.name ??
                           `${item.fileName} (reanexar arquivo)`}
                       url={item.source === "link" && validModelLink(item.link) ? item.link : undefined}
-                      onEdit={() => beginReviewEdit("details")} />
+                      onEdit={() => beginReviewEdit("details", 0, item.source === "link" ? `model-url-${item.id}` : `model-reupload-${item.id}`)} />
                     <SummaryRow label="Configuração"
                       value={`${item.quantity} un. · ${item.colorMode === "indeciso" ? "cores a definir" : item.colors.map(colorText).join(", ")} · ${item.scale === "nao-sei" ? "tamanho a definir" : item.scale === "alterar" ? dimensionsText(item.dimensions, false, true) : "tamanho original"}${item.notes.trim() ? ` · ${item.notes.trim()}` : ""}`}
-                      onEdit={() => beginReviewEdit("details")} />
+                      onEdit={() => beginReviewEdit("details", 0, `model-quantity-${item.id}`)} />
                   </div>
                 ))}
               </> : null}
-              {draft.type === "arquivo" && !multiModelEnabled ? <>
+              {draft.type === "arquivo" && !reviewingMultiModel ? <>
                 {draft.modelSource === "link" && validModelLink(draft.modelLink) ? <SummaryRow label="Link do modelo" value={draft.modelLink.trim()} url={draft.modelLink.trim()} onEdit={() => beginReviewEdit("details")} /> :
                   <SummaryRow label="Arquivo 3D" value={files.model[0]?.name ?? pendingConfirmation?.attachments.find(file => file.role === "model")?.name ?? "Pendente de anexo"} onEdit={() => beginReviewEdit("details")} />}
                 <SummaryRow label="Tamanho" value={draft.modelScaleUnknown ? "A definir" : draft.modelScale === "alterar" ? dimensionsText(draft.modelDimensions, false, true) : "Tamanho original"} onEdit={() => beginReviewEdit("details")} />
@@ -1734,7 +1776,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           <section className={styles.reviewSection} aria-labelledby="review-preferences-title" inert={sending || submissionLocked}>
             <h3 id="review-preferences-title">{quickRequest ? (activeFiles.length ? "Quantidade e arquivos" : "Quantidade") : (activeFiles.length ? "Cores, quantidade e arquivos" : "Cores e quantidade")}</h3>
             <dl className={styles.summary}>
-              {!quickRequest && !(draft.type === "arquivo" && multiModelEnabled) ? <SummaryRow label="Cores" value={colorsSummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} /> : null}
+              {!quickRequest && !reviewingMultiModel ? <SummaryRow label="Cores" value={colorsSummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} /> : null}
               <SummaryRow label="Quantidade" value={quantitySummary} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 4 : draft.type === "placa" ? 3 : 0)} />
               {draft.type !== "placa" && draft.type !== "arquivo" && activeFiles.length ? <SummaryRow label="Arquivos" value={activeFiles.map((file) => file.name).join(", ")} onEdit={() => beginReviewEdit("details", draft.type === "caixa" ? 3 : 0)} /> : null}
 
@@ -1757,9 +1799,9 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
             <QuoteTurnstile key={turnstileResetKey} siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
           ) : null}
           <p className={styles.privacyNote}>Seus dados serão usados para analisar esta solicitação e retornar pelo contato escolhido. A verificação de segurança utiliza Cloudflare Turnstile.</p>
-          {!intakeEnabled ? <p className={styles.pendingNotice} role="status">O envio está em configuração. Nenhuma informação ou arquivo foi transmitido.</p> : null}
+          {!intakeEnabled && !pendingConfirmation ? <p className={styles.pendingNotice} role="status">O envio está em configuração. Nenhuma informação ou arquivo foi transmitido.</p> : null}
           {submissionError ? <p className={emailPending || !sending ? styles.pendingNotice : styles.submissionStatus} role={sending ? "status" : "alert"}>{submissionError}</p> : null}
-          <div className={styles.actions}><button type="button" className={styles.secondaryAction} disabled={sending || submissionLocked} onClick={() => setReviewing(false)}><span aria-hidden="true">←</span> Voltar</button><button type="button" className={styles.primaryAction} disabled={!intakeEnabled || sending} onClick={submitQuote}>{sending ? "Enviando..." : submissionLocked ? "Tentar confirmar envio" : "Solicitar orçamento"}</button></div>
+          <div className={styles.actions}><button type="button" className={styles.secondaryAction} disabled={sending || submissionLocked} onClick={() => setReviewing(false)}><span aria-hidden="true">←</span> Voltar</button><button type="button" className={styles.primaryAction} disabled={(!intakeEnabled && !pendingConfirmation) || sending} onClick={submitQuote}>{sending ? "Enviando..." : submissionLocked ? "Tentar confirmar envio" : "Solicitar orçamento"}</button></div>
         </div>
       ) : null}
     </section>

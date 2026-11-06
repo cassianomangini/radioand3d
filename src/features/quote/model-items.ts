@@ -3,6 +3,7 @@ import { validModelLink } from './model-link';
 export const MODEL_ITEM_LIMIT = 20;
 export const MODEL_LINK_MAX_LENGTH = 350;
 export const MODEL_NOTES_MAX_LENGTH = 140;
+export const MODEL_TITLE_MAX_LENGTH = 80;
 
 export type ModelColor = { name: string; rgb: string };
 export type ModelDimensions = { width: string; depth: string; height: string };
@@ -11,6 +12,7 @@ export type ModelItem = {
   source: 'link' | 'file';
   link: string;
   fileName: string;
+  title?: string;
   quantity: number;
   colorMode: 'tenho' | 'indeciso';
   colors: ModelColor[];
@@ -36,6 +38,9 @@ export function validModelItems(value: unknown): value is ModelItem[] {
     if (entry.source !== 'link' && entry.source !== 'file') return false;
     if (typeof entry.link !== 'string' || typeof entry.fileName !== 'string' ||
         typeof entry.notes !== 'string' || entry.notes.length > MODEL_NOTES_MAX_LENGTH) return false;
+    if (entry.title !== undefined &&
+        (typeof entry.title !== 'string' || entry.title.length > MODEL_TITLE_MAX_LENGTH ||
+         /[\u0000-\u001f\u007f]/.test(entry.title))) return false;
     if (entry.source === 'link' &&
       (entry.fileName !== '' || entry.link.length > MODEL_LINK_MAX_LENGTH || !validModelLink(entry.link))) return false;
     if (entry.source === 'file' &&
@@ -83,6 +88,9 @@ export function restorableModelItems(value: unknown): value is ModelItem[] {
         typeof item.fileName !== 'string' || item.fileName.length > 255 ||
         typeof item.notes !== 'string' || item.notes.length > MODEL_NOTES_MAX_LENGTH ||
         /[\u0000-\u001f\u007f]/.test(item.fileName)) return false;
+    if (item.title !== undefined &&
+        (typeof item.title !== 'string' || item.title.length > MODEL_TITLE_MAX_LENGTH ||
+         /[\u0000-\u001f\u007f]/.test(item.title))) return false;
     if (item.source === 'file' && !fileName.test(item.fileName)) return false;
     if (!Number.isSafeInteger(item.quantity) || (item.quantity as number) < 1 ||
         (item.quantity as number) > 10000) return false;

@@ -187,7 +187,6 @@ export async function handleQuoteSubmit(
   catalogReader: typeof getSiteCatalog = getSiteCatalog,
 ): Promise<Response> {
   try {
-    requireQuoteEnabled();
     requireSameOriginJson(request);
     requireQuoteEmailConfig();
     const token = existingSessionToken(request);
@@ -195,40 +194,43 @@ export async function handleQuoteSubmit(
     if (!hash) throw new QuoteHttpError(403, 'quote_session_invalid');
     const data = await readQuoteJson(request);
     if (!record(data) || !exactKeys(data, ['requestId','submissionKey','draft','attachments']) ||
-      !uuid(data.requestId) || !uuid(data.submissionKey)) {
+      !uuid(data.requestId) || !uuid(data.submissionKey) ||
+      !record(data.draft) || !Array.isArray(data.attachments)) {
       throw new QuoteHttpError(400, 'invalid_quote_submit');
     }
-    const draft = parseQuoteForm(data.draft);
-    if (draft?.type === 'arquivo' && draft.modelItems?.length &&
-        process.env.CM_QUOTE_MULTIMODEL_ENABLED !== 'true') {
-      throw new QuoteHttpError(503, 'quote_multimodel_unavailable');
-    }
-    const attachments = parseQuoteAttachments(data.attachments);
-    if (!draft || !attachments || !validateQuoteForm(draft, attachments)) {
-      throw new QuoteHttpError(400, 'invalid_quote_submit');
-    }
-    if (draft.studioPhotoId) {
-      let photoKey: string | null;
-      try { photoKey = studioPhotoKeyFromId(draft.studioPhotoId); }
-      catch { throw new QuoteHttpError(503, 'studio_reference_unavailable'); }
-      if (!photoKey) throw new QuoteHttpError(400, 'invalid_quote_submit');
-    }
-    if (draft.productSlug) {
-      if (draft.type !== 'outro') throw new QuoteHttpError(400, 'invalid_quote_submit');
-      const catalog = await catalogReader();
-      if (catalog.state === 'unavailable') throw new QuoteHttpError(503, 'product_reference_unavailable');
-      const product = catalog.products.find((entry) => entry.slug === draft.productSlug);
-      if (product?.sourceStatus !== 'NORMAL') {
-        throw new QuoteHttpError(400, 'invalid_quote_submit');
-      }
-    }
-    const prepared = prepareQuoteForStorage(draft, attachments);
     const db = gateway ?? createQuoteGateway();
     // A completed operation with the same ownership + submission key is
-    // a replay, not a new submission: do not charge the hourly rate window.
+    // a replay. Read the stored request for its email, even if flags, catalog
+    // availability or form validation rules have changed since submission.
     const replay = await db.submissionReceipt(data.requestId, hash, data.submissionKey);
     let receipt = replay;
     if (!receipt) {
+      requireQuoteEnabled();
+      const draft = parseQuoteForm(data.draft);
+      const attachments = parseQuoteAttachments(data.attachments);
+      if (!draft || !attachments || !validateQuoteForm(draft, attachments)) {
+        throw new QuoteHttpError(400, 'invalid_quote_submit');
+      }
+      if (draft.type === 'arquivo' && draft.modelItems?.length &&
+          process.env.CM_QUOTE_MULTIMODEL_ENABLED !== 'true') {
+        throw new QuoteHttpError(503, 'quote_multimodel_unavailable');
+      }
+      if (draft.studioPhotoId) {
+        let photoKey: string | null;
+        try { photoKey = studioPhotoKeyFromId(draft.studioPhotoId); }
+        catch { throw new QuoteHttpError(503, 'studio_reference_unavailable'); }
+        if (!photoKey) throw new QuoteHttpError(400, 'invalid_quote_submit');
+      }
+      if (draft.productSlug) {
+        if (draft.type !== 'outro') throw new QuoteHttpError(400, 'invalid_quote_submit');
+        const catalog = await catalogReader();
+        if (catalog.state === 'unavailable') throw new QuoteHttpError(503, 'product_reference_unavailable');
+        const product = catalog.products.find((entry) => entry.slug === draft.productSlug);
+        if (product?.sourceStatus !== 'NORMAL') {
+          throw new QuoteHttpError(400, 'invalid_quote_submit');
+        }
+      }
+      const prepared = prepareQuoteForStorage(draft, attachments);
       if (!await db.consumeRate('submit', rateLimitHash(request))) {
         throw new QuoteHttpError(429, 'quote_rate_limited');
       }

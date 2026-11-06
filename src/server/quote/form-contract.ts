@@ -1,6 +1,7 @@
 import type { Draft } from '@/app/orcamentos/quote-flow';
 import { validateQuoteFiles } from '@/features/quote/file-policy';
 import { validModelLink } from '@/features/quote/model-link';
+import { validModelItems, modelUnits } from '@/features/quote/model-items';
 import { uuid } from './http';
 import type { QuoteProjectType } from './supabase-gateway';
 
@@ -10,6 +11,7 @@ export type QuoteAttachmentInput = {
   name: string;
   size: number;
   type: string;
+  modelItemId?: string;
 };
 
 const textFields = [
@@ -82,6 +84,9 @@ export function parseQuoteForm(value: unknown): Draft | null {
       !value.colors.every(color => object(color) &&
         typeof color.name === 'string' && color.name.length <= 80 &&
         typeof color.rgb === 'string' && (color.rgb === '' || /^#[0-9a-f]{6}$/i.test(color.rgb)))) return null;
+  if ('modelItems' in value && (!Array.isArray(value.modelItems) ||
+      (value.modelItems.length > 0 && !validModelItems(value.modelItems)))) return null;
+  if (value.type !== 'arquivo' && Array.isArray(value.modelItems) && value.modelItems.length > 0) return null;
   if (!oneOf(value.contactMethod, ['whatsapp', 'email']) ||
       !oneOf(value.delivery, ['retirada', 'envio']) ||
       !oneOf(value.boxMode, ['', 'quick', 'detailed']) ||
@@ -103,6 +108,8 @@ export function parseQuoteAttachments(value: unknown): QuoteAttachmentInput[] | 
         /[\u0000-\u001f\u007f]/.test(item.name) ||
         !Number.isSafeInteger(item.size) || (item.size as number) < 1 ||
         typeof item.type !== 'string' || item.type.length > 120) return null;
+    if (item.modelItemId !== undefined && (item.role !== 'model' ||
+        typeof item.modelItemId !== 'string' || !uuid(item.modelItemId))) return null;
     const extension = item.name.split('.').pop()?.toLowerCase() ?? '';
     const allowed = item.role === 'model' ? ['stl', '3mf'] : imageExtensions;
     if (!allowed.includes(extension)) return null;
@@ -110,7 +117,8 @@ export function parseQuoteAttachments(value: unknown): QuoteAttachmentInput[] | 
   }
   if (new Set(files.map(file => file.id)).size !== files.length ||
       !validateQuoteFiles(files).ok ||
-      fileRoles.slice(0, -1).some(role => files.filter(file => file.role === role).length > 1)) return null;
+      fileRoles.filter(role => role !== 'references' && role !== 'model')
+        .some(role => files.filter(file => file.role === role).length > 1)) return null;
   return files;
 }
 
@@ -159,6 +167,15 @@ export function validateQuoteForm(draft: Draft, files: QuoteAttachmentInput[]): 
     return hasColors(draft);
   }
   if (draft.type === 'arquivo') {
+    if (draft.modelItems?.length) {
+      if (!validModelItems(draft.modelItems)) return false;
+      const models = files.filter(file => file.role === 'model');
+      const itemsWithFile = draft.modelItems.filter(item => item.source === 'file');
+      return itemsWithFile.length === models.length &&
+        itemsWithFile.every(item => models.filter(file => file.modelItemId === item.id &&
+          file.name === item.fileName).length === 1) &&
+        models.every(file => itemsWithFile.some(item => item.id === file.modelItemId));
+    }
     if ((draft.modelSource === 'file' && (!fileByRole(files, 'model') || draft.modelLink.trim())) ||
         (draft.modelSource === 'link' && (fileByRole(files, 'model') || !validModelLink(draft.modelLink))) ||
         (!draft.modelScaleUnknown && !oneOf(draft.modelScale, ['original', 'alterar'])) ||
@@ -175,8 +192,9 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
   const projectType: QuoteProjectType = draft.type === 'arquivo' ? 'impressao' : draft.type!;
   const mode = draft.type === 'caixa' ? draft.boxMode : draft.type === 'placa' ? draft.plateMode : '';
   const production = {
-    quantity: draft.quantity, colorMode: draft.colorMode,
-    colors: mode === 'quick' ? [] : draft.colors.filter(color => color.name.trim() || color.rgb),
+    quantity: draft.type === 'arquivo' && draft.modelItems?.length ? modelUnits(draft.modelItems) : draft.quantity,
+    colorMode: draft.type === 'arquivo' && draft.modelItems?.length ? 'por-modelo' : draft.colorMode,
+    colors: draft.type === 'arquivo' && draft.modelItems?.length ? [] : mode === 'quick' ? [] : draft.colors.filter(color => color.name.trim() || color.rgb),
     delivery: draft.delivery, cep: draft.delivery === 'envio' ? draft.cep.trim() : null,
   };
   const project = draft.type === 'caixa' ? {
@@ -203,13 +221,28 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
     use: mode === 'detailed' && !draft.plateUseUnknown ? draft.plateUse : null,
     fixation: mode === 'detailed' && !draft.plateFixationUnknown ? draft.plateFixation.trim() : null,
     dimensions: mode === 'detailed' && !draft.plateUnknown ? draft.plateDimensions : null,
+  } : draft.type === 'arquivo' && draft.modelItems?.length ? {
+    kind: 'impressao',
+    modelLink: files.length === 0 ? draft.modelItems.find(item => item.source === 'link')?.link ?? null : null,
+    items: draft.modelItems.map(item => ({
+      id: item.id, source: item.source, link: item.source === 'link' ? item.link.trim() : null,
+      attachmentId: item.source === 'file' ? files.find(file => file.modelItemId === item.id)?.id ?? null : null,
+      fileName: item.source === 'file' ? item.fileName : null,
+      quantity: item.quantity, colorMode: item.colorMode,
+      colors: item.colorMode === 'tenho' ? item.colors : [],
+      scale: item.scale, dimensions: item.scale === 'alterar' ? item.dimensions : null,
+      notes: item.notes.trim(),
+    })),
   } : draft.type === 'arquivo' ? {
     kind: 'impressao', scale: draft.modelScaleUnknown ? 'a definir' : draft.modelScale,
     modelLink: draft.modelLink.trim() || null,
     dimensions: !draft.modelScaleUnknown && draft.modelScale === 'alterar' ? draft.modelDimensions : null,
     notes: draft.modelNotes.trim(),
   } : { kind: 'outro', description: draft.otherDescription.trim(), size: draft.otherSize.trim() };
-  const needsInformation = mode === 'quick' || draft.colorMode === 'indeciso' ||
+  const needsInformation = mode === 'quick' ||
+    (draft.type === 'arquivo' && draft.modelItems?.length ?
+      draft.modelItems.some(item => item.colorMode === 'indeciso' || item.scale === 'nao-sei') :
+      draft.colorMode === 'indeciso') ||
     draft.boxUnknown || draft.plateUnknown || draft.modelScaleUnknown ||
     draft.plateContentUnknown || draft.plateUseUnknown || draft.plateFixationUnknown;
   return {

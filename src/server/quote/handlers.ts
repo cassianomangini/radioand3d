@@ -181,6 +181,10 @@ export async function handleQuoteSubmit(
       throw new QuoteHttpError(400, 'invalid_quote_submit');
     }
     const draft = parseQuoteForm(data.draft);
+    if (draft?.type === 'arquivo' && draft.modelItems?.length &&
+        process.env.CM_QUOTE_MULTIMODEL_ENABLED !== 'true') {
+      throw new QuoteHttpError(503, 'quote_multimodel_unavailable');
+    }
     const attachments = parseQuoteAttachments(data.attachments);
     if (!draft || !attachments || !validateQuoteForm(draft, attachments)) {
       throw new QuoteHttpError(400, 'invalid_quote_submit');

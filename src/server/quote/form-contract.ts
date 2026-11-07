@@ -84,8 +84,11 @@ export function parseQuoteForm(value: unknown): Draft | null {
       !value.colors.every(color => object(color) &&
         typeof color.name === 'string' && color.name.length <= 80 &&
         typeof color.rgb === 'string' && (color.rgb === '' || /^#[0-9a-f]{6}$/i.test(color.rgb)))) return null;
-  if ('modelItems' in value && (!Array.isArray(value.modelItems) ||
-      (value.modelItems.length > 0 && !validModelItems(value.modelItems)))) return null;
+  // Answers from another journey remain in the browser draft. Only the active
+  // printing journey can turn model items into a submitted project.
+  if (value.type === 'arquivo' && 'modelItems' in value &&
+      (!Array.isArray(value.modelItems) ||
+       (value.modelItems.length > 0 && !validModelItems(value.modelItems)))) return null;
   // Hidden answers from another project type are not submitted or stored in project JSON.
   // Keep them in the draft so switching project types does not erase the customer work.
   if (!oneOf(value.contactMethod, ['whatsapp', 'email']) ||
@@ -130,11 +133,19 @@ export function validateQuoteForm(draft: Draft, files: QuoteAttachmentInput[]): 
         : !/^\d{10,13}$/.test(draft.contact.replace(/\D/g, ''))) ||
       (draft.delivery === 'envio' && draft.cep.replace(/\D/g, '').length !== 8)) return false;
 
-  const allowedRoles: Record<NonNullable<Draft['type']>, QuoteAttachmentInput['role'][]> = {
-    caixa: ['boxLogo', 'boxQr', 'references'], placa: ['logo', 'qr', 'references'],
-    arquivo: ['model'], outro: ['references'],
-  };
-  if (files.some(file => !allowedRoles[draft.type!].includes(file.role))) return false;
+  const allowedRoles: QuoteAttachmentInput['role'][] = draft.type === 'caixa'
+    ? draft.boxMode === 'quick' ? ['references'] : [
+        ...(!draft.boxNoPersonalization && draft.boxPersonalization.includes('Logotipo') ? ['boxLogo' as const] : []),
+        ...(!draft.boxNoPersonalization && draft.boxPersonalization.includes('QR Code') && draft.boxQrSource === 'file' ? ['boxQr' as const] : []),
+        ...(!draft.boxNoPersonalization && draft.boxPersonalization.includes('Imagem ou desenho') ? ['references' as const] : []),
+      ]
+    : draft.type === 'placa' ? draft.plateMode === 'quick' ? ['references'] : [
+        ...(!draft.plateContentUnknown && draft.plateContents.includes('Logotipo') ? ['logo' as const] : []),
+        ...(!draft.plateContentUnknown && draft.plateContents.includes('QR Code') && draft.plateQrSource === 'file' ? ['qr' as const] : []),
+        'references',
+      ]
+    : draft.type === 'arquivo' ? ['model'] : ['references'];
+  if (files.some(file => !allowedRoles.includes(file.role))) return false;
 
   if (draft.type === 'caixa') {
     if (draft.boxMode === 'quick') return Boolean(draft.boxQuickDescription.trim() || fileByRole(files, 'references'));
@@ -151,7 +162,7 @@ export function validateQuoteForm(draft: Draft, files: QuoteAttachmentInput[]): 
            (draft.boxQrSource === 'file' && !fileByRole(files, 'boxQr')) || !draft.boxQrSource)) ||
         (!draft.boxNoPersonalization && draft.boxPersonalization.includes('Imagem ou desenho') && !fileByRole(files, 'references')) ||
         (draft.boxShape === 'Outro formato' && !draft.boxShapeOther.trim() &&
-          !draft.boxPersonalization.includes('Imagem ou desenho'))) return false;
+          (draft.boxNoPersonalization || !draft.boxPersonalization.includes('Imagem ou desenho')))) return false;
     return hasColors(draft);
   }
   if (draft.type === 'placa') {
@@ -224,15 +235,17 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
     dimensions: mode === 'detailed' && !draft.plateUnknown ? draft.plateDimensions : null,
   } : draft.type === 'arquivo' && draft.modelItems?.length ? {
     kind: 'impressao',
-    modelLink: files.length === 0 ? draft.modelItems.find(item => item.source === 'link')?.link ?? null : null,
+    modelLink: files.length === 0 ? draft.modelItems.find(item => item.source === 'link')?.link.trim() ?? null : null,
     items: draft.modelItems.map(item => ({
       id: item.id, source: item.source, link: item.source === 'link' ? item.link.trim() : null,
       title: item.title?.trim() || null,
       attachmentId: item.source === 'file' ? files.find(file => file.modelItemId === item.id)?.id ?? null : null,
       fileName: item.source === 'file' ? item.fileName : null,
       quantity: item.quantity, colorMode: item.colorMode,
-      colors: item.colorMode === 'tenho' ? item.colors : [],
-      scale: item.scale, dimensions: item.scale === 'alterar' ? item.dimensions : null,
+      colors: item.colorMode === 'tenho' ? item.colors.map(color => ({ name: color.name.trim(), rgb: color.rgb })) : [],
+      scale: item.scale, dimensions: item.scale === 'alterar' ? {
+        width: item.dimensions.width.trim(), depth: item.dimensions.depth.trim(), height: item.dimensions.height.trim(),
+      } : null,
       notes: item.notes.trim(),
     })),
   } : draft.type === 'arquivo' ? {
@@ -241,12 +254,19 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
     dimensions: !draft.modelScaleUnknown && draft.modelScale === 'alterar' ? draft.modelDimensions : null,
     notes: draft.modelNotes.trim(),
   } : { kind: 'outro', description: draft.otherDescription.trim(), size: draft.otherSize.trim() };
-  const needsInformation = mode === 'quick' ||
-    (draft.type === 'arquivo' && draft.modelItems?.length ?
-      draft.modelItems.some(item => item.colorMode === 'indeciso' || item.scale === 'nao-sei') :
-      draft.colorMode === 'indeciso') ||
-    draft.boxUnknown || draft.plateUnknown || draft.modelScaleUnknown ||
-    draft.plateContentUnknown || draft.plateUseUnknown || draft.plateFixationUnknown;
+  const needsInformation = draft.type === 'caixa'
+    ? mode === 'quick' || draft.colorMode === 'indeciso' ||
+      (mode === 'detailed' && (draft.boxUnknown || draft.boxDividers === 'nao-sei' ||
+        draft.boxBasis === 'nao-sei'))
+    : draft.type === 'placa'
+      ? mode === 'quick' || draft.colorMode === 'indeciso' ||
+        (mode === 'detailed' && (draft.plateUnknown || draft.plateContentUnknown ||
+          draft.plateUseUnknown || draft.plateFixationUnknown))
+      : draft.type === 'arquivo'
+        ? draft.modelItems?.length
+          ? draft.modelItems.some(item => item.colorMode === 'indeciso' || item.scale === 'nao-sei')
+          : draft.colorMode === 'indeciso' || draft.modelScaleUnknown
+        : draft.colorMode === 'indeciso';
   return {
     projectType, noFile: files.length === 0,
     startingPoints: [mode === 'quick' ? 'pedido rápido' : mode === 'detailed' ? 'formulário detalhado' : 'formulário',
@@ -260,4 +280,15 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
     attachmentIds: files.map(file => file.id),
   };
 }
+
+/** Twenty maximally filled model items stay below 20k characters. Count only
+ * fields actually persisted and mailed, with room for the other journeys. */
+export function quoteStoredTextLength(value: unknown): number {
+  if (typeof value === 'string') return value.length;
+  if (Array.isArray(value)) return value.reduce<number>((sum, item) => sum + quoteStoredTextLength(item), 0);
+  if (object(value)) return Object.values(value).reduce<number>((sum, item) => sum + quoteStoredTextLength(item), 0);
+  return 0;
+}
+
+export const QUOTE_STORED_TEXT_LIMIT = 30_000;
 

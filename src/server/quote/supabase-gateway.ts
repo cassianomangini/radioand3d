@@ -71,6 +71,11 @@ export type QuoteGateway = {
     Promise<{ request_id: string; submission_time: string } | null>;
   submitQuote(input: QuoteSubmitInput): Promise<{ request_id: string; submission_time: string }>;
   notificationData(requestId: string, ownerHash: string): Promise<QuoteNotificationData>;
+  // Optional for injected legacy adapters; the production gateway implements
+  // both methods and serializes sends across server instances.
+  claimEmail?(requestId: string, ownerHash: string, claimToken: string):
+    Promise<'claimed' | 'busy' | 'sent'>;
+  finishEmail?(requestId: string, ownerHash: string, claimToken: string): Promise<void>;
   emailWasSent(requestId: string): Promise<boolean>;
   recordEmailSent(requestId: string): Promise<void>;
 };
@@ -403,6 +408,27 @@ export function createQuoteGateway(fetcher: typeof fetch = fetch): QuoteGateway 
         contactMethod: row.contact_method, contactName: row.contact_name,
         contactValue: row.contact_value, attachments: links,
       };
+    },
+    async claimEmail(requestId, ownerHash, claimToken) {
+      if (!uuid(requestId) || !uuid(claimToken) || !/^[a-f0-9]{64}$/.test(ownerHash)) {
+        throw new QuoteHttpError(400, 'invalid_quote_submit');
+      }
+      const state = await api<'claimed' | 'busy' | 'sent'>('/rest/v1/rpc/quote_email_claim', {
+        p_request_id: requestId, p_owner_session_hash: ownerHash, p_claim_token: claimToken,
+      });
+      if (!['claimed', 'busy', 'sent'].includes(state)) {
+        throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+      }
+      return state;
+    },
+    async finishEmail(requestId, ownerHash, claimToken) {
+      if (!uuid(requestId) || !uuid(claimToken) || !/^[a-f0-9]{64}$/.test(ownerHash)) {
+        throw new QuoteHttpError(400, 'invalid_quote_submit');
+      }
+      const finished = await api<boolean>('/rest/v1/rpc/quote_email_finish', {
+        p_request_id: requestId, p_owner_session_hash: ownerHash, p_claim_token: claimToken,
+      });
+      if (finished !== true) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
     },
     async emailWasSent(requestId) {
       if (!uuid(requestId)) throw new QuoteHttpError(400, 'invalid_quote_submit');

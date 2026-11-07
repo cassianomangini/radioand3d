@@ -17,9 +17,11 @@ export class QuoteHttpError extends Error {
   }
 }
 
-// A full 20-model quote with descriptions and per-item colors can exceed 16 KB.
-// This is still a bounded JSON payload; uploads use the separate private TUS flow.
-const BODY_LIMIT = 48_000;
+// A full 20-model quote can also carry text retained while switching between
+// the four journeys. Keep a finite transport ceiling above that valid draft;
+// uploads still use the separate private TUS flow.
+const BODY_LIMIT = 256_000;
+export const SMALL_QUOTE_BODY_LIMIT = 4_096;
 const NO_CACHE = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
 
 export function responseJson(value: unknown, status = 200, extra?: HeadersInit): Response {
@@ -40,7 +42,7 @@ export function requireQuoteEnabled(): void {
   }
 }
 
-export function requireSameOriginJson(request: Request): void {
+export function requireSameOriginJson(request: Request, bodyLimit = BODY_LIMIT): void {
   const origin = request.headers.get('origin');
   const requestOrigin = new URL(request.url).origin;
   if (!origin || origin !== requestOrigin ||
@@ -50,12 +52,12 @@ export function requireSameOriginJson(request: Request): void {
   const type = request.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase();
   if (type !== 'application/json') throw new QuoteHttpError(415, 'invalid_content_type');
   const length = request.headers.get('content-length');
-  if (length && (!/^\d+$/.test(length) || Number(length) > BODY_LIMIT)) {
+  if (length && (!/^\d+$/.test(length) || Number(length) > bodyLimit)) {
     throw new QuoteHttpError(413, 'request_too_large');
   }
 }
 
-export async function readQuoteJson(request: Request): Promise<unknown> {
+export async function readQuoteJson(request: Request, bodyLimit = BODY_LIMIT): Promise<unknown> {
   const reader = request.body?.getReader();
   if (!reader) throw new QuoteHttpError(400, 'invalid_json');
   let size = 0;
@@ -65,7 +67,7 @@ export async function readQuoteJson(request: Request): Promise<unknown> {
       const { done, value } = await reader.read();
       if (done) break;
       size += value.length;
-      if (size > BODY_LIMIT) throw new QuoteHttpError(413, 'request_too_large');
+      if (size > bodyLimit) throw new QuoteHttpError(413, 'request_too_large');
       chunks.push(value);
     }
   } finally {

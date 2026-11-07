@@ -1345,7 +1345,8 @@
   background: #050d1a;
   color: var(--text-primary);
 }
-.modelColorEntry button,
+.modelColorPicker { position: relative; flex: none; }
+.modelColorEntry > button,
 .modelTextAction { min-height: 40px; padding: var(--space-2); border: 0; background: none; color: var(--text-secondary); cursor: pointer; }
 .modelTextAction { justify-self: start; font-weight: 700; }
 .modelEmpty { padding: var(--space-4); border: 1px dashed var(--border-default); border-radius: var(--radius-field); color: var(--text-muted); font-size: 0.86rem; text-align: center; }

@@ -7,7 +7,7 @@ import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import { validModelLink } from "@/features/quote/model-link";
 import { validModelItems, restorableModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, MODEL_TITLE_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
-import { validateQuoteFiles, quoteFilePolicyLabel, quoteFileRoleAllows } from "@/features/quote/file-policy";
+import { QUOTE_FILE_POLICY, validateQuoteFiles, quoteFilePolicyLabel, quoteFileRoleAllows } from "@/features/quote/file-policy";
 import styles from "./page.module.css";
 
 const projectOptions = [
@@ -226,21 +226,26 @@ function visibleFileEntries(files: SelectedFiles, draft: Draft, modelFiles: Reco
     return draft.modelItems.flatMap((item) => item.source === "file" && modelFiles[item.id]
       ? [{ role: "model" as const, file: modelFiles[item.id], modelItemId: item.id }] : []);
   }
-  const activeRoles: FileField[] = draft.type === "arquivo" ? ["model"]
-    : draft.type === "caixa" ? [
-      ...(draft.boxMode === "detailed" && !draft.boxNoPersonalization && draft.boxPersonalization.includes("Logotipo") ? ["boxLogo" as const] : []),
-      ...(draft.boxMode === "detailed" && !draft.boxNoPersonalization && draft.boxPersonalization.includes("QR Code") && draft.boxQrSource === "file" ? ["boxQr" as const] : []),
-      ...(draft.boxMode === "quick" || (draft.boxMode === "detailed" && !draft.boxNoPersonalization && draft.boxPersonalization.includes("Imagem ou desenho")) ? ["references" as const] : []),
-    ] : draft.type === "placa" ? [
-      ...(draft.plateMode === "detailed" && !draft.plateContentUnknown && draft.plateContents.includes("Logotipo") ? ["logo" as const] : []),
-      ...(draft.plateMode === "detailed" && !draft.plateContentUnknown && draft.plateContents.includes("QR Code") && draft.plateQrSource === "file" ? ["qr" as const] : []),
-      "references",
-    ] : ["references"];
-  return activeRoles.flatMap((role) => files[role].map((file) => ({ role, file })));
+  return activeFileRoles(draft).flatMap((role) => files[role].map((file) => ({ role, file })));
 }
 
 function visibleFiles(files: SelectedFiles, draft: Draft, modelFiles: Record<string, File> = {}): File[] {
   return visibleFileEntries(files, draft, modelFiles).map(({ file }) => file);
+}
+
+function activeFileRoles(draft: Draft): FileField[] {
+  if (draft.type === "arquivo") return ["model"];
+  if (draft.type === "caixa") return draft.boxMode === "quick" ? ["references"] : [
+    ...(!draft.boxNoPersonalization && draft.boxPersonalization.includes("Logotipo") ? ["boxLogo" as const] : []),
+    ...(!draft.boxNoPersonalization && draft.boxPersonalization.includes("QR Code") && draft.boxQrSource === "file" ? ["boxQr" as const] : []),
+    ...(!draft.boxNoPersonalization && draft.boxPersonalization.includes("Imagem ou desenho") ? ["references" as const] : []),
+  ];
+  if (draft.type === "placa") return draft.plateMode === "quick" ? ["references"] : [
+    ...(!draft.plateContentUnknown && draft.plateContents.includes("Logotipo") ? ["logo" as const] : []),
+    ...(!draft.plateContentUnknown && draft.plateContents.includes("QR Code") && draft.plateQrSource === "file" ? ["qr" as const] : []),
+    "references",
+  ];
+  return draft.type === "outro" ? ["references"] : [];
 }
 
 function newModelItem(source: ModelItem["source"], value: string): ModelItem {
@@ -264,6 +269,25 @@ function modelLinkIssue(link: string): string | null {
     return "o domínio deve ser MakerWorld ou Bambu Handy.";
   }
   if (!validModelLink(link)) return "o endereço não aponta para uma página de modelo válida.";
+  return null;
+}
+
+function modelItemIssue(item: ModelItem): string | null {
+  if (item.source === "link") {
+    const issue = modelLinkIssue(item.link.trim());
+    if (issue) return `Corrija o link: ${issue}`;
+  }
+  if (!Number.isSafeInteger(item.quantity) || item.quantity < 1 || item.quantity > 10000) {
+    return "Informe uma quantidade entre 1 e 10.000.";
+  }
+  if (item.colorMode === "tenho" && (!item.colors.length || item.colors.length > 4 ||
+      item.colors.some(color => !color.name.trim() && !color.rgb))) {
+    return "Preencha de uma a quatro cores ou escolha Ainda não decidi.";
+  }
+  if (item.scale === "alterar" && (!Object.values(item.dimensions).some(value => value.trim()) ||
+      Object.values(item.dimensions).some(value => value.trim() && !validDimension(value)))) {
+    return "Informe ao menos uma medida válida em cm ou escolha outro tamanho.";
+  }
   return null;
 }
 
@@ -481,6 +505,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const [modelLinksInput, setModelLinksInput] = useState("");
   const [error, setError] = useState<FieldError>(null);
   const [openColorMenu, setOpenColorMenu] = useState<number | null>(null);
+  const [openModelColorMenu, setOpenModelColorMenu] = useState<string | null>(null);
   const [reviewEdit, setReviewEdit] = useState<ReviewEditArea | null>(null);
   const [sending, setSending] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -512,6 +537,9 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           const savedDraft = stored.draft as Draft;
           if (!Array.isArray(savedDraft.modelItems)) savedDraft.modelItems = [];
           setDraft(savedDraft);
+          if (typeof stored.modelLinksInput === "string" && stored.modelLinksInput.length <= 8000) {
+            setModelLinksInput(stored.modelLinksInput);
+          }
           setStep(typeof stored.step === "number" && [1, 2, 3].includes(stored.step) ? stored.step : 1);
           setBoxDetailStep(typeof stored.boxDetailStep === "number" ? Math.min(4, Math.max(0, stored.boxDetailStep)) : 0);
           setPlateDetailStep(typeof stored.plateDetailStep === "number" ? Math.min(3, Math.max(0, stored.plateDetailStep)) : 0);
@@ -520,9 +548,14 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
             const contacts = stored.savedContacts as Record<string, unknown>;
             setSavedContacts({ whatsapp: typeof contacts.whatsapp === "string" ? contacts.whatsapp : "", email: typeof contacts.email === "string" ? contacts.email : "" });
           }
+          const hasModelItemsWithFiles = savedDraft.type === "arquivo" &&
+            savedDraft.modelItems.some(item => item.source === "file");
+          const needsModelFile = savedDraft.type === "arquivo" &&
+            (savedDraft.modelItems.length ? hasModelItemsWithFiles : savedDraft.modelSource === "file");
           const missing = Array.isArray(stored.fileRoles) ? stored.fileRoles.filter((role): role is FileField =>
-            typeof role === "string" && Object.hasOwn(allowedExtensions, role)) : [];
-          setFileReattach(savedDraft.modelItems.some(item => item.source === "file") ?
+            typeof role === "string" && Object.hasOwn(allowedExtensions, role) &&
+            (role !== "model" || needsModelFile)) : [];
+          setFileReattach(hasModelItemsWithFiles ?
             [...new Set([...missing, "model" as FileField])] : missing);
           if (restorableConfirmation(stored.pendingConfirmation)) {
             setPendingConfirmation(stored.pendingConfirmation);
@@ -547,13 +580,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       }
       sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({
         savedAt: Date.now(), reference: studioPhotoId ?? productReference?.slug ?? null,
-        step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts,
+        step, reviewing, boxDetailStep, plateDetailStep, draft, modelLinksInput, savedContacts,
         fileRoles: [...new Set([...fileReattach, ...(Object.keys(modelFiles).length ? ["model" as FileField] : []),
           ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
         pendingConfirmation,
       }));
     } catch { /* Storage may be disabled or full. */ }
-  }, [hydrated, receiptId, studioPhotoId, productReference?.slug, step, reviewing, boxDetailStep, plateDetailStep, draft, savedContacts, files, modelFiles, fileReattach, pendingConfirmation]);
+  }, [hydrated, receiptId, studioPhotoId, productReference?.slug, step, reviewing, boxDetailStep, plateDetailStep, draft, modelLinksInput, savedContacts, files, modelFiles, fileReattach, pendingConfirmation]);
 
   useEffect(() => { headingRef.current?.focus(); }, [step, reviewing, reviewEdit, draft.boxMode, draft.plateMode]);
   useEffect(() => {
@@ -638,6 +671,9 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (!incoming.length) return;
     const capacity = MODEL_ITEM_LIMIT - draft.modelItems.length;
     if (incoming.length > capacity) return setError({ field: "modelFiles", message: `Máximo de ${MODEL_ITEM_LIMIT} modelos no orçamento.` });
+    if (draft.modelItems.filter(item => item.source === "file").length + incoming.length > QUOTE_FILE_POLICY.maxFiles) {
+      return setError({ field: "modelFiles", message: `Envie no máximo ${QUOTE_FILE_POLICY.maxFiles} arquivos por pedido, incluindo os que precisam ser reenviados.` });
+    }
     const invalid = incoming.find(file => !quoteFileRoleAllows("model", file.name));
     if (invalid) return setError({ field: "modelFiles", message: `Escolha STL ou 3MF para o modelo “${invalid.name}”.` });
     const currently = Object.values(modelFiles);
@@ -669,6 +705,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   function removeModelItem(id: string) {
     setDraft(current => ({ ...current, modelItems: current.modelItems.filter(item => item.id !== id) }));
     setModelFiles(current => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)));
+    if (draft.modelItems.filter(item => item.id !== id && item.source === "file")
+      .every(item => modelFiles[item.id])) {
+      setFileReattach(current => current.filter(role => role !== "model"));
+    }
     setError(null);
   }
 
@@ -766,7 +806,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (stage === 3 && !draft.boxNoPersonalization && draft.boxPersonalization.includes("QR Code") && !draft.boxQrSource) return { field: "boxQrSource", message: "Escolha como quer informar o QR Code." };
     if (stage === 3 && !draft.boxNoPersonalization && draft.boxPersonalization.includes("QR Code") && draft.boxQrSource === "content" && !draft.boxQrContent.trim()) return { field: "boxQrContent", message: "Informe o link ou texto do QR Code." };
     if (stage === 3 && !draft.boxNoPersonalization && draft.boxPersonalization.includes("QR Code") && draft.boxQrSource === "file" && files.boxQr.length === 0) return { field: "boxQr", message: "Anexe o QR Code pronto." };
-    if (stage === 3 && draft.boxShape === "Outro formato" && !draft.boxShapeOther.trim() && !draft.boxPersonalization.includes("Imagem ou desenho")) return { field: "boxPersonalization", message: "Descreva o formato no passo anterior ou escolha Imagem ou desenho para enviar uma referência." };
+    if (stage === 3 && draft.boxShape === "Outro formato" && !draft.boxShapeOther.trim() &&
+        (draft.boxNoPersonalization || !draft.boxPersonalization.includes("Imagem ou desenho"))) return { field: "boxPersonalization", message: "Descreva o formato no passo anterior ou escolha Imagem ou desenho para enviar uma referência." };
     if (stage === 3 && !draft.boxNoPersonalization && draft.boxPersonalization.includes("Imagem ou desenho") && files.references.length === 0) return { field: "references", message: "Envie a imagem ou desenho para a personalização." };
     if (stage === 4 && draft.colorMode !== "indeciso" && (draft.colors.length === 0 || draft.colors.length > 4 || !draft.colors.every(hasColor))) return { field: "colors", message: "Preencha cada cor adicionada ou marque Ainda não decidi." };
     return null;
@@ -790,6 +831,14 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     const fileCheck = validateQuoteFiles(activeFiles);
     if (!fileCheck.ok) return { field: draft.type === "arquivo" ? "modelFiles" : "references", message: fileCheck.message };
     if (draft.type === "arquivo" && multiModelEnabled) {
+      let units = 0;
+      for (const [index, item] of draft.modelItems.entries()) {
+        units += item.quantity;
+        const issue = modelItemIssue(item) ??
+          (units > 10000 ? "O pedido ultrapassa o limite de 10.000 unidades." : null);
+        if (issue) return { field: `model-${item.id}`,
+          message: `Modelo ${String(index + 1).padStart(2, "0")}: ${issue}` };
+      }
       if (!validModelItems(draft.modelItems)) return { field: "modelItems", message: `Adicione de 1 a ${MODEL_ITEM_LIMIT} modelos válidos e confira suas preferências.` };
       if (draft.modelItems.some(item => item.source === "file" && !modelFiles[item.id])) {
         return { field: "modelFiles", message: "Anexe novamente os arquivos pendentes antes de continuar." };
@@ -892,7 +941,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({
         savedAt: Date.now(), reference: studioPhotoId ?? productReference?.slug ?? null,
         step: 3, reviewing: true, boxDetailStep, plateDetailStep, draft: confirmation.draft,
-        savedContacts, fileRoles: [...new Set([...fileReattach, ...(Object.keys(modelFiles).length ? ["model" as FileField] : []),
+        modelLinksInput, savedContacts, fileRoles: [...new Set([...fileReattach, ...(Object.keys(modelFiles).length ? ["model" as FileField] : []),
           ...Object.entries(files).filter(([, selected]) => selected.length).map(([role]) => role as FileField)])],
         pendingConfirmation: confirmation,
       }));
@@ -901,10 +950,14 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(confirmation), cache: "no-store",
     });
-    const result = await response.json().catch(() => null) as { requestId?: string; error?: string } | null;
+    const result = await response.json().catch(() => null) as {
+      requestId?: string; error?: string; notificationStatus?: string;
+    } | null;
     if (response.status === 202 && result?.error === "quote_email_pending") {
       setEmailPending(true);
-      setSubmissionError("O pedido foi salvo no banco, mas o aviso por e-mail ainda não foi confirmado. Tente novamente.");
+      setSubmissionError(result.notificationStatus === "sending"
+        ? "O pedido foi salvo e o aviso por e-mail está em andamento. Aguarde um pouco e tente confirmar novamente."
+        : "O pedido foi salvo no banco, mas o aviso por e-mail ainda não foi confirmado. Tente novamente.");
       return;
     }
     if (!response.ok || !result?.requestId) throw new Error(result?.error || "quote_unavailable");
@@ -992,7 +1045,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         setPendingConfirmation(null);
         setSubmissionLocked(false);
       }
-      if (code === "invalid_quote_submit") { setPendingConfirmation(null); setSubmissionLocked(false); }
+      if (["invalid_quote_submit", "request_too_large"].includes(code)) {
+        setPendingConfirmation(null);
+        setSubmissionLocked(false);
+      }
       setSubmissionError(code === "human_verification_required" ? "Confirme a verificação de segurança para enviar o orçamento."
         : code === "human_verification_expired" ? "A verificação expirou. Tente novamente no quadro de segurança."
         : code === "quote_verification_unavailable" ? "A verificação está temporariamente indisponível. Tente novamente sem refazer o pedido."
@@ -1002,6 +1058,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         : code === "quote_upload_unavailable" ? "Não foi possível enviar um arquivo. Confira sua conexão e tente novamente."
         : code === "quote_storage_budget_reached" ? "O envio de arquivos está temporariamente indisponível por limite de armazenamento. Você pode remover os arquivos e enviar links dos modelos ou solicitar ajuda pelo contato do Estúdio."
         : code === "quote_file_limit_reached" ? "Os anexos ultrapassam os limites permitidos. Remova ou substitua alguns arquivos."
+        : code === "request_too_large" ? "O texto do pedido ultrapassa o limite de envio. Reduza as descrições e tente novamente."
         : code === "invalid_quote_submit" ? "Algum dado do pedido precisa ser revisto antes do envio."
         : "Não foi possível concluir o envio. Seu pedido permanece nesta página para tentar novamente.");
     } finally {
@@ -1089,6 +1146,11 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   const quantitySummary = `${currentQuantity} ${currentQuantity === 1 ? "unidade" : "unidades"}`;
   const colorsSummary = draft.colorMode === "indeciso" ? "Cores a decidir" : draft.colors.map(colorText).filter(Boolean).join(", ") || "Cores não informadas";
   const activeFiles = visibleFiles(files, draft, modelFiles);
+  const missingFileRoles = fileReattach.filter(role => activeFileRoles(draft).includes(role) &&
+    (role === "model" ? draft.modelItems.length
+      ? draft.modelItems.some(item => item.source === "file" && !modelFiles[item.id])
+      : draft.modelSource === "file" && files.model.length === 0
+      : files[role].length === 0));
   const quickRequest = (draft.type === "caixa" && draft.boxMode === "quick") || (draft.type === "placa" && draft.plateMode === "quick");
 
   if (receiptId) return (
@@ -1123,8 +1185,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         </div>
       )}
 
-      {fileReattach.length > 0 && !pendingConfirmation && step > 1 ? (
-        <p className={styles.pendingNotice} role="status">O rascunho foi recuperado. Arquivos selecionados antes da atualização precisam ser anexados novamente.</p>
+      {missingFileRoles.length > 0 && !pendingConfirmation && step > 1 ? (
+        <p className={styles.pendingNotice} role="status">O rascunho foi recuperado. Reanexe os arquivos locais que quiser enviar; eles não são preservados após atualizar a página.</p>
       ) : null}
 
       {draft.studioPhotoId && step > 1 ? (
@@ -1392,6 +1454,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                   <label htmlFor="quote-model-links">Cole links dos modelos, um por linha</label>
                   <textarea id="quote-model-links" className={styles.modelLinksInput} rows={3}
                     value={modelLinksInput} onChange={event => setModelLinksInput(event.target.value)}
+                    maxLength={8000}
                     placeholder={"https://makerworld.com/pt/models/12345\nhttps://makerworld.com/pt/models/67890"}
                     aria-invalid={error?.field === "modelLinks"} />
                   <button className={styles.modelAddAction} type="button" disabled={!modelLinksInput.trim() || draft.modelItems.length >= MODEL_ITEM_LIMIT}
@@ -1401,7 +1464,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 <div className={styles.field}>
                   <label htmlFor="quote-model-files">Ou adicione arquivos STL/3MF</label>
                   <input id="quote-model-files" className={styles.fileInput} type="file" accept=".stl,.3mf" multiple
-                    disabled={draft.modelItems.length >= MODEL_ITEM_LIMIT}
+                    disabled={draft.modelItems.length >= MODEL_ITEM_LIMIT ||
+                      draft.modelItems.filter(item => item.source === "file").length >= QUOTE_FILE_POLICY.maxFiles}
                     onChange={event => { addModelFiles(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
                   <p className={styles.fieldHint}>Até 5 arquivos no pedido inteiro. Arquivos 3D: 30 MB cada. Total de anexos: 50 MB. Os links não ocupam armazenamento. Se precisar enviar mais arquivos ou maiores, fale com o Estúdio para uma análise manual.</p>
                   <InlineError error={error} field="modelFiles" />
@@ -1432,9 +1496,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                           <div className={styles.field}>
                             <label htmlFor={`model-url-${item.id}`}>Link</label>
                             <input id={`model-url-${item.id}`} type="url" value={item.link} maxLength={MODEL_LINK_MAX_LENGTH}
+                              aria-invalid={error?.field === `model-${item.id}`}
                               onChange={event => changeModelItem(item.id, { link: event.target.value })} />
-                            {validModelLink(item.link) ? <a href={item.link} target="_blank" rel="noopener noreferrer" className={styles.modelExternal}>Abrir modelo em outra aba</a> : <small>Confira o link HTTPS do MakerWorld/Bambu Handy.</small>}
-                            {draft.modelItems.filter(other => other.id !== item.id && other.source === "link" && other.link === item.link).length > 0 ? <small>Este link também aparece em outro item. Você pode manter configurações diferentes.</small> : null}
+                            {validModelLink(item.link) ? <a href={item.link.trim()} target="_blank" rel="noopener noreferrer" className={styles.modelExternal}>Abrir modelo em outra aba</a> : <small>Confira o link HTTPS do MakerWorld/Bambu Handy.</small>}
+                            {draft.modelItems.filter(other => other.id !== item.id && other.source === "link" && other.link.trim() === item.link.trim()).length > 0 ? <small>Este link também aparece em outro item. Você pode manter configurações diferentes.</small> : null}
                           </div>
                         ) : (
                           <div className={styles.field}>
@@ -1471,10 +1536,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                           <div className={styles.field}>
                             <label htmlFor={`model-colors-${item.id}`}>Cores</label>
                             <select id={`model-colors-${item.id}`} value={item.colorMode}
-                              onChange={event => changeModelItem(item.id, {
-                                colorMode: event.target.value as ModelItem["colorMode"],
-                                colors: event.target.value === "tenho" ? item.colors.length ? item.colors : [{ name: "", rgb: "" }] : [],
-                              })}>
+                              onChange={event => {
+                                setOpenModelColorMenu(null);
+                                changeModelItem(item.id, {
+                                  colorMode: event.target.value as ModelItem["colorMode"],
+                                  colors: event.target.value === "tenho" ? item.colors.length ? item.colors : [{ name: "", rgb: "" }] : [],
+                                });
+                              }}>
                               <option value="indeciso">Ainda não decidi</option>
                               <option value="tenho">Escolher cores</option>
                             </select>
@@ -1501,8 +1569,49 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                                   value={color.name} placeholder={`Cor ${colorIndex + 1}, ex.: branco`}
                                   onChange={event => changeModelItem(item.id, { colors: item.colors.map((current, i) =>
                                     i === colorIndex ? { name: event.target.value, rgb: "" } : current) })} />
-                                <button type="button" aria-label={`Remover cor ${colorIndex + 1} do modelo ${index + 1}`}
-                                  onClick={() => changeModelItem(item.id, { colors: item.colors.filter((_, i) => i !== colorIndex) })}>×</button>
+                                <div className={styles.modelColorPicker}
+                                  onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpenModelColorMenu(null); }}
+                                  onKeyDown={event => {
+                                    if (event.key === "Escape" && openModelColorMenu === `${item.id}:${colorIndex}`) {
+                                      setOpenModelColorMenu(null);
+                                      document.getElementById(`model-color-picker-${item.id}-${colorIndex}`)?.focus();
+                                    }
+                                  }}>
+                                  <button id={`model-color-picker-${item.id}-${colorIndex}`} className={styles.colorPickerButton}
+                                    type="button" aria-label={`Escolher cor ${colorIndex + 1} do modelo ${index + 1}`}
+                                    aria-expanded={openModelColorMenu === `${item.id}:${colorIndex}`}
+                                    aria-controls={openModelColorMenu === `${item.id}:${colorIndex}` ? `model-color-menu-${item.id}-${colorIndex}` : undefined}
+                                    onClick={() => setOpenModelColorMenu(openModelColorMenu === `${item.id}:${colorIndex}` ? null : `${item.id}:${colorIndex}`)}>
+                                    <span className={styles.colorPickerPreview} style={color.rgb ? { background: color.rgb } : undefined} aria-hidden="true" />
+                                  </button>
+                                  {openModelColorMenu === `${item.id}:${colorIndex}` ? (
+                                    <div className={styles.colorMenu} id={`model-color-menu-${item.id}-${colorIndex}`}
+                                      role="group" aria-label={`Cores para o modelo ${index + 1}, cor ${colorIndex + 1}`}>
+                                      <span className={styles.colorMenuTitle}>Escolha uma cor</span>
+                                      <div className={styles.colorMenuGrid}>
+                                        {colorOptions.map(option => (
+                                          <button key={option.name} className={styles.colorMenuOption} type="button"
+                                            title={option.name} aria-label={`Selecionar ${option.name} para o modelo ${index + 1}, cor ${colorIndex + 1}`}
+                                            aria-pressed={color.rgb === option.rgb}
+                                            onClick={() => {
+                                              changeModelItem(item.id, { colors: item.colors.map((current, i) =>
+                                                i === colorIndex ? { name: option.name, rgb: option.rgb } : current) });
+                                              setOpenModelColorMenu(null);
+                                              document.getElementById(`model-color-picker-${item.id}-${colorIndex}`)?.focus();
+                                            }}>
+                                            <span className={styles.colorSwatch} style={{ backgroundColor: option.rgb }} aria-hidden="true" />
+                                            <span>{option.name}</span>
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  ) : null}
+                                </div>
+                                {item.colors.length > 1 ? <button type="button" aria-label={`Remover cor ${colorIndex + 1} do modelo ${index + 1}`}
+                                  onClick={() => {
+                                    setOpenModelColorMenu(null);
+                                    changeModelItem(item.id, { colors: item.colors.filter((_, i) => i !== colorIndex) });
+                                  }}>×</button> : null}
                               </div>
                             ))}
                             {item.colors.length < 4 ? <button type="button" className={styles.modelTextAction} onClick={() =>
@@ -1515,6 +1624,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                             value={item.notes} onChange={event => changeModelItem(item.id, { notes: event.target.value })}
                             placeholder="Ex.: precisa encaixar em outra peça" />
                         </div>
+                        <InlineError error={error} field={`model-${item.id}`} />
                       </li>
                     ))}
                   </ol>
@@ -1721,7 +1831,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       {step === 3 && reviewing ? (
         <div className={styles.formPanel}>
           <section className={styles.reviewSection} aria-labelledby="review-details-title" inert={sending || submissionLocked}>
-            <h3 id="review-details-title">Sua peça</h3>
+            <h3 id="review-details-title">{reviewingMultiModel ? "Seus modelos" : "Sua peça"}</h3>
             <dl className={styles.summary}>
               <SummaryRow label="Tipo" value={projectOptions.find((option) => option.value === draft.type)?.title ?? "Não informado"} onEdit={() => edit(1)} />
               {draft.type === "caixa" && draft.boxMode === "quick" ? <SummaryRow label="Descrição" value={draft.boxQuickDescription.trim() || "Descrita pela referência"} onEdit={() => beginReviewEdit("details")} /> : null}
@@ -1798,7 +1908,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           {intakeEnabled && turnstileSiteKey && !submissionLocked ? (
             <QuoteTurnstile key={turnstileResetKey} siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
           ) : null}
-          <p className={styles.privacyNote}>Seus dados serão usados para analisar esta solicitação e retornar pelo contato escolhido. A verificação de segurança utiliza Cloudflare Turnstile.</p>
+          <p className={styles.privacyNote}>Vamos analisar viabilidade técnica, valor e prazo antes de retornar pelo contato escolhido. Seus dados serão usados para esta solicitação. A verificação de segurança utiliza Cloudflare Turnstile.</p>
           {!intakeEnabled && !pendingConfirmation ? <p className={styles.pendingNotice} role="status">O envio está em configuração. Nenhuma informação ou arquivo foi transmitido.</p> : null}
           {submissionError ? <p className={emailPending || !sending ? styles.pendingNotice : styles.submissionStatus} role={sending ? "status" : "alert"}>{submissionError}</p> : null}
           <div className={styles.actions}><button type="button" className={styles.secondaryAction} disabled={sending || submissionLocked} onClick={() => setReviewing(false)}><span aria-hidden="true">←</span> Voltar</button><button type="button" className={styles.primaryAction} disabled={(!intakeEnabled && !pendingConfirmation) || sending} onClick={submitQuote}>{sending ? "Enviando..." : submissionLocked ? "Tentar confirmar envio" : "Solicitar orçamento"}</button></div>

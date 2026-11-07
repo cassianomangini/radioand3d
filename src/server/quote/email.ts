@@ -25,6 +25,27 @@ function display(value: unknown): string {
   return String(value);
 }
 
+function modelColors(value: unknown): string {
+  if (!Array.isArray(value)) return 'a definir';
+  const colors = value.map(color => {
+    if (!color || typeof color !== 'object') return '';
+    const entry = color as Record<string, unknown>;
+    const name = typeof entry.name === 'string' ? entry.name.trim() : '';
+    const rgb = typeof entry.rgb === 'string' && /^#[0-9a-f]{6}$/i.test(entry.rgb) ? entry.rgb : '';
+    return name && rgb ? `${name} (${rgb})` : name || rgb;
+  }).filter(Boolean);
+  return colors.join(', ') || 'a definir';
+}
+
+function modelDimensions(value: unknown): string {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return 'a definir';
+  const entry = value as Record<string, unknown>;
+  const dimensions = ([['width', 'largura'], ['depth', 'profundidade'], ['height', 'altura']] as const)
+    .flatMap(([key, label]) => typeof entry[key] === 'string' && entry[key].trim()
+      ? [`${label} ${entry[key].trim()} cm`] : []);
+  return dimensions.join(' · ') || 'a definir';
+}
+
 type EmailLine = string | { name: string; url: string };
 export type QuoteEmailMessage = { text: string; html: string };
 
@@ -52,8 +73,8 @@ function quoteEmailLines(requestId: string, quote: QuoteNotificationData, siteOr
         if (!file) throw new QuoteHttpError(503, 'quote_email_attachment_missing');
         modelLines.push({ name: file.name, url: file.url });
       } else throw new QuoteHttpError(503, 'quote_email_model_invalid');
-      modelLines.push(`Cores: ${item.colorMode === 'indeciso' ? 'a definir' : display(item.colors ?? [])}`);
-      modelLines.push(`Tamanho: ${item.scale === 'nao-sei' ? 'a definir' : item.scale === 'alterar' ? display(item.dimensions) : 'original'}`);
+      modelLines.push(`Cores: ${item.colorMode === 'indeciso' ? 'a definir' : modelColors(item.colors)}`);
+      modelLines.push(`Tamanho: ${item.scale === 'nao-sei' ? 'a definir' : item.scale === 'alterar' ? modelDimensions(item.dimensions) : 'original'}`);
       if (typeof item.notes === 'string' && item.notes.trim()) modelLines.push(`Observações: ${item.notes.trim()}`);
     }
   }

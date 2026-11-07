@@ -1,13 +1,16 @@
+import { randomUUID } from 'node:crypto';
 import {
   QuoteHttpError, exactKeys, existingSessionToken, issueSessionCookie,
   newQuoteSession, ownerHash, rateLimitHash, readQuoteJson, record,
-  requireQuoteEnabled, requireSameOriginJson, responseError, responseJson, uuid,
+  requireQuoteEnabled, requireSameOriginJson, responseError, responseJson,
+  SMALL_QUOTE_BODY_LIMIT, uuid,
 } from './http';
 import { createQuoteGateway, type QuoteGateway, type QuoteProjectType } from './supabase-gateway';
 import { quoteFileRoleAllows, validateQuoteFiles } from '../../features/quote/file-policy';
 import { detectQuoteFile } from './file-sniffer';
 import { validate3mfArchive } from './zip-3mf';
-import { parseQuoteAttachments, parseQuoteForm, prepareQuoteForStorage, validateQuoteForm } from './form-contract';
+import { parseQuoteAttachments, parseQuoteForm, prepareQuoteForStorage,
+  quoteStoredTextLength, QUOTE_STORED_TEXT_LIMIT, validateQuoteForm } from './form-contract';
 import { quoteEmailMessage, requireQuoteEmailConfig, sendQuoteEmail } from './email';
 import { verifyQuoteTurnstile } from './turnstile';
 import { studioPhotoKeyFromId } from '@/features/studio/r2-photos';
@@ -21,8 +24,8 @@ export async function handleQuoteSession(
 ): Promise<Response> {
   try {
     requireQuoteEnabled();
-    requireSameOriginJson(request);
-    const data = await readQuoteJson(request);
+    requireSameOriginJson(request, SMALL_QUOTE_BODY_LIMIT);
+    const data = await readQuoteJson(request, SMALL_QUOTE_BODY_LIMIT);
     if (!record(data) || !exactKeys(data, ['projectType', 'turnstileToken']) ||
       typeof data.projectType !== 'string' || !TYPES.includes(data.projectType) ||
       typeof data.turnstileToken !== 'string' ||
@@ -54,11 +57,11 @@ export async function handleQuoteAttachmentInit(
   let metricGateway: QuoteGateway | undefined;
   try {
     requireQuoteEnabled();
-    requireSameOriginJson(request);
+    requireSameOriginJson(request, SMALL_QUOTE_BODY_LIMIT);
     const token = existingSessionToken(request);
     const hash = token && ownerHash(token);
     if (!hash) throw new QuoteHttpError(403, 'quote_session_invalid');
-    const body = await readQuoteJson(request);
+    const body = await readQuoteJson(request, SMALL_QUOTE_BODY_LIMIT);
     if (!record(body) || !exactKeys(body, ['requestId','uploadKey','name','size','type','role']) ||
       !uuid(body.requestId) || !uuid(body.uploadKey) ||
       typeof body.role !== 'string' ||
@@ -130,11 +133,11 @@ export async function handleQuoteAttachmentComplete(
 ): Promise<Response> {
   try {
     requireQuoteEnabled();
-    requireSameOriginJson(request);
+    requireSameOriginJson(request, SMALL_QUOTE_BODY_LIMIT);
     const token = existingSessionToken(request);
     const hash = token && ownerHash(token);
     if (!hash) throw new QuoteHttpError(403, 'quote_session_invalid');
-    const body = await readQuoteJson(request);
+    const body = await readQuoteJson(request, SMALL_QUOTE_BODY_LIMIT);
     if (!record(body) || !exactKeys(body, ['requestId','attachmentId']) ||
       !uuid(body.requestId) || !uuid(body.attachmentId)) {
       throw new QuoteHttpError(400, 'invalid_quote_attachment');
@@ -231,6 +234,9 @@ export async function handleQuoteSubmit(
         }
       }
       const prepared = prepareQuoteForStorage(draft, attachments);
+      if (quoteStoredTextLength(prepared) > QUOTE_STORED_TEXT_LIMIT) {
+        throw new QuoteHttpError(400, 'invalid_quote_submit');
+      }
       if (!await db.consumeRate('submit', rateLimitHash(request))) {
         throw new QuoteHttpError(429, 'quote_rate_limited');
       }
@@ -242,7 +248,21 @@ export async function handleQuoteSubmit(
       });
     }
     try {
-      if (!await db.emailWasSent(receipt.request_id)) {
+      if (db.claimEmail || db.finishEmail) {
+        if (!db.claimEmail || !db.finishEmail) throw new QuoteHttpError(503, 'quote_upstream_unavailable');
+        const claimToken = randomUUID();
+        const state = await db.claimEmail(receipt.request_id, hash, claimToken);
+        if (state === 'busy') {
+          return responseJson({ error: 'quote_email_pending', requestId: receipt.request_id,
+            submittedAt: receipt.submission_time, notificationStatus: 'sending' }, 202);
+        }
+        if (state === 'claimed') {
+          const notification = await db.notificationData(receipt.request_id, hash);
+          await mailer(receipt.request_id, quoteEmailMessage(receipt.request_id, notification, new URL(request.url).origin));
+          await db.finishEmail(receipt.request_id, hash, claimToken);
+        }
+      } else if (!await db.emailWasSent(receipt.request_id)) {
+        // Existing injected adapters keep their previous test contract.
         const notification = await db.notificationData(receipt.request_id, hash);
         await mailer(receipt.request_id, quoteEmailMessage(receipt.request_id, notification, new URL(request.url).origin));
         await db.recordEmailSent(receipt.request_id);

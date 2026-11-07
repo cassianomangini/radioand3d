@@ -11,6 +11,7 @@ import { detectQuoteFile } from './file-sniffer';
 import { validate3mfArchive } from './zip-3mf';
 import { parseQuoteAttachments, parseQuoteForm, prepareQuoteForStorage,
   quoteStoredTextLength, QUOTE_STORED_TEXT_LIMIT, validateQuoteForm } from './form-contract';
+import { PRINT_RIGHTS_VERSION } from '@/features/quote/print-rights';
 import { quoteEmailMessage, requireQuoteEmailConfig, sendQuoteEmail } from './email';
 import { verifyQuoteTurnstile } from './turnstile';
 import { studioPhotoKeyFromId } from '@/features/studio/r2-photos';
@@ -218,6 +219,9 @@ export async function handleQuoteSubmit(
       }
       if (draft.type === 'arquivo' && !draft.printRightsAccepted) {
         throw new QuoteHttpError(400, 'quote_print_rights_required');
+      }
+      if (draft.type === 'arquivo' && draft.printRightsVersion !== PRINT_RIGHTS_VERSION) {
+        throw new QuoteHttpError(409, 'quote_print_rights_outdated');
       }
       if (draft.type === 'arquivo' && draft.modelItems?.length &&
           process.env.CM_QUOTE_MULTIMODEL_ENABLED !== 'true') {

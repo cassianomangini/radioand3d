@@ -63,9 +63,13 @@ function fileByRole(files: QuoteAttachmentInput[], role: QuoteAttachmentInput['r
 }
 
 export function parseQuoteForm(value: unknown): Draft | null {
-  if (!object(value) || !oneOf(value.type, ['caixa', 'placa', 'arquivo', 'outro']) ||
-      !Number.isSafeInteger(value.quantity) || (value.quantity as number) < 1 ||
-      (value.quantity as number) > 10000) return null;
+  if (!object(value) || !oneOf(value.type, ['caixa', 'placa', 'arquivo', 'outro'])) return null;
+  const hasModelItems = value.type === 'arquivo' && Array.isArray(value.modelItems) &&
+    value.modelItems.length > 0;
+  // Multi-model quantities live on the items. The old, hidden quantity may
+  // contain an unfinished value from an earlier journey and is never stored.
+  if (!hasModelItems && (!Number.isSafeInteger(value.quantity) ||
+      (value.quantity as number) < 1 || (value.quantity as number) > 10000)) return null;
   if (value.studioPhotoId != null &&
       (typeof value.studioPhotoId !== 'string' || value.studioPhotoId.length > 260 ||
        !/^[A-Za-z0-9_-]+\.[a-f0-9]{32}\.[a-f0-9]{32}$/.test(value.studioPhotoId))) return null;
@@ -78,6 +82,8 @@ export function parseQuoteForm(value: unknown): Draft | null {
   if (value.desiredDate !== undefined &&
       (typeof value.desiredDate !== 'string' || value.desiredDate.length > 10)) return null;
   if (value.printRightsAccepted !== undefined && typeof value.printRightsAccepted !== 'boolean') return null;
+  if (value.printRightsVersion !== undefined &&
+      (typeof value.printRightsVersion !== 'string' || value.printRightsVersion.length > 40)) return null;
   for (const key of booleanFields) if (typeof value[key] !== 'boolean') return null;
   for (const key of dimensionFields) if (!dimension(value[key])) return null;
   for (const key of listFields) {
@@ -105,8 +111,10 @@ export function parseQuoteForm(value: unknown): Draft | null {
       !oneOf(value.colorMode, ['', 'tenho', 'indeciso']) ||
       !oneOf(value.boxQrSource, ['', 'content', 'file']) ||
       !oneOf(value.plateQrSource, ['', 'content', 'file'])) return null;
-  return { ...value, desiredDate: value.desiredDate ?? '',
-    printRightsAccepted: value.printRightsAccepted ?? false } as Draft;
+  return { ...value, quantity: hasModelItems ? 1 : value.quantity,
+    desiredDate: value.desiredDate ?? '',
+    printRightsAccepted: value.printRightsAccepted ?? false,
+    printRightsVersion: value.printRightsVersion ?? '' } as Draft;
 }
 
 export function parseQuoteAttachments(value: unknown): QuoteAttachmentInput[] | null {

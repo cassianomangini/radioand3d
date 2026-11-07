@@ -7,7 +7,7 @@ import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import { validModelLink } from "@/features/quote/model-link";
 import { formatDesiredDate, saoPauloToday, validDesiredDate } from "@/features/quote/desired-date";
-import { PRINT_RIGHTS_TEXT } from "@/features/quote/print-rights";
+import { PRINT_RIGHTS_TEXT, PRINT_RIGHTS_VERSION } from "@/features/quote/print-rights";
 import { validModelItems, restorableModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, MODEL_TITLE_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
 import { QUOTE_FILE_POLICY, validateQuoteFiles, quoteFilePolicyLabel, quoteFileRoleAllows } from "@/features/quote/file-policy";
 import styles from "./page.module.css";
@@ -114,6 +114,7 @@ export type Draft = {
   cep: string;
   desiredDate: string;
   printRightsAccepted: boolean;
+  printRightsVersion: string;
 };
 
 type SelectedFiles = Record<FileField, File[]>;
@@ -169,6 +170,7 @@ const initialDraft: Draft = {
   cep: "",
   desiredDate: "",
   printRightsAccepted: false,
+  printRightsVersion: "",
 };
 
 const allowedExtensions: Record<FileField, string[]> = {
@@ -220,6 +222,11 @@ function restorableDraft(value: unknown): value is Draft {
   if (candidate.modelItems === undefined) candidate.modelItems = [];
   if (candidate.desiredDate === undefined) candidate.desiredDate = "";
   if (candidate.printRightsAccepted === undefined) candidate.printRightsAccepted = false;
+  if (candidate.printRightsVersion === undefined) candidate.printRightsVersion = "";
+  if (candidate.printRightsAccepted && candidate.printRightsVersion !== PRINT_RIGHTS_VERSION) {
+    candidate.printRightsAccepted = false;
+    candidate.printRightsVersion = "";
+  }
   return Object.entries(initialDraft).every(([key, template]) => {
     const field = candidate[key];
     if (Array.isArray(template)) {
@@ -653,9 +660,17 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
 
   function selectProjectType(type: ProjectType) {
     setDraft((current) => ({ ...current, type, productSlug: null,
-      printRightsAccepted: current.type === type ? current.printRightsAccepted : false }));
+      printRightsAccepted: current.type === type ? current.printRightsAccepted : false,
+      printRightsVersion: current.type === type ? current.printRightsVersion : "" }));
     setError(null);
     setStep(2);
+  }
+
+  function changePrintRights(accepted: boolean) {
+    setDraft((current) => ({ ...current, printRightsAccepted: accepted,
+      printRightsVersion: accepted ? PRINT_RIGHTS_VERSION : "" }));
+    setError(null);
+    setSubmissionError("");
   }
 
   function chooseBoxMode(mode: Exclude<RequestMode, "">) {
@@ -1050,7 +1065,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       if (!validateProject()) return;
       const contactError = validateContact();
       if (contactError) return openContactError(contactError);
-      if (draft.type === "arquivo" && !draft.printRightsAccepted) {
+      if (draft.type === "arquivo" && (!draft.printRightsAccepted || draft.printRightsVersion !== PRINT_RIGHTS_VERSION)) {
         return setError({ field: "printRightsAccepted", message: "Confirme a declaração para solicitar a impressão." });
       }
     }
@@ -1132,7 +1147,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         setPendingConfirmation(null);
         setSubmissionLocked(false);
       }
-      if (["invalid_quote_submit", "request_too_large", "quote_print_rights_required"].includes(code)) {
+      if (["invalid_quote_submit", "request_too_large", "quote_print_rights_required", "quote_print_rights_outdated"].includes(code)) {
         setPendingConfirmation(null);
         setSubmissionLocked(false);
       }
@@ -1161,6 +1176,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         : code === "quote_file_limit_reached" ? "Os anexos ultrapassam os limites permitidos. Remova ou substitua alguns arquivos."
         : code === "request_too_large" ? "O texto do pedido ultrapassa o limite de envio. Reduza as descrições e tente novamente."
         : code === "quote_print_rights_required" ? "Confirme a declaração de impressão e tente novamente."
+        : code === "quote_print_rights_outdated" ? "A declaração de impressão foi atualizada. Atualize a página, leia o texto atual e confirme novamente."
         : code === "invalid_quote_submit" ? "Algum dado do pedido precisa ser revisto antes do envio."
         : "Não foi possível concluir o envio. Seu pedido permanece nesta página para tentar novamente.");
     } finally {
@@ -2026,7 +2042,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
               <label htmlFor="quote-print-rights">
                 <input id="quote-print-rights" type="checkbox" checked={draft.printRightsAccepted}
                   disabled={sending || submissionLocked} aria-invalid={error?.field === "printRightsAccepted"}
-                  onChange={(event) => update("printRightsAccepted", event.target.checked)} />
+                  onChange={(event) => changePrintRights(event.target.checked)} />
                 <span>{PRINT_RIGHTS_TEXT}</span>
               </label>
               <Link href="/orcamentos/condicoes" target="_blank" rel="noopener noreferrer">Leia as condições do serviço</Link>

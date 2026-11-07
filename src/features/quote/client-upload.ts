@@ -41,7 +41,8 @@ export async function uploadSignedFile(
 
   async function currentOffset(): Promise<number> {
     const response = await fetcher(uploadUrl.href, { method: "HEAD", headers, cache: "no-store", redirect: "error" });
-    const offset = Number(response.headers.get("upload-offset"));
+    const rawOffset = response.headers.get("upload-offset");
+    const offset = rawOffset !== null && /^\d+$/.test(rawOffset) ? Number(rawOffset) : NaN;
     if (!response.ok || !Number.isSafeInteger(offset) || offset < 0 || offset > file.size) {
       throw new Error("quote_upload_unavailable");
     }
@@ -58,7 +59,9 @@ export async function uploadSignedFile(
         headers: { ...headers, "Upload-Offset": String(offset), "Content-Type": "application/offset+octet-stream" },
         body: file.slice(offset, next), cache: "no-store", redirect: "error",
       });
-      if (response.status !== 204 || Number(response.headers.get("upload-offset")) !== next) {
+      const rawOffset = response.headers.get("upload-offset");
+      if (response.status !== 204 || rawOffset === null || !/^\d+$/.test(rawOffset) ||
+          Number(rawOffset) !== next) {
         throw new Error("quote_upload_unavailable");
       }
       offset = next;

@@ -201,6 +201,8 @@ export async function handleQuoteSubmit(
       !record(data.draft) || !Array.isArray(data.attachments)) {
       throw new QuoteHttpError(400, 'invalid_quote_submit');
     }
+    const requestId = data.requestId;
+    const submissionKey = data.submissionKey;
     const db = gateway ?? createQuoteGateway();
     // A completed operation with the same ownership + submission key is
     // a replay. Read the stored request for its email, even if flags, catalog
@@ -214,9 +216,15 @@ export async function handleQuoteSubmit(
       if (!draft || !attachments || !validateQuoteForm(draft, attachments)) {
         throw new QuoteHttpError(400, 'invalid_quote_submit');
       }
+      if (draft.type === 'arquivo' && !draft.printRightsAccepted) {
+        throw new QuoteHttpError(400, 'quote_print_rights_required');
+      }
       if (draft.type === 'arquivo' && draft.modelItems?.length &&
           process.env.CM_QUOTE_MULTIMODEL_ENABLED !== 'true') {
         throw new QuoteHttpError(503, 'quote_multimodel_unavailable');
+      }
+      if (!await db.consumeRate('submit', rateLimitHash(request))) {
+        throw new QuoteHttpError(429, 'quote_rate_limited');
       }
       if (draft.studioPhotoId) {
         let photoKey: string | null;
@@ -233,19 +241,39 @@ export async function handleQuoteSubmit(
           throw new QuoteHttpError(400, 'invalid_quote_submit');
         }
       }
-      const prepared = prepareQuoteForStorage(draft, attachments);
-      if (quoteStoredTextLength(prepared) > QUOTE_STORED_TEXT_LIMIT) {
-        throw new QuoteHttpError(400, 'invalid_quote_submit');
+      // Client-declared file metadata is only a claim. Bind every selected
+      // attachment to the validated reservation owned by this draft before
+      // using it to associate a model item or another input role.
+      try {
+        await Promise.all(attachments.map(async file => {
+          const reserved = await db.ownedAttachment(requestId, hash, file.id);
+          const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+          if (reserved.validation_status !== 'validated' ||
+              reserved.original_name !== file.name ||
+              reserved.extension !== extension ||
+              reserved.reported_size_bytes !== file.size ||
+              reserved.validated_size_bytes !== file.size) {
+            throw new QuoteHttpError(400, 'invalid_quote_submit');
+          }
+        }));
+      } catch (error) {
+        // Another request with this same key may have committed between the
+        // initial receipt lookup and this draft-only attachment lookup.
+        receipt = await db.submissionReceipt(requestId, hash, submissionKey);
+        if (!receipt) throw error;
       }
-      if (!await db.consumeRate('submit', rateLimitHash(request))) {
-        throw new QuoteHttpError(429, 'quote_rate_limited');
+      if (!receipt) {
+        const prepared = prepareQuoteForStorage(draft, attachments);
+        if (quoteStoredTextLength(prepared) > QUOTE_STORED_TEXT_LIMIT) {
+          throw new QuoteHttpError(400, 'invalid_quote_submit');
+        }
+        receipt = await db.submitQuote({
+          requestId: data.requestId,
+          ownerHash: hash,
+          submissionKey: data.submissionKey,
+          ...prepared,
+        });
       }
-      receipt = await db.submitQuote({
-        requestId: data.requestId,
-        ownerHash: hash,
-        submissionKey: data.submissionKey,
-        ...prepared,
-      });
     }
     try {
       if (db.claimEmail || db.finishEmail) {

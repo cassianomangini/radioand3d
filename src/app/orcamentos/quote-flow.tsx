@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { quoteApi, uploadSignedFile } from "@/features/quote/client-upload";
 import { QuoteTurnstile } from "@/features/quote/quote-turnstile";
 import { validModelLink } from "@/features/quote/model-link";
+import { formatDesiredDate, saoPauloToday, validDesiredDate } from "@/features/quote/desired-date";
+import { PRINT_RIGHTS_TEXT } from "@/features/quote/print-rights";
 import { validModelItems, restorableModelItems, modelUnits, MODEL_ITEM_LIMIT, MODEL_LINK_MAX_LENGTH, MODEL_NOTES_MAX_LENGTH, MODEL_TITLE_MAX_LENGTH, type ModelItem } from "@/features/quote/model-items";
 import { QUOTE_FILE_POLICY, validateQuoteFiles, quoteFilePolicyLabel, quoteFileRoleAllows } from "@/features/quote/file-policy";
 import styles from "./page.module.css";
@@ -60,7 +62,7 @@ type QrSource = "" | "content" | "file";
 type FileField = "model" | "logo" | "qr" | "boxLogo" | "boxQr" | "references";
 type Dimensions = { width: string; depth: string; height: string };
 type ColorChoice = { name: string; rgb: string };
-type FieldError = { field: string; message: string } | null;
+type FieldError = { field: string; message: string; focusId?: string } | null;
 type ReviewEditArea = "details" | "contact" | "delivery";
 export type Draft = {
   type: ProjectType | null;
@@ -110,6 +112,8 @@ export type Draft = {
   contact: string;
   delivery: "" | "retirada" | "envio";
   cep: string;
+  desiredDate: string;
+  printRightsAccepted: boolean;
 };
 
 type SelectedFiles = Record<FileField, File[]>;
@@ -163,6 +167,8 @@ const initialDraft: Draft = {
   contact: "",
   delivery: "",
   cep: "",
+  desiredDate: "",
+  printRightsAccepted: false,
 };
 
 const allowedExtensions: Record<FileField, string[]> = {
@@ -176,6 +182,22 @@ const allowedExtensions: Record<FileField, string[]> = {
 
 function fileIdentity(file: File) {
   return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+// File metadata is enough to avoid duplicate picks in the list, but not to
+// decide whether an uploaded binary may be reused after replacement.
+const uploadFileIds = new WeakMap<File, string>();
+function uploadFileIdentity(file: File) {
+  let id = uploadFileIds.get(file);
+  if (!id) {
+    id = crypto.randomUUID();
+    uploadFileIds.set(file, id);
+  }
+  return id;
+}
+
+function uploadEntryKey(entry: { role: FileField; file: File; modelItemId?: string }) {
+  return `${entry.role}:${entry.modelItemId ?? ""}:${uploadFileIdentity(entry.file)}`;
 }
 
 type UploadedFile = { id: string; role: FileField; name: string; size: number; type: string; modelItemId?: string };
@@ -196,6 +218,8 @@ function restorableDraft(value: unknown): value is Draft {
   if (candidate.type !== null && !projectOptions.some((option) => option.value === candidate.type)) return false;
   if (candidate.modelSource !== "file" && candidate.modelSource !== "link") return false;
   if (candidate.modelItems === undefined) candidate.modelItems = [];
+  if (candidate.desiredDate === undefined) candidate.desiredDate = "";
+  if (candidate.printRightsAccepted === undefined) candidate.printRightsAccepted = false;
   return Object.entries(initialDraft).every(([key, template]) => {
     const field = candidate[key];
     if (Array.isArray(template)) {
@@ -272,21 +296,26 @@ function modelLinkIssue(link: string): string | null {
   return null;
 }
 
-function modelItemIssue(item: ModelItem): string | null {
+function modelItemIssue(item: ModelItem): { message: string; focusId: string } | null {
   if (item.source === "link") {
     const issue = modelLinkIssue(item.link.trim());
-    if (issue) return `Corrija o link: ${issue}`;
+    if (issue) return { message: `Corrija o link: ${issue}`, focusId: `model-url-${item.id}` };
   }
   if (!Number.isSafeInteger(item.quantity) || item.quantity < 1 || item.quantity > 10000) {
-    return "Informe uma quantidade entre 1 e 10.000.";
+    return { message: "Informe uma quantidade entre 1 e 10.000.", focusId: `model-quantity-${item.id}` };
   }
   if (item.colorMode === "tenho" && (!item.colors.length || item.colors.length > 4 ||
       item.colors.some(color => !color.name.trim() && !color.rgb))) {
-    return "Preencha de uma a quatro cores ou escolha Ainda não decidi.";
+    const missingColor = item.colors.findIndex(color => !color.name.trim() && !color.rgb);
+    return { message: "Preencha de uma a quatro cores ou escolha Ainda não decidi.",
+      focusId: missingColor < 0 ? `model-colors-${item.id}` : `model-color-${item.id}-${missingColor}` };
   }
   if (item.scale === "alterar" && (!Object.values(item.dimensions).some(value => value.trim()) ||
       Object.values(item.dimensions).some(value => value.trim() && !validDimension(value)))) {
-    return "Informe ao menos uma medida válida em cm ou escolha outro tamanho.";
+    const invalid = (['width', 'depth', 'height'] as const).find(key =>
+      item.dimensions[key].trim() && !validDimension(item.dimensions[key]));
+    return { message: "Informe ao menos uma medida válida em cm ou escolha outro tamanho.",
+      focusId: `model-${item.id}-${invalid ?? 'width'}` };
   }
   return null;
 }
@@ -299,7 +328,9 @@ function dimensionsText(dimensions: Dimensions, unknown = false, depth = false) 
 
 function validDimension(value: string) {
   const normalized = value.trim().replace(",", ".");
-  return /^\d+(?:\.\d+)?$/.test(normalized) && Number(normalized) > 0;
+  const number = Number(normalized);
+  return normalized.length <= 24 && /^\d+(?:\.\d+)?$/.test(normalized) &&
+    Number.isFinite(number) && number > 0;
 }
 
 function colorText(color: ColorChoice) {
@@ -355,15 +386,16 @@ function InlineError({ error, field }: { error: FieldError; field: string }) {
   return error?.field === field ? <p className={styles.fieldError} role="alert">{error.message}</p> : null;
 }
 
-function QuantityPicker({ value, onChange }: { value: number; onChange: (value: number) => void }) {
+function QuantityPicker({ value, onChange, error }: { value: number; onChange: (value: number) => void; error: FieldError }) {
   return (
     <div className={styles.field}>
       <label htmlFor="quote-quantity">Quantas unidades você precisa?</label>
       <div className={styles.quantity}>
         <button type="button" aria-label="Diminuir quantidade" disabled={value <= 1} onClick={() => onChange(Math.max(1, value - 1))}>−</button>
-        <input id="quote-quantity" type="number" min="1" inputMode="numeric" value={value} onChange={(event) => onChange(Math.max(1, Math.floor(Number(event.target.value) || 1)))} />
-        <button type="button" aria-label="Aumentar quantidade" onClick={() => onChange(value + 1)}>+</button>
+        <input id="quote-quantity" type="number" min="1" max="10000" inputMode="numeric" value={value} aria-invalid={error?.field === "quantity"} onChange={(event) => onChange(Math.max(1, Math.min(10000, Math.floor(Number(event.target.value) || 1))))} />
+        <button type="button" aria-label="Aumentar quantidade" disabled={value >= 10000} onClick={() => onChange(Math.min(10000, value + 1))}>+</button>
       </div>
+      <InlineError error={error} field="quantity" />
     </div>
   );
 }
@@ -406,7 +438,7 @@ function DimensionFields({
         {measures.map((measure) => (
           <div className={styles.field} key={measure.key}>
             <label htmlFor={`${id}-${measure.key}`}>{measure.label} <span>cm</span></label>
-            <input id={`${id}-${measure.key}`} type="text" inputMode="decimal" placeholder="Ex.: 12" value={value[measure.key]} disabled={unknown} aria-invalid={error?.field === `${id}Dimensions`} onChange={(event) => onChange(measure.key, event.target.value)} />
+            <input id={`${id}-${measure.key}`} type="text" inputMode="decimal" maxLength={24} placeholder="Ex.: 12" value={value[measure.key]} disabled={unknown} aria-invalid={error?.field === `${id}Dimensions`} onChange={(event) => onChange(measure.key, event.target.value)} />
             <small>{measure.help}</small>
           </div>
         ))}
@@ -456,11 +488,14 @@ function FilePicker({
         type="file"
         accept={accept}
         multiple={multiple}
+        aria-invalid={error?.field === id}
         onChange={(event) => {
           onAdd(id, Array.from(event.target.files ?? []));
           event.target.value = "";
         }}
       />
+      {id === "references" || id === "logo" || id === "boxLogo" ?
+        <small>Envie fotos ou imagens que você tenha autorização para compartilhar.</small> : null}
       {files.length > 0 ? (
         <ul className={styles.fileList} aria-label="Arquivos selecionados">
           {files.map((file, index) => (
@@ -598,12 +633,29 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (step === 2 && ((draft.type === "caixa" && draft.boxMode === "detailed") || (draft.type === "placa" && draft.plateMode === "detailed"))) formStepRef.current?.scrollIntoView({ block: "start" });
   }, [boxDetailStep, plateDetailStep, draft.boxMode, draft.plateMode, draft.type, step]);
   useEffect(() => {
-    if (error) document.querySelector(`.${styles.fieldError}`)?.scrollIntoView({ block: "center" });
+    if (!error) return;
+    const message = document.querySelector(`.${styles.fieldError}`);
+    const field = message?.closest(`.${styles.field}, .${styles.fieldSet}`);
+    const invalid = field?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    const control = (error.focusId ? document.getElementById(error.focusId) : null) ??
+      (invalid?.matches('input, textarea, select, button') ? invalid :
+      invalid?.querySelector<HTMLElement>('input, textarea, select, button') ??
+      field?.querySelector<HTMLElement>('input, textarea, select, button'));
+    control?.focus({ preventScroll: true });
+    message?.scrollIntoView({ block: "center" });
   }, [error]);
 
   function update<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((current) => ({ ...current, [key]: value }));
     setError(null);
+    setSubmissionError("");
+  }
+
+  function selectProjectType(type: ProjectType) {
+    setDraft((current) => ({ ...current, type, productSlug: null,
+      printRightsAccepted: current.type === type ? current.printRightsAccepted : false }));
+    setError(null);
+    setStep(2);
   }
 
   function chooseBoxMode(mode: Exclude<RequestMode, "">) {
@@ -827,6 +879,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   function validateDetails(): FieldError {
+    if ((draft.type !== "arquivo" || !multiModelEnabled) &&
+        (!Number.isSafeInteger(draft.quantity) || draft.quantity < 1 || draft.quantity > 10000)) {
+      return { field: "quantity", message: "Informe uma quantidade entre 1 e 10.000." };
+    }
     const activeFiles = visibleFiles(files, draft, modelFiles);
     const fileCheck = validateQuoteFiles(activeFiles);
     if (!fileCheck.ok) return { field: draft.type === "arquivo" ? "modelFiles" : "references", message: fileCheck.message };
@@ -835,9 +891,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       for (const [index, item] of draft.modelItems.entries()) {
         units += item.quantity;
         const issue = modelItemIssue(item) ??
-          (units > 10000 ? "O pedido ultrapassa o limite de 10.000 unidades." : null);
+          (units > 10000 ? { message: "O pedido ultrapassa o limite de 10.000 unidades.",
+            focusId: `model-quantity-${item.id}` } : null);
         if (issue) return { field: `model-${item.id}`,
-          message: `Modelo ${String(index + 1).padStart(2, "0")}: ${issue}` };
+          message: `Modelo ${String(index + 1).padStart(2, "0")}: ${issue.message}`, focusId: issue.focusId };
       }
       if (!validModelItems(draft.modelItems)) return { field: "modelItems", message: `Adicione de 1 a ${MODEL_ITEM_LIMIT} modelos válidos e confira suas preferências.` };
       if (draft.modelItems.some(item => item.source === "file" && !modelFiles[item.id])) {
@@ -862,32 +919,43 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   }
 
   function validateProject() {
+    function showProjectError(validation: NonNullable<FieldError>, stage = 0) {
+      if (reviewing) beginReviewEdit("details", stage, validation.focusId, validation);
+      else {
+        if (draft.type === "caixa" && draft.boxMode === "detailed") setBoxDetailStep(stage);
+        if (draft.type === "placa" && draft.plateMode === "detailed") setPlateDetailStep(stage);
+        setError(validation);
+      }
+      return false;
+    }
+
+    if (draft.type === "caixa" && !draft.boxMode) {
+      return showProjectError({ field: "boxMode", message: "Escolha pedido rápido ou montar passo a passo.",
+        focusId: "quote-box-quick-mode" });
+    }
+    if (draft.type === "placa" && !draft.plateMode) {
+      return showProjectError({ field: "plateMode", message: "Escolha pedido rápido ou montar passo a passo.",
+        focusId: "quote-plate-quick-mode" });
+    }
     if (draft.type === "caixa" && draft.boxMode === "detailed") {
       for (let stage = 0; stage <= 4; stage += 1) {
         const validation = validateBoxDetail(stage);
-        if (validation) {
-          setBoxDetailStep(stage);
-          setError(validation);
-          return false;
-        }
+        if (validation) return showProjectError(validation, stage);
       }
     }
     if (draft.type === "placa" && draft.plateMode === "detailed") {
       for (let stage = 0; stage <= 3; stage += 1) {
         const validation = validatePlateDetail(stage);
-        if (validation) {
-          setPlateDetailStep(stage);
-          setError(validation);
-          return false;
-        }
+        if (validation) return showProjectError(validation, stage);
       }
     }
     const validation = validateDetails();
     if (validation) {
-      if (draft.type === "caixa" && draft.boxMode === "detailed" && validation.field === "references") setBoxDetailStep(3);
-      if (draft.type === "placa" && draft.plateMode === "detailed" && validation.field === "references") setPlateDetailStep(3);
-      setError(validation);
-      return false;
+      const stage = validation.field === "quantity" && draft.type === "caixa" && draft.boxMode === "detailed" ? 4
+        : validation.field === "quantity" && draft.type === "placa" && draft.plateMode === "detailed" ? 3
+        : validation.field === "references" && draft.type === "caixa" && draft.boxMode === "detailed" ? 3
+        : validation.field === "references" && draft.type === "placa" && draft.plateMode === "detailed" ? 3 : 0;
+      return showProjectError(validation, stage);
     }
     setError(null);
     return true;
@@ -919,10 +987,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
   function validateContact(): FieldError {
     let validation: FieldError = null;
     if (!draft.name.trim()) validation = { field: "name", message: "Informe seu nome." };
+    else if (draft.name.length > 160) validation = { field: "name", message: "Use até 160 caracteres no nome." };
+    else if (draft.contact.length > 320) validation = { field: "contact", message: "Use até 320 caracteres no contato." };
     else if (draft.contactMethod === "whatsapp" && !/^\d{10,13}$/.test(draft.contact.replace(/\D/g, ""))) validation = { field: "contact", message: "Confira o número de WhatsApp com DDD." };
     else if (draft.contactMethod === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.contact.trim())) validation = { field: "contact", message: "Confira o endereço de e-mail." };
     else if (!draft.delivery) validation = { field: "delivery", message: "Escolha como prefere receber o pedido." };
     else if (draft.delivery === "envio" && draft.cep.replace(/\D/g, "").length !== 8) validation = { field: "cep", message: "Informe um CEP com 8 números." };
+    else if (!validDesiredDate(draft.desiredDate)) validation = { field: "desiredDate", message: "Escolha uma data válida a partir de hoje ou deixe sem data." };
     return validation;
   }
 
@@ -931,6 +1002,11 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (validation) return setError(validation);
     setError(null);
     setReviewing(true);
+  }
+
+  function openContactError(validation: NonNullable<FieldError>) {
+    const area = ["name", "contact"].includes(validation.field) ? "contact" : "delivery";
+    beginReviewEdit(area, 0, undefined, validation);
   }
 
   async function confirmQuote(confirmation: PendingConfirmation) {
@@ -973,7 +1049,10 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     if (!pendingConfirmation) {
       if (!validateProject()) return;
       const contactError = validateContact();
-      if (contactError) return setError(contactError);
+      if (contactError) return openContactError(contactError);
+      if (draft.type === "arquivo" && !draft.printRightsAccepted) {
+        return setError({ field: "printRightsAccepted", message: "Confirme a declaração para solicitar a impressão." });
+      }
     }
     setSubmissionError("");
     setSending(true);
@@ -983,7 +1062,9 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         return;
       }
       const entries = visibleFileEntries(files, draft, modelFiles);
-      const signature = JSON.stringify(draft) + JSON.stringify(entries.map(({ role, file, modelItemId }) => [role, modelItemId, fileIdentity(file)]));
+      // The draft's text may change while an upload is being retried. Reuse
+      // its reservation unless the project type or actual selected files change.
+      const signature = JSON.stringify([draft.type, entries.map(uploadEntryKey).sort()]);
       let pending = pendingSubmission.current;
       if (!pending || pending.signature !== signature) {
         pendingSubmission.current = null;
@@ -999,7 +1080,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       }
       for (let index = 0; index < entries.length; index += 1) {
         const { role, file, modelItemId } = entries[index];
-        const key = `${role}:${modelItemId ?? ""}:${fileIdentity(file)}`;
+        const key = uploadEntryKey({ role, file, modelItemId });
         const upload = pending.uploads.get(key) ?? { uploadKey: crypto.randomUUID() };
         pending.uploads.set(key, upload);
         if (!upload.complete && upload.attachmentId) {
@@ -1008,7 +1089,12 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
               requestId: pending.requestId, attachmentId: upload.attachmentId,
             });
             upload.complete = true;
-          } catch { /* Upload may still be incomplete; resume below. */ }
+          } catch (cause) {
+            // Only a missing object can be uploaded again with this grant.
+            // A transient validation/rate error must keep the same request and
+            // attachment ID for the next confirmation attempt.
+            if (!(cause instanceof Error) || cause.message !== "quote_file_missing") throw cause;
+          }
         }
         if (!upload.complete) {
           const authorization = await quoteApi<{
@@ -1028,7 +1114,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       }
       setSubmissionError("Registrando pedido e enviando e-mail...");
       const attachments: UploadedFile[] = entries.map(({ role, file, modelItemId }) => {
-        const uploaded = pending!.uploads.get(`${role}:${modelItemId ?? ""}:${fileIdentity(file)}`);
+        const uploaded = pending!.uploads.get(uploadEntryKey({ role, file, modelItemId }));
         if (!uploaded?.attachmentId || !uploaded.complete) throw new Error("quote_upload_unavailable");
         return { id: uploaded.attachmentId, role, name: file.name, size: file.size, type: file.type,
           ...(modelItemId ? { modelItemId } : {}) };
@@ -1040,14 +1126,25 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         setTurnstileToken("");
         setTurnstileResetKey((key) => key + 1);
       }
-      if (["quote_not_found", "quote_conflict", "upload_reservation_expiring", "quote_session_invalid"].includes(code)) {
+      if (["quote_not_found", "quote_attachment_not_found", "quote_conflict",
+        "upload_reservation_expiring", "quote_session_invalid"].includes(code)) {
         pendingSubmission.current = null;
         setPendingConfirmation(null);
         setSubmissionLocked(false);
       }
-      if (["invalid_quote_submit", "request_too_large"].includes(code)) {
+      if (["invalid_quote_submit", "request_too_large", "quote_print_rights_required"].includes(code)) {
         setPendingConfirmation(null);
         setSubmissionLocked(false);
+      }
+      if (code === "invalid_quote_submit") {
+        // A date can become invalid while the summary stays open overnight.
+        // Return to the field if the client can identify the rejected answer.
+        if (!validateProject()) return;
+        const contactError = validateContact();
+        if (contactError) return openContactError(contactError);
+      }
+      if (code === "quote_print_rights_required") {
+        setError({ field: "printRightsAccepted", message: "Confirme a declaração para solicitar a impressão." });
       }
       setSubmissionError(code === "human_verification_required" ? "Confirme a verificação de segurança para enviar o orçamento."
         : code === "human_verification_expired" ? "A verificação expirou. Tente novamente no quadro de segurança."
@@ -1056,9 +1153,14 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         : code === "quote_multimodel_unavailable" ? "O envio de múltiplos modelos está pausado. Seu pedido permanece salvo nesta página para tentar novamente quando o serviço voltar."
         : code === "quote_not_available" ? "O recebimento de novos pedidos está pausado. Se este pedido já foi registrado, tente confirmar novamente mais tarde."
         : code === "quote_upload_unavailable" ? "Não foi possível enviar um arquivo. Confira sua conexão e tente novamente."
+        : code === "quote_file_missing" ? "O arquivo ainda não chegou ao armazenamento. Tente enviar novamente."
+        : code === "quote_file_size_mismatch" ? "O tamanho do arquivo recebido é diferente do selecionado. Escolha outro arquivo."
+        : code === "unsupported_file_content" || code === "quote_file_invalid" ? "O conteúdo do arquivo não corresponde a um formato aceito. Escolha outro arquivo STL, 3MF, PDF ou imagem."
+        : code === "quote_attachment_not_found" ? "Um arquivo do pedido não está mais disponível. Selecione os arquivos novamente para enviar."
         : code === "quote_storage_budget_reached" ? "O envio de arquivos está temporariamente indisponível por limite de armazenamento. Você pode remover os arquivos e enviar links dos modelos ou solicitar ajuda pelo contato do Estúdio."
         : code === "quote_file_limit_reached" ? "Os anexos ultrapassam os limites permitidos. Remova ou substitua alguns arquivos."
         : code === "request_too_large" ? "O texto do pedido ultrapassa o limite de envio. Reduza as descrições e tente novamente."
+        : code === "quote_print_rights_required" ? "Confirme a declaração de impressão e tente novamente."
         : code === "invalid_quote_submit" ? "Algum dado do pedido precisa ser revisto antes do envio."
         : "Não foi possível concluir o envio. Seu pedido permanece nesta página para tentar novamente.");
     } finally {
@@ -1066,12 +1168,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
     }
   }
 
-  function beginReviewEdit(area: ReviewEditArea, detailStage = 0, modelFieldId?: string) {
+  function beginReviewEdit(area: ReviewEditArea, detailStage = 0, modelFieldId?: string, initialError: FieldError = null) {
     reviewSnapshot.current = { draft, files, modelFiles, savedContacts };
     reviewModelFocus.current = modelFieldId ?? null;
     setReviewEdit(area);
     setReviewing(false);
-    setError(null);
+    setError(initialError);
+    setSubmissionError("");
     if (area === "details") {
       if (draft.type === "caixa" && draft.boxMode === "detailed") setBoxDetailStep(detailStage);
       if (draft.type === "placa" && draft.plateMode === "detailed") setPlateDetailStep(detailStage);
@@ -1099,7 +1202,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       const validation = validateContact();
       if (validation) {
         if (reviewEdit === "delivery" && ["name", "contact"].includes(validation.field)) setReviewEdit("contact");
-        if (reviewEdit === "contact" && ["delivery", "cep"].includes(validation.field)) setReviewEdit("delivery");
+        if (reviewEdit === "contact" && ["delivery", "cep", "desiredDate"].includes(validation.field)) setReviewEdit("delivery");
         return setError(validation);
       }
     }
@@ -1227,7 +1330,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
           <legend className={styles.visuallyHidden}>Tipo de projeto</legend>
           {projectOptions.map((option, index) => (
             <label className={styles.option} key={option.value}>
-              <input type="radio" name="quote-project-type" value={option.value} checked={draft.type === option.value} onClick={() => { update("type", option.value); update("productSlug", null); setStep(2); }} onChange={() => { update("type", option.value); update("productSlug", null); setStep(2); }} />
+              <input type="radio" name="quote-project-type" value={option.value} checked={draft.type === option.value} onClick={() => selectProjectType(option.value)} onChange={() => selectProjectType(option.value)} />
               <span className={styles.optionCopy}>
                 <span className={styles.optionNumber}>{String(index + 1).padStart(2, "0")}</span>
                 <strong>{option.title}</strong>
@@ -1244,8 +1347,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
         <div className={`${styles.formPanel} ${showingGuidedForm ? styles.guidedFormPanel : ""}`}>
           {draft.type === "caixa" ? (
             <>
-              {!draft.boxMode ? <div className={styles.boxModeChoices} role="group" aria-label="Como prefere descrever sua caixa?">
-                <button type="button" onClick={() => chooseBoxMode("quick")}>
+              {!draft.boxMode ? <div className={styles.boxModeChoices} role="group" aria-label="Como prefere descrever sua caixa?" data-invalid={error?.field === "boxMode"}>
+                <button id="quote-box-quick-mode" type="button" onClick={() => chooseBoxMode("quick")}>
                   <span className={styles.boxModeCopy}>
                     <span>01 · Pedido rápido</span>
                     <strong>Foto ou descrição</strong>
@@ -1266,12 +1369,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                   </span>
                 </button>
               </div> : null}
+              {!draft.boxMode ? <InlineError error={error} field="boxMode" /> : null}
               {draft.boxMode === "quick" ? (
                 <>
                   <FilePicker id="references" label="Envie uma foto de referência, se tiver" accept=".png,.jpg,.jpeg,.webp,.pdf" files={files.references} multiple onAdd={addFiles} onRemove={removeFile} error={error} />
                   <div className={styles.field}>
                     <label htmlFor="box-quick-description">O que você quer criar ou mudar?</label>
-                    <textarea id="box-quick-description" className={styles.quickDescription} value={draft.boxQuickDescription} aria-invalid={error?.field === "boxQuickDescription"} onChange={(event) => update("boxQuickDescription", event.target.value)} placeholder="Ex.: quero essa caixa em preto e vermelho, com meu QR Code." />
+                    <textarea id="box-quick-description" className={styles.quickDescription} maxLength={2000} value={draft.boxQuickDescription} aria-invalid={error?.field === "boxQuickDescription"} onChange={(event) => update("boxQuickDescription", event.target.value)} placeholder="Ex.: quero essa caixa em preto e vermelho, com meu QR Code." />
                     <small>Pode escrever do seu jeito. Uma foto ou uma descrição já basta para continuar.</small>
                     <InlineError error={error} field="boxQuickDescription" />
                   </div>
@@ -1293,7 +1397,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                         ))}
                       </div>
                       <InlineError error={error} field="boxShape" />
-                      {draft.boxShape === "Outro formato" ? <><input type="text" aria-label="Descreva o formato da caixa" value={draft.boxShapeOther} aria-invalid={error?.field === "boxShapeOther"} onChange={(event) => update("boxShapeOther", event.target.value)} placeholder="Descreva o formato ou envie uma imagem na personalização" /><InlineError error={error} field="boxShapeOther" /></> : null}
+                      {draft.boxShape === "Outro formato" ? <><input type="text" maxLength={2000} aria-label="Descreva o formato da caixa" value={draft.boxShapeOther} aria-invalid={error?.field === "boxShapeOther"} onChange={(event) => update("boxShapeOther", event.target.value)} placeholder="Descreva o formato ou envie uma imagem na personalização" /><InlineError error={error} field="boxShapeOther" /></> : null}
                     </div>
                   ) : null}
                   {boxDetailStep === 1 ? (
@@ -1309,7 +1413,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                       {draft.boxDividers === "com" ? (
                         <div className={styles.field}>
                           <label htmlFor="box-divider-count">Quantas divisórias serão?</label>
-                          <input id="box-divider-count" type="text" inputMode="numeric" value={draft.boxDividerCount} aria-invalid={error?.field === "boxDividerCount"} onChange={(event) => update("boxDividerCount", event.target.value.replace(/\D/g, "").replace(/^0+/, ""))} placeholder="Ex.: 2" />
+                          <input id="box-divider-count" type="text" inputMode="numeric" maxLength={2000} value={draft.boxDividerCount} aria-invalid={error?.field === "boxDividerCount"} onChange={(event) => update("boxDividerCount", event.target.value.replace(/\D/g, "").replace(/^0+/, ""))} placeholder="Ex.: 2" />
                           <InlineError error={error} field="boxDividerCount" />
                         </div>
                       ) : null}
@@ -1340,13 +1444,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                         </div>
                         <InlineError error={error} field="boxPersonalization" />
                       </div>
-                      {!draft.boxNoPersonalization && draft.boxPersonalization.includes("Nome ou frase") ? <div className={styles.field}><label htmlFor="box-text">Qual texto vai na caixa?</label><input id="box-text" type="text" value={draft.boxText} aria-invalid={error?.field === "boxText"} onChange={(event) => update("boxText", event.target.value)} placeholder="Nome, frase ou outra ideia" /><InlineError error={error} field="boxText" /></div> : null}
+                      {!draft.boxNoPersonalization && draft.boxPersonalization.includes("Nome ou frase") ? <div className={styles.field}><label htmlFor="box-text">Qual texto vai na caixa?</label><input id="box-text" type="text" maxLength={2000} value={draft.boxText} aria-invalid={error?.field === "boxText"} onChange={(event) => update("boxText", event.target.value)} placeholder="Nome, frase ou outra ideia" /><InlineError error={error} field="boxText" /></div> : null}
                       {!draft.boxNoPersonalization && draft.boxPersonalization.includes("Logotipo") ? <FilePicker id="boxLogo" label="Envie seu logotipo, se já tiver" accept=".png,.jpg,.jpeg,.webp,.pdf" files={files.boxLogo} onAdd={addFiles} onRemove={removeFile} error={error} /> : null}
                       {!draft.boxNoPersonalization && draft.boxPersonalization.includes("Imagem ou desenho") ? <FilePicker id="references" label="Envie uma imagem ou desenho da caixa" accept=".png,.jpg,.jpeg,.webp,.pdf" files={files.references} multiple onAdd={addFiles} onRemove={removeFile} error={error} /> : null}
                       {!draft.boxNoPersonalization && draft.boxPersonalization.includes("QR Code") ? (
                         <>
                           <QrSourcePicker name="box" value={draft.boxQrSource} onChange={(value) => update("boxQrSource", value)} error={error} />
-                          {draft.boxQrSource === "content" ? <div className={styles.field}><label htmlFor="box-qr">O que o QR Code deve exibir?</label><input id="box-qr" type="text" value={draft.boxQrContent} aria-invalid={error?.field === "boxQrContent"} onChange={(event) => update("boxQrContent", event.target.value)} placeholder="Link ou texto" /><InlineError error={error} field="boxQrContent" /></div> : null}
+                          {draft.boxQrSource === "content" ? <div className={styles.field}><label htmlFor="box-qr">O que o QR Code deve exibir?</label><input id="box-qr" type="text" maxLength={2000} value={draft.boxQrContent} aria-invalid={error?.field === "boxQrContent"} onChange={(event) => update("boxQrContent", event.target.value)} placeholder="Link ou texto" /><InlineError error={error} field="boxQrContent" /></div> : null}
                           {draft.boxQrSource === "file" ? <FilePicker id="boxQr" label="Anexe seu QR Code pronto" accept=".png,.jpg,.jpeg,.webp,.pdf" files={files.boxQr} onAdd={addFiles} onRemove={removeFile} error={error} /> : null}
                         </>
                       ) : null}
@@ -1359,8 +1463,8 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
 
           {draft.type === "placa" ? (
             <>
-              {!draft.plateMode ? <div className={`${styles.boxModeChoices} ${styles.plateModeChoices}`} role="group" aria-label="Como prefere descrever sua placa?">
-                <button type="button" onClick={() => choosePlateMode("quick")}>
+              {!draft.plateMode ? <div className={`${styles.boxModeChoices} ${styles.plateModeChoices}`} role="group" aria-label="Como prefere descrever sua placa?" data-invalid={error?.field === "plateMode"}>
+                <button id="quote-plate-quick-mode" type="button" onClick={() => choosePlateMode("quick")}>
                   <span className={styles.boxModeCopy}>
                     <span>01 · Pedido rápido</span>
                     <strong>Foto ou descrição</strong>
@@ -1375,12 +1479,13 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                   </span>
                 </button>
               </div> : null}
+              {!draft.plateMode ? <InlineError error={error} field="plateMode" /> : null}
               {draft.plateMode === "quick" ? (
                 <>
                   <FilePicker id="references" label="Envie uma foto de referência, se tiver" accept=".png,.jpg,.jpeg,.webp,.pdf" files={files.references} multiple onAdd={addFiles} onRemove={removeFile} error={error} />
                   <div className={styles.field}>
                     <label htmlFor="plate-quick-description">O que você quer criar?</label>
-                    <textarea id="plate-quick-description" className={styles.quickDescription} value={draft.plateQuickDescription} aria-invalid={error?.field === "plateQuickDescription"} onChange={(event) => update("plateQuickDescription", event.target.value)} placeholder="Ex.: quero uma placa azul com meu logotipo e QR Code." />
+                    <textarea id="plate-quick-description" className={styles.quickDescription} maxLength={2000} value={draft.plateQuickDescription} aria-invalid={error?.field === "plateQuickDescription"} onChange={(event) => update("plateQuickDescription", event.target.value)} placeholder="Ex.: quero uma placa azul com meu logotipo e QR Code." />
                     <small>Pode escrever do seu jeito. Uma foto ou uma descrição já basta para continuar.</small>
                     <InlineError error={error} field="plateQuickDescription" />
                   </div>
@@ -1401,12 +1506,12 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                         </div>
                         <InlineError error={error} field="plateContents" />
                       </div>
-                      {!draft.plateContentUnknown && draft.plateContents.includes("Nome ou frase") ? <div className={styles.field}><label htmlFor="plate-text">Qual texto vai na placa?</label><input id="plate-text" type="text" value={draft.plateText} aria-invalid={error?.field === "plateText"} onChange={(event) => update("plateText", event.target.value)} placeholder="Digite o nome ou a frase" /><InlineError error={error} field="plateText" /></div> : null}
+                      {!draft.plateContentUnknown && draft.plateContents.includes("Nome ou frase") ? <div className={styles.field}><label htmlFor="plate-text">Qual texto vai na placa?</label><input id="plate-text" type="text" maxLength={2000} value={draft.plateText} aria-invalid={error?.field === "plateText"} onChange={(event) => update("plateText", event.target.value)} placeholder="Digite o nome ou a frase" /><InlineError error={error} field="plateText" /></div> : null}
                       {!draft.plateContentUnknown && draft.plateContents.includes("Logotipo") ? <FilePicker id="logo" label="Envie seu logotipo, se já tiver" accept=".png,.jpg,.jpeg,.webp,.pdf" files={files.logo} onAdd={addFiles} onRemove={removeFile} error={error} /> : null}
                       {!draft.plateContentUnknown && draft.plateContents.includes("QR Code") ? (
                         <>
                           <QrSourcePicker name="plate" value={draft.plateQrSource} onChange={(value) => update("plateQrSource", value)} error={error} />
-                          {draft.plateQrSource === "content" ? <div className={styles.field}><label htmlFor="plate-qr">O que o QR Code deve exibir?</label><input id="plate-qr" type="text" value={draft.plateQrContent} aria-invalid={error?.field === "plateQrContent"} onChange={(event) => update("plateQrContent", event.target.value)} placeholder="Link ou texto" /><InlineError error={error} field="plateQrContent" /></div> : null}
+                          {draft.plateQrSource === "content" ? <div className={styles.field}><label htmlFor="plate-qr">O que o QR Code deve exibir?</label><input id="plate-qr" type="text" maxLength={2000} value={draft.plateQrContent} aria-invalid={error?.field === "plateQrContent"} onChange={(event) => update("plateQrContent", event.target.value)} placeholder="Link ou texto" /><InlineError error={error} field="plateQrContent" /></div> : null}
                           {draft.plateQrSource === "file" ? <FilePicker id="qr" label="Anexe seu QR Code pronto" accept=".png,.jpg,.jpeg,.webp,.pdf" files={files.qr} onAdd={addFiles} onRemove={removeFile} error={error} /> : null}
                         </>
                       ) : null}
@@ -1429,7 +1534,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                           <label htmlFor="plate-fixation">Como pretende colocar a placa?</label>
                           <button className={styles.skipButton} type="button" aria-pressed={draft.plateFixationUnknown} onClick={() => update("plateFixationUnknown", !draft.plateFixationUnknown)}>Ainda não sei</button>
                         </div>
-                        <input id="plate-fixation" type="text" value={draft.plateFixation} disabled={draft.plateFixationUnknown} aria-invalid={error?.field === "plateFixation"} onChange={(event) => update("plateFixation", event.target.value)} placeholder="Apoiada, pendurada, fixada..." />
+                        <input id="plate-fixation" type="text" maxLength={2000} value={draft.plateFixation} disabled={draft.plateFixationUnknown} aria-invalid={error?.field === "plateFixation"} onChange={(event) => update("plateFixation", event.target.value)} placeholder="Apoiada, pendurada, fixada..." />
                         <InlineError error={error} field="plateFixation" />
                       </div>
                     </>
@@ -1553,7 +1658,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                             {(["width", "depth", "height"] as const).map((dimension) => (
                               <div className={styles.field} key={dimension}>
                                 <label htmlFor={`model-${item.id}-${dimension}`}>{dimension === "width" ? "Largura" : dimension === "depth" ? "Profundidade" : "Altura"} (cm)</label>
-                                <input id={`model-${item.id}-${dimension}`} type="text" inputMode="decimal"
+                                <input id={`model-${item.id}-${dimension}`} type="text" inputMode="decimal" maxLength={24}
                                   value={item.dimensions[dimension]} onChange={event => changeModelItem(item.id,
                                     { dimensions: { ...item.dimensions, [dimension]: event.target.value } })} placeholder="Ex.: 12" />
                               </div>
@@ -1564,7 +1669,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                           <div className={styles.modelColorList}>
                             {item.colors.map((color, colorIndex) => (
                               <div className={styles.modelColorEntry} key={colorIndex}>
-                                <input type="text" list="quote-model-color-suggestions" maxLength={48}
+                                <input id={`model-color-${item.id}-${colorIndex}`} type="text" list="quote-model-color-suggestions" maxLength={48}
                                   aria-label={`Modelo ${index + 1}, cor ${colorIndex + 1}`}
                                   value={color.name} placeholder={`Cor ${colorIndex + 1}, ex.: branco`}
                                   onChange={event => changeModelItem(item.id, { colors: item.colors.map((current, i) =>
@@ -1662,7 +1767,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
               {draft.modelSource === "file" ? <FilePicker id="model" label="Envie seu arquivo 3D" accept=".stl,.3mf" files={files.model} onAdd={addFiles} onRemove={removeFile} error={error} /> :
                 <div className={styles.field}>
                   <label htmlFor="model-link">Link do modelo no MakerWorld ou Bambu Handy</label>
-                  <input id="model-link" type="url" value={draft.modelLink} onChange={event => update("modelLink", event.target.value)} placeholder="https://makerworld.com/en/models/..." />
+                  <input id="model-link" type="url" maxLength={2000} value={draft.modelLink} aria-invalid={error?.field === "modelLink"} onChange={event => update("modelLink", event.target.value)} placeholder="https://makerworld.com/en/models/..." />
                   <InlineError error={error} field="modelLink" />
                 </div>}
               <div className={styles.field}>
@@ -1677,7 +1782,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 <InlineError error={error} field="modelScale" />
               </div>
               {!draft.modelScaleUnknown && draft.modelScale === "alterar" ? <DimensionFields id="model" value={draft.modelDimensions} onChange={(dimension, value) => updateDimension("modelDimensions", dimension, value)} unknown={false} onUnknown={() => undefined} allowUnknown={false} depth error={error} /> : null}
-              <div className={styles.field}><label htmlFor="model-notes">Alguma exigência importante? <small>Opcional</small></label><textarea id="model-notes" value={draft.modelNotes} onChange={event => update("modelNotes", event.target.value)} placeholder="Ex.: encaixe, resistência ou outra observação." /></div>
+              <div className={styles.field}><label htmlFor="model-notes">Alguma exigência importante? <small>Opcional</small></label><textarea id="model-notes" maxLength={2000} value={draft.modelNotes} onChange={event => update("modelNotes", event.target.value)} placeholder="Ex.: encaixe, resistência ou outra observação." /></div>
             </>
           ) : null}
 
@@ -1687,6 +1792,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 <label htmlFor="other-description">{draft.studioPhotoId || draft.productSlug ? "O que você quer mudar nesta peça?" : "O que você gostaria de criar?"}</label>
                 <textarea
                   id="other-description"
+                  maxLength={2000}
                   value={draft.otherDescription}
                   aria-invalid={error?.field === "otherDescription"}
                   onChange={(event) => update("otherDescription", event.target.value)}
@@ -1694,7 +1800,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 />
                 <InlineError error={error} field="otherDescription" />
               </div>
-              <div className={styles.field}><label htmlFor="other-size">Sabe o tamanho aproximado? <small>Opcional</small></label><input id="other-size" type="text" value={draft.otherSize} onChange={(event) => update("otherSize", event.target.value)} placeholder="Escreva o que souber" /></div>
+              <div className={styles.field}><label htmlFor="other-size">Sabe o tamanho aproximado? <small>Opcional</small></label><input id="other-size" type="text" maxLength={2000} value={draft.otherSize} onChange={(event) => update("otherSize", event.target.value)} placeholder="Escreva o que souber" /></div>
             </>
           ) : null}
 
@@ -1711,7 +1817,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
                 {draft.colors.map((color, index) => (
                   <div className={styles.colorEntry} key={index}>
                     <div className={styles.colorRow}>
-                      <input type="text" aria-label={`Cor ${index + 1} por nome`} value={color.name} disabled={draft.colorMode === "indeciso"} aria-invalid={error?.field === "colors" && !hasColor(color)} onChange={(event) => updateColor(index, { name: event.target.value, rgb: "" })} placeholder={`Cor ${index + 1}: ex. preto ou vermelho`} />
+                      <input type="text" maxLength={80} aria-label={`Cor ${index + 1} por nome`} value={color.name} disabled={draft.colorMode === "indeciso"} aria-invalid={error?.field === "colors" && !hasColor(color)} onChange={(event) => updateColor(index, { name: event.target.value, rgb: "" })} placeholder={`Cor ${index + 1}: ex. preto ou vermelho`} />
                       {index > 0 && draft.colorMode !== "indeciso" ? <button className={styles.colorRemove} type="button" aria-label={`Remover cor ${index + 1}`} onClick={() => removeColor(index)}>×</button> : null}
                       <div
                         className={styles.colorPicker}
@@ -1777,7 +1883,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
               <p>Esta ação substitui as preferências individuais atuais. Você pode alterar cada modelo depois.</p>
             </div>
           ) : null}
-          {showingQuantity ? <QuantityPicker value={draft.quantity} onChange={(value) => update("quantity", value)} /> : null}
+          {showingQuantity ? <QuantityPicker value={draft.quantity} onChange={(value) => update("quantity", value)} error={error} /> : null}
           {showingFilePolicy ? <p className={styles.filePolicy}>Os arquivos permanecem privados e precisam ser reenviados se a página for atualizada. {quoteFilePolicyLabel()}.</p> : null}
           {reviewEdit === "details" ? (
             <div className={styles.actions}>
@@ -1801,7 +1907,7 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
       {step === 3 && !reviewing ? (
         <div className={styles.formPanel}>
           {reviewEdit !== "delivery" ? <>
-          <div className={styles.field}><label htmlFor="quote-name">Qual é o seu nome?</label><input id="quote-name" type="text" autoComplete="name" value={draft.name} aria-invalid={error?.field === "name"} onChange={(event) => update("name", event.target.value)} placeholder="Seu nome" /><InlineError error={error} field="name" /></div>
+          <div className={styles.field}><label htmlFor="quote-name">Qual é o seu nome?</label><input id="quote-name" type="text" autoComplete="name" maxLength={160} value={draft.name} aria-invalid={error?.field === "name"} onChange={(event) => update("name", event.target.value)} placeholder="Seu nome" /><InlineError error={error} field="name" /></div>
           <div className={styles.field}>
             <span className={styles.fieldLabel}>Como prefere que a gente entre em contato?</span>
             <div className={styles.choiceButtons} role="group" aria-label="Canal de contato">
@@ -1809,18 +1915,27 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
               <button type="button" aria-pressed={draft.contactMethod === "email"} onClick={() => chooseContactMethod("email")}>E-mail</button>
             </div>
           </div>
-          <div className={styles.field}><label htmlFor="quote-contact">Seu {draft.contactMethod === "whatsapp" ? "WhatsApp" : "e-mail"}</label><input id="quote-contact" type={draft.contactMethod === "email" ? "email" : "tel"} inputMode={draft.contactMethod === "email" ? "email" : "tel"} autoComplete={draft.contactMethod === "email" ? "email" : "tel"} value={draft.contact} aria-invalid={error?.field === "contact"} onChange={(event) => changeContact(event.target.value)} placeholder={draft.contactMethod === "email" ? "voce@exemplo.com" : "(00) 00000-0000"} /><InlineError error={error} field="contact" /></div>
+          <div className={styles.field}><label htmlFor="quote-contact">Seu {draft.contactMethod === "whatsapp" ? "WhatsApp" : "e-mail"}</label><input id="quote-contact" type={draft.contactMethod === "email" ? "email" : "tel"} inputMode={draft.contactMethod === "email" ? "email" : "tel"} autoComplete={draft.contactMethod === "email" ? "email" : "tel"} maxLength={320} value={draft.contact} aria-invalid={error?.field === "contact"} onChange={(event) => changeContact(event.target.value)} placeholder={draft.contactMethod === "email" ? "voce@exemplo.com" : "(00) 00000-0000"} /><InlineError error={error} field="contact" /></div>
           </> : null}
           {reviewEdit !== "contact" ? <>
           <div className={styles.field}>
             <span className={styles.fieldLabel}>Como prefere receber seu pedido?</span>
             <div className={styles.choiceButtons} role="group" aria-label="Entrega do pedido">
               <button type="button" aria-pressed={draft.delivery === "retirada"} onClick={() => update("delivery", "retirada")}>Retirar em São Caetano do Sul</button>
-              <button type="button" aria-pressed={draft.delivery === "envio"} onClick={() => update("delivery", "envio")}>Receber no meu endereço pela Shopee</button>
+              <button type="button" aria-pressed={draft.delivery === "envio"} onClick={() => update("delivery", "envio")}>Receber em casa</button>
             </div>
             <InlineError error={error} field="delivery" />
           </div>
-          {draft.delivery === "envio" ? <div className={styles.field}><label htmlFor="quote-cep">Qual é o seu CEP?</label><input id="quote-cep" type="text" inputMode="numeric" autoComplete="postal-code" value={draft.cep} aria-invalid={error?.field === "cep"} onChange={(event) => update("cep", event.target.value)} placeholder="00000-000" /><small>Depois do orçamento, combinaremos os detalhes do envio pela Shopee.</small><InlineError error={error} field="cep" /></div> : null}
+          {draft.delivery === "envio" ? <div className={styles.field}><label htmlFor="quote-cep">Qual é o seu CEP?</label><input id="quote-cep" type="text" inputMode="numeric" autoComplete="postal-code" value={draft.cep} aria-invalid={error?.field === "cep"} onChange={(event) => update("cep", event.target.value)} placeholder="00000-000" /><small>Depois de analisar o pedido, combinaremos a forma de envio.</small><InlineError error={error} field="cep" /></div> : null}
+          <div className={styles.field}>
+            <label htmlFor="quote-desired-date">Precisa para alguma data?</label>
+            <div className={styles.choiceButtons} role="group" aria-label="Prazo desejado">
+              <button type="button" aria-pressed={!draft.desiredDate} onClick={() => update("desiredDate", "")}>Não tenho data</button>
+            </div>
+            <input id="quote-desired-date" type="date" min={saoPauloToday()} value={draft.desiredDate} aria-invalid={error?.field === "desiredDate"} onChange={(event) => update("desiredDate", event.target.value)} />
+            <small>Vamos verificar se conseguimos atender essa data junto com o orçamento. Para envio, considere a data em que deseja receber.</small>
+            <InlineError error={error} field="desiredDate" />
+          </div>
           </> : null}
           {reviewEdit ? (
             <div className={styles.actions}><button type="button" className={styles.secondaryAction} onClick={cancelReviewEdit}>Cancelar alteração</button><button type="button" className={styles.primaryAction} onClick={saveReviewEdit}>Salvar e voltar ao resumo</button></div>
@@ -1902,9 +2017,22 @@ export function QuoteFlow({ intakeEnabled, studioPhotoId, productReference, turn
             <dl className={styles.summary}>
               <SummaryRow label="Nome" value={draft.name.trim()} onEdit={() => beginReviewEdit("contact")} />
               <SummaryRow label="Contato" value={`${draft.contactMethod === "email" ? "E-mail" : "WhatsApp"}: ${draft.contact}`} onEdit={() => beginReviewEdit("contact")} />
-              <SummaryRow label="Entrega" value={draft.delivery === "retirada" ? "Retirada em São Caetano do Sul" : `Receber no meu endereço pela Shopee · CEP ${draft.cep}`} onEdit={() => beginReviewEdit("delivery")} />
+              <SummaryRow label="Entrega" value={draft.delivery === "retirada" ? "Retirar em São Caetano do Sul" : `Receber em casa · CEP ${draft.cep}`} onEdit={() => beginReviewEdit("delivery")} />
+              <SummaryRow label="Data desejada" value={draft.desiredDate ? formatDesiredDate(draft.desiredDate) ?? draft.desiredDate : "Não tenho data"} onEdit={() => beginReviewEdit("delivery")} />
             </dl>
           </section>
+          {draft.type === "arquivo" && !pendingConfirmation ? (
+            <div className={`${styles.field} ${styles.printRightsField}`}>
+              <label htmlFor="quote-print-rights">
+                <input id="quote-print-rights" type="checkbox" checked={draft.printRightsAccepted}
+                  disabled={sending || submissionLocked} aria-invalid={error?.field === "printRightsAccepted"}
+                  onChange={(event) => update("printRightsAccepted", event.target.checked)} />
+                <span>{PRINT_RIGHTS_TEXT}</span>
+              </label>
+              <Link href="/orcamentos/condicoes" target="_blank" rel="noopener noreferrer">Leia as condições do serviço</Link>
+              <InlineError error={error} field="printRightsAccepted" />
+            </div>
+          ) : null}
           {intakeEnabled && turnstileSiteKey && !submissionLocked ? (
             <QuoteTurnstile key={turnstileResetKey} siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
           ) : null}

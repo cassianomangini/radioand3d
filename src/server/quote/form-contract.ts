@@ -1,6 +1,8 @@
 import type { Draft } from '@/app/orcamentos/quote-flow';
 import { validateQuoteFiles } from '@/features/quote/file-policy';
 import { validModelLink } from '@/features/quote/model-link';
+import { validDesiredDate } from '@/features/quote/desired-date';
+import { PRINT_RIGHTS_TEXT, PRINT_RIGHTS_VERSION } from '@/features/quote/print-rights';
 import { validModelItems, modelUnits } from '@/features/quote/model-items';
 import { uuid } from './http';
 import type { QuoteProjectType } from './supabase-gateway';
@@ -73,6 +75,9 @@ export function parseQuoteForm(value: unknown): Draft | null {
   for (const key of textFields) {
     if (typeof value[key] !== 'string' || value[key].length > 2000) return null;
   }
+  if (value.desiredDate !== undefined &&
+      (typeof value.desiredDate !== 'string' || value.desiredDate.length > 10)) return null;
+  if (value.printRightsAccepted !== undefined && typeof value.printRightsAccepted !== 'boolean') return null;
   for (const key of booleanFields) if (typeof value[key] !== 'boolean') return null;
   for (const key of dimensionFields) if (!dimension(value[key])) return null;
   for (const key of listFields) {
@@ -100,7 +105,8 @@ export function parseQuoteForm(value: unknown): Draft | null {
       !oneOf(value.colorMode, ['', 'tenho', 'indeciso']) ||
       !oneOf(value.boxQrSource, ['', 'content', 'file']) ||
       !oneOf(value.plateQrSource, ['', 'content', 'file'])) return null;
-  return value as Draft;
+  return { ...value, desiredDate: value.desiredDate ?? '',
+    printRightsAccepted: value.printRightsAccepted ?? false } as Draft;
 }
 
 export function parseQuoteAttachments(value: unknown): QuoteAttachmentInput[] | null {
@@ -131,7 +137,8 @@ export function validateQuoteForm(draft: Draft, files: QuoteAttachmentInput[]): 
       (draft.contactMethod === 'email'
         ? !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.contact.trim())
         : !/^\d{10,13}$/.test(draft.contact.replace(/\D/g, ''))) ||
-      (draft.delivery === 'envio' && draft.cep.replace(/\D/g, '').length !== 8)) return false;
+      (draft.delivery === 'envio' && draft.cep.replace(/\D/g, '').length !== 8) ||
+      !validDesiredDate(draft.desiredDate)) return false;
 
   const allowedRoles: QuoteAttachmentInput['role'][] = draft.type === 'caixa'
     ? draft.boxMode === 'quick' ? ['references'] : [
@@ -208,6 +215,10 @@ export function prepareQuoteForStorage(draft: Draft, files: QuoteAttachmentInput
     colorMode: draft.type === 'arquivo' && draft.modelItems?.length ? 'por-modelo' : draft.colorMode,
     colors: draft.type === 'arquivo' && draft.modelItems?.length ? [] : mode === 'quick' ? [] : draft.colors.filter(color => color.name.trim() || color.rgb),
     delivery: draft.delivery, cep: draft.delivery === 'envio' ? draft.cep.trim() : null,
+    desiredDate: draft.desiredDate || null,
+    ...(draft.type === 'arquivo' ? { printRightsAcceptance: {
+      version: PRINT_RIGHTS_VERSION, text: PRINT_RIGHTS_TEXT, acceptedAt: new Date().toISOString(),
+    } } : {}),
   };
   const project = draft.type === 'caixa' ? {
     kind: 'caixa', mode, description: mode === 'quick' ? draft.boxQuickDescription.trim() : null,

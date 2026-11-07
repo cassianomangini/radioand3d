@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { QuoteHttpError, uuid } from './http';
 import type { QuoteNotificationData } from './supabase-gateway';
 import { validModelLink } from '@/features/quote/model-link';
+import { formatDesiredDate } from '@/features/quote/desired-date';
 
 const recipient = 'casman1986@gmail.com';
 
@@ -79,6 +80,13 @@ function quoteEmailLines(requestId: string, quote: QuoteNotificationData, siteOr
     }
   }
   const colors = quote.production.colorMode === 'indeciso' ? 'a definir' : display(quote.production.colors ?? []);
+  const desiredDate = formatDesiredDate(quote.production.desiredDate);
+  const rights = quote.production.printRightsAcceptance;
+  const acceptedRights = rights && typeof rights === 'object' && !Array.isArray(rights)
+    ? rights as Record<string, unknown> : null;
+  const rightsLine = acceptedRights && typeof acceptedRights.version === 'string' &&
+    typeof acceptedRights.acceptedAt === 'string' && Number.isFinite(Date.parse(acceptedRights.acceptedAt))
+    ? `Declaração de impressão: aceita em ${acceptedRights.acceptedAt} (versão ${acceptedRights.version})` : null;
   const studioReference = quote.sourceReference?.startsWith('/api/studio/photos/')
     ? new URL(quote.sourceReference, siteOrigin).href : null;
   return [
@@ -88,7 +96,9 @@ function quoteEmailLines(requestId: string, quote: QuoteNotificationData, siteOr
     `Projeto: ${quote.projectType}`,
     `Quantidade total: ${display(quote.production.quantity)}`,
     ...(items ? [] : [`Cores: ${colors}`]),
-    `Entrega: ${display(quote.production.delivery)}${quote.production.cep ? `, CEP ${display(quote.production.cep)}` : ''}`,
+    `Entrega: ${quote.production.delivery === 'retirada' ? 'Retirar em São Caetano do Sul' : 'Receber em casa'}${quote.production.cep ? `, CEP ${display(quote.production.cep)}` : ''}`,
+    ...(desiredDate ? [`Data desejada: ${desiredDate}`] : []),
+    ...(rightsLine ? [rightsLine] : []),
     ...(studioReference ? [{ name: 'Foto de referência do Estúdio', url: studioReference }] : []),
     '', 'Detalhes:', ...details, ...modelLines,
     '', 'Arquivos enviados:',

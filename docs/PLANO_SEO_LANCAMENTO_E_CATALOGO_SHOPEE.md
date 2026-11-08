@@ -19,36 +19,6 @@ Sitemap e metadados auxiliam descoberta e entendimento; não garantem indexaçã
 
 **Escopo comercial prioritário:** páginas dos produtos Shopee, suas imagens verdadeiras e intenção de compra. O carrossel de fotos do Estúdio é secundário. Não criar blog, páginas de palavras-chave vazias ou categorias artificiais apenas para multiplicar URLs.
 
-## 2. Ponto de partida (verificado no repositório em 06/11/2026)
-
-- A propriedade de domínio `cmangini3d.com.br` foi verificada pelo proprietário no **Google Search Console**.
-- O projeto já tem `/produtos`, `/produtos/[slug]`, botão de compra por produto na Shopee, Home, Estúdio e Orçamentos.
-- O snapshot de catálogo conferido contém **27 produtos**. Essa quantidade é um retrato do código na data e **não** comprova estado comercial atual dos anúncios.
-- `src/app/sitemap.ts` e `src/app/robots.ts` foram implementados; `metadataBase`, títulos, descriptions e canonical das páginas principais foram adicionados.
-- `src/features/products/search-approval.ts` atualmente **não aprova nenhum slug** para indexação: detalhe público de produto pode existir no site, mas segue `noindex` até revisão. **Não remover esse bloqueio globalmente.**
-- A validação técnica de SEO registrou lint, typecheck, 45 testes e build aprovados no [GitHub Actions](https://github.com/cassianomangini/radioand3d/actions/runs/42293514312). Isso **não substitui** validação do HTML e das respostas HTTP no domínio após deploy.
-- O deploy do novo SEO e o envio do sitemap ao Search Console **ainda precisavam ser confirmados** na revisão. Conferir novamente o estado atual antes de marcar os itens abaixo.
-
-O [plano técnico detalhado da integração Shopee + SEO](superpowers/plans/2026-11-04-catalogo-shopee-seo.md) permanece referência complementar para origem dos dados, estados, snapshots, segurança e arquitetura. Este documento determina **sequência de lançamento e critérios comerciais**, sem cancelar as restrições de segurança existentes.
-
-## P0 — Lançamento e indexação inicial (agora)
-
-**Objetivo:** permitir que o Google descubra as páginas principais corretas, sem indexar detalhes de produto ainda não revisados.
-
-### Checklist de execução
-
-- [ ] Executar build e deploy da `main` aprovada para **Production** na Vercel; conferir o SHA efetivamente publicado. Não presumir que push no GitHub produz deploy: verificar configuração atual.
-- [ ] Confirmar `https://cmangini3d.com.br` como endereço canônico; configurar/verificar **redirecionamento permanente** de `www.cmangini3d.com.br` para o domínio sem `www`; revisar também URLs `vercel.app` para não criar versões públicas concorrentes.
-- [ ] Inspecionar **respostas reais**: páginas públicas retornam 200 e apresentam canonical correta, título/description e `index,follow` em produção. Previews permanecem `noindex`.
-- [ ] Confirmar `/robots.txt` e `/sitemap.xml` respondendo corretamente no domínio canônico; sitemap deve conter somente URLs públicas e elegíveis. `/api/studio/photos/` e outras imagens públicas usadas nas páginas não devem ser bloqueadas por engano; APIs privadas continuam protegidas.
-- [ ] Validar `/`, `/estudio`, `/produtos` e `/orcamentos`: navegação, links, texto, mobile/desktop e o CTA real. Não declarar orçamento enviado sem confirmação do backend.
-- [ ] Confirmar que `/produtos/[slug]` permanece fora do índice enquanto não aprovado editorialmente.
-- [ ] Abrir **Google Search Console** na propriedade de domínio `cmangini3d.com.br` > **Sitemaps** > adicionar `sitemap.xml` > **Enviar**. Conferir status de processamento.
-- [ ] Usar **Inspeção de URL** para testar URL publicada e solicitar indexação de `/`, `/estudio`, `/produtos`, `/orcamentos`; não enviar produtos ainda marcados `noindex`.
-- [ ] Acompanhar **Indexação > Páginas** e **Desempenho > Resultados da pesquisa**. Status de sitemap `Sucesso` **não** significa páginas indexadas.
-
-**Critério de aceite P0:** domínio e redirects corretos; resposta HTTP/HTML conferida; sitemap funcionando e enviado; nenhuma URL privada ou produto não aprovado anunciado como indexável. **Não exige ranking ou indexação imediata.**
-
 ## P1 — Piloto de produtos Shopee no Google (próxima prioridade)
 
 **Objetivo:** liberar um primeiro grupo **de 5 a 8 produtos** com páginas realmente úteis, mantendo a expansão gradual. A seleção final depende de evidências, não é uma lista fixa por preferência.
@@ -61,7 +31,7 @@ O [plano técnico detalhado da integração Shopee + SEO](superpowers/plans/2026
 - [ ] Conferir marcas, personagens e alegações de propriedade intelectual antes de construir SEO baseado nesses nomes.
 - [ ] Registrar motivo da inclusão/exclusão e fontes usadas para cada produto candidato.
 
-**Candidatos iniciais para investigar, não pré-aprovados:** porta-figurinhas 3D, caixa de dois compartimentos, porta-controles de mesa, porta-curativos compacto, casinha porta-iscas de formiga e chaveiro Mureta de Santos. Substituir candidatos se os dados reais apontarem oportunidade superior.
+**Candidatos iniciais para investigar, não pré-aprovados:** caixa de dois compartimentos, porta-controles de mesa, porta-curativos compacto, casinha porta-iscas de formiga e chaveiro Mureta de Santos. .
 
 ### Critério mínimo de uma página de produto indexável
 

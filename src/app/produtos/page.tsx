@@ -7,8 +7,8 @@ import { ProductCatalog } from "./product-catalog";
 import styles from "./products.module.css";
 import { getProductSubtitle } from "./subtitles";
 
-const title = "Produtos Impressos em 3D | CM 3D & Rádio";
-const description = "Conheça caixas, organizadores, peças decorativas e outros produtos reais impressos em 3D pelo estúdio CM 3D, com compra pela Shopee.";
+const title = "Produtos Impressos em 3D | CMangini 3D";
+const description = "Conheça caixas, organizadores, peças decorativas e outros produtos reais impressos em 3D pelo estúdio CMangini 3D, com compra pela Shopee.";
 
 export const metadata: Metadata = {
   title,
@@ -37,7 +37,7 @@ export default async function ProdutosPage() {
       <header className={styles.banner}>
         <div className={styles.bannerContent}>
           <h1 className={styles.bannerTitle}>Produtos</h1>
-          <p>Conheça as peças do Estúdio CM 3D.</p>
+          <p>Conheça as peças do estúdio CMangini 3D.</p>
         </div>
       </header>
 

@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
 import { HomeFrame } from "../components/home-frame";
+import { SITE_URL } from "@/lib/site-seo";
 
-const title = "CM 3D & Rádio | Impressão 3D em São Caetano do Sul";
-const description = "Caixas sob medida, placas personalizadas e impressão 3D por encomenda em São Caetano do Sul. Retirada local e envio para todo o Brasil.";
+const title = "CMangini 3D | Impressão 3D em São Caetano do Sul";
+const description = "Na CMangini 3D, fazemos caixas sob medida, placas personalizadas e impressão 3D por encomenda em São Caetano do Sul. Enviamos para todo o Brasil.";
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "CMangini 3D",
+  url: `${SITE_URL}/`,
+};
 
 export const metadata: Metadata = {
   title,
@@ -14,10 +22,15 @@ export const metadata: Metadata = {
     url: "/",
     type: "website",
     locale: "pt_BR",
-    siteName: "CM 3D & Rádio",
+    siteName: "CMangini 3D",
   },
 };
 
 export default function Home() {
-  return <HomeFrame />;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema).replace(/</g, "\\u003c") }} />
+      <HomeFrame />
+    </>
+  );
 }

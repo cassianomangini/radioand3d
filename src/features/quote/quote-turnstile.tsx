@@ -22,12 +22,16 @@ declare global {
 }
 
 const SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const NON_RETRYABLE_ERRORS = new Set(["110100", "110110", "110200", "200100", "400020", "400021", "400070"]);
 
 function errorMessage(code: string): string {
-  if (["110100", "110110", "110200", "400020", "400021", "400070"].includes(code)) {
-    return `A verificação está indisponível neste endereço (código ${code}). Seus dados continuam preenchidos.`;
+  if (code === "110200") {
+    return "A verificação de segurança não foi autorizada para este endereço (código 110200). Avise o responsável pelo site. Seu pedido continua preenchido.";
   }
-  if (code === "200100") return `A verificação encontrou um problema de horário ou cache (código ${code}). Seus dados continuam preenchidos.`;
+  if (NON_RETRYABLE_ERRORS.has(code) && code !== "200100") {
+    return `A verificação de segurança precisa de correção neste site (código ${code}). Avise o responsável pelo site. Seu pedido continua preenchido.`;
+  }
+  if (code === "200100") return `A verificação encontrou um problema de horário ou cache (código ${code}). Confira o relógio do aparelho e atualize a página. Seu pedido continua preenchido.`;
   return `Não foi possível concluir a verificação${code ? ` (código ${code})` : ""}. Tente novamente sem perder o pedido.`;
 }
 
@@ -40,6 +44,7 @@ export function QuoteTurnstile({
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<string | null>(null);
   const [error, setError] = useState("");
+  const [canRetry, setCanRetry] = useState(true);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -65,6 +70,7 @@ export function QuoteTurnstile({
             if (cancelled) return;
             onToken("");
             console.warn("[quote-turnstile] widget error", { code, hostname: location.hostname });
+            setCanRetry(!NON_RETRYABLE_ERRORS.has(code));
             setError(errorMessage(code));
           },
         });
@@ -105,6 +111,7 @@ export function QuoteTurnstile({
   function retry() {
     onToken("");
     setError("");
+    setCanRetry(true);
     if (widgetRef.current && window.turnstile) {
       try { window.turnstile.reset(widgetRef.current); return; }
       catch { /* Recreate the widget below. */ }
@@ -114,8 +121,8 @@ export function QuoteTurnstile({
 
   return (
     <div aria-label="Proteção contra envios automatizados">
-      <div ref={containerRef} />
-      {error ? <p role="alert">{error} <button type="button" onClick={retry}>Tentar novamente</button></p> : null}
+      <div ref={containerRef} hidden={Boolean(error) && !canRetry} />
+      {error ? <p role="alert">{error} {canRetry ? <button type="button" onClick={retry}>Tentar novamente</button> : null}</p> : null}
     </div>
   );
 }

@@ -3,8 +3,8 @@ import Link from "next/link";
 import styles from "../page.module.css";
 
 export const metadata: Metadata = {
-  title: "Condições da impressão 3D | CM 3D & Rádio",
-  description: "Condições para solicitar uma impressão 3D sob demanda no Estúdio CM 3D & Rádio.",
+  title: "Condições da impressão 3D | CMangini 3D",
+  description: "Condições para solicitar uma impressão 3D sob demanda no estúdio CMangini 3D.",
   alternates: { canonical: "/orcamentos/condicoes" },
 };
 

@@ -129,7 +129,7 @@ export function SiteHeader({ radioOpen = false, docked = false, onHome, onOpenRa
           {docked && onRestoreRadio ? <RadioMiniPlayer onRestore={() => { setMenuOpen(false); onRestoreRadio(); }} /> : null}
           <div className={styles.social} role="group" aria-label="Contato e redes sociais">
             <a href="mailto:casman1986@gmail.com" aria-label="Enviar e-mail para casman1986@gmail.com" title="E-mail: casman1986@gmail.com" onClick={() => setMenuOpen(false)}><SocialIcon name="email" /></a>
-            <a href="https://www.instagram.com/cmangini3d/" aria-label="Instagram do CMangini3D" title="Instagram: @cmangini3d" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}><SocialIcon name="instagram" /></a>
+            <a href="https://www.instagram.com/cmangini3d/" aria-label="Instagram da CMangini 3D" title="Instagram: @cmangini3d" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}><SocialIcon name="instagram" /></a>
             <a href="https://shopee.com.br/artesopolis" aria-label="Loja Artesopolis na Shopee" title="Shopee: artesopolis" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}><SocialIcon name="shopee" /></a>
           </div>
         </div>

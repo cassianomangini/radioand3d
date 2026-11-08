@@ -140,7 +140,7 @@ export function requireQuoteEmailConfig(): EmailConfig {
       from.length > 200 || !/^[^\r\n<>]+ <[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+>$/.test(from)) {
     throw new QuoteHttpError(503, 'quote_email_configuration_missing');
   }
-  return { provider: 'resend', key, from };
+  return { provider: 'resend', key, from: from.replace(/^[^<>]+(?= <)/, 'CMangini 3D') };
 }
 
 export async function sendQuoteEmail(requestId: string, message: QuoteEmailMessage, fetcher: typeof fetch = fetch): Promise<void> {
@@ -148,7 +148,7 @@ export async function sendQuoteEmail(requestId: string, message: QuoteEmailMessa
     throw new QuoteHttpError(400, 'invalid_quote_email');
   }
   return sendNotification(
-    `Novo orçamento CM 3D #${requestId.slice(0, 8)}`,
+    `Novo orçamento CMangini 3D #${requestId.slice(0, 8)}`,
     `quote/${requestId}`, `<quote-${requestId}@gmail.com>`, message, fetcher,
   );
 }
@@ -159,10 +159,10 @@ export async function sendQuoteOperationsAlert(dayUtc: string, lines: string[], 
       lines.some(line => line.length > 200 || /[\r\n<>]/.test(line))) {
     throw new QuoteHttpError(400, 'invalid_quote_email');
   }
-  const text = ['Alerta operacional dos orçamentos CM 3D', `Dia UTC: ${dayUtc}`, '', ...lines].join('\n');
+  const text = ['Alerta operacional dos orçamentos CMangini 3D', `Dia UTC: ${dayUtc}`, '', ...lines].join('\n');
   const digest = createHash('sha256').update(text).digest('hex').slice(0, 16);
   await sendNotification(
-    `Alerta operacional de orçamentos CM 3D (${dayUtc})`,
+    `Alerta operacional de orçamentos CMangini 3D (${dayUtc})`,
     `quote/operations/${dayUtc}/${digest}`, `<quote-operations-${dayUtc}-${digest}@gmail.com>`,
     { text, html: `<div style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(text)}</div>` },
     fetcher,
@@ -181,7 +181,7 @@ async function sendNotification(subject: string, idempotencyKey: string, message
     });
     try {
       const result = await transport.sendMail({
-        from: `CM 3D <${recipient}>`, to: recipient,
+        from: `CMangini 3D <${recipient}>`, to: recipient,
         subject, text: message.text, html: message.html, messageId,
       });
       if (!result.accepted.some(address => address.toLowerCase() === recipient)) {

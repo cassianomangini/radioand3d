@@ -23,7 +23,9 @@
 
 O novo site reúne dois mundos conectados:
 
-- **CM 3D Estúdio:** serviços de placas personalizadas, caixas sob medida, avaliação de arquivos 3D, produtos reais, impressões realizadas, materiais e apresentação da operação.
+**Nome do site:** CM 3D & Rádio. **Nome do estúdio:** CMangini 3D. Os títulos e textos das páginas comerciais usam o nome do estúdio.
+
+- **Estúdio CMangini 3D:** serviços de placas personalizadas, caixas sob medida, avaliação de arquivos 3D, produtos reais, impressões realizadas, materiais e apresentação da operação.
 - **CM Rádio:** músicas autorais publicadas, fila, busca, reprodução, controles, visualizador e links individuais.
 
 **Objetivos de conversão:** (1) receber pedidos de orçamento com destino real e seguro; (2) apresentar produtos e levar o comprador à página específica da Shopee.

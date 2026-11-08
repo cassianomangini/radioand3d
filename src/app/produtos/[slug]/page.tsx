@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const product = catalog.products.find((entry) => entry.slug === slug);
   if (!product) {
-    return { title: "Produto indisponível | CM 3D & Rádio", robots: { index: false, follow: false } };
+    return { title: "Produto indisponível | CMangini 3D", robots: { index: false, follow: false } };
   }
 
   return {
@@ -84,7 +84,7 @@ export default async function ProductPage({ params }: Props) {
       <header className={styles.banner}>
         <div className={styles.bannerContent}>
           <p className={styles.bannerTitle}>Produtos</p>
-          <p>Peças do Estúdio CM 3D.</p>
+          <p>Peças do estúdio CMangini 3D.</p>
         </div>
       </header>
       <div className={styles.wrap}>

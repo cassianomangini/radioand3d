@@ -4,8 +4,8 @@ import { getStudioPhotos, studioPhotoSrc } from "@/features/studio/r2-photos";
 import { StudioCarousel, type StudioSlide } from "./studio-carousel";
 import styles from "./page.module.css";
 
-const title = "Estúdio de Impressão 3D | CM 3D & Rádio";
-const description = "Conheça o estúdio CM 3D, em São Caetano do Sul, e veja peças e trabalhos reais de impressão 3D.";
+const title = "Estúdio de Impressão 3D | CMangini 3D";
+const description = "Conheça o estúdio CMangini 3D, em São Caetano do Sul, e veja peças e trabalhos reais de impressão 3D.";
 
 export const metadata: Metadata = {
   title,
@@ -40,7 +40,7 @@ export default async function StudioPage() {
   const photos = shufflePhotos(await getStudioPhotos());
   const slides: StudioSlide[] = photos.map((photo, index) => ({
     src: studioPhotoSrc(photo),
-    alt: `Trabalho do estúdio CM 3D, foto ${index + 1}`,
+    alt: `Trabalho do estúdio CMangini 3D, foto ${index + 1}`,
     title: `Foto ${index + 1}`,
     category: categoryFromKey(photo.key),
   }));
@@ -48,7 +48,7 @@ export default async function StudioPage() {
     <div className={styles.page} data-studio-page>
       <div className={styles.layout}>
         <header className={styles.intro}>
-          <h1>Estúdio</h1>
+          <h1>Estúdio CMangini 3D</h1>
           <p>
             Conheça nosso estúdio e veja alguns dos trabalhos que já realizamos.
           </p>

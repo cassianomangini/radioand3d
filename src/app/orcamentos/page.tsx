@@ -9,8 +9,8 @@ import { getSiteCatalog } from "@/server/products/catalog";
 import { QuoteFlow } from "./quote-flow";
 import styles from "./page.module.css";
 
-const title = "Orçamento de Impressão 3D | CM 3D & Rádio";
-const description = "Solicite orçamento para caixas sob medida, placas personalizadas ou impressão 3D por encomenda. Conte sua ideia em poucos passos.";
+const title = "Orçamento de Impressão 3D | CMangini 3D";
+const description = "Solicite à CMangini 3D um orçamento para caixas sob medida, placas personalizadas ou impressão 3D por encomenda. Conte sua ideia em poucos passos.";
 
 export const metadata: Metadata = {
   title,

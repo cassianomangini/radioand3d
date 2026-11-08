@@ -4,7 +4,7 @@ import styles from "../app/page.module.css";
 
 export function HomeFrame() {
   return (
-    <section className={styles.homeHero} aria-label="Apresentação do CMangini3D">
+    <section className={styles.homeHero} aria-label="Apresentação da CMangini 3D">
       <div className={styles.copy}>
         <h1>
           Caixas sob medida.
@@ -22,7 +22,7 @@ export function HomeFrame() {
             sizes="(max-width: 1023px) 100vw, 1px"
           />
         </figure>
-        <ul className={styles.featureGrid} aria-label="Informações sobre o CMangini3D">
+        <ul className={styles.featureGrid} aria-label="Informações sobre a CMangini 3D">
           <li className={styles.featureCard}>
             <span className={styles.featureIcon} aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" /></svg></span>
             <span className={styles.featureText}><small>Retirada em</small><strong>São Caetano do Sul</strong><small>ABC Paulista</small></span>
@@ -45,7 +45,7 @@ export function HomeFrame() {
           <ButtonLink href="/estudio" variant="secondary">Conhecer o Estúdio</ButtonLink>
         </div>
         <p>
-          Nossos produtos também estão
+          Na CMangini 3D, nossos produtos também estão
           disponíveis na{" "}
           <a className={styles.shopeeLink} href="https://shopee.com.br/artesopolis">
             <strong>Shopee.</strong>

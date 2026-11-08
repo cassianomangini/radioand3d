@@ -29,8 +29,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "CM 3D & Rádio",
-  description: "Caixas sob medida, placas personalizadas e impressão 3D por encomenda. Estúdio em São Caetano do Sul, com envio para todo o Brasil.",
+  title: "CMangini 3D",
+  description: "CMangini 3D: caixas sob medida, placas personalizadas e impressão 3D por encomenda. Estúdio em São Caetano do Sul, com envio para todo o Brasil.",
   robots: {
     index: isIndexableDeployment(),
     follow: isIndexableDeployment(),

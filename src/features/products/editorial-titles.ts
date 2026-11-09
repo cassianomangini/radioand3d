@@ -44,7 +44,10 @@ export function suggestProductDisplayTitle(original: string): string {
   const first48 = candidate.slice(0, 48);
   const lastSpace = first48.lastIndexOf(" ");
   // Se a palavra termina exatamente na posicao 48, podemos preserva-la.
-  const end = candidate[48] === " " ? 48 : (lastSpace >= 24 ? lastSpace : 48);
+  const end = candidate[48] === " " ? 48 : lastSpace;
+  // Sem separador viavel, sinalizar o truncamento em vez de produzir
+  // uma palavra incompleta que pareca ser o nome do produto.
+  if (end < 24) return candidate.slice(0, 47).trimEnd() + "…";
   // Evitar conectivos soltos ou adverbios que nao definem o produto.
   return candidate.slice(0, end).trimEnd()
     .replace(/\s+(?:com|e|de|da|do|das|dos|para|em|no|na|bem)$/iu, "").trimEnd();

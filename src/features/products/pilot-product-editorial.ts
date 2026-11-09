@@ -6,7 +6,7 @@ export type PilotProductEditorial = Readonly<{
 }>;
 export const pilotProductEditorial: Readonly<Record<string, PilotProductEditorial>> = {
   "caixa-organizadora-dois-compartimentos": {
-    metaDescription: "Caixa organizadora com dois compartimentos e tampa deslizante para pequenos acessórios. Veja medidas, opções de modelo e compra na Shopee.",
+    metaDescription: "Caixa portátil com tampa deslizante, disponível em versões com dois compartimentos ou sem divisória. Confira medidas e opções na Shopee.",
     paragraphs: [
       "A versão com divisória desta caixa organizadora portátil separa pequenos objetos em dois compartimentos. A tampa deslizante permite reunir acessórios em uma peça compacta para guardar na mesa, gaveta ou bolsa.",
       "É indicada para objetos pequenos, como brincos, anéis, fones, cartões de memória e acessórios de escritório. O anúncio informa medidas externas aproximadas de 10,7 × 6,7 × 2,2 cm e internas de 10 × 2,94 × 2 cm por compartimento.",

@@ -39,6 +39,11 @@ test('produto novo sem curadoria recebe sugestao conservadora sem alterar a orig
   assert.equal(suggestProductDisplayTitle('Caixa especial transparente com mecanismo bem especifico'), 'Caixa especial transparente com mecanismo');
   assert.equal(getProductDisplayTitle({ slug: 'item-longo', name: 'Caixa organizadora para acessórios de escritório com tampa e compartimentos diversos' }), 'Caixa organizadora para acessórios de escritório');
   assert.equal(getProductSeoTitle({ slug: 'item-longo', name: 'Caixa organizadora para acessórios de escritório com tampa e compartimentos diversos' }), 'Caixa organizadora para acessórios de escritório | CMangini3D');
+  const longToken = 'Super' + 'a'.repeat(75);
+  const shortened = suggestProductDisplayTitle(longToken);
+  assert.equal(shortened.length, 48);
+  assert.ok(shortened.endsWith('…'), 'palavra sem espaços deve sinalizar truncamento');
+  assert.equal(longToken.length, 80, 'o nome recebido não foi alterado');
 });
 
 test('os titulos de produtos por categoria correspondem a sua funcao', async () => {

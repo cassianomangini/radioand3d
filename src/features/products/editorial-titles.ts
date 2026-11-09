@@ -41,10 +41,13 @@ export function suggestProductDisplayTitle(original: string): string {
   const first = normalized.split(/\s+(?:[|–—-])\s+/u, 1)[0]?.trim() ?? normalized;
   const candidate = first.length >= 12 ? first : normalized;
   if (candidate.length <= 48) return candidate;
-  const lastSpace = candidate.slice(0, 49).lastIndexOf(" ");
-  // Nao cortar uma palavra ao meio quando houver uma separacao util.
-  const end = lastSpace >= 24 ? lastSpace : 48;
-  return candidate.slice(0, end).trimEnd();
+  const first48 = candidate.slice(0, 48);
+  const lastSpace = first48.lastIndexOf(" ");
+  // Se a palavra termina exatamente na posicao 48, podemos preserva-la.
+  const end = candidate[48] === " " ? 48 : (lastSpace >= 24 ? lastSpace : 48);
+  // Evitar conectivos soltos ou adverbios que nao definem o produto.
+  return candidate.slice(0, end).trimEnd()
+    .replace(/\s+(?:com|e|de|da|do|das|dos|para|em|no|na|bem)$/iu, "").trimEnd();
 }
 
 function editorialTitle(slug: string): EditorialTitle | undefined {

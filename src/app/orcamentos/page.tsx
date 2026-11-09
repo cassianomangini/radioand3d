@@ -6,11 +6,12 @@ import { quoteServiceConfig } from "@/server/quote/supabase-gateway";
 import { requireQuoteTurnstileConfig } from "@/server/quote/turnstile";
 import { studioPhotoKeyFromId } from "@/features/studio/r2-photos";
 import { getSiteCatalog } from "@/server/products/catalog";
+import { getProductDisplayTitle } from "@/features/products/editorial-titles";
 import { QuoteFlow } from "./quote-flow";
 import styles from "./page.module.css";
 
-const title = "Orçamento de Impressão 3D | CMangini 3D";
-const description = "Solicite à CMangini 3D um orçamento para caixas sob medida, placas personalizadas ou impressão 3D por encomenda. Conte sua ideia em poucos passos.";
+const title = "Orçamento de Impressão 3D | CMangini3D";
+const description = "Solicite à CMangini3D um orçamento para caixas sob medida, placas personalizadas ou impressão 3D por encomenda. Conte sua ideia em poucos passos.";
 
 export const metadata: Metadata = {
   title,
@@ -38,7 +39,7 @@ export default async function OrcamentosPage({
     const catalog = await getSiteCatalog();
     const product = catalog.products.find((entry) => entry.slug === query.produto);
     if (product?.sourceStatus === "NORMAL") {
-      productReference = { slug: product.slug, name: product.name, imageUrl: product.imageUrls[0] };
+      productReference = { slug: product.slug, name: getProductDisplayTitle(product), imageUrl: product.imageUrls[0] };
     }
   }
   let intakeEnabled = false;

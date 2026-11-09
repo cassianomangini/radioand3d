@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { HomeFrame } from "../components/home-frame";
 import { SITE_URL } from "@/lib/site-seo";
 
-const title = "CMangini 3D | Impressão 3D em São Caetano do Sul";
-const description = "Na CMangini 3D, fazemos caixas sob medida, placas personalizadas e impressão 3D por encomenda em São Caetano do Sul. Enviamos para todo o Brasil.";
+const title = "CMangini3D | Impressão 3D em São Caetano do Sul";
+const description = "Na CMangini3D, fazemos caixas sob medida, placas personalizadas e impressão 3D por encomenda em São Caetano do Sul. Enviamos para todo o Brasil.";
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "CMangini 3D",
+  name: "CMangini3D",
   url: `${SITE_URL}/`,
 };
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     url: "/",
     type: "website",
     locale: "pt_BR",
-    siteName: "CMangini 3D",
+    siteName: "CMangini3D",
   },
 };
 

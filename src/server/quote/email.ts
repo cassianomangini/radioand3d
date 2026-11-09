@@ -140,7 +140,7 @@ export function requireQuoteEmailConfig(): EmailConfig {
       from.length > 200 || !/^[^\r\n<>]+ <[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+>$/.test(from)) {
     throw new QuoteHttpError(503, 'quote_email_configuration_missing');
   }
-  return { provider: 'resend', key, from: from.replace(/^[^<>]+(?= <)/, 'CMangini 3D') };
+  return { provider: 'resend', key, from: from.replace(/^[^<>]+(?= <)/, 'CMangini3D') };
 }
 
 export async function sendQuoteEmail(requestId: string, message: QuoteEmailMessage, fetcher: typeof fetch = fetch): Promise<void> {

@@ -7,38 +7,9 @@ import { isIndexableDeployment } from "@/lib/site-seo";
 import { ProductGallery } from "../product-gallery";
 import styles from "../products.module.css";
 import { getProductSubtitle } from "../subtitles";
+import { getProductDisplayTitle, getProductSeoTitle } from "@/features/products/editorial-titles";
 
 type Props = { params: Promise<{ slug: string }> };
-
-const breadcrumbNames: Record<string, string> = {
-  "porta-figurinhas-3d": "Porta Figurinhas 3D com Tampa",
-  "caixa-organizadora-grande": "Caixa Organizadora Grande",
-  "caixa-organizadora-dois-compartimentos": "Caixa com 2 Compartimentos",
-  "caixa-organizadora-quadrada": "Caixa Organizadora Quadrada",
-  "caixinha-organizadora-pequena": "Caixinha Organizadora Pequena",
-  "estojo-duplo-compacto": "Estojo Duplo Compacto",
-  "porta-controles-de-mesa": "Porta Controles de Mesa",
-  "porta-lapis-cachepo": "Porta Lápis / Cachepô",
-  "suporte-celular-articulado": "Suporte Celular Articulado",
-  "chaveiro-mureta-santos": "Chaveiro Mureta de Santos",
-  "capa-botao-descarga": "Capa para Botão de Descarga",
-  "dinossauro-articulado-t-rex": "Dinossauro Articulado T-Rex",
-  "dummy-13-boneco-articulado": "Dummy 13 Articulado",
-  "fita-cassete-retro": "Fita Cassete Retrô",
-  "imas-frases-veganas-2": "Kit 2 Ímãs Frases Veganas",
-  "imas-frases-veganas-4": "Kit 4 Ímãs Frases Veganas",
-  "bolinhas-basquete-sensoriais": "Bolinhas de Basquete Texturizadas",
-  "kit-porta-curativos": "Kit Porta Curativos",
-  "kit-porta-figurinhas-3d": "Kit Porta Figurinhas 3D",
-  "martelo-thor-rotativo": "Martelo de Brinquedo Thor",
-  "mini-arvore-pinheiro": "Mini Árvore Decorativa",
-  "casinha-porta-iscas-formiga": "Casinha Porta Iscas de Formiga",
-  "nave-espacial-espiral": "Nave Espacial de Encaixe",
-  "porta-controle-good-vibes": "Porta Controle Good Vibes",
-  "porta-curativos-compacto": "Porta Curativos Compacto",
-  "porta-remedios-semanal": "Porta Remédios Semanal",
-  "trio-estrelas-decorativas": "Trio de Estrelas Decorativas",
-};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -48,11 +19,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const product = catalog.products.find((entry) => entry.slug === slug);
   if (!product) {
-    return { title: "Produto indisponível | CMangini 3D", robots: { index: false, follow: false } };
+    return { title: "Produto indisponível | CMangini3D", robots: { index: false, follow: false } };
   }
 
   return {
-    title: product.seoTitle,
+    title: getProductSeoTitle(product),
     description: product.seoDescription,
     alternates: { canonical: `/produtos/${product.slug}` },
     robots: {
@@ -60,11 +31,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       follow: isIndexableDeployment(),
     },
     openGraph: {
-      title: product.seoTitle,
+      title: getProductSeoTitle(product),
       description: product.seoDescription,
       url: `/produtos/${product.slug}`,
       type: "website",
-      images: [{ url: product.imageUrls[0], alt: product.name }],
+      images: [{ url: product.imageUrls[0], alt: getProductDisplayTitle(product) }],
     },
   };
 }
@@ -84,17 +55,17 @@ export default async function ProductPage({ params }: Props) {
       <header className={styles.banner}>
         <div className={styles.bannerContent}>
           <p className={styles.bannerTitle}>Produtos</p>
-          <p>Peças do estúdio CMangini 3D.</p>
+          <p>Peças do estúdio CMangini3D.</p>
         </div>
       </header>
       <div className={styles.wrap}>
         <nav className={styles.breadcrumbs} aria-label="Navegação estrutural">
-          <Link href="/produtos">Produtos</Link><span aria-hidden="true">/</span><span aria-current="page">{breadcrumbNames[product.slug] ?? product.name}</span>
+          <Link href="/produtos">Produtos</Link><span aria-hidden="true">/</span><span aria-current="page">{getProductDisplayTitle(product)}</span>
         </nav>
         <article className={styles.detail}>
-          <ProductGallery key={product.slug} name={product.name} images={product.imageUrls} />
+          <ProductGallery key={product.slug} name={getProductDisplayTitle(product)} images={product.imageUrls} />
           <div className={styles.detailCopy}>
-            <h1>{product.name}</h1>
+            <h1>{getProductDisplayTitle(product)}</h1>
             {subtitle && <p className={styles.detailSubtitle}>{subtitle}</p>}
             {(product.material || product.dimensions) && (
               <section className={styles.specs} aria-labelledby="specs-heading">

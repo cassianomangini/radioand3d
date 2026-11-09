@@ -8,7 +8,7 @@
 - O site usa títulos editoriais por `slug` estável, para card, H1, breadcrumb, galeria e referência de produto no orçamento.
 - SEO Title é independente: produto e intenção comercial específica, terminando em `| CMangini3D`.
 - Os 27 slugs presentes no snapshot atual têm equivalência explícita em `src/features/products/editorial-titles.ts`. Títulos de exibição têm até 48 caracteres; cards limitam visualmente a 2 linhas.
-- Um novo item sem curadoria recebe sugestão de até 48 caracteres: aproveita separadores da Shopee quando úteis ou corta no limite de uma palavra, sem fabricar atributos. **Exige revisão editorial** antes de entrar no índice. O dado de origem continua intacto.
+- Um novo item sem curadoria recebe sugestão de até 48 caracteres: aproveita separadores da Shopee quando úteis ou corta no limite de uma palavra quando possível (ou sinaliza com reticências quando não há espaços), sem fabricar atributos. **Exige revisão editorial** antes de entrar no índice. O dado de origem continua intacto.
 - Se a Shopee mudar o nome de um dos 27 anúncios, a versão editorial se mantém. Quando o produto mudar de natureza, a curadoria deve ser revista.
 - O controle de indexação em `search-approval.ts` permanece inalterado: título curto **não** significa aprovação de SEO ou entrada automática no sitemap.
 

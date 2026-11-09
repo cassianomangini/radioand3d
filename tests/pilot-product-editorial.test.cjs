@@ -14,39 +14,51 @@ const candidates = [
   'porta-figurinhas-3d',
 ];
 
-test('piloto tem cinco produtos reais com descricoes individuais, diferentes do anuncio bruto', async () => {
+test('cinco produtos reais tem copy de site, beneficios e meta descriptions proprias', async () => {
   const { pilotProductEditorial, getPilotProductEditorial } = await editorial;
   assert.deepEqual(Object.keys(pilotProductEditorial).sort(), [...candidates].sort());
   assert.equal(new Set(Object.values(pilotProductEditorial).map(item => item.metaDescription)).size, 5);
+  assert.equal(new Set(Object.values(pilotProductEditorial).map(item => item.lead)).size, 5);
   for (const slug of candidates) {
     const row = snapshot.find(item => item.slug === slug);
     const item = getPilotProductEditorial(slug);
-    assert.ok(row);
-    assert.ok(item);
+    assert.ok(row, slug);
+    assert.ok(item, slug);
     assert.notEqual(item.metaDescription, row.name);
-    assert.ok(item.metaDescription.length >= 90 && item.metaDescription.length <= 170);
-    assert.equal(item.paragraphs.length, 3);
-    assert.ok(item.paragraphs.every(text => text.length >= 80));
-    assert.ok(!item.paragraphs.join(' ').includes('Artesopolis'));
+    assert.ok(item.metaDescription.length >= 90 && item.metaDescription.length <= 160, slug);
+    assert.ok(item.lead.length >= 65 && item.body.length >= 65, slug);
+    assert.ok(Array.isArray(item.facts) && item.facts.length >= 2, slug);
+    assert.equal(new Set(item.facts.map(fact => fact.label)).size, item.facts.length, slug);
+    assert.ok(item.facts.every(fact => fact.label.trim() && fact.value.trim()), slug);
+    assert.ok(item.note && item.note.length >= 50, slug);
+    const whole = [item.lead, item.body, item.note].join(' ');
+    assert.doesNotMatch(whole, /o an[uú]ncio informa|confira as medidas [uú]teis|do Artesopolis|do Artes[oó]polis/iu, slug);
   }
   assert.equal(getPilotProductEditorial('item-nao-revisado'), null);
 });
 
-test('o piloto registra distincao critica das variacoes e os cuidados relevantes', async () => {
+test('informacoes cruciais permanecem visiveis sem tom burocratico', async () => {
   const { getPilotProductEditorial } = await editorial;
   const caixa = getPilotProductEditorial('caixa-organizadora-dois-compartimentos');
-  assert.match(caixa.paragraphs.join(' '), /sem divisória/);
-  assert.match(caixa.metaDescription, /sem divisória/, 'snippet não deve omitir a variação sem divisória');
+  assert.match(caixa.body, /sem divisória/);
+  assert.match(caixa.metaDescription, /sem divisória/);
+  assert.match(caixa.note, /medidas internas/);
   const curativos = getPilotProductEditorial('porta-curativos-compacto');
-  assert.match(curativos.paragraphs.join(' '), /não deve ser usado para armazenar comprimidos soltos/);
+  assert.match(curativos.note, /Curativos não inclusos/);
+  assert.match(curativos.facts.map(f => f.value).join(' '), /10 × 3,2 × 1,8/);
   const iscas = getPilotProductEditorial('casinha-porta-iscas-formiga');
-  assert.match(iscas.paragraphs.join(' '), /sem isca, formicida, gel, inseticida/);
+  assert.match(iscas.note, /não acompanham/);
+  assert.match(iscas.note, /crianças e animais/);
+  const figurinhas = getPilotProductEditorial('porta-figurinhas-3d');
+  assert.match(figurinhas.note, /kit é vendido em outro anúncio/);
+  const controles = getPilotProductEditorial('porta-controles-de-mesa');
+  assert.match(controles.note, /dimensões variam/);
 });
 
-test('nenhum produto fica automaticamente elegivel a indexacao pelo piloto', async () => {
+test('novo texto do piloto nao libera indexacao automaticamente', async () => {
   const approval = await import(pathToFileURL(resolve('src/features/products/search-approval.ts')).href);
   assert.equal(approval.hasSearchApprovedProducts(), false);
   for (const slug of candidates) {
-    assert.equal(approval.isSearchApprovedProduct({slug,sourceStatus:'NORMAL'}), false);
+    assert.equal(approval.isSearchApprovedProduct({ slug, sourceStatus: 'NORMAL' }), false);
   }
 });

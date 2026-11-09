@@ -49,6 +49,8 @@ function draft(modelItems) {
     otherDescription: '', otherSize: '', colorMode: '', colors: [{ name: '', rgb: '' }],
     quantity: 1, name: 'Cliente', contactMethod: 'whatsapp', contact: '11999999999',
     delivery: 'retirada', cep: '',
+    // O validador recebe o formato completo que o formulario envia hoje.
+    desiredDate: '', printRightsAccepted: false, printRightsVersion: '',
   };
 }
 

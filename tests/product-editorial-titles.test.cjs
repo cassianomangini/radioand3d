@@ -36,7 +36,15 @@ test('produto novo sem curadoria recebe sugestao conservadora sem alterar a orig
   assert.equal(getProductDisplayTitle(product), 'Organizador para Mesa');
   assert.equal(product.name, 'Organizador para Mesa | Impressão 3D');
   assert.equal(getProductSeoTitle(product), 'Organizador para Mesa | CMangini3D');
-  assert.equal(suggestProductDisplayTitle('Caixa especial transparente com mecanismo bem especifico'), 'Caixa especial transparente com mecanismo bem especifico');
+  assert.equal(suggestProductDisplayTitle('Caixa especial transparente com mecanismo bem especifico'), 'Caixa especial transparente com mecanismo');
+  assert.equal(getProductDisplayTitle({ slug: 'item-longo', name: 'Caixa organizadora para acessórios de escritório com tampa e compartimentos diversos' }), 'Caixa organizadora para acessórios de escritório');
+  assert.equal(getProductSeoTitle({ slug: 'item-longo', name: 'Caixa organizadora para acessórios de escritório com tampa e compartimentos diversos' }), 'Caixa organizadora para acessórios de escritório | CMangini3D');
+});
+
+test('os titulos de produtos por categoria correspondem a sua funcao', async () => {
+  const { getProductDisplayTitle, getProductSeoTitle } = await editorial;
+  assert.equal(getProductDisplayTitle({ slug: 'porta-controle-good-vibes', name: 'Nome bruto' }), 'Vaso Decorativo Good Vibes Only');
+  assert.equal(getProductSeoTitle({ slug: 'capa-botao-descarga', name: 'Nome bruto' }), 'Capa para Botão de Descarga de Vaso Sanitário | CMangini3D');
 });
 
 test('seo editorial de produto novo e preservado e a marca fica normalizada', async () => {

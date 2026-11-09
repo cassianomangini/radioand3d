@@ -6,9 +6,10 @@ import { getProductCategory } from "./categories";
 import { ProductCatalog } from "./product-catalog";
 import styles from "./products.module.css";
 import { getProductSubtitle } from "./subtitles";
+import { getProductDisplayTitle } from "@/features/products/editorial-titles";
 
-const title = "Produtos Impressos em 3D | CMangini 3D";
-const description = "Conheça caixas, organizadores, peças decorativas e outros produtos reais impressos em 3D pelo estúdio CMangini 3D, com compra pela Shopee.";
+const title = "Produtos Impressos em 3D | CMangini3D";
+const description = "Conheça caixas, organizadores, peças decorativas e outros produtos reais impressos em 3D pelo estúdio CMangini3D, com compra pela Shopee.";
 
 export const metadata: Metadata = {
   title,
@@ -26,7 +27,7 @@ export default async function ProdutosPage() {
   const products = visibleProducts(catalog.products);
   const cards = products.map((product) => ({
     slug: product.slug,
-    name: product.name,
+    name: getProductDisplayTitle(product),
     subtitle: getProductSubtitle(product.slug),
     imageUrl: product.imageUrls[0],
     category: getProductCategory(product),
@@ -37,7 +38,7 @@ export default async function ProdutosPage() {
       <header className={styles.banner}>
         <div className={styles.bannerContent}>
           <h1 className={styles.bannerTitle}>Produtos</h1>
-          <p>Conheça as peças do estúdio CMangini 3D.</p>
+          <p>Conheça as peças do estúdio CMangini3D.</p>
         </div>
       </header>
 

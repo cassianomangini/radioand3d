@@ -224,6 +224,12 @@
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.16;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .cardSubtitle {

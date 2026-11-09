@@ -36,6 +36,7 @@ test('o piloto registra distincao critica das variacoes e os cuidados relevantes
   const { getPilotProductEditorial } = await editorial;
   const caixa = getPilotProductEditorial('caixa-organizadora-dois-compartimentos');
   assert.match(caixa.paragraphs.join(' '), /sem divisória/);
+  assert.match(caixa.metaDescription, /sem divisória/, 'snippet não deve omitir a variação sem divisória');
   const curativos = getPilotProductEditorial('porta-curativos-compacto');
   assert.match(curativos.paragraphs.join(' '), /não deve ser usado para armazenar comprimidos soltos/);
   const iscas = getPilotProductEditorial('casinha-porta-iscas-formiga');

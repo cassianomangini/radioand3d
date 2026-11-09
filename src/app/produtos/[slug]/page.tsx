@@ -8,6 +8,7 @@ import { ProductGallery } from "../product-gallery";
 import styles from "../products.module.css";
 import { getProductSubtitle } from "../subtitles";
 import { getProductDisplayTitle, getProductSeoTitle } from "@/features/products/editorial-titles";
+import { getPilotProductEditorial } from "@/features/products/pilot-product-editorial";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -22,9 +23,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Produto indisponível | CMangini3D", robots: { index: false, follow: false } };
   }
 
+  const metaDescription = getPilotProductEditorial(product.slug)?.metaDescription ?? product.seoDescription;
   return {
     title: getProductSeoTitle(product),
-    description: product.seoDescription,
+    description: metaDescription,
     alternates: { canonical: `/produtos/${product.slug}` },
     robots: {
       index: isIndexableDeployment() && isSearchApprovedProduct(product),
@@ -32,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     openGraph: {
       title: getProductSeoTitle(product),
-      description: product.seoDescription,
+      description: metaDescription,
       url: `/produtos/${product.slug}`,
       type: "website",
       images: [{ url: product.imageUrls[0], alt: getProductDisplayTitle(product) }],
@@ -49,6 +51,8 @@ export default async function ProductPage({ params }: Props) {
   const product = catalog.products.find((entry) => entry.slug === slug);
   if (!product || product.sourceStatus === "SELLER_DELETE") notFound();
   const subtitle = getProductSubtitle(product.slug);
+  const editorial = getPilotProductEditorial(product.slug);
+  const descriptionParagraphs = editorial?.paragraphs ?? product.description.split(/\n\n+/);
 
   return (
     <div className={styles.page}>
@@ -90,7 +94,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
           <section className={styles.description} aria-labelledby="description-heading">
             <h2 id="description-heading">Sobre a peça</h2>
-            {product.description.split(/\n\n+/).map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+            {descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </section>
           <div className={styles.descriptionActions}>
             <Link className={styles.secondaryAction} href={`/orcamentos?produto=${encodeURIComponent(product.slug)}`}>

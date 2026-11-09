@@ -1,49 +1,69 @@
-// Copy editorial em revisao. Ainda nao autoriza indexacao: a aprovacao esta
-// isolada em search-approval.ts e depende de QA, fotos, dados e link de compra.
+// Texto editorial exclusivo do site CMangini3D. Informacoes e medidas
+// derivadas dos anuncios do catalogo; nao representam garantia de compatibilidade.
+// O gate de indexacao continua independente (search-approval.ts).
 export type PilotProductEditorial = Readonly<{
   metaDescription: string;
-  paragraphs: readonly string[];
+  lead: string;
+  body: string;
+  facts: readonly Readonly<{ label: string; value: string }>[];
+  note: string;
 }>;
+
 export const pilotProductEditorial: Readonly<Record<string, PilotProductEditorial>> = {
   "caixa-organizadora-dois-compartimentos": {
-    metaDescription: "Caixa portátil com tampa deslizante, disponível em versões com dois compartimentos ou sem divisória. Confira medidas e opções na Shopee.",
-    paragraphs: [
-      "A versão com divisória desta caixa organizadora portátil separa pequenos objetos em dois compartimentos. A tampa deslizante permite reunir acessórios em uma peça compacta para guardar na mesa, gaveta ou bolsa.",
-      "É indicada para objetos pequenos, como brincos, anéis, fones, cartões de memória e acessórios de escritório. O anúncio informa medidas externas aproximadas de 10,7 × 6,7 × 2,2 cm e internas de 10 × 2,94 × 2 cm por compartimento.",
-      "A peça é produzida em PLA por impressão 3D. Existe também uma opção anunciada sem divisória; confira a variação selecionada e compare as medidas internas com o que pretende guardar antes da compra.",
+    metaDescription: "Caixa organizadora com tampa deslizante para bijuterias, acessórios e objetos pequenos. Opções com dois compartimentos ou sem divisória.",
+    lead: "Brincos, cartões de memória e outros objetos pequenos não precisam ficar espalhados. Esta caixa organizadora reúne tudo em um só lugar, na gaveta, na mesa ou na bolsa.",
+    body: "A tampa deslizante facilita o acesso. Escolha a versão com dois compartimentos para separar os acessórios ou a opção sem divisória para ter um espaço único.",
+    facts: [
+      { label: "Medidas externas", value: "10,7 × 6,7 × 2,2 cm (aprox.)" },
+      { label: "Cada compartimento", value: "10 × 2,94 × 2 cm (aprox.)" },
+      { label: "Material", value: "PLA, impressão 3D" },
     ],
+    note: "As medidas internas se referem à versão com divisória. Confira a variação escolhida antes da compra. Objetos das fotos não acompanham o produto.",
   },
   "porta-controles-de-mesa": {
-    metaDescription: "Porta-controles de mesa com duas divisórias para organizar controles remotos e pequenos acessórios. Consulte as cores e medidas na Shopee.",
-    paragraphs: [
-      "O porta-controles é um suporte de mesa com duas divisórias, pensado para manter controles remotos reunidos e fáceis de localizar. Também pode organizar pequenos acessórios em uma mesa, estante ou aparador.",
-      "A peça tem acabamento em camadas característico da impressão 3D e é anunciada em PLA. As medidas variam conforme a versão: o anúncio informa 9 × 6,2 × 6,5 cm para preto/cobre e 10 × 7 × 7 cm para Rainbow.",
-      "Antes de comprar, verifique a variação de cor e compare as dimensões do suporte com o espaço disponível e os controles que pretende guardar.",
+    metaDescription: "Porta-controles de mesa com dois compartimentos, impresso em 3D. Organize os controles perto da TV e escolha entre cores e acabamentos.",
+    lead: "Chega de procurar o controle remoto entre as almofadas. Este porta-controles de mesa reúne seus controles perto da TV e ajuda a manter a estante organizada.",
+    body: "Com dois espaços para controles ou pequenos acessórios, é produzido em PLA por impressão 3D. Há diferentes combinações de cores e acabamentos.",
+    facts: [
+      { label: "Versão preto/cobre", value: "9 × 6,2 × 6,5 cm (aprox.)" },
+      { label: "Versão Rainbow", value: "10 × 7 × 7 cm (aprox.)" },
+      { label: "Material", value: "PLA, impressão 3D" },
     ],
+    note: "As dimensões variam conforme a versão. Compare o tamanho do suporte com os controles que pretende guardar.",
   },
   "porta-curativos-compacto": {
-    metaDescription: "Estojo compacto para organizar curativos embalados na bolsa, mochila ou nécessaire. Veja as medidas internas e escolha a cor na Shopee.",
-    paragraphs: [
-      "Este porta-curativos compacto reúne embalagens individuais de curativos em um estojo para transportar na bolsa, mochila ou nécessaire. É uma opção para quem quer evitar que as embalagens fiquem soltas entre outros objetos.",
-      "O anúncio informa aproximadamente 11 × 3,3 × 1,9 cm de medidas externas e 10 × 3,2 × 1,8 cm de área interna. A compatibilidade depende do tamanho e da espessura das embalagens: alguns curativos maiores podem não caber.",
-      "Confira as medidas úteis e as opções de cor no anúncio antes de escolher. O estojo não acompanha curativos e não deve ser usado para armazenar comprimidos soltos em contato direto com a peça.",
+    metaDescription: "Porta-curativos compacto para bolsa, mochila ou viagem. Estojo rígido impresso em 3D, com diferentes cores e medidas internas informadas.",
+    lead: "Chega de curativos espalhados no fundo da bolsa! O Porta-Curativos Compacto mantém as embalagens individuais reunidas em um estojo rígido, fácil de levar no dia a dia.",
+    body: "Impresso em 3D e disponível em várias cores, tem um formato compacto para guardar na bolsa, mochila ou nécessaire sem ocupar muito espaço.",
+    facts: [
+      { label: "Medidas externas", value: "11 × 3,3 × 1,9 cm (aprox.)" },
+      { label: "Espaço interno", value: "10 × 3,2 × 1,8 cm (aprox.)" },
+      { label: "Material", value: "PLA, impressão 3D" },
     ],
+    note: "Indicado principalmente para curativos em embalagens pequenas ou médias. Alguns maiores podem não caber: compare as medidas antes de comprar. Curativos não inclusos.",
   },
   "casinha-porta-iscas-formiga": {
-    metaDescription: "Casinha porta-iscas para formigas com telhado removível. Suporte vazio em PLA, sem produtos químicos; veja dimensões e variações na Shopee.",
-    paragraphs: [
-      "A casinha porta-iscas é um suporte em formato de miniatura, com telhado removível para acomodar uma isca comercial para formigas. A abertura fica no telhado, que pode ser retirado e encaixado novamente.",
-      "O anúncio informa medidas aproximadas de 6,1 × 5 × 5,16 cm, fabricação em PLA por impressão 3D e opções de cor. O produto vendido é somente o recipiente vazio, sem isca, formicida, gel, inseticida ou qualquer produto químico.",
-      "Ao utilizar uma isca, siga as instruções, restrições de ambiente e cuidados do fabricante do produto químico. Não considere a casinha uma proteção contra acesso de crianças ou animais.",
+    metaDescription: "Casinha porta-iscas para formigas com telhado removível. Suporte em PLA para iscas comerciais, vendido sem isca ou inseticida.",
+    lead: "Uma forma mais discreta de acomodar a isca de formigas. A mini casinha tem telhado removível: é só abrir, colocar a isca comercial e encaixar o telhado novamente.",
+    body: "Produzida em PLA por impressão 3D, a casinha é compacta e pode ser usada em locais permitidos pelas instruções da isca escolhida.",
+    facts: [
+      { label: "Dimensões", value: "6,1 × 5 × 5,16 cm (aprox.)" },
+      { label: "Abertura", value: "Telhado removível" },
+      { label: "Material", value: "PLA, impressão 3D" },
     ],
+    note: "Você recebe apenas a casinha com o telhado. Isca, formicida e outros produtos químicos não acompanham a peça. Siga as instruções de uso da isca e mantenha fora do alcance de crianças e animais.",
   },
   "porta-figurinhas-3d": {
-    metaDescription: "Porta-figurinhas com tampa deslizante para guardar figurinhas de álbum e cards semelhantes. Consulte dimensões, cores e opções na Shopee.",
-    paragraphs: [
-      "Este porta-figurinhas é uma caixa compacta com tampa deslizante, feita para reunir figurinhas de álbum e cards de formato compatível. Pode ser usada para guardar a coleção em casa ou levá-la na mochila.",
-      "O anúncio informa medidas aproximadas de 8,5 cm de comprimento, 6,5 cm de largura e 3,5 cm de altura. A peça é produzida em PLA por impressão 3D, com diferentes combinações de cores.",
-      "Confira as medidas e o tipo de figurinha ou card antes de escolher. A quantidade que cabe na caixa depende da espessura e do formato dos itens; este anúncio corresponde ao porta-figurinhas, distinto do kit listado separadamente.",
+    metaDescription: "Porta-figurinhas com tampa deslizante, feito em PLA. Organize figurinhas e cards compatíveis em uma caixa compacta com cores variadas.",
+    lead: "Sua coleção merece um lugar próprio. O porta-figurinhas reúne as figurinhas em uma caixinha com tampa deslizante, prática para guardar em casa ou levar na mochila.",
+    body: "Impresso em 3D em PLA, está disponível em diferentes combinações de cores. Também pode acomodar cards de tamanho semelhante, desde que caibam nas medidas da caixa.",
+    facts: [
+      { label: "Dimensões (fechado)", value: "8,5 × 6,5 × 3,5 cm (aprox.)" },
+      { label: "Capacidade informada", value: "Mais de 100 figurinhas padrão" },
+      { label: "Material", value: "PLA, impressão 3D" },
     ],
+    note: "A quantidade pode variar conforme a espessura das figurinhas. Este produto é a caixa individual; o kit é vendido em outro anúncio.",
   },
 };
 

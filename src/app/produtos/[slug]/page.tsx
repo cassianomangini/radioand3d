@@ -52,7 +52,6 @@ export default async function ProductPage({ params }: Props) {
   if (!product || product.sourceStatus === "SELLER_DELETE") notFound();
   const subtitle = getProductSubtitle(product.slug);
   const editorial = getPilotProductEditorial(product.slug);
-  const descriptionParagraphs = editorial?.paragraphs ?? product.description.split(/\n\n+/);
 
   return (
     <div className={styles.page}>
@@ -71,7 +70,7 @@ export default async function ProductPage({ params }: Props) {
           <div className={styles.detailCopy}>
             <h1>{getProductDisplayTitle(product)}</h1>
             {subtitle && <p className={styles.detailSubtitle}>{subtitle}</p>}
-            {(product.material || product.dimensions) && (
+            {!editorial && (product.material || product.dimensions) && (
               <section className={styles.specs} aria-labelledby="specs-heading">
                 <h2 id="specs-heading">Detalhes</h2>
                 <table>
@@ -94,7 +93,23 @@ export default async function ProductPage({ params }: Props) {
           </div>
           <section className={styles.description} aria-labelledby="description-heading">
             <h2 id="description-heading">Sobre a peça</h2>
-            {descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+            {editorial ? (
+              <>
+                <p className={styles.editorialLead}>{editorial.lead}</p>
+                <p>{editorial.body}</p>
+                <dl className={styles.editorialFacts}>
+                  {editorial.facts.map((fact) => (
+                    <div key={fact.label}>
+                      <dt>{fact.label}</dt>
+                      <dd>{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className={styles.editorialNote}>{editorial.note}</p>
+              </>
+            ) : product.description.split(/\n\n+/).map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
           </section>
           <div className={styles.descriptionActions}>
             <Link className={styles.secondaryAction} href={`/orcamentos?produto=${encodeURIComponent(product.slug)}`}>

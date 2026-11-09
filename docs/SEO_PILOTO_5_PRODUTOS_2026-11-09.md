@@ -1,16 +1,16 @@
 # Piloto SEO editorial - cinco produtos da Shopee
 
-**Estado:** conteúdo de teste pronto no código, **sem autorização para indexação**, revisão comercial e visual ainda obrigatória.
+**Estado:** textos comerciais reescritos e organizados no código, **sem autorização para indexação**; revisão de dados, fotos e visual ainda obrigatória.
 **Projeto:** CMangini3D, frente de produtos do repositório `radioand3d`.
 **Fonte dos atributos:** `src/server/products/published-catalog-snapshot.json`, sincronizado em **04/11/2026**. São informações fornecidas pelos próprios anúncios, não testes laboratoriais nem confirmação atual de estoque, cor ou medidas.
 
 ## O que este PR realmente entrega
 
 - Metadescrições únicas para cinco páginas prioritárias, sem simplesmente repetir o título bruto da Shopee.
-- Texto próprio em três parágrafos por página: função, uso, medidas ou mecanismo informados e condição importante para a escolha.
+- Texto comercial por produto: benefício inicial, explicação curta, fatos em campos legíveis e uma ressalva objetiva. Linguagem natural, sem expressões como "o anúncio informa".
 - Nenhuma alteração no anúncio, banco, sincronização, preço, link de compra ou slug.
 - **Nenhuma alteração no `search-approval.ts` ou no sitemap.** As cinco páginas continuam `noindex` até uma revisão posterior explícita.
-- Este PR depende dos títulos curtos introduzidos no **PR #45**. Não mesclar fora de ordem.
+- Os títulos curtos do **PR #45** já foram integrados à `main`; esta revisão ajusta apenas a apresentação e as descrições comerciais do piloto.
 
 ## Candidatos e hipóteses a investigar
 

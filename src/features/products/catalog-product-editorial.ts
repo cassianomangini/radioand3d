@@ -70,7 +70,7 @@ export const catalogProductEditorial: Readonly<Record<string, CatalogProductEdit
     lead: "Cartões, cabos e pequenos acessórios ficam mais fáceis de encontrar quando têm um lugar próprio. Esta caixa organizadora reúne esses itens em um estojo fino para levar na bolsa ou guardar na gaveta.",
     body: "Feita em PLA por impressão 3D, tem tampa deslizante e formato prático para organizar objetos de uso diário. Há diferentes acabamentos para escolher.",
     facts: [
-      { label: "Dimensões fechada", value: "12,7 × 7,7 × 1,7 cm (aprox.)" },
+      { label: "Medidas (fechada)", value: "12,7 × 7,7 × 1,7 cm (aprox.)" },
       { label: "Fechamento", value: "Tampa deslizante" },
       { label: "Material", value: "PLA, impressão 3D" },
     ],
@@ -81,7 +81,7 @@ export const catalogProductEditorial: Readonly<Record<string, CatalogProductEdit
     lead: "Brincos, anéis e outras miudezas merecem um lugar para não se perder na gaveta. A caixa quadrada reúne pequenos acessórios e ainda decora com estampas em relevo.",
     body: "A tampa de encaixe completa o formato compacto, feito em PLA por impressão 3D. Há diferentes estampas para combinar com seu estilo.",
     facts: [
-      { label: "Dimensões fechada", value: "9,2 × 9,2 × 1,8 cm (aprox.)" },
+      { label: "Medidas (fechada)", value: "9,2 × 9,2 × 1,8 cm (aprox.)" },
       { label: "Fechamento", value: "Tampa de encaixe" },
       { label: "Material", value: "PLA, impressão 3D" },
     ],
@@ -162,7 +162,7 @@ export const catalogProductEditorial: Readonly<Record<string, CatalogProductEdit
       { label: "Articulações", value: "Cauda, corpo, braços e pernas" },
       { label: "Material", value: "PLA, impressão 3D" },
     ],
-    note: "Peça decorativa, não indicada para crianças pequenas por conter partes delicadas. Evite torções fortes nas articulações e exposição ao calor excessivo.",
+    note: "Peça decorativa, não indicada para crianças pequenas por conter partes que podem se soltar. Evite torções fortes nas articulações e exposição ao calor excessivo.",
   },
   "dummy-13-boneco-articulado": {
     metaDescription: "Kit Dummy 13 com boneco articulado para montar. Acompanha duas cartelas de peças e manual de instruções, com opções de cores.",
@@ -177,7 +177,7 @@ export const catalogProductEditorial: Readonly<Record<string, CatalogProductEdit
   },
   "fita-cassete-retro": {
     metaDescription: "Fita cassete decorativa impressa em 3D para quem gosta de música e estética retrô. Enfeite para mesa, estante ou quarto.",
-    lead: "Um toque dos anos 80 e 90 para a decoração. Esta fita cassete em miniatura leva o visual retrô para a mesa, o quarto ou a estante.",
+    lead: "Um toque dos anos 80 e 90 para a decoração. Esta peça no formato de fita cassete leva o visual retrô para a mesa, o quarto ou a estante.",
     body: "Produzida por impressão 3D, é uma peça para expor em ambientes criativos, setups e cantinhos dedicados à música.",
     facts: [
       { label: "Dimensões", value: "10,44 × 6,32 × 1,11 cm (aprox.)" },

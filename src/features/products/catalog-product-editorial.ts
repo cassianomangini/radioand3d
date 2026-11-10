@@ -308,6 +308,18 @@ export const catalogProductEditorial: Readonly<Record<string, CatalogProductEdit
     ],
     note: "Confira a cor selecionada para o conjunto. Luzes, móveis e outros objetos das fotos não acompanham as estrelas.",
   },
+  "kit-soldados-verdes-dedo-do-meio": {
+    metaDescription: "Kit com 3 miniaturas de soldados verdes fazendo o gesto do dedo do meio. Peças decorativas em PLA verde oliva, com 6 cm de altura.",
+    lead: "Três soldados verdes com uma atitude nada discreta. O kit traz miniaturas fazendo o gesto do dedo do meio, para colocar um toque de humor na mesa, na estante ou no setup.",
+    body: "Cada soldado tem detalhes no capacete, uniforme e botas, além de uma base integrada para exposição. As três peças são impressas em 3D na cor verde oliva.",
+    facts: [
+      { label: "Conteúdo", value: "3 miniaturas de soldados verdes" },
+      { label: "Medidas de cada peça", value: "6 × 3,5 × 2 cm (aprox.)" },
+      { label: "Filamento", value: "PLA Velvet Verde Oliva" },
+      { label: "Base", value: "Integrada à miniatura" },
+    ],
+    note: "São miniaturas decorativas para coleção, não brinquedos indicados para crianças pequenas. O kit inclui três soldados, sem os objetos de cenário das fotos.",
+  },
 };
 
 export function getCatalogProductEditorial(slug: string): CatalogProductEditorial | null {

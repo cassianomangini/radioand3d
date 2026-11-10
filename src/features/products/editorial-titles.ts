@@ -32,6 +32,7 @@ export const curatedProductTitles: Readonly<Record<string, EditorialTitle>> = {
   "capa-botao-descarga": { displayTitle: "Capa para Botão de Descarga do Vaso", seoTitle: "Capa para Botão de Descarga de Vaso Sanitário" },
   "chaveiro-mureta-santos": { displayTitle: "Chaveiro Mureta de Santos", seoTitle: "Chaveiro Mureta de Santos em 3D" },
   "dummy-13-boneco-articulado": { displayTitle: "Dummy 13 – Boneco para Montar", seoTitle: "Dummy 13 – Boneco Articulado para Montar" },
+  "kit-soldados-verdes-dedo-do-meio": { displayTitle: "Kit 3 Soldados Verdes Irreverentes", seoTitle: "Kit 3 Miniaturas Soldado Verde Dedo do Meio" },
 };
 
 // Produto novo ainda exige revisao editorial antes de entrar no Google.

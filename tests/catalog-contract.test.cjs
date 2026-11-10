@@ -51,7 +51,7 @@ test('rejects a private image host, a wrong status link, and duplicate slugs', a
   assert.equal(parseCatalogResponse({ products: [product(), product()] }), null);
 });
 
-test('published snapshot includes all 27 active listings with a category', async () => {
+test('published snapshot includes all 28 linked active listings with a category', async () => {
   const rows = JSON.parse(readFileSync(resolve('src/server/products/published-catalog-snapshot.json'), 'utf8'));
   const { parseCatalogResponse } = await contract;
   const { getProductCategory } = await categories;
@@ -63,7 +63,12 @@ test('published snapshot includes all 27 active listings with a category', async
     customizable: false, variations: row.variations,
     sourceStatus: 'NORMAL', sourceSyncedAt: row.sourceSyncedAt, contentUpdatedAt: row.sourceSyncedAt,
   })) });
-  assert.equal(parsed?.length, 27);
-  assert.equal(new Set(rows.map((row) => row.id)).size, 27);
+  assert.equal(parsed?.length, 28);
+  assert.equal(new Set(rows.map((row) => row.id)).size, 28);
   assert.ok(parsed.every((entry) => getProductCategory(entry) !== null));
+  const kit = rows.find((row) => row.id === 58222566967);
+  assert.equal(kit?.slug, 'kit-soldados-verdes-dedo-do-meio');
+  assert.equal(kit?.imageUrls.length, 4);
+  assert.deepEqual(kit?.variations, []);
+  assert.equal(kit?.material, 'PLA');
 });

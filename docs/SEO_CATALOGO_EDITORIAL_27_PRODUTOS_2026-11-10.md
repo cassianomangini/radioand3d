@@ -1,4 +1,7 @@
-# Catálogo comercial CMangini3D — textos para 27 produtos
+# Catálogo comercial CMangini3D — textos para 27 produtos (histórico)
+
+> **Atualização de 10/11/2026:** este documento registra a fase de 27 produtos. O anúncio Shopee `58222566967` foi posteriormente vinculado ao produto interno `253`, passou a ter receita 3D validada e foi incluído como 28º item no snapshot do site com o slug `kit-soldados-verdes-dedo-do-meio`. A camada editorial foi ampliada para 28 títulos e descrições. **A indexação segue bloqueada** até revisão individual.
+
 
 **Estado do código:** os 27 slugs presentes no snapshot publicado têm descrição comercial própria, sem edição de anúncios da Shopee.
 **Origem:** `src/server/products/published-catalog-snapshot.json`, correspondente aos itens anteriormente sincronizados para o site.

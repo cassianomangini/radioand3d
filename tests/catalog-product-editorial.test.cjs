@@ -17,11 +17,11 @@ const previousPilot = [
 test('todo o catalogo publicado tem copy propria, sem alterar os dados da Shopee', async () => {
   const { catalogProductEditorial, getCatalogProductEditorial } = await editorial;
   const slugs = Object.keys(catalogProductEditorial);
-  assert.equal(snapshot.length, 27);
+  assert.equal(snapshot.length, 28);
   assert.deepEqual(new Set(slugs), new Set(snapshot.map(product => product.slug)));
-  assert.equal(slugs.length - previousPilot.length, 22);
-  assert.equal(new Set(Object.values(catalogProductEditorial).map(item => item.metaDescription)).size, 27);
-  assert.equal(new Set(Object.values(catalogProductEditorial).map(item => item.lead)).size, 27);
+  assert.equal(slugs.length - previousPilot.length, 23);
+  assert.equal(new Set(Object.values(catalogProductEditorial).map(item => item.metaDescription)).size, 28);
+  assert.equal(new Set(Object.values(catalogProductEditorial).map(item => item.lead)).size, 28);
   for (const product of snapshot) {
     const content = getCatalogProductEditorial(product.slug);
     assert.ok(content, product.slug);
@@ -53,6 +53,12 @@ test('informacoes decisivas e limites de variacoes seguem claros', async () => {
   assert.match(get('bolinhas-basquete-sensoriais').note, /Não indicado para crianças pequenas/);
   assert.match(get('kit-porta-curativos').note, /não acompanham o kit/);
   assert.match(get('casinha-porta-iscas-formiga').note, /crianças e animais/);
+  const soldados = get('kit-soldados-verdes-dedo-do-meio');
+  assert.match(soldados.lead, /dedo do meio/i);
+  assert.match(soldados.facts[0].value, /3 miniaturas/);
+  assert.match(soldados.facts[1].value, /6 × 3,5 × 2 cm/);
+  assert.match(soldados.facts[2].value, /Verde Oliva/);
+  assert.doesNotMatch(soldados.metaDescription, /Toy Story|Disney|Pixar/i);
 });
 
 test('texto editorial nao libera indexacao e manteve os cinco primeiros', async () => {

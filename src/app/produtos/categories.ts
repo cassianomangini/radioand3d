@@ -40,6 +40,7 @@ const knownProductCategories: Record<string, ProductCategory> = {
   "porta-curativos-compacto": "caixas-e-porta-objetos",
   "porta-remedios-semanal": "caixas-e-porta-objetos",
   "trio-estrelas-decorativas": "pecas-natalinas",
+  "kit-soldados-verdes-dedo-do-meio": "pecas-decorativas-utilidades",
 };
 
 export function getProductCategory(product: Pick<CatalogProduct, "slug" | "categorySlug">): ProductCategory | null {

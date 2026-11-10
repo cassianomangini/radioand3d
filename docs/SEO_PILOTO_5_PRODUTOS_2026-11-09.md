@@ -1,3 +1,5 @@
+> **Histórico do piloto:** o escopo foi ampliado em 10/11/2026 para os 27 produtos do catálogo. Consulte [SEO_CATALOGO_EDITORIAL_27_PRODUTOS_2026-11-10.md](SEO_CATALOGO_EDITORIAL_27_PRODUTOS_2026-11-10.md) para o estado vigente. O gate de indexação continua fechado.
+
 # Piloto SEO editorial - cinco produtos da Shopee
 
 **Estado:** textos comerciais reescritos e organizados no código, **sem autorização para indexação**; revisão de dados, fotos e visual ainda obrigatória.

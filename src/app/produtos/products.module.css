@@ -232,6 +232,11 @@
 
 .cardBody strong {
   flex-shrink: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
   font-family: var(--font-heading);
   font-size: 1rem;
   font-weight: 700;

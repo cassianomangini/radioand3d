@@ -107,7 +107,7 @@ export const catalogProductEditorial: Readonly<Record<string, CatalogProductEdit
       { label: "Fechamento", value: "Tampa de encaixe" },
       { label: "Material", value: "PLA, impressão 3D" },
     ],
-    note: "Verifique as medidas antes de escolher o que guardar. A ficha do produto apresenta valores diferentes de comprimento, que precisam de confirmação.",
+    note: "Confira as medidas disponíveis e compare com os objetos que pretende guardar. O estojo é vendido sem acessórios.",
   },
   "porta-lapis-cachepo": {
     metaDescription: "Porta-lápis e porta-pincéis com design ondulado, que também funciona como cachepô decorativo. Cores individuais e opção de kit.",

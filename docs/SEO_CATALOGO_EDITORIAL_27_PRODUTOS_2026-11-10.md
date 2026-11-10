@@ -30,3 +30,15 @@ Na consulta de leitura à Shopee, havia **28 anúncios NORMAL**. O snapshot publ
 ## Critérios para aprovar SEO depois
 
 Conferir cada anúncio ativo, foto real, dimensões, variações, direitos aplicáveis, canonical, destino do CTA Shopee, HTML gerado e experiência desktop/mobile. Validar metadados e a ausência de texto desatualizado. Só depois aprovar slugs específicos no gate de indexação e confirmar HTML/robots/sitemap da produção. **Nenhuma melhora de posição, CTR ou vendas é garantida pelo texto.**
+
+## Revisão de qualidade pós-merge (10/11/2026)
+
+**Correções efetuadas:**
+- Fita cassete: eliminada a palavra "miniatura". As dimensões declaradas no anúncio são próximas às de uma fita cassete convencional; a copy agora diz "peça no formato de fita cassete".
+- Caixas grande e quadrada: rótulo gramatical de medidas corrigido.
+- T-Rex articulado: aviso de partes que podem se soltar, mais alinhado ao risco descrito no anúncio.
+- Cards: reposto o limite visual de duas linhas, sem alterar títulos originais, H1 e título SEO. Teste de regressão adicionado.
+
+**Verificações estáticas:** os 27 slugs, descrições únicas, metadados por produto, canonical, `noindex` e sitemap foram revistos em código. O CI deve passar antes de qualquer merge. Os dados conflitantes e a quantidade do kit porta-figurinhas permanecem pendências **reais de produto**, não correções que o site possa inventar.
+
+**Limite:** revisão de código e copy não equivale a screenshot desktop/mobile nem teste da página publicada. A inspeção visual real e a confirmação das especificações continuam exigidas antes da indexação.

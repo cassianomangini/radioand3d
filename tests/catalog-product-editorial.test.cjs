@@ -66,3 +66,24 @@ test('texto editorial nao libera indexacao e manteve os cinco primeiros', async 
   assert.match(get('porta-curativos-compacto').lead, /Chega de curativos espalhados/);
   assert.match(get('porta-figurinhas-3d').note, /kit é vendido em outro anúncio/);
 });
+
+test('revisao editorial preserva escala, informacoes claras e alerta de partes soltas', async () => {
+  const { getCatalogProductEditorial: get } = await editorial;
+  const cassete = get('fita-cassete-retro');
+  assert.doesNotMatch(cassete.lead, /miniatura/i);
+  assert.match(cassete.lead, /formato de fita cassete/i);
+  assert.match(get('dinossauro-articulado-t-rex').note, /partes que podem se soltar/);
+  for (const slug of ['caixa-organizadora-grande', 'caixa-organizadora-quadrada']) {
+    const facts = get(slug).facts;
+    assert.ok(facts.some((fact) => fact.label === 'Medidas (fechada)'), slug);
+    assert.ok(facts.every((fact) => fact.label !== 'Dimensões fechada'), slug);
+  }
+});
+
+test('titulos dos cards continuam visualmente limitados a duas linhas', () => {
+  const css = readFileSync(resolve('src/app/produtos/products.module.css'), 'utf8');
+  const rule = css.match(/\.cardBody strong \{([^}]+)\}/u)?.[1];
+  assert.ok(rule, 'regra de nome do card');
+  assert.match(rule, /-webkit-line-clamp:\s*2\s*;/);
+  assert.match(rule, /overflow:\s*hidden\s*;/);
+});

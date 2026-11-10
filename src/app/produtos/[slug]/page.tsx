@@ -8,7 +8,7 @@ import { ProductGallery } from "../product-gallery";
 import styles from "../products.module.css";
 import { getProductSubtitle } from "../subtitles";
 import { getProductDisplayTitle, getProductSeoTitle } from "@/features/products/editorial-titles";
-import { getPilotProductEditorial } from "@/features/products/pilot-product-editorial";
+import { getCatalogProductEditorial } from "@/features/products/catalog-product-editorial";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Produto indisponível | CMangini3D", robots: { index: false, follow: false } };
   }
 
-  const metaDescription = getPilotProductEditorial(product.slug)?.metaDescription ?? product.seoDescription;
+  const metaDescription = getCatalogProductEditorial(product.slug)?.metaDescription ?? product.seoDescription;
   return {
     title: getProductSeoTitle(product),
     description: metaDescription,
@@ -51,7 +51,7 @@ export default async function ProductPage({ params }: Props) {
   const product = catalog.products.find((entry) => entry.slug === slug);
   if (!product || product.sourceStatus === "SELLER_DELETE") notFound();
   const subtitle = getProductSubtitle(product.slug);
-  const editorial = getPilotProductEditorial(product.slug);
+  const editorial = getCatalogProductEditorial(product.slug);
 
   return (
     <div className={styles.page}>

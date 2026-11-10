@@ -7,10 +7,10 @@ const { pathToFileURL } = require('node:url');
 const editorial = import(pathToFileURL(resolve('src/features/products/editorial-titles.ts')).href);
 const snapshot = JSON.parse(readFileSync(resolve('src/server/products/published-catalog-snapshot.json'), 'utf8'));
 
-test('os 27 anuncios do snapshot tem titulo editorial unico e curto', async () => {
+test('os 28 anuncios do snapshot tem titulo editorial unico e curto', async () => {
   const { curatedProductTitles, getProductDisplayTitle, getProductSeoTitle } = await editorial;
-  assert.equal(snapshot.length, 27);
-  assert.equal(Object.keys(curatedProductTitles).length, 27);
+  assert.equal(snapshot.length, 28);
+  assert.equal(Object.keys(curatedProductTitles).length, 28);
   assert.deepEqual(new Set(Object.keys(curatedProductTitles)), new Set(snapshot.map((row) => row.slug)));
   const titles = snapshot.map((row) => getProductDisplayTitle({ slug: row.slug, name: row.name }));
   assert.equal(new Set(titles).size, snapshot.length);
@@ -50,6 +50,8 @@ test('os titulos de produtos por categoria correspondem a sua funcao', async () 
   const { getProductDisplayTitle, getProductSeoTitle } = await editorial;
   assert.equal(getProductDisplayTitle({ slug: 'porta-controle-good-vibes', name: 'Nome bruto' }), 'Vaso Decorativo Good Vibes Only');
   assert.equal(getProductSeoTitle({ slug: 'capa-botao-descarga', name: 'Nome bruto' }), 'Capa para Botão de Descarga de Vaso Sanitário | CMangini3D');
+  assert.equal(getProductDisplayTitle({ slug: 'kit-soldados-verdes-dedo-do-meio', name: 'Nome bruto' }), 'Kit 3 Soldados Verdes Irreverentes');
+  assert.equal(getProductSeoTitle({ slug: 'kit-soldados-verdes-dedo-do-meio', name: 'Nome bruto' }), 'Kit 3 Miniaturas Soldado Verde Dedo do Meio | CMangini3D');
 });
 
 test('seo editorial de produto novo e preservado e a marca fica normalizada', async () => {

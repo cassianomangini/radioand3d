@@ -69,6 +69,17 @@ export default async function ProductPage({ params }: Props) {
           <ProductGallery key={product.slug} name={getProductDisplayTitle(product)} images={product.imageUrls} />
           <div className={styles.detailCopy}>
             <h1>{getProductDisplayTitle(product)}</h1>
+            {editorial && <p className={styles.detailLead}>{editorial.lead}</p>}
+            {editorial && (
+              <dl className={styles.editorialFacts}>
+                {editorial.facts.map((fact) => (
+                  <div key={fact.label}>
+                    <dt>{fact.label}</dt>
+                    <dd>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
             {subtitle && <p className={styles.detailSubtitle}>{subtitle}</p>}
             {!editorial && (product.material || product.dimensions) && (
               <section className={styles.specs} aria-labelledby="specs-heading">
@@ -95,16 +106,7 @@ export default async function ProductPage({ params }: Props) {
             <h2 id="description-heading">Sobre a peça</h2>
             {editorial ? (
               <>
-                <p className={styles.editorialLead}>{editorial.lead}</p>
                 <p>{editorial.body}</p>
-                <dl className={styles.editorialFacts}>
-                  {editorial.facts.map((fact) => (
-                    <div key={fact.label}>
-                      <dt>{fact.label}</dt>
-                      <dd>{fact.value}</dd>
-                    </div>
-                  ))}
-                </dl>
                 <p className={styles.editorialNote}>{editorial.note}</p>
               </>
             ) : product.description.split(/\n\n+/).map((paragraph, index) => (

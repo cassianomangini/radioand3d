@@ -186,6 +186,128 @@ export const catalogProductEditorial: Readonly<Record<string, CatalogProductEdit
     ],
     note: "É um objeto decorativo: não reproduz áudio e não funciona em aparelhos toca-fitas.",
   },
+  "imas-frases-veganas-2": {
+    metaDescription: "Kit com 2 ímãs decorativos de geladeira com frases veganas. Plaquinhas de 7,4 × 4,9 cm para cozinha, armário ou painel metálico.",
+    lead: "Duas frases para dar mais personalidade à geladeira. Este kit reúne plaquinhas com humor vegano para decorar a cozinha ou um painel metálico.",
+    body: "O conjunto traz as frases “All You Need Is Couve” e “Era Soja Que Me Faltava”. Cada plaquinha já possui ímã para fixação.",
+    facts: [
+      { label: "Conteúdo", value: "2 plaquinhas com ímã" },
+      { label: "Medida de cada uma", value: "7,4 × 4,9 × 0,3 cm" },
+      { label: "Frases", value: "Couve e soja" },
+    ],
+    note: "Use em superfícies metálicas que aceitem ímãs. O kit contém as duas frases indicadas, sem itens adicionais.",
+  },
+  "imas-frases-veganas-4": {
+    metaDescription: "Kit com 4 ímãs de geladeira com frases veganas para decorar a cozinha ou painel metálico. Plaquinhas de 7,4 × 4,9 cm.",
+    lead: "Quatro frases e bastante personalidade para a geladeira. As plaquinhas deste kit combinam humor vegano com decoração para a cozinha.",
+    body: "O conjunto inclui quatro modelos diferentes com ímã, entre eles “All You Need Is Couve” e “Era Soja Que Me Faltava”. Veja nas fotos as outras frases do kit.",
+    facts: [
+      { label: "Conteúdo", value: "4 plaquinhas com ímã" },
+      { label: "Medida de cada uma", value: "7,4 × 4,9 × 0,3 cm" },
+      { label: "Fixação", value: "Superfície metálica compatível" },
+    ],
+    note: "Confira as quatro frases nas imagens antes de comprar. As peças precisam de uma superfície onde o ímã consiga aderir.",
+  },
+  "bolinhas-basquete-sensoriais": {
+    metaDescription: "Kit com 2 bolinhas de basquete texturizadas que giram. Peças em PLA para manusear, brincar com o movimento ou decorar a mesa.",
+    lead: "Um passatempo para quem gosta de ter alguma coisa nas mãos. O kit traz duas mini bolinhas de basquete com textura e movimento giratório.",
+    body: "As peças são rígidas, feitas em PLA por impressão 3D. Além do movimento, têm um visual esportivo que combina com a mesa ou estante.",
+    facts: [
+      { label: "Quantidade", value: "2 bolinhas" },
+      { label: "Superfície", value: "Texturizada" },
+      { label: "Movimento", value: "Giratório" },
+    ],
+    note: "Não indicado para crianças pequenas devido ao tamanho das peças. São miniaturas para manuseio, não bolas para jogar basquete.",
+  },
+  "kit-porta-curativos": {
+    metaDescription: "Kit com porta-curativos e caixa organizadora com divisória. Duas peças impressas em 3D para bolsa, nécessaire e pequenos acessórios.",
+    lead: "Dois estojos compactos para organizar o que vai com você. O kit combina um porta-curativos para embalagens individuais e uma caixinha com divisória para itens pequenos.",
+    body: "As duas peças são produzidas por impressão 3D e estão disponíveis em diferentes cores. Uma combinação prática para guardar na bolsa, mochila ou nécessaire.",
+    facts: [
+      { label: "Conteúdo", value: "1 porta-curativos + 1 caixinha" },
+      { label: "Porta-curativos", value: "11 × 3,3 × 1,9 cm (aprox.)" },
+      { label: "Caixinha", value: "8,8 × 6,2 × 1,5 cm (aprox.)" },
+    ],
+    note: "Curativos, medicamentos e outros objetos não acompanham o kit. Confira o tamanho das embalagens antes de colocá-las no porta-curativos.",
+  },
+  "kit-porta-figurinhas-3d": {
+    metaDescription: "Kit porta-figurinhas com tampa deslizante para guardar figurinhas e cards de tamanho compatível. Veja dimensões e cores na Shopee.",
+    lead: "Figurinhas espalhadas pela mochila? O porta-figurinhas com tampa deslizante dá à coleção um espaço próprio para guardar e transportar.",
+    body: "O modelo foi pensado para figurinhas de álbum e cards de tamanho semelhante. Há versões em diferentes cores, produzidas por impressão 3D.",
+    facts: [
+      { label: "Dimensões do estojo", value: "8,38 × 6,38 × 4 cm (aprox.)" },
+      { label: "Capacidade indicada", value: "Mais de 100 figurinhas padrão" },
+      { label: "Fechamento", value: "Tampa deslizante" },
+    ],
+    note: "A quantidade que cabe depende da espessura das figurinhas. Confira no anúncio a quantidade de peças incluídas no kit e a variação escolhida.",
+  },
+  "martelo-thor-rotativo": {
+    metaDescription: "Martelo nórdico rotativo impresso em 3D, com símbolos em relevo e eixo giratório. Peça decorativa para colecionar ou manusear.",
+    lead: "Um pequeno martelo inspirado na mitologia nórdica que também gira. A miniatura combina detalhes em relevo com um movimento para brincar com os dedos.",
+    body: "Produzido em PLA por impressão 3D, tem símbolos nas laterais e empunhadura texturizada. Fica bem como peça de mesa ou item de coleção.",
+    facts: [
+      { label: "Dimensões", value: "10,5 × 6 × 3,5 cm (aprox.)" },
+      { label: "Peso", value: "Cerca de 60 g" },
+      { label: "Mecanismo", value: "Eixo rotativo" },
+    ],
+    note: "Peça decorativa e de passatempo, não uma ferramenta. Contém partes móveis e não é indicada para crianças pequenas.",
+  },
+  "mini-arvore-pinheiro": {
+    metaDescription: "Mini pinheiro verde impresso em 3D, com 16,1 cm de altura e base fixa. Uma peça para mesa, prateleira ou decoração de Natal.",
+    lead: "Um pinheiro para decorar sem precisar montar árvore grande. A mini árvore verde cabe na mesa, na estante ou em um cantinho de Natal.",
+    body: "Com visual simples e base fixa, chega pronta para usar como decoração. É produzida em PLA por impressão 3D e pode continuar exposta depois das festas.",
+    facts: [
+      { label: "Altura", value: "16,1 cm (aprox.)" },
+      { label: "Largura e profundidade", value: "10,73 × 10,73 cm (aprox.)" },
+      { label: "Conteúdo", value: "1 mini pinheiro com base fixa" },
+    ],
+    note: "Não acompanha luzes nem outros objetos decorativos. Evite deixar a peça próxima de calor intenso.",
+  },
+  "nave-espacial-espiral": {
+    metaDescription: "Nave alienígena de duas peças com encaixe em espiral. Puzzle para deslizar, encaixar e brincar com o movimento, em várias cores.",
+    lead: "Parece que as duas peças não vão se encaixar. O segredo está no movimento: as espirais deslizam uma pela outra até formar a nave espacial.",
+    body: "É uma peça para desmontar, montar e explorar o encaixe de novo. As combinações de cores dão um visual diferente ao pequeno puzzle.",
+    facts: [
+      { label: "Peças", value: "2 partes em espiral" },
+      { label: "Mecanismo", value: "Encaixe deslizante" },
+      { label: "Variações", value: "Combinações de cores" },
+    ],
+    note: "Recomendada para jovens e adultos. Não indicada para crianças pequenas; evite forçar as peças fora do sentido do encaixe.",
+  },
+  "porta-controle-good-vibes": {
+    metaDescription: "Vaso decorativo Good Vibes Only com frase em relevo e textura vertical. Peça impressa em 3D para arranjos secos ou pequenos objetos.",
+    lead: "Um recado de boas vibrações para a mesa ou estante. O vaso decorativo Good Vibes Only mistura frase em relevo e textura vertical para dar personalidade ao ambiente.",
+    body: "Feito em PLA por impressão 3D, funciona como recipiente decorativo para arranjos secos, plantas artificiais ou pequenos objetos.",
+    facts: [
+      { label: "Material", value: "PLA, impressão 3D" },
+      { label: "Acabamento", value: "Textura vertical e frase em relevo" },
+      { label: "Uso", value: "Arranjos secos e pequenos objetos" },
+    ],
+    note: "Plantas e acessórios das fotos não acompanham a peça. Não há indicação de impermeabilização para uso com água.",
+  },
+  "porta-remedios-semanal": {
+    metaDescription: "Porta-remédios semanal compacto com sete divisões marcadas de domingo a sábado e abertura deslizante. Para organizar a rotina.",
+    lead: "Os sete dias da semana em um só estojo. O porta-remédios semanal tem compartimentos marcados de domingo a sábado para ajudar a organizar a rotina.",
+    body: "As marcações e o sistema deslizante facilitam encontrar o compartimento do dia. É uma peça compacta, impressa em PLA, para guardar em casa ou levar em viagens.",
+    facts: [
+      { label: "Organização", value: "7 dias, de DOM a SAB" },
+      { label: "Dimensões", value: "15 × 4,16 × 1,5 cm (aprox.)" },
+      { label: "Material", value: "PLA, impressão 3D" },
+    ],
+    note: "Medicamentos não inclusos. Respeite a dose e as orientações de armazenamento de cada medicamento; confirme se o recipiente é adequado ao conteúdo.",
+  },
+  "trio-estrelas-decorativas": {
+    metaDescription: "Trio de estrelas decorativas impressas em 3D, em três tamanhos e opções azul, dourada ou vermelha. Para o Natal e outros ambientes.",
+    lead: "Três estrelas de tamanhos diferentes para montar uma composição na mesa, no aparador ou na estante. O conjunto combina com o Natal e com outras decorações ao longo do ano.",
+    body: "O kit inclui uma estrela pequena, uma média e uma grande, impressas em 3D. As opções de cor incluem azul brilhante, dourado e vermelho.",
+    facts: [
+      { label: "Conteúdo", value: "3 estrelas: pequena, média e grande" },
+      { label: "Pequena", value: "4,5 × 4,5 × 1,4 cm (aprox.)" },
+      { label: "Média", value: "7,4 × 7,2 × 1,4 cm (aprox.)" },
+      { label: "Grande", value: "9,3 × 9 × 1,4 cm (aprox.)" },
+    ],
+    note: "Confira a cor selecionada para o conjunto. Luzes, móveis e outros objetos das fotos não acompanham as estrelas.",
+  },
 };
 
 export function getCatalogProductEditorial(slug: string): CatalogProductEditorial | null {

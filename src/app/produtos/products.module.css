@@ -18,6 +18,16 @@
   background: var(--bg-panel) url("/images/studio/banner_estudio_1920x384.png") center / cover no-repeat;
 }
 
+@container catalog (min-width: 801px) {
+  :global([data-layout-mode="single"]) .banner {
+    min-height: clamp(6rem, 7cqi, 8.4rem);
+  }
+
+  :global([data-layout-mode="split"]) .banner {
+    min-height: clamp(6rem, 8cqi, 10rem);
+  }
+}
+
 .bannerContent {
   width: min(100%, 720px);
 }
@@ -37,7 +47,7 @@
 .bannerContent > p:not(.bannerTitle) {
   margin: var(--space-1) 0 0;
   color: var(--text-secondary);
-  font-size: clamp(0.8rem, 1.1cqi, 1rem);
+  font-size: 0.8rem;
   line-height: 1.4;
 }
 
@@ -213,22 +223,19 @@
 
 .cardBody {
   display: flex;
-  flex: 1;
+  flex: 1 0 auto;
   flex-direction: column;
   gap: var(--space-2);
+  min-width: 0;
   padding: var(--space-4);
 }
 
 .cardBody strong {
+  flex-shrink: 0;
   font-family: var(--font-heading);
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.16;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
   overflow-wrap: anywhere;
 }
 

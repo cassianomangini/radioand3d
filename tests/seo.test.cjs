@@ -58,12 +58,25 @@ test("somente o deploy de producao pode ser indexado", () => {
   }
 });
 
-test("nenhum slug esta aprovado automaticamente para indexacao", () => {
-  assert.equal(approval.hasSearchApprovedProducts(), false);
-  assert.deepEqual(approval.searchApprovedProducts([
-    { slug: "produto-normal", sourceStatus: "NORMAL" },
-    { slug: "produto-bloqueado", sourceStatus: "BANNED" },
-  ]), []);
+test("piloto tem exatamente cinco slugs e exige status NORMAL", () => {
+  const expected = [
+    "caixa-organizadora-dois-compartimentos",
+    "porta-curativos-compacto",
+    "porta-controles-de-mesa",
+    "casinha-porta-iscas-formiga",
+    "caixa-organizadora-grande",
+  ];
+  assert.equal(approval.hasSearchApprovedProducts(), true);
+  const products = [
+    ...expected.map((slug) => ({ slug, sourceStatus: "NORMAL" })),
+    { slug: "produto-nao-aprovado", sourceStatus: "NORMAL" },
+    { slug: expected[0], sourceStatus: "UNLIST" },
+    { slug: expected[1], sourceStatus: "BANNED" },
+    { slug: expected[2], sourceStatus: "SELLER_DELETE" },
+  ];
+  assert.deepEqual(approval.searchApprovedProducts(products).map((p) => p.slug), expected);
+  assert.equal(approval.isSearchApprovedProduct({ slug: expected[0], sourceStatus: "NORMAL" }), true);
+  assert.equal(approval.isSearchApprovedProduct({ slug: expected[0], sourceStatus: "UNLIST" }), false);
 });
 
 test("previews bloqueiam todos os rastreadores e nao publicam sitemap", async () => {
@@ -130,4 +143,63 @@ test("com produtos aprovados uma falha de catalogo nao entrega sitemap truncado"
     () => loadSitemap(true, { state: "unavailable", products: [] }, ["caixa-ativa"])(),
     /site_catalog_unavailable_for_sitemap/,
   );
+});
+
+
+test("os cinco produtos do piloto tem conteudo editorial, fotos e item Shopee", () => {
+  const snapshot = require("../src/server/products/published-catalog-snapshot.json");
+  const editorials = loadTypeScript("src/features/products/catalog-product-editorial.ts");
+  const titles = loadTypeScript("src/features/products/editorial-titles.ts");
+  const approved = approval.searchApprovedProducts(snapshot.map((row) => ({
+    slug: row.slug,
+    sourceStatus: "NORMAL",
+  })));
+  assert.equal(approved.length, 5);
+  for (const item of approved) {
+    const p = snapshot.find((row) => row.slug === item.slug);
+    assert.ok(p);
+    assert.ok(Number.isSafeInteger(p.id));
+    assert.ok(p.imageUrls.length >= 2, "insufficient images for " + item.slug);
+    assert.ok(p.imageUrls.every((url) => url.startsWith("https://cf.shopee.com.br/file/")));
+    const editorial = editorials.getCatalogProductEditorial(item.slug);
+    assert.ok(editorial && editorial.lead && editorial.body && editorial.metaDescription);
+    assert.ok(titles.getProductSeoTitle({ slug: p.slug, name: p.name }).endsWith("| CMangini3D"));
+  }
+});
+
+test("sitemap real anuncia cinco aprovados e exclui outros produtos", async () => {
+  const snapshot = require("../src/server/products/published-catalog-snapshot.json");
+  const catalog = {
+    state: "available",
+    products: snapshot.map((row) => ({ slug: row.slug, sourceStatus: "NORMAL" })),
+  };
+  const sitemap = loadTypeScript("src/app/sitemap.ts", {
+    "@/lib/site-seo": { ...seo, isIndexableDeployment: () => true },
+    "@/features/products/search-approval": approval,
+    "@/server/products/catalog": { getSiteCatalog: async () => catalog },
+  }).default;
+  const urls = (await sitemap()).map((page) => page.url);
+  assert.equal(urls.length, 9);
+  assert.equal(new Set(urls).size, urls.length);
+  for (const slug of [
+    "caixa-organizadora-dois-compartimentos",
+    "porta-curativos-compacto",
+    "porta-controles-de-mesa",
+    "casinha-porta-iscas-formiga",
+    "caixa-organizadora-grande",
+  ]) assert.ok(urls.includes("https://cmangini3d.com.br/produtos/" + slug));
+  assert.ok(!urls.includes("https://cmangini3d.com.br/produtos/kit-soldados-verdes-dedo-do-meio"));
+});
+
+test("BreadcrumbList aponta URLs canonicas, sem precos ou avaliacao inventados", () => {
+  const data = loadTypeScript("src/features/products/product-breadcrumb-jsonld.ts", {
+    "@/lib/site-seo": seo,
+  }).productBreadcrumbJsonLd({
+    slug: "porta-curativos-compacto",
+    name: "Porta-Curativos Compacto",
+  });
+  assert.equal(data["@type"], "BreadcrumbList");
+  assert.equal(data.itemListElement[1].item, "https://cmangini3d.com.br/produtos/porta-curativos-compacto");
+  assert.ok(!JSON.stringify(data).includes("offers"));
+  assert.ok(!JSON.stringify(data).includes("aggregateRating"));
 });

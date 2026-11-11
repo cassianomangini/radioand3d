@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSiteCatalog } from "@/server/products/catalog";
 import { isSearchApprovedProduct } from "@/features/products/search-approval";
+import { productBreadcrumbJsonLd } from "@/features/products/product-breadcrumb-jsonld";
 import { isIndexableDeployment } from "@/lib/site-seo";
 import { ProductGallery } from "../product-gallery";
 import styles from "../products.module.css";
@@ -52,9 +53,18 @@ export default async function ProductPage({ params }: Props) {
   if (!product || product.sourceStatus === "SELLER_DELETE") notFound();
   const subtitle = getProductSubtitle(product.slug);
   const editorial = getCatalogProductEditorial(product.slug);
+  const breadcrumbJsonLd = isIndexableDeployment() && isSearchApprovedProduct(product)
+    ? JSON.stringify(productBreadcrumbJsonLd({
+        slug: product.slug,
+        name: getProductDisplayTitle(product),
+      })).replace(/</g, "\\u003c")
+    : null;
 
   return (
     <div className={styles.page}>
+      {breadcrumbJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
+      )}
       <header className={styles.banner}>
         <div className={styles.bannerContent}>
           <p className={styles.bannerTitle}>Produtos</p>

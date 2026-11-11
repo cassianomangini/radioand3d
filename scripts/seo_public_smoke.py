@@ -135,7 +135,7 @@ def check_image(slug):
     return None
 
 if __name__ == "__main__":
-    if len(ROWS) != 28 or len(APPROVED) != 23 or len(PENDING) != 5:
+    if len(ROWS) != 28 or len(APPROVED) != 25 or len(PENDING) != 3:
         ERRORS.append(f"catalogo divergente do lote: total={len(ROWS)} aprovados={len(APPROVED)} pendentes={len(PENDING)}")
     check_main()
     with ThreadPoolExecutor(max_workers=4) as pool:

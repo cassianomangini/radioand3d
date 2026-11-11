@@ -61,19 +61,17 @@ test('informacoes decisivas e limites de variacoes seguem claros', async () => {
   assert.doesNotMatch(soldados.metaDescription, /Toy Story|Disney|Pixar/i);
 });
 
-test('copy sozinha nao aprova indexacao: 23 liberados e cinco pendentes', async () => {
+test('copy sozinha nao aprova indexacao: 25 liberados e tres pendentes', async () => {
   const { getCatalogProductEditorial: get } = await editorial;
   const approval = await import(pathToFileURL(resolve('src/features/products/search-approval.ts')).href);
   const pending = new Set([
     'kit-porta-figurinhas-3d',
     'dummy-13-boneco-articulado',
     'fita-cassete-retro',
-    'martelo-thor-rotativo',
-    'kit-soldados-verdes-dedo-do-meio',
   ]);
   assert.equal(approval.hasSearchApprovedProducts(), true);
   const eligible = snapshot.filter(p => !pending.has(p.slug));
-  assert.equal(eligible.length, 23);
+  assert.equal(eligible.length, 25);
   for (const product of snapshot) {
     assert.equal(
       approval.isSearchApprovedProduct({ slug: product.slug, sourceStatus: 'NORMAL' }),

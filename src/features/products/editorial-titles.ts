@@ -27,12 +27,12 @@ export const curatedProductTitles: Readonly<Record<string, EditorialTitle>> = {
   "caixa-organizadora-grande": { displayTitle: "Caixa Grande com Tampa Deslizante", seoTitle: "Caixa Organizadora Grande com Tampa Deslizante" },
   "mini-arvore-pinheiro": { displayTitle: "Mini Pinheiro Decorativo", seoTitle: "Mini Pinheiro Decorativo para Natal" },
   "caixa-organizadora-dois-compartimentos": { displayTitle: "Caixa Portátil com 2 Compartimentos", seoTitle: "Caixa Organizadora com 2 Compartimentos" },
-  "martelo-thor-rotativo": { displayTitle: "Martelo Nórdico Rotativo", seoTitle: "Martelo Nórdico Rotativo de Brinquedo" },
+  "martelo-thor-rotativo": { displayTitle: "Martelo Nórdico Rotativo", seoTitle: "Mini Martelo Nórdico Rotativo em 3D" },
   "dinossauro-articulado-t-rex": { displayTitle: "Dinossauro T-Rex Articulado", seoTitle: "Dinossauro T-Rex Articulado Flexível" },
   "capa-botao-descarga": { displayTitle: "Capa para Botão de Descarga do Vaso", seoTitle: "Capa para Botão de Descarga de Vaso Sanitário" },
   "chaveiro-mureta-santos": { displayTitle: "Chaveiro Mureta de Santos", seoTitle: "Chaveiro Mureta de Santos em 3D" },
   "dummy-13-boneco-articulado": { displayTitle: "Dummy 13 – Boneco para Montar", seoTitle: "Dummy 13 – Boneco Articulado para Montar" },
-  "kit-soldados-verdes-dedo-do-meio": { displayTitle: "Kit 3 Soldados Verdes Irreverentes", seoTitle: "Kit 3 Miniaturas Soldado Verde Dedo do Meio" },
+  "kit-soldados-verdes-dedo-do-meio": { displayTitle: "Kit 3 Soldados Verdes Dedo do Meio", seoTitle: "Kit 3 Soldados Verdes Dedo do Meio" },
 };
 
 // Produto novo ainda exige revisao editorial antes de entrar no Google.

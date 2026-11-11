@@ -58,18 +58,16 @@ test("somente o deploy de producao pode ser indexado", () => {
   }
 });
 
-test("indexacao exige whitelist explicita e status NORMAL (23 aprovados)", () => {
+test("indexacao exige whitelist explicita e status NORMAL (25 aprovados)", () => {
   const snapshot = require("../src/server/products/published-catalog-snapshot.json");
   const pending = new Set([
     "dummy-13-boneco-articulado",
     "fita-cassete-retro",
-    "martelo-thor-rotativo",
     "kit-porta-figurinhas-3d",
-    "kit-soldados-verdes-dedo-do-meio",
   ]);
   assert.equal(snapshot.length, 28);
   const eligible = snapshot.filter(p => !pending.has(p.slug)).map(p => p.slug);
-  assert.equal(eligible.length, 23);
+  assert.equal(eligible.length, 25);
   assert.equal(approval.hasSearchApprovedProducts(), true);
   for (const p of snapshot) {
     assert.equal(approval.isSearchApprovedProduct({ slug: p.slug, sourceStatus: "NORMAL" }),
@@ -162,7 +160,7 @@ test("produtos indexaveis tem conteudo editorial, fotos e item Shopee", () => {
     slug: row.slug,
     sourceStatus: "NORMAL",
   })));
-  assert.equal(approved.length, 23);
+  assert.equal(approved.length, 25);
   for (const item of approved) {
     const p = snapshot.find((row) => row.slug === item.slug);
     assert.ok(p);
@@ -175,7 +173,7 @@ test("produtos indexaveis tem conteudo editorial, fotos e item Shopee", () => {
   }
 });
 
-test("sitemap tem 4 paginas e 23 detalhes ativos, sem aprovacoes pendentes", async () => {
+test("sitemap tem 4 paginas e 25 detalhes ativos, sem aprovacoes pendentes", async () => {
   const snapshot = require("../src/server/products/published-catalog-snapshot.json");
   const catalog = {
     state: "available",
@@ -187,14 +185,12 @@ test("sitemap tem 4 paginas e 23 detalhes ativos, sem aprovacoes pendentes", asy
     "@/server/products/catalog": { getSiteCatalog: async () => catalog },
   }).default;
   const urls = (await sitemap()).map((page) => page.url);
-  assert.equal(urls.length, 27);
+  assert.equal(urls.length, 29);
   assert.equal(new Set(urls).size, urls.length);
   const pending = new Set([
     "dummy-13-boneco-articulado",
     "fita-cassete-retro",
-    "martelo-thor-rotativo",
     "kit-porta-figurinhas-3d",
-    "kit-soldados-verdes-dedo-do-meio",
   ]);
   for (const p of snapshot) {
     assert.equal(urls.includes("https://cmangini3d.com.br/produtos/" + p.slug),

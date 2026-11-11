@@ -31,6 +31,8 @@ const approvedSlugs = new Set<string>([
   "porta-controle-good-vibes",
   "porta-remedios-semanal",
   "trio-estrelas-decorativas",
+  "martelo-thor-rotativo",
+  "kit-soldados-verdes-dedo-do-meio",
 ]);
 
 export function isSearchApprovedProduct(

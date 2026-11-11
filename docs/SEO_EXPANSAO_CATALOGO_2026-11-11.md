@@ -67,3 +67,9 @@ O campo `Nenhum sitemap de referência detectado` pode aparecer antes do Google 
 - [ ] Acompanhar páginas rastreadas/indexadas, impressões, consultas, CTR e cliques para a Shopee. Não presumir melhora do ranking dentro da plataforma.
 
 **Aceite:** whitelist e testes aprovados + build e deploy validados. Não usar `Google não reconhece URL` como motivo para habilitar itens sem qualidade; separar problemas de descoberta de decisões editoriais.
+
+## Verificação pública e atualização das fotos em 11/11/2026
+
+- GitHub Actions [SEO public runtime smoke](https://github.com/cassianomangini/radioand3d/actions/runs/43007747332): **sucesso**, 27 URLs no sitemap (4 principais + 23 produtos), 28 páginas de produtos verificadas, canonical, robots/noindex, CTA de compra por ID e 28 imagens principais respondendo como imagens. Zero erros e zero avisos CDN. Isto verifica HTTP/HTML, **não a aparência visual real das fotos**.
+- Leitura `view_shopee_item_images` da Shopee live identificou 1 divergência de 28 anúncios: quatro URLs secundárias de `caixa-organizadora-grande` foram substituídas na Shopee; a imagem principal permaneceu igual. A atualização do snapshot substitui **apenas** essas quatro referências, sem alterar nomes, preço, estoque ou outras imagens.
+- As 5 pendências editoriais e de origem permanecem bloqueadas; a verificação externa não aprova automaticamente direitos do modelo ou quantidade de peças.

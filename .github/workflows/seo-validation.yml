@@ -5,6 +5,7 @@ on:
     paths:
       - "src/app/**"
       - "src/features/products/**"
+      - "src/server/products/published-catalog-snapshot.json"
       - "src/lib/site-seo.ts"
       - "next.config.ts"
       - "tests/seo.test.cjs"
@@ -15,6 +16,7 @@ on:
     paths:
       - "src/app/**"
       - "src/features/products/**"
+      - "src/server/products/published-catalog-snapshot.json"
       - "src/lib/site-seo.ts"
       - "next.config.ts"
       - "tests/seo.test.cjs"

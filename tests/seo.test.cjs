@@ -58,25 +58,33 @@ test("somente o deploy de producao pode ser indexado", () => {
   }
 });
 
-test("piloto tem exatamente cinco slugs e exige status NORMAL", () => {
-  const expected = [
-    "caixa-organizadora-dois-compartimentos",
-    "porta-curativos-compacto",
-    "porta-controles-de-mesa",
-    "casinha-porta-iscas-formiga",
-    "caixa-organizadora-grande",
-  ];
+test("indexacao exige whitelist explicita e status NORMAL (23 aprovados)", () => {
+  const snapshot = require("../src/server/products/published-catalog-snapshot.json");
+  const pending = new Set([
+    "dummy-13-boneco-articulado",
+    "fita-cassete-retro",
+    "martelo-thor-rotativo",
+    "kit-porta-figurinhas-3d",
+    "kit-soldados-verdes-dedo-do-meio",
+  ]);
+  assert.equal(snapshot.length, 28);
+  const eligible = snapshot.filter(p => !pending.has(p.slug)).map(p => p.slug);
+  assert.equal(eligible.length, 23);
   assert.equal(approval.hasSearchApprovedProducts(), true);
-  const products = [
-    ...expected.map((slug) => ({ slug, sourceStatus: "NORMAL" })),
-    { slug: "produto-nao-aprovado", sourceStatus: "NORMAL" },
-    { slug: expected[0], sourceStatus: "UNLIST" },
-    { slug: expected[1], sourceStatus: "BANNED" },
-    { slug: expected[2], sourceStatus: "SELLER_DELETE" },
-  ];
-  assert.deepEqual(approval.searchApprovedProducts(products).map((p) => p.slug), expected);
-  assert.equal(approval.isSearchApprovedProduct({ slug: expected[0], sourceStatus: "NORMAL" }), true);
-  assert.equal(approval.isSearchApprovedProduct({ slug: expected[0], sourceStatus: "UNLIST" }), false);
+  for (const p of snapshot) {
+    assert.equal(approval.isSearchApprovedProduct({ slug: p.slug, sourceStatus: "NORMAL" }),
+      !pending.has(p.slug), p.slug);
+    for (const sourceStatus of ["UNLIST", "BANNED", "SELLER_DELETE"]) {
+      assert.equal(approval.isSearchApprovedProduct({ slug: p.slug, sourceStatus }), false,
+        "inactive item " + p.slug);
+    }
+  }
+  assert.equal(approval.isSearchApprovedProduct({ slug: "produto-futuro", sourceStatus: "NORMAL" }), false);
+  assert.deepEqual(
+    new Set(approval.searchApprovedProducts(snapshot.map(p => ({ slug: p.slug, sourceStatus: "NORMAL" })))
+      .map(p => p.slug)),
+    new Set(eligible),
+  );
 });
 
 test("previews bloqueiam todos os rastreadores e nao publicam sitemap", async () => {
@@ -146,7 +154,7 @@ test("com produtos aprovados uma falha de catalogo nao entrega sitemap truncado"
 });
 
 
-test("os cinco produtos do piloto tem conteudo editorial, fotos e item Shopee", () => {
+test("produtos indexaveis tem conteudo editorial, fotos e item Shopee", () => {
   const snapshot = require("../src/server/products/published-catalog-snapshot.json");
   const editorials = loadTypeScript("src/features/products/catalog-product-editorial.ts");
   const titles = loadTypeScript("src/features/products/editorial-titles.ts");
@@ -154,7 +162,7 @@ test("os cinco produtos do piloto tem conteudo editorial, fotos e item Shopee", 
     slug: row.slug,
     sourceStatus: "NORMAL",
   })));
-  assert.equal(approved.length, 5);
+  assert.equal(approved.length, 23);
   for (const item of approved) {
     const p = snapshot.find((row) => row.slug === item.slug);
     assert.ok(p);
@@ -167,7 +175,7 @@ test("os cinco produtos do piloto tem conteudo editorial, fotos e item Shopee", 
   }
 });
 
-test("sitemap real anuncia cinco aprovados e exclui outros produtos", async () => {
+test("sitemap tem 4 paginas e 23 detalhes ativos, sem aprovacoes pendentes", async () => {
   const snapshot = require("../src/server/products/published-catalog-snapshot.json");
   const catalog = {
     state: "available",
@@ -179,16 +187,24 @@ test("sitemap real anuncia cinco aprovados e exclui outros produtos", async () =
     "@/server/products/catalog": { getSiteCatalog: async () => catalog },
   }).default;
   const urls = (await sitemap()).map((page) => page.url);
-  assert.equal(urls.length, 9);
+  assert.equal(urls.length, 27);
   assert.equal(new Set(urls).size, urls.length);
-  for (const slug of [
-    "caixa-organizadora-dois-compartimentos",
-    "porta-curativos-compacto",
-    "porta-controles-de-mesa",
-    "casinha-porta-iscas-formiga",
-    "caixa-organizadora-grande",
-  ]) assert.ok(urls.includes("https://cmangini3d.com.br/produtos/" + slug));
-  assert.ok(!urls.includes("https://cmangini3d.com.br/produtos/kit-soldados-verdes-dedo-do-meio"));
+  const pending = new Set([
+    "dummy-13-boneco-articulado",
+    "fita-cassete-retro",
+    "martelo-thor-rotativo",
+    "kit-porta-figurinhas-3d",
+    "kit-soldados-verdes-dedo-do-meio",
+  ]);
+  for (const p of snapshot) {
+    assert.equal(urls.includes("https://cmangini3d.com.br/produtos/" + p.slug),
+      !pending.has(p.slug), p.slug);
+  }
+  catalog.products[0].sourceStatus = "UNLIST";
+  const newUrls = (await sitemap()).map((p) => p.url);
+  if (!pending.has(catalog.products[0].slug)) {
+    assert.ok(!newUrls.includes("https://cmangini3d.com.br/produtos/" + catalog.products[0].slug));
+  }
 });
 
 test("BreadcrumbList aponta URLs canonicas, sem precos ou avaliacao inventados", () => {

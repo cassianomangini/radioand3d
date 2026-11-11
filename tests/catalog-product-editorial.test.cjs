@@ -61,13 +61,27 @@ test('informacoes decisivas e limites de variacoes seguem claros', async () => {
   assert.doesNotMatch(soldados.metaDescription, /Toy Story|Disney|Pixar/i);
 });
 
-test('texto editorial nao libera indexacao e manteve os cinco primeiros', async () => {
+test('copy sozinha nao libera indexacao: apenas os cinco slugs aprovados passam', async () => {
   const { getCatalogProductEditorial: get } = await editorial;
   const approval = await import(pathToFileURL(resolve('src/features/products/search-approval.ts')).href);
-  assert.equal(approval.hasSearchApprovedProducts(), false);
+  const seoPilot = new Set([
+    'caixa-organizadora-dois-compartimentos',
+    'porta-curativos-compacto',
+    'porta-controles-de-mesa',
+    'casinha-porta-iscas-formiga',
+    'caixa-organizadora-grande',
+  ]);
+  assert.equal(approval.hasSearchApprovedProducts(), true);
   for (const product of snapshot) {
-    assert.equal(approval.isSearchApprovedProduct({ slug: product.slug, sourceStatus: 'NORMAL' }), false);
+    assert.equal(
+      approval.isSearchApprovedProduct({ slug: product.slug, sourceStatus: 'NORMAL' }),
+      seoPilot.has(product.slug),
+      product.slug,
+    );
   }
+  assert.equal(approval.isSearchApprovedProduct({
+    slug: 'porta-curativos-compacto', sourceStatus: 'UNLIST',
+  }), false);
   assert.deepEqual(new Set(previousPilot).size, 5);
   assert.match(get('porta-curativos-compacto').lead, /Chega de curativos espalhados/);
   assert.match(get('porta-figurinhas-3d').note, /kit é vendido em outro anúncio/);

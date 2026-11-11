@@ -8,6 +8,7 @@ on:
       - "src/lib/site-seo.ts"
       - "next.config.ts"
       - "tests/seo.test.cjs"
+      - "tests/catalog-product-editorial.test.cjs"
       - ".github/workflows/seo-validation.yml"
   push:
     branches: [main]
@@ -17,6 +18,7 @@ on:
       - "src/lib/site-seo.ts"
       - "next.config.ts"
       - "tests/seo.test.cjs"
+      - "tests/catalog-product-editorial.test.cjs"
       - ".github/workflows/seo-validation.yml"
 
 permissions:
@@ -49,6 +51,7 @@ jobs:
           pnpm exec eslint
           src/lib/site-seo.ts
           src/features/products/search-approval.ts
+          src/features/products/product-breadcrumb-jsonld.ts
           src/app/robots.ts
           src/app/sitemap.ts
           src/app/layout.tsx

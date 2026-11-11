@@ -50,8 +50,9 @@ test('os titulos de produtos por categoria correspondem a sua funcao', async () 
   const { getProductDisplayTitle, getProductSeoTitle } = await editorial;
   assert.equal(getProductDisplayTitle({ slug: 'porta-controle-good-vibes', name: 'Nome bruto' }), 'Vaso Decorativo Good Vibes Only');
   assert.equal(getProductSeoTitle({ slug: 'capa-botao-descarga', name: 'Nome bruto' }), 'Capa para Botão de Descarga de Vaso Sanitário | CMangini3D');
-  assert.equal(getProductDisplayTitle({ slug: 'kit-soldados-verdes-dedo-do-meio', name: 'Nome bruto' }), 'Kit 3 Soldados Verdes Irreverentes');
-  assert.equal(getProductSeoTitle({ slug: 'kit-soldados-verdes-dedo-do-meio', name: 'Nome bruto' }), 'Kit 3 Miniaturas Soldado Verde Dedo do Meio | CMangini3D');
+  assert.equal(getProductDisplayTitle({ slug: 'kit-soldados-verdes-dedo-do-meio', name: 'Nome bruto' }), 'Kit 3 Soldados Verdes Dedo do Meio');
+  assert.equal(getProductSeoTitle({ slug: 'kit-soldados-verdes-dedo-do-meio', name: 'Nome bruto' }), 'Kit 3 Soldados Verdes Dedo do Meio | CMangini3D');
+  assert.equal(getProductSeoTitle({ slug: 'martelo-thor-rotativo', name: 'Nome bruto' }), 'Mini Martelo Nórdico Rotativo em 3D | CMangini3D');
 });
 
 test('seo editorial de produto novo e preservado e a marca fica normalizada', async () => {

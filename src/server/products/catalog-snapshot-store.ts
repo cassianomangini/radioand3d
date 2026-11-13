@@ -1,7 +1,15 @@
 import { createHash, createHmac } from "node:crypto";
 import { parseCatalogResponse, type CatalogProduct } from "@/features/products/catalog-contract";
 
-const OBJECT_KEY = "cmangini3d/site-catalog/public-v1.json";
+function storageObjectKey(): string {
+  if (process.env.VERCEL_ENV === "production") {
+    return "cmangini3d/site-catalog/production-v1.json";
+  }
+  // Preview branches MUST NOT modify the production catalog. The hashed ref
+  // avoids exposing branch names in object keys and isolates PR previews.
+  const branch = process.env.VERCEL_GIT_COMMIT_REF?.trim() || "local";
+  return "cmangini3d/site-catalog/preview-" + digest(branch).slice(0, 16) + "-v1.json";
+}
 const MAX_SNAPSHOT_BYTES = 3_000_000;
 const R2_TIMEOUT_MS = 8_000;
 
@@ -38,7 +46,7 @@ function signRequest(
   method: "GET" | "PUT", body: string, condition?: { name: "if-match" | "if-none-match"; value: string },
 ) {
   const config = storageConfig();
-  const pathname = "/" + config.bucket + "/" + OBJECT_KEY;
+  const pathname = "/" + config.bucket + "/" + storageObjectKey();
   const payloadHash = digest(body);
   const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, "");
   const day = timestamp.slice(0, 8);

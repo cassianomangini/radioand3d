@@ -47,12 +47,15 @@ const item = {
 const etag = '"' + "a".repeat(32) + '"';
 
 function withR2Env(callback) {
-  const keys = ["R2_S3_ENDPOINT", "R2_BUCKET", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"];
+  const keys = ["R2_S3_ENDPOINT", "R2_BUCKET", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY",
+    "VERCEL_ENV", "VERCEL_GIT_COMMIT_REF"];
   const originals = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
   process.env.R2_S3_ENDPOINT = "https://abc123.r2.cloudflarestorage.com";
   process.env.R2_BUCKET = "musicas";
   process.env.R2_ACCESS_KEY_ID = "test-access-id";
   process.env.R2_SECRET_ACCESS_KEY = "test-signing-secret";
+  process.env.VERCEL_ENV = "production";
+  delete process.env.VERCEL_GIT_COMMIT_REF;
   return Promise.resolve().then(callback).finally(() => {
     for (const key of keys) {
       if (originals[key] === undefined) delete process.env[key];
@@ -72,7 +75,7 @@ test("R2 snapshot returns null only for 404 and signs GET requests privately", a
     });
     assert.equal(result, null);
     assert.equal(requestUrl,
-      "https://abc123.r2.cloudflarestorage.com/musicas/cmangini3d/site-catalog/public-v1.json");
+      "https://abc123.r2.cloudflarestorage.com/musicas/cmangini3d/site-catalog/production-v1.json");
     assert.equal(requestOptions.cache, "no-store");
     assert.match(requestOptions.headers.authorization, /AWS4-HMAC-SHA256/);
     assert.equal(JSON.stringify(requestOptions).includes("test-signing-secret"), false);
@@ -141,5 +144,34 @@ test("R2 never accepts a non-Cloudflare endpoint or emits plaintext credentials"
     await assert.rejects(
       () => store.readStoredCatalog(async () => new Response(null, { status: 404 })),
       /invalid_endpoint/);
+  });
+});
+
+
+test("preview branch cannot read or overwrite the production R2 snapshot", async () => {
+  await withR2Env(async () => {
+    const productionUrls = [];
+    await store.readStoredCatalog(async (url) => {
+      productionUrls.push(url);
+      return new Response(null, { status: 404 });
+    });
+    process.env.VERCEL_ENV = "preview";
+    process.env.VERCEL_GIT_COMMIT_REF = "feat/cm3d-site-catalog-source-sync";
+    const previewUrls = [];
+    await store.readStoredCatalog(async (url) => {
+      previewUrls.push(url);
+      return new Response(null, { status: 404 });
+    });
+    process.env.VERCEL_GIT_COMMIT_REF = "another-feature-branch";
+    await store.readStoredCatalog(async (url) => {
+      previewUrls.push(url);
+      return new Response(null, { status: 404 });
+    });
+    assert.equal(productionUrls.length, 1);
+    assert.equal(previewUrls.length, 2);
+    assert.match(productionUrls[0], /production-v1\.json$/);
+    assert.match(previewUrls[0], /preview-[a-f0-9]{16}-v1\.json$/);
+    assert.notEqual(previewUrls[0], previewUrls[1]);
+    assert.notEqual(previewUrls[0], productionUrls[0]);
   });
 });

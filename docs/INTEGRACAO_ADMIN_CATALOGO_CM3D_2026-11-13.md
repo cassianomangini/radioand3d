@@ -20,9 +20,15 @@ antigo retorno `{ products: [...] }` esperado no site antes desta mudança.
    seguindo o cursor `after`, com validação de versão, loja, IDs, URL da
    Shopee, imagens e dados de origem. Cada consulta tem timeout; o ciclo deve
    terminar sem erro para a projeção ser aceita.
-2. A cada **15 minutos**, o Next.js revalida a fonte (intervalo configurado
-   no `fetch`). Isso não aumenta a frequência da coleta Shopee do Admin:
-   somente reflete o último snapshot **observado** pelo Admin.
+2. O catálogo público é persistido em **Cloudflare R2** (já conectado ao
+   site), num objeto exclusivo `cmangini3d/site-catalog/public-v1.json`.
+   A leitura do site usa essa cópia durável, independente da disponibilidade
+   momentânea do Admin. Depois de **15 minutos** sem atualização, uma visita
+   agenda uma atualização **após a resposta**, sem segurar a página. Há também
+   um Cron autenticado diário para aquecer dados em períodos sem visitantes.
+   O ambiente Vercel atual usa plano Hobby, cujo Cron nativo não suporta
+   agendamento subdiário: atualizações exatas de 15 minutos sem visitas
+   requerem agendador externo ou alteração de plano.
 3. Os **28 produtos editoriais existentes** continuam com os mesmos slugs,
    títulos e textos curados. O catálogo usa os dados da fonte para refletir
    fotografias, variações, status e dimensões completas verificadas.
@@ -47,21 +53,25 @@ antigo retorno `{ products: [...] }` esperado no site antes desta mudança.
 8. Os três legados pendentes continuam sem indexação até revisão humana:
    `kit-porta-figurinhas-3d`, `dummy-13-boneco-articulado`,
    `fita-cassete-retro`.
-9. Se o feed estiver inacessível, parcial, inválido, com cursor
-   truncado, status desconhecido ou faltar **qualquer** um dos 28 itens
-   editoriais, o site ativa um **fallback local completo** para os
-   28 produtos existentes. As URLs públicas e as 25 aprovações SEO
-   permanecem disponíveis. O erro é registrado em log sem credenciais.
-   Nunca responder 5xx, catálogo vazio ou sitemap truncado devido apenas
-   a uma falha de integração com o Admin.
-10. Mesmo com configuração parcial, token ausente ou URL inválida, o
-    site continua servindo o snapshot editorial, sem aguardar a API.
-    **Limitação do fallback:** o snapshot é histórico, não comprova
-    disponibilidade atual na Shopee. O site deve monitorar falhas para
-    restabelecer a atualização dos status e fotos.
+9. Uma sincronização só substitui o catálogo R2 depois de obter **todas**
+   as páginas e validar os **28 itens editoriais existentes** e os dados
+   novos. Publicações incompletas ou com status inesperado são rejeitadas.
+   O snapshot público é escrito com `If-Match` / `If-None-Match` para
+   impedir atualizações concorrentes de sobrescreverem uma versão que não
+   leram. Em caso de corrida, o site lê a versão persistida vencedora.
+10. Se o Admin ficar indisponível, a cópia completa no R2 mantém **todas
+    as páginas já persistidas, inclusive novos produtos**, com títulos, URLs
+    e SEO do site. Uma falha do feed nunca apaga o objeto em R2. Se também
+    não houver cópia R2 acessível, ainda há o catálogo editorial embutido
+    de 28 itens como proteção final. Nenhum produto **novo** é exposto ao
+    público antes da confirmação da escrita durável.
 11. Um item marcado explicitamente como `SELLER_DELETE` deixa de
     oferecer compra e indexação, mas sua URL editorial antiga responde
     200, com o texto preservado, em vez de virar um 404 inesperado.
+12. O site nunca interpreta falta de resposta do Admin como exclusão
+    de produtos. Quando opera com dados antigos, isso é sinalizado em log.
+    Para saber disponibilidade **atual** é necessário que Shopee/Admin
+    tenham fornecido uma leitura recente.
 
 ## Configuração no deploy
 
@@ -77,6 +87,11 @@ No runtime **do site**:
 - `CM_SITE_CATALOG_TOKEN` (o **mesmo** segredo configurado no Admin)
 - `CM_SITE_AUTO_INDEX_ENABLED=false` na primeira publicação; mudar para
   `true` **somente após** validar dados, fotos, slugs, robots e sitemap.
+- `R2_S3_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID` e
+  `R2_SECRET_ACCESS_KEY`, **já configuradas no site**; é necessário confirmar
+  que essas credenciais têm permissão de PUT/GET e que o bucket tem espaço
+  e política adequados. O arquivo contém apenas dados do **contrato público**
+  do site; não exportar internals do Admin ao bucket.
 
 Segredos não devem usar prefixo `NEXT_PUBLIC_`. Não imprimir tokens em
 logs nem em URLs. A organização e a loja são fixadas no Admin e não são
@@ -119,16 +134,30 @@ escolhidas pelo site por parâmetro da requisição.
   personalização; o site não deve inferir essas propriedades para novos
   itens. A sincronização de imagens internas de `product_media` não faz
   parte deste contrato.
-- Uma queda do feed mantém páginas **antigas**, mas não garante
-  continuidade de URLs **novas e ainda não editoradas**. Por isso
-  `CM_SITE_AUTO_INDEX_ENABLED` permanece `false` até existir uma
-  persistência de último estado válido sob ownership do site.
+- **Novas URLs só são exibidas após escrita durável em R2.** Depois
+  disso, uma queda do Admin não as remove. Se R2 também ficar indisponível
+  a partir de um processo sem memória/cache válido, a proteção local de
+  28 itens não substitui uma segunda cópia durável independente. Por isso
+  mantenha monitoramento e backups do bucket. Nenhum sistema distribuído
+  garante informações atuais durante indisponibilidade simultânea de todas
+  as fontes de dados.
+- A persistência R2 guarda cópias normalizadas do **catálogo público**,
+  não um editor de publicações. Textos comerciais permanecem no site,
+  e os 28 legados sempre usam a versão editorial vigente do código.
+- O objeto R2 usa o bucket apontado por `R2_BUCKET`. Se esse bucket for
+  servido publicamente, o conteúdo persistido também pode ser acessível
+  por URL direta; ele contém somente os campos do contrato público do site.
 - Esta versão não possui um banco editorial próprio com UI de revisão.
   A curadoria histórica permanece no repositório do site, e os novos itens
   recebem texto inicial com regras. Uma camada editorial persistente pode
   evoluir **somente no site**, sem escrever campos de SEO no Admin.
-- O intervalo de 15 minutos cobre o cache do site, mas não garante que a
-  Shopee já tenha sido sincronizada no Admin.
+- A verificação de 15 minutos é acionada por tráfego, sem bloquear
+  renderização. O Cron nativo diário funciona mesmo sem visitas. O site
+  só reflete o último snapshot já capturado pelo Admin/Shopee.
+- A rota protegida `/api/internal/site-catalog-refresh` permite forçar
+  atualização com `CRON_SECRET`; responde 403 a visitantes anônimos.
+  O Cron Vercel chama essa rota diariamente às 06:00 UTC.
 
-**Estado de entrega:** código de leitura e projeção em PR; não prova de deploy
-ou integração live até testes, configuração e leitura real serem executados.
+**Estado de entrega:** implementação e testes em PR. A escrita e leitura real
+em R2 e a integração do feed devem ser verificadas no ambiente implantado
+antes de ligar a indexação automática de novos itens.

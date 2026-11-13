@@ -183,20 +183,6 @@ function knownSiteProduct(item: SourceItem, seed: SiteEditorialSeed): CatalogPro
   };
 }
 
-function missingSiteProduct(seed: SiteEditorialSeed): CatalogProduct {
-  // A missing source is NOT proof of deletion. Keep the historic URL but do
-  // not expose a possibly-invalid purchase link or index it.
-  return {
-    slug: seed.slug, name: seed.name, summary: seed.summary,
-    description: seed.description, seoTitle: seed.name, seoDescription: seed.summary,
-    categorySlug: null, shopeeUrl: null, imageUrls: seed.imageUrls,
-    material: seed.material, dimensions: seed.dimensions, customizable: false,
-    variations: seed.variations,
-    sourceStatus: "UNLIST", sourceSyncedAt: seed.sourceSyncedAt,
-    contentUpdatedAt: seed.sourceSyncedAt,
-  };
-}
-
 /**
  * Reconcile source facts against the site's 28 human-curated pages.
  * New products get stable ID-only slugs and conditional site-generated copy.
@@ -211,15 +197,21 @@ export function buildSiteCatalog(
     throw new Error("catalog_duplicate_item_id");
   }
 
-  // Do not mistake a scope/config issue for 28 source items being deleted.
+  // Never interpret a partial provider feed as a request to remove legacy
+  // URLs, index approvals, product cards, or CTAs. Explicit provider status
+  // changes are handled below; missing rows are not proof of deactivation.
   const matched = seeds.filter((seed) => sourceById.has(seed.id)).length;
-  if (seeds.length > 0 && matched < Math.ceil(seeds.length / 2)) {
+  if (matched !== seeds.length) {
     throw new Error("catalog_source_scope_incomplete");
   }
 
   const known = seeds.map((seed) => {
     const item = sourceById.get(seed.id);
-    return item ? knownSiteProduct(item, seed) : missingSiteProduct(seed);
+    if (!item) throw new Error("catalog_source_scope_incomplete");
+    if (!["NORMAL", "UNLIST", "BANNED", "SELLER_DELETE"].includes(item.sourceStatus)) {
+      throw new Error("catalog_source_unknown_status");
+    }
+    return knownSiteProduct(item, seed);
   });
 
   const additions = source

@@ -12,6 +12,7 @@ on:
       - "tests/seo.test.cjs"
       - "tests/catalog-source-sync.test.cjs"
       - "tests/catalog-durable-storage.test.cjs"
+      - "tests/catalog-refresh-auth.test.cjs"
       - "tests/catalog-product-editorial.test.cjs"
       - "tests/product-editorial-titles.test.cjs"
       - ".github/workflows/seo-validation.yml"
@@ -27,6 +28,7 @@ on:
       - "tests/seo.test.cjs"
       - "tests/catalog-source-sync.test.cjs"
       - "tests/catalog-durable-storage.test.cjs"
+      - "tests/catalog-refresh-auth.test.cjs"
       - "tests/catalog-product-editorial.test.cjs"
       - "tests/product-editorial-titles.test.cjs"
       - ".github/workflows/seo-validation.yml"
@@ -81,6 +83,7 @@ jobs:
           tests/seo.test.cjs
           tests/catalog-source-sync.test.cjs
           tests/catalog-durable-storage.test.cjs
+          tests/catalog-refresh-auth.test.cjs
       - name: Generate route types
         run: pnpm exec next typegen
       - name: Typecheck

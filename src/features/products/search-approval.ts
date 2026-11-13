@@ -1,12 +1,9 @@
 import type { CatalogProduct } from "./catalog-contract";
 
-// Aprovacao editorial separada do status da Shopee. Uma listagem NORMAL nao
-// e automaticamente uma pagina pronta para indexacao.
-// Expansao 11/11/2026: slugs explicitamente revisados e NORMAL na Shopee live.
-// Somente o status NORMAL + whitelist libera indexacao; novos itens nao sao
-// aprovados automaticamente. Ver docs/SEO_EXPANSAO_CATALOGO_2026-11-11.md.
-// Atenção: fallback de catalogo em Vercel e snapshot; mudancas de status
-// na Shopee exigem revalidacao/sincronizacao para refletir no site.
+// Editorial publicacao continua pertencendo exclusivamente ao CMangini3D.
+// Os 25 slugs revisados permanecem aprovados. Novas paginas geradas pelo site
+// podem ser indexadas somente com gate de qualidade e flag de rollout explicita.
+// Status NORMAL da Shopee sozinho nunca e autorizacao de indexacao.
 const approvedSlugs = new Set<string>([
   "caixa-organizadora-dois-compartimentos",
   "porta-curativos-compacto",
@@ -35,15 +32,17 @@ const approvedSlugs = new Set<string>([
   "kit-soldados-verdes-dedo-do-meio",
 ]);
 
-export function isSearchApprovedProduct(
-  product: Pick<CatalogProduct, "slug" | "sourceStatus">,
-): boolean {
-  return product.sourceStatus === "NORMAL" && approvedSlugs.has(product.slug);
+type Candidate = Pick<CatalogProduct, "slug" | "sourceStatus"> &
+  Partial<Pick<CatalogProduct, "autoIndexEligible">>;
+
+export function isSearchApprovedProduct(product: Candidate): boolean {
+  if (product.sourceStatus !== "NORMAL") return false;
+  if (approvedSlugs.has(product.slug)) return true;
+  return product.autoIndexEligible === true
+    && /^produto-3d-[1-9]\d*$/.test(product.slug);
 }
 
-export function searchApprovedProducts<T extends Pick<CatalogProduct, "slug" | "sourceStatus">>(
-  products: readonly T[],
-): T[] {
+export function searchApprovedProducts<T extends Candidate>(products: readonly T[]): T[] {
   return products.filter(isSearchApprovedProduct);
 }
 

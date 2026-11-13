@@ -4,6 +4,13 @@
     "deploymentEnabled": false
   },
   "crons": [
-    { "path": "/api/internal/quote-retention", "schedule": "0 4 * * *" }
+    {
+      "path": "/api/internal/quote-retention",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/internal/site-catalog-refresh",
+      "schedule": "0 6 * * *"
+    }
   ]
 }

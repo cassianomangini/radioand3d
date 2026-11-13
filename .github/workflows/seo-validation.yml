@@ -18,10 +18,11 @@ on:
     paths:
       - "src/app/**"
       - "src/features/products/**"
-      - "src/server/products/published-catalog-snapshot.json"
+      - "src/server/products/**"
       - "src/lib/site-seo.ts"
       - "next.config.ts"
       - "tests/seo.test.cjs"
+      - "tests/catalog-source-sync.test.cjs"
       - "tests/catalog-product-editorial.test.cjs"
       - "tests/product-editorial-titles.test.cjs"
       - ".github/workflows/seo-validation.yml"

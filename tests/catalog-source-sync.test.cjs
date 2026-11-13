@@ -173,7 +173,8 @@ test("site source reader fetches the full feed and never falls back silently aft
   const requests = [];
   global.fetch = async (url, options) => {
     requests.push({ url: String(url), options });
-    const all = [...seeds.map((seed) => legacyItem(seed)), sourceItem(9001)];
+    const all = [...seeds.map((seed) => legacyItem(seed)), sourceItem(9001)]
+      .sort((a, b) => a.itemId - b.itemId);
     return { ok: true, json: async () => page(all) };
   };
   try {

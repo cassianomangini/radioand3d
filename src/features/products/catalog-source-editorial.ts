@@ -32,7 +32,7 @@ const genericItem = /\b(?:caix(?:a|inha)|estojo|porta|organizador|organizadora|s
 
 function lastContentChange(item: SourceItem, fallback: string): string {
   const dates = [item.sourceUpdatedAt, item.product?.updatedAt, fallback]
-    .filter((value): value is string => Boolean(value) && Number.isFinite(Date.parse(value)));
+    .filter((value): value is string => typeof value === "string" && Number.isFinite(Date.parse(value)));
   return dates.sort((a, b) => Date.parse(b) - Date.parse(a))[0] ?? fallback;
 }
 

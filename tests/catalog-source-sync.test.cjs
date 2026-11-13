@@ -154,13 +154,18 @@ test("auto indexing is gated; obvious IP, kits, stale status and missing evidenc
   assert.equal(approval.searchApprovedProducts(preview).length, 25);
 });
 
-test("a partial source cannot silently remove established indexed pages", () => {
+test("one missing or unknown legacy item cannot silently deindex a product", () => {
+  const all = seeds.map((seed) => legacyItem(seed));
   assert.throws(() => editorial.buildSiteCatalog(
-    [legacyItem(seeds[0])], seeds, { now, autoIndex: true },
+    all.slice(1), seeds, { now, autoIndex: true },
   ), /scope_incomplete/);
+  all[0] = legacyItem(seeds[0], { sourceStatus: "UNKNOWN", shopeeUrl: null });
+  assert.throws(() => editorial.buildSiteCatalog(
+    all, seeds, { now, autoIndex: true },
+  ), /unknown_status/);
 });
 
-test("site source reader fetches the full feed and never falls back silently after configuration", async () => {
+test("site source reader fetches the full feed and preserves legacy pages when source fails", async () => {
   const original = {
     url: process.env.CM_SITE_CATALOG_API_URL,
     token: process.env.CM_SITE_CATALOG_TOKEN,
@@ -204,8 +209,11 @@ test("site source reader fetches the full feed and never falls back silently aft
 
     global.fetch = async () => ({ ok: false, status: 503 });
     const failed = await catalog.getSiteCatalog();
-    assert.equal(failed.state, "unavailable");
-    assert.equal(failed.products.length, 0);
+    assert.equal(failed.state, "available");
+    assert.equal(failed.degraded, true);
+    assert.equal(failed.products.length, 28);
+    assert.deepEqual(failed.products.map((p) => p.slug), seeds.map((p) => p.slug));
+    assert.equal(approval.searchApprovedProducts(failed.products).length, 25);
   } finally {
     global.fetch = original.fetch;
     for (const [key, value] of [
@@ -267,8 +275,10 @@ test("reads a 70-item catalog with a real second cursor and rejects a partial pa
 
       secondPageShouldFail = true;
       const failed = await catalog.getSiteCatalog();
-      assert.equal(failed.state, "unavailable");
-      assert.deepEqual(failed.products, []);
+      assert.equal(failed.state, "available");
+      assert.equal(failed.degraded, true);
+      assert.deepEqual(failed.products.map((p) => p.slug), seeds.map((p) => p.slug));
+      assert.equal(approval.searchApprovedProducts(failed.products).length, 25);
     } finally {
       Date.now = originalNow;
     }
@@ -283,4 +293,57 @@ test("reads a 70-item catalog with a real second cursor and rejects a partial pa
       else process.env[key] = value;
     }
   }
+});
+
+
+test("broken or incomplete API credentials never cause product or sitemap outage", async () => {
+  const original = {
+    url: process.env.CM_SITE_CATALOG_API_URL,
+    token: process.env.CM_SITE_CATALOG_TOKEN,
+  };
+  const reader = loadTypeScript("src/server/products/catalog.ts", {
+    "@/features/products/catalog-contract": contract,
+    "@/features/products/catalog-source-contract": source,
+    "@/features/products/catalog-source-editorial": editorial,
+    "./published-catalog-snapshot.json": { default: seeds },
+  });
+  try {
+    for (const config of [
+      { url: "https://admin.example/api/internal/site-catalog", token: undefined },
+      { url: undefined, token: "site-source-secret-token-at-least-32-chars" },
+      { url: "https://admin.example/broken", token: "site-source-secret-token-at-least-32-chars" },
+    ]) {
+      if (config.url === undefined) delete process.env.CM_SITE_CATALOG_API_URL;
+      else process.env.CM_SITE_CATALOG_API_URL = config.url;
+      if (config.token === undefined) delete process.env.CM_SITE_CATALOG_TOKEN;
+      else process.env.CM_SITE_CATALOG_TOKEN = config.token;
+
+      const result = await reader.getSiteCatalog();
+      assert.equal(result.state, "available");
+      assert.equal(result.degraded, true);
+      assert.equal(result.products.length, 28);
+      assert.equal(approval.searchApprovedProducts(result.products).length, 25);
+    }
+  } finally {
+    for (const [key, value] of [
+      ["CM_SITE_CATALOG_API_URL", original.url],
+      ["CM_SITE_CATALOG_TOKEN", original.token],
+    ]) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+});
+
+test("deleted Shopee listing keeps an editorial detail URL without a purchase CTA", () => {
+  const all = seeds.map((seed) => legacyItem(seed));
+  all[0] = legacyItem(seeds[0], { sourceStatus: "SELLER_DELETE", shopeeUrl: null });
+  const rendered = editorial.buildSiteCatalog(all, seeds, { now, autoIndex: false });
+  assert.equal(rendered[0].slug, seeds[0].slug);
+  assert.equal(rendered[0].sourceStatus, "SELLER_DELETE");
+  assert.equal(rendered[0].shopeeUrl, null);
+  assert.equal(approval.isSearchApprovedProduct(rendered[0]), false);
+  const detailPage = fs.readFileSync(path.join(__dirname, "..", "src/app/produtos/[slug]/page.tsx"), "utf8");
+  assert.match(detailPage, /if \(!product\) notFound\(\)/);
+  assert.doesNotMatch(detailPage, /product\.sourceStatus\s*===\s*"SELLER_DELETE"\)\s*notFound/);
 });

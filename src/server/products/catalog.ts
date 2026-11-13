@@ -8,7 +8,7 @@ import {
 import snapshotRows from "./published-catalog-snapshot.json";
 
 export type CatalogRead =
-  | { state: "available"; products: CatalogProduct[] }
+  | { state: "available"; products: CatalogProduct[]; degraded?: boolean }
   | { state: "unavailable"; products: [] };
 
 const REVALIDATE_SECONDS = 15 * 60;
@@ -34,9 +34,9 @@ const snapshotProducts = parseCatalogResponse({ products: editorialSeeds.map((ro
   contentUpdatedAt: row.sourceSyncedAt,
 })) });
 
-function publishedSnapshot(): CatalogRead {
+function publishedSnapshot(degraded = false): CatalogRead {
   return snapshotProducts
-    ? { state: "available", products: snapshotProducts }
+    ? { state: "available", products: snapshotProducts, degraded }
     : { state: "unavailable", products: [] };
 }
 
@@ -92,10 +92,17 @@ export async function getSiteCatalog(): Promise<CatalogRead> {
   // Until the integration is provisioned, preserve the already-published site.
   if (!endpoint && !token) return publishedSnapshot();
 
-  // Partial/malformed configuration must not silently be treated as a snapshot.
-  if (!endpoint || !token || token.length < 32) return { state: "unavailable", products: [] };
+  // A broken integration must never break the existing 28 product pages,
+  // their canonical URLs or the 25 editorially approved sitemap entries.
+  if (!endpoint || !token || token.length < 32) {
+    console.error("[cm3d-catalog] source configuration incomplete; using editorial snapshot");
+    return publishedSnapshot(true);
+  }
   const url = sourceEndpoint(endpoint);
-  if (!url) return { state: "unavailable", products: [] };
+  if (!url) {
+    console.error("[cm3d-catalog] source endpoint invalid; using editorial snapshot");
+    return publishedSnapshot(true);
+  }
 
   try {
     const source = await fetchSourceCatalog(url, token);
@@ -106,9 +113,12 @@ export async function getSiteCatalog(): Promise<CatalogRead> {
     if (!products) throw new Error("catalog_source_invalid_projection");
     return { state: "available", products };
   } catch (error) {
-    // Keep details/sitemap as 5xx on upstream failure rather than respond 200
-    // with products silently deleted or an old purchasable status.
-    console.error("[cm3d-catalog] source unavailable:", error instanceof Error ? error.message : "unknown");
-    return { state: "unavailable", products: [] };
+    // A provider outage is not a request to deindex product pages. Keep the
+    // site-owned editorial baseline; do not accept an incomplete projection.
+    // New uncurated products disappear from this temporary fallback and are
+    // deliberately noindex until a durable site-owned record is introduced.
+    console.error("[cm3d-catalog] source unavailable; using editorial snapshot",
+      error instanceof Error ? error.name : "unknown");
+    return publishedSnapshot(true);
   }
 }

@@ -1,5 +1,7 @@
 export type CatalogProduct = {
   slug: string;
+  /** Site-derived eligibility only; never a field from the Admin feed. */
+  autoIndexEligible?: boolean;
   name: string;
   summary: string;
   description: string;
@@ -64,13 +66,14 @@ function isoDate(value: unknown): value is string {
 function parseProduct(value: unknown): CatalogProduct | null {
   if (!record(value)) return null;
   const {
-    slug, name, summary, description, categorySlug, seoTitle, seoDescription,
+    slug, name, summary, description, categorySlug, seoTitle, seoDescription, autoIndexEligible,
     shopeeUrl, imageUrls, material, dimensions, customizable, variations,
     sourceStatus, sourceSyncedAt, contentUpdatedAt,
   } = value;
   if (typeof slug !== "string" || !slugPattern.test(slug)
     || !nonempty(name) || !nonempty(summary) || !nonempty(description)
     || !nonempty(seoTitle) || !nonempty(seoDescription)
+    || (autoIndexEligible !== undefined && typeof autoIndexEligible !== "boolean")
     || (categorySlug !== null && (typeof categorySlug !== "string" || !slugPattern.test(categorySlug)))
     || !optionalText(material) || !optionalText(dimensions)
     || typeof customizable !== "boolean"
@@ -84,13 +87,14 @@ function parseProduct(value: unknown): CatalogProduct | null {
 
   return {
     slug, name, summary, description, categorySlug, seoTitle, seoDescription,
+    ...(autoIndexEligible === true ? { autoIndexEligible: true } : {}),
     shopeeUrl: shopeeUrl as string | null, imageUrls, material, dimensions, customizable, variations,
     sourceStatus, sourceSyncedAt, contentUpdatedAt,
   };
 }
 
 export function parseCatalogResponse(value: unknown): CatalogProduct[] | null {
-  if (!record(value) || !Array.isArray(value.products) || value.products.length > 200) return null;
+  if (!record(value) || !Array.isArray(value.products) || value.products.length > 1500) return null;
   const products = value.products.map(parseProduct);
   if (products.some((product) => product === null)) return null;
   const valid = products as CatalogProduct[];

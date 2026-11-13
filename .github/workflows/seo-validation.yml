@@ -5,10 +5,14 @@ on:
     paths:
       - "src/app/**"
       - "src/features/products/**"
-      - "src/server/products/published-catalog-snapshot.json"
+      - "src/server/products/**"
       - "src/lib/site-seo.ts"
       - "next.config.ts"
+      - "vercel.json"
       - "tests/seo.test.cjs"
+      - "tests/catalog-source-sync.test.cjs"
+      - "tests/catalog-durable-storage.test.cjs"
+      - "tests/catalog-refresh-auth.test.cjs"
       - "tests/catalog-product-editorial.test.cjs"
       - "tests/product-editorial-titles.test.cjs"
       - ".github/workflows/seo-validation.yml"
@@ -17,10 +21,14 @@ on:
     paths:
       - "src/app/**"
       - "src/features/products/**"
-      - "src/server/products/published-catalog-snapshot.json"
+      - "src/server/products/**"
       - "src/lib/site-seo.ts"
       - "next.config.ts"
+      - "vercel.json"
       - "tests/seo.test.cjs"
+      - "tests/catalog-source-sync.test.cjs"
+      - "tests/catalog-durable-storage.test.cjs"
+      - "tests/catalog-refresh-auth.test.cjs"
       - "tests/catalog-product-editorial.test.cjs"
       - "tests/product-editorial-titles.test.cjs"
       - ".github/workflows/seo-validation.yml"
@@ -55,6 +63,12 @@ jobs:
           pnpm exec eslint
           src/lib/site-seo.ts
           src/features/products/search-approval.ts
+          src/features/products/catalog-source-contract.ts
+          src/features/products/catalog-source-editorial.ts
+          src/features/products/catalog-contract.ts
+          src/server/products/catalog.ts
+          src/server/products/catalog-snapshot-store.ts
+          src/app/api/internal/site-catalog-refresh/route.ts
           src/features/products/product-breadcrumb-jsonld.ts
           src/app/robots.ts
           src/app/sitemap.ts
@@ -67,6 +81,9 @@ jobs:
           src/app/orcamentos/page.tsx
           next.config.ts
           tests/seo.test.cjs
+          tests/catalog-source-sync.test.cjs
+          tests/catalog-durable-storage.test.cjs
+          tests/catalog-refresh-auth.test.cjs
       - name: Generate route types
         run: pnpm exec next typegen
       - name: Typecheck

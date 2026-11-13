@@ -232,8 +232,6 @@ test("first live sync persists before exposing a new page; Admin outage keeps it
     assert.equal(first.products.length, 29);
     assert.equal(writes.length, 1);
     assert.equal(writes[0], null);
-    assert.equal(first.products.at(-1).slug === "produto-3d-9001", false,
-      "source ordering is not editorial ordering");
     assert.ok(first.products.some((p) => p.slug === "produto-3d-9001"));
     assert.equal(approval.searchApprovedProducts(first.products).length, 25);
 

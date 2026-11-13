@@ -66,8 +66,7 @@ function shopeeImage(value: unknown): value is string {
   try {
     const url = new URL(value);
     return url.protocol === "https:" && url.hostname === "cf.shopee.com.br"
-      && url.pathname.startsWith("/file/") && !url.username && !url.password
-      && !url.search && !url.hash;
+      && url.pathname.startsWith("/file/") && !url.username && !url.password;
   } catch {
     return false;
   }

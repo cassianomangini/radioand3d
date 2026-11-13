@@ -53,7 +53,7 @@ function optionalText(value: unknown, limit = 8000): value is string | null {
 
 function date(value: unknown): value is string | null {
   return value === null || (typeof value === "string"
-    && /^\\d{4}-\\d{2}-\\d{2}T/.test(value)
+    && /^\d{4}-\d{2}-\d{2}T/.test(value)
     && Number.isFinite(Date.parse(value)));
 }
 

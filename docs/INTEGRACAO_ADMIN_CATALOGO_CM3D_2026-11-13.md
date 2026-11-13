@@ -47,13 +47,21 @@ antigo retorno `{ products: [...] }` esperado no site antes desta mudança.
 8. Os três legados pendentes continuam sem indexação até revisão humana:
    `kit-porta-figurinhas-3d`, `dummy-13-boneco-articulado`,
    `fita-cassete-retro`.
-9. Se o feed configurado estiver inacessível, parcial, inválido, com cursor
-   truncado ou não corresponder a pelo menos metade dos 28 IDs conhecidos,
-   o site retorna erro temporário (5xx nas rotas que o consomem), em vez
-   de devolver um catálogo 200 vazio ou restaurar status de compra antigos.
-10. Enquanto **as duas** variáveis de integração estiverem totalmente
-    ausentes, a versão publicada do snapshot de 28 itens é mantida para
-    preservar o site atual. Configuração **parcial** não ativa esse fallback.
+9. Se o feed estiver inacessível, parcial, inválido, com cursor
+   truncado, status desconhecido ou faltar **qualquer** um dos 28 itens
+   editoriais, o site ativa um **fallback local completo** para os
+   28 produtos existentes. As URLs públicas e as 25 aprovações SEO
+   permanecem disponíveis. O erro é registrado em log sem credenciais.
+   Nunca responder 5xx, catálogo vazio ou sitemap truncado devido apenas
+   a uma falha de integração com o Admin.
+10. Mesmo com configuração parcial, token ausente ou URL inválida, o
+    site continua servindo o snapshot editorial, sem aguardar a API.
+    **Limitação do fallback:** o snapshot é histórico, não comprova
+    disponibilidade atual na Shopee. O site deve monitorar falhas para
+    restabelecer a atualização dos status e fotos.
+11. Um item marcado explicitamente como `SELLER_DELETE` deixa de
+    oferecer compra e indexação, mas sua URL editorial antiga responde
+    200, com o texto preservado, em vez de virar um 404 inesperado.
 
 ## Configuração no deploy
 
@@ -81,8 +89,9 @@ escolhidas pelo site por parâmetro da requisição.
 - Todos os 28 IDs editoriais encontrados na fonte, com slug estável e
   título/descrição preservados. Conferir especialmente produtos com kits,
   direitos de terceiros e anúncios atualizados recentemente.
-- Anúncio suspenso/inativo perde CTA e `index`; catálogo e sitemap não
-  anunciam disponibilidade inexistente.
+- Anúncio suspenso/inativo **confirmado pelo feed** perde CTA e `index`;
+  falha de comunicação ativa o snapshot, preservando URLs e SEO, mas sem
+  alegar verificação atual de disponibilidade.
 - Novos produtos comuns aparecem com página própria e `noindex` enquanto
   auto-indexação estiver desligada. Ativar somente após revisar uma amostra
   de textos e fotos reais.
@@ -110,6 +119,10 @@ escolhidas pelo site por parâmetro da requisição.
   personalização; o site não deve inferir essas propriedades para novos
   itens. A sincronização de imagens internas de `product_media` não faz
   parte deste contrato.
+- Uma queda do feed mantém páginas **antigas**, mas não garante
+  continuidade de URLs **novas e ainda não editoradas**. Por isso
+  `CM_SITE_AUTO_INDEX_ENABLED` permanece `false` até existir uma
+  persistência de último estado válido sob ownership do site.
 - Esta versão não possui um banco editorial próprio com UI de revisão.
   A curadoria histórica permanece no repositório do site, e os novos itens
   recebem texto inicial com regras. Uma camada editorial persistente pode

@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { parseCatalogResponse, type CatalogProduct } from "@/features/products/catalog-contract";
 import {
   CATALOG_SOURCE_MAX_PAGES, CATALOG_SHOP_ID, parseCatalogSourcePage, type SourceItem,
@@ -5,13 +6,16 @@ import {
 import {
   buildSiteCatalog, type SiteEditorialSeed,
 } from "@/features/products/catalog-source-editorial";
+import {
+  readStoredCatalog, writeStoredCatalog, type StoredCatalog,
+} from "./catalog-snapshot-store";
 import snapshotRows from "./published-catalog-snapshot.json";
 
 export type CatalogRead =
   | { state: "available"; products: CatalogProduct[]; degraded?: boolean }
   | { state: "unavailable"; products: [] };
 
-const REVALIDATE_SECONDS = 15 * 60;
+const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 12_000;
 const editorialSeeds: SiteEditorialSeed[] = snapshotRows;
 
@@ -52,6 +56,12 @@ function sourceEndpoint(raw: string): URL | null {
   }
 }
 
+function configuredSource(): { endpoint: URL; token: string } | null {
+  const token = process.env.CM_SITE_CATALOG_TOKEN?.trim() ?? "";
+  const endpoint = sourceEndpoint(process.env.CM_SITE_CATALOG_API_URL?.trim() ?? "");
+  return token.length >= 32 && endpoint ? { endpoint, token } : null;
+}
+
 async function fetchSourceCatalog(endpoint: URL, token: string): Promise<SourceItem[]> {
   const items: SourceItem[] = [];
   let cursor = 0;
@@ -61,12 +71,11 @@ async function fetchSourceCatalog(endpoint: URL, token: string): Promise<SourceI
 
     const response = await fetch(url, {
       headers: { Authorization: "Bearer " + token, Accept: "application/json" },
-      cache: "force-cache",
-      next: { revalidate: REVALIDATE_SECONDS, tags: ["site-catalog-source"] },
+      cache: "no-store",
+      redirect: "error",
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!response.ok) throw new Error("catalog_source_http_" + response.status);
-
     const result = parseCatalogSourcePage(await response.json(), cursor);
     if (!result) throw new Error("catalog_source_invalid_page");
     items.push(...result.items);
@@ -81,44 +90,118 @@ async function fetchSourceCatalog(endpoint: URL, token: string): Promise<SourceI
 }
 
 /**
- * Admin supplies only facts. The site's editable editorial copy/URLs survive
- * source changes. New simple items can pass the site's conservative quality
- * gate; auto-indexing remains a separate explicit rollout flag.
+ * Always apply the current site-owned editorial copy, even when an older
+ * operational snapshot was written before a deploy changed the copy.
+ */
+function productsFromStored(stored: StoredCatalog): CatalogProduct[] {
+  if (!snapshotProducts) throw new Error("catalog_editorial_baseline_invalid");
+  const bySlug = new Map(stored.products.map((item) => [item.slug, item]));
+  if (bySlug.size !== stored.products.length) throw new Error("catalog_storage_duplicate_slugs");
+
+  const known = snapshotProducts.map((seed) => {
+    const value = bySlug.get(seed.slug);
+    if (!value) throw new Error("catalog_storage_missing_legacy");
+    return {
+      ...value,
+      name: seed.name,
+      summary: seed.summary,
+      description: seed.description,
+      seoTitle: seed.seoTitle,
+      seoDescription: seed.seoDescription,
+      categorySlug: seed.categorySlug,
+      autoIndexEligible: false,
+    };
+  });
+
+  const newProducts = stored.products
+    .filter((item) => !snapshotProducts.some((seed) => seed.slug === item.slug))
+    .map((product) => ({
+      ...product,
+      autoIndexEligible: process.env.CM_SITE_AUTO_INDEX_ENABLED === "true"
+        && product.autoIndexEligible === true,
+    }));
+
+  const parsed = parseCatalogResponse({ products: [...known, ...newProducts] });
+  if (!parsed) throw new Error("catalog_storage_invalid_projection");
+  return parsed;
+}
+
+function warn(reason: string, error?: unknown): void {
+  // Never log tokens, raw provider payloads, or R2 request URLs.
+  console.error("[cm3d-catalog] " + reason,
+    error instanceof Error ? error.name : "");
+}
+
+/**
+ * A catalog becomes visible only after a successful durable R2 write.
+ * On an atomic write conflict another refresh already committed a snapshot.
+ */
+async function refreshAndPersist(previous: StoredCatalog | null): Promise<CatalogRead> {
+  const config = configuredSource();
+  if (!config) throw new Error("catalog_source_unconfigured");
+  const source = await fetchSourceCatalog(config.endpoint, config.token);
+  const proposed = parseCatalogResponse({ products: buildSiteCatalog(source, editorialSeeds, {
+    now: Date.now(),
+    autoIndex: process.env.CM_SITE_AUTO_INDEX_ENABLED === "true",
+  }) });
+  if (!proposed) throw new Error("catalog_source_invalid_projection");
+
+  const outcome = await writeStoredCatalog(proposed, previous?.etag ?? null);
+  if (outcome === "written") {
+    return { state: "available", products: proposed };
+  }
+  const winner = await readStoredCatalog();
+  if (!winner) throw new Error("catalog_storage_conflict_without_snapshot");
+  return { state: "available", products: productsFromStored(winner) };
+}
+
+/**
+ * Public pages serve a durable site-owned copy immediately. If the last
+ * successful sync is older than 15 minutes, refresh after the response.
+ * A bad Admin response, network outage or partial catalog can never erase
+ * a previously published page or truncate the 25 approved sitemap URLs.
  */
 export async function getSiteCatalog(): Promise<CatalogRead> {
-  const endpoint = process.env.CM_SITE_CATALOG_API_URL?.trim();
-  const token = process.env.CM_SITE_CATALOG_TOKEN?.trim();
-
-  // Until the integration is provisioned, preserve the already-published site.
-  if (!endpoint && !token) return publishedSnapshot();
-
-  // A broken integration must never break the existing 28 product pages,
-  // their canonical URLs or the 25 editorially approved sitemap entries.
-  if (!endpoint || !token || token.length < 32) {
-    console.error("[cm3d-catalog] source configuration incomplete; using editorial snapshot");
-    return publishedSnapshot(true);
-  }
-  const url = sourceEndpoint(endpoint);
-  if (!url) {
-    console.error("[cm3d-catalog] source endpoint invalid; using editorial snapshot");
-    return publishedSnapshot(true);
-  }
-
+  let stored: StoredCatalog | null = null;
   try {
-    const source = await fetchSourceCatalog(url, token);
-    const products = parseCatalogResponse({ products: buildSiteCatalog(source, editorialSeeds, {
-      now: Date.now(),
-      autoIndex: process.env.CM_SITE_AUTO_INDEX_ENABLED === "true",
-    }) });
-    if (!products) throw new Error("catalog_source_invalid_projection");
-    return { state: "available", products };
+    stored = await readStoredCatalog();
+    if (stored) {
+      const products = productsFromStored(stored);
+      const ageMs = Date.now() - Date.parse(stored.savedAt);
+      const needsRefresh = !Number.isFinite(ageMs) || ageMs > REFRESH_INTERVAL_MS;
+      if (needsRefresh && configuredSource()) {
+        try {
+          const versionToRefresh = stored;
+          after(async () => {
+            try { await refreshAndPersist(versionToRefresh); }
+            catch (error) { warn("background_source_refresh_failed", error); }
+          });
+        } catch (error) {
+          warn("background_refresh_schedule_unavailable", error);
+        }
+      }
+      return { state: "available", products, degraded: needsRefresh };
+    }
   } catch (error) {
-    // A provider outage is not a request to deindex product pages. Keep the
-    // site-owned editorial baseline; do not accept an incomplete projection.
-    // New uncurated products disappear from this temporary fallback and are
-    // deliberately noindex until a durable site-owned record is introduced.
-    console.error("[cm3d-catalog] source unavailable; using editorial snapshot",
-      error instanceof Error ? error.name : "unknown");
-    return publishedSnapshot(true);
+    warn("durable_catalog_read_failed", error);
   }
+
+  // Only the first successful request must build the durable catalog.
+  // Never expose new product URLs before storage is confirmed.
+  if (configuredSource()) {
+    try {
+      return await refreshAndPersist(stored);
+    } catch (error) {
+      warn("catalog_initial_sync_failed; serving editorial baseline", error);
+    }
+  }
+  return publishedSnapshot(true);
+}
+
+/** Used by an authenticated refresh job; never callable from the browser. */
+export async function syncSiteCatalog(): Promise<CatalogRead> {
+  let previous: StoredCatalog | null = null;
+  try { previous = await readStoredCatalog(); }
+  catch (error) { warn("refresh_store_read_failed", error); throw error; }
+  return refreshAndPersist(previous);
 }

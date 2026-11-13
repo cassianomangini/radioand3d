@@ -21,7 +21,7 @@ antigo retorno `{ products: [...] }` esperado no site antes desta mudança.
    Shopee, imagens e dados de origem. Cada consulta tem timeout; o ciclo deve
    terminar sem erro para a projeção ser aceita.
 2. O catálogo público é persistido em **Cloudflare R2** (já conectado ao
-   site), num objeto exclusivo `cmangini3d/site-catalog/public-v1.json`.
+   site), num objeto exclusivo `cmangini3d/site-catalog/production-v1.json`.
    A leitura do site usa essa cópia durável, independente da disponibilidade
    momentânea do Admin. Depois de **15 minutos** sem atualização, uma visita
    agenda uma atualização **após a resposta**, sem segurar a página. Há também
@@ -90,7 +90,8 @@ No runtime **do site**:
 - `R2_S3_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID` e
   `R2_SECRET_ACCESS_KEY`, **já configuradas no site**; é necessário confirmar
   que essas credenciais têm permissão de PUT/GET e que o bucket tem espaço
-  e política adequados. O arquivo contém apenas dados do **contrato público**
+  e política adequados. Preview utiliza objeto R2 separado por branch,
+  nunca o objeto de produção. O arquivo contém apenas dados do **contrato público**
   do site; não exportar internals do Admin ao bucket.
 
 Segredos não devem usar prefixo `NEXT_PUBLIC_`. Não imprimir tokens em

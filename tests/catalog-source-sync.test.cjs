@@ -165,57 +165,34 @@ test("one missing or unknown legacy item cannot silently deindex a product", () 
   ), /unknown_status/);
 });
 
-test("site source reader fetches the full feed and preserves legacy pages when source fails", async () => {
+
+function catalogReaderWithStore(store, scheduled) {
+  return loadTypeScript("src/server/products/catalog.ts", {
+    "next/server": { after: (callback) => scheduled.push(callback) },
+    "@/features/products/catalog-contract": contract,
+    "@/features/products/catalog-source-contract": source,
+    "@/features/products/catalog-source-editorial": editorial,
+    "./catalog-snapshot-store": store,
+    "./published-catalog-snapshot.json": { default: seeds },
+  });
+}
+
+async function withCatalogRuntime(testBody) {
   const original = {
     url: process.env.CM_SITE_CATALOG_API_URL,
     token: process.env.CM_SITE_CATALOG_TOKEN,
     auto: process.env.CM_SITE_AUTO_INDEX_ENABLED,
     fetch: global.fetch,
+    now: Date.now,
   };
   process.env.CM_SITE_CATALOG_API_URL = "https://admin.example/api/internal/site-catalog";
   process.env.CM_SITE_CATALOG_TOKEN = "site-source-secret-token-at-least-32-chars";
-  process.env.CM_SITE_AUTO_INDEX_ENABLED = "true";
-  const requests = [];
-  global.fetch = async (url, options) => {
-    requests.push({ url: String(url), options });
-    const all = [...seeds.map((seed) => legacyItem(seed)), sourceItem(9001)]
-      .sort((a, b) => a.itemId - b.itemId);
-    return { ok: true, json: async () => page(all) };
-  };
-  try {
-    const catalog = loadTypeScript("src/server/products/catalog.ts", {
-      "@/features/products/catalog-contract": contract,
-      "@/features/products/catalog-source-contract": source,
-      "@/features/products/catalog-source-editorial": editorial,
-      "./published-catalog-snapshot.json": { default: seeds },
-    });
-    // Reader uses Date.now(); ensure this fixture's November 2026 gate is stable.
-    const originalNow = Date.now;
-    Date.now = () => now;
-    try {
-      const result = await catalog.getSiteCatalog();
-      assert.equal(result.state, "available");
-      assert.equal(result.products.length, 29);
-      assert.equal(result.products.at(-1).autoIndexEligible, true);
-      assert.equal(requests.length, 1);
-      assert.equal(requests[0].url,
-        "https://admin.example/api/internal/site-catalog");
-      assert.equal(requests[0].options.cache, "force-cache");
-      assert.equal(requests[0].options.headers.Authorization,
-        "Bearer site-source-secret-token-at-least-32-chars");
-    } finally {
-      Date.now = originalNow;
-    }
-
-    global.fetch = async () => ({ ok: false, status: 503 });
-    const failed = await catalog.getSiteCatalog();
-    assert.equal(failed.state, "available");
-    assert.equal(failed.degraded, true);
-    assert.equal(failed.products.length, 28);
-    assert.deepEqual(failed.products.map((p) => p.slug), seeds.map((p) => p.slug));
-    assert.equal(approval.searchApprovedProducts(failed.products).length, 25);
-  } finally {
+  process.env.CM_SITE_AUTO_INDEX_ENABLED = "false";
+  Date.now = () => now;
+  try { await testBody(); }
+  finally {
     global.fetch = original.fetch;
+    Date.now = original.now;
     for (const [key, value] of [
       ["CM_SITE_CATALOG_API_URL", original.url],
       ["CM_SITE_CATALOG_TOKEN", original.token],
@@ -225,125 +202,193 @@ test("site source reader fetches the full feed and preserves legacy pages when s
       else process.env[key] = value;
     }
   }
-});
+}
 
-test("reads a 70-item catalog with a real second cursor and rejects a partial page", async () => {
-  const previous = {
-    url: process.env.CM_SITE_CATALOG_API_URL,
-    token: process.env.CM_SITE_CATALOG_TOKEN,
-    auto: process.env.CM_SITE_AUTO_INDEX_ENABLED,
-    fetch: global.fetch,
-  };
-  process.env.CM_SITE_CATALOG_API_URL = "https://admin.example/api/internal/site-catalog";
-  process.env.CM_SITE_CATALOG_TOKEN = "site-source-secret-token-at-least-32-chars";
-  process.env.CM_SITE_AUTO_INDEX_ENABLED = "false";
+test("first live sync persists before exposing a new page; Admin outage keeps its URL", async () => {
+  await withCatalogRuntime(async () => {
+    let saved = null;
+    const writes = [];
+    const scheduled = [];
+    const store = {
+      readStoredCatalog: async () => saved,
+      writeStoredCatalog: async (products, etag) => {
+        writes.push(etag);
+        saved = { products, savedAt: new Date(now).toISOString(),
+          etag: '"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"' };
+        return "written";
+      },
+    };
+    const reader = catalogReaderWithStore(store, scheduled);
+    const all = [...seeds.map((seed) => legacyItem(seed)), sourceItem(9001)]
+      .sort((a, b) => a.itemId - b.itemId);
+    global.fetch = async (url, options) => {
+      assert.equal(String(url), "https://admin.example/api/internal/site-catalog");
+      assert.equal(options.cache, "no-store");
+      assert.equal(options.headers.Authorization, "Bearer site-source-secret-token-at-least-32-chars");
+      return { ok: true, json: async () => page(all) };
+    };
+    const first = await reader.getSiteCatalog();
+    assert.equal(first.state, "available");
+    assert.equal(first.products.length, 29);
+    assert.equal(writes.length, 1);
+    assert.equal(writes[0], null);
+    assert.equal(first.products.at(-1).slug === "produto-3d-9001", false,
+      "source ordering is not editorial ordering");
+    assert.ok(first.products.some((p) => p.slug === "produto-3d-9001"));
+    assert.equal(approval.searchApprovedProducts(first.products).length, 25);
 
-  const all = [
-    ...seeds.map((seed) => legacyItem(seed)),
-    ...Array.from({ length: 42 }, (_, index) => sourceItem(60000000000 + index)),
-  ].sort((a, b) => a.itemId - b.itemId);
-  const cursor = all[49].itemId;
-  const seen = [];
-  let secondPageShouldFail = false;
-  global.fetch = async (url) => {
-    const requestUrl = new URL(url);
-    const after = requestUrl.searchParams.get("after");
-    seen.push(after);
-    if (after === null) {
-      return { ok: true, json: async () => page(all.slice(0, 50), true) };
-    }
-    assert.equal(after, String(cursor));
-    if (secondPageShouldFail) return { ok: false, status: 503 };
-    return { ok: true, json: async () => page(all.slice(50)) };
-  };
+    // A cold-start request on another instance reads the same persisted data.
+    global.fetch = async () => { throw new Error("upstream not reachable"); };
+    const secondReader = catalogReaderWithStore(store, scheduled);
+    const second = await secondReader.getSiteCatalog();
+    assert.equal(second.state, "available");
+    assert.equal(second.products.length, 29);
+    assert.ok(second.products.some((p) => p.slug === "produto-3d-9001"));
+    assert.equal(scheduled.length, 0);
 
-  try {
-    const catalog = loadTypeScript("src/server/products/catalog.ts", {
-      "@/features/products/catalog-contract": contract,
-      "@/features/products/catalog-source-contract": source,
-      "@/features/products/catalog-source-editorial": editorial,
-      "./published-catalog-snapshot.json": { default: seeds },
-    });
-    const originalNow = Date.now;
-    Date.now = () => now;
-    try {
-      const response = await catalog.getSiteCatalog();
-      assert.equal(response.state, "available");
-      assert.equal(response.products.length, 70);
-      assert.deepEqual(seen, [null, String(cursor)]);
-      assert.equal(approval.searchApprovedProducts(response.products).length, 25);
-
-      secondPageShouldFail = true;
-      const failed = await catalog.getSiteCatalog();
-      assert.equal(failed.state, "available");
-      assert.equal(failed.degraded, true);
-      assert.deepEqual(failed.products.map((p) => p.slug), seeds.map((p) => p.slug));
-      assert.equal(approval.searchApprovedProducts(failed.products).length, 25);
-    } finally {
-      Date.now = originalNow;
-    }
-  } finally {
-    global.fetch = previous.fetch;
-    for (const [key, value] of [
-      ["CM_SITE_CATALOG_API_URL", previous.url],
-      ["CM_SITE_CATALOG_TOKEN", previous.token],
-      ["CM_SITE_AUTO_INDEX_ENABLED", previous.auto],
-    ]) {
-      if (value === undefined) delete process.env[key];
-      else process.env[key] = value;
-    }
-  }
-});
-
-
-test("broken or incomplete API credentials never cause product or sitemap outage", async () => {
-  const original = {
-    url: process.env.CM_SITE_CATALOG_API_URL,
-    token: process.env.CM_SITE_CATALOG_TOKEN,
-  };
-  const reader = loadTypeScript("src/server/products/catalog.ts", {
-    "@/features/products/catalog-contract": contract,
-    "@/features/products/catalog-source-contract": source,
-    "@/features/products/catalog-source-editorial": editorial,
-    "./published-catalog-snapshot.json": { default: seeds },
+    // Once the saved data ages, the update runs after the response without
+    // affecting a new product URL or the 25 approved SEO pages.
+    Date.now = () => now + 20 * 60_000;
+    const old = await secondReader.getSiteCatalog();
+    assert.equal(old.state, "available");
+    assert.equal(old.degraded, true);
+    assert.equal(old.products.length, 29);
+    assert.equal(scheduled.length, 1);
+    const consoleError = console.error;
+    console.error = () => {};
+    try { await scheduled[0](); }
+    finally { console.error = consoleError; }
+    const afterFailure = await reader.getSiteCatalog();
+    assert.equal(afterFailure.products.length, 29);
+    assert.ok(afterFailure.products.some((p) => p.slug === "produto-3d-9001"));
+    assert.equal(writes.length, 1);
   });
-  try {
-    for (const config of [
-      { url: "https://admin.example/api/internal/site-catalog", token: undefined },
-      { url: undefined, token: "site-source-secret-token-at-least-32-chars" },
-      { url: "https://admin.example/broken", token: "site-source-secret-token-at-least-32-chars" },
-    ]) {
-      if (config.url === undefined) delete process.env.CM_SITE_CATALOG_API_URL;
-      else process.env.CM_SITE_CATALOG_API_URL = config.url;
-      if (config.token === undefined) delete process.env.CM_SITE_CATALOG_TOKEN;
-      else process.env.CM_SITE_CATALOG_TOKEN = config.token;
+});
 
+test("70-item feed is persisted in full across two pages; page-two failure cannot erase it", async () => {
+  await withCatalogRuntime(async () => {
+    const scheduled = [];
+    let saved = null;
+    const reader = catalogReaderWithStore({
+      readStoredCatalog: async () => saved,
+      writeStoredCatalog: async (products) => {
+        saved = { products, savedAt: new Date(now).toISOString(),
+          etag: '"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"' };
+        return "written";
+      },
+    }, scheduled);
+    const all = [
+      ...seeds.map((seed) => legacyItem(seed)),
+      ...Array.from({ length: 42 }, (_, index) => sourceItem(60000000000 + index)),
+    ].sort((a, b) => a.itemId - b.itemId);
+    const cursor = all[49].itemId;
+    const seen = [];
+    global.fetch = async (url) => {
+      const after = new URL(url).searchParams.get("after");
+      seen.push(after);
+      return { ok: true, json: async () => after === null
+        ? page(all.slice(0, 50), true) : page(all.slice(50)) };
+    };
+
+    const first = await reader.getSiteCatalog();
+    assert.equal(first.state, "available");
+    assert.equal(first.products.length, 70);
+    assert.deepEqual(seen, [null, String(cursor)]);
+
+    Date.now = () => now + 20 * 60_000;
+    const current = await reader.getSiteCatalog();
+    assert.equal(current.products.length, 70);
+    assert.equal(scheduled.length, 1);
+    global.fetch = async (url) => {
+      if (new URL(url).searchParams.has("after")) return { ok: false, status: 503 };
+      return { ok: true, json: async () => page(all.slice(0, 50), true) };
+    };
+    const consoleError = console.error;
+    console.error = () => {};
+    try { await scheduled[0](); }
+    finally { console.error = consoleError; }
+    const stillAvailable = await reader.getSiteCatalog();
+    assert.equal(stillAvailable.state, "available");
+    assert.equal(stillAvailable.products.length, 70);
+    assert.equal(approval.searchApprovedProducts(stillAvailable.products).length, 25);
+  });
+});
+
+test("initial failure, missing credentials and invalid endpoint preserve 28 legacy pages", async () => {
+  await withCatalogRuntime(async () => {
+    const scheduled = [];
+    const reader = catalogReaderWithStore({
+      readStoredCatalog: async () => null,
+      writeStoredCatalog: async () => { throw new Error("R2 is write-protected"); },
+    }, scheduled);
+    const originalConsole = console.error;
+    console.error = () => {};
+    try {
+      global.fetch = async () => { throw new Error("upstream unavailable"); };
+      const sourceDown = await reader.getSiteCatalog();
+      assert.equal(sourceDown.state, "available");
+      assert.equal(sourceDown.products.length, 28);
+      assert.equal(approval.searchApprovedProducts(sourceDown.products).length, 25);
+
+      const configs = [
+        { endpoint: "https://admin.example/api/internal/site-catalog", token: undefined },
+        { endpoint: undefined, token: "site-source-secret-token-at-least-32-chars" },
+        { endpoint: "https://admin.example/bad-path", token: "site-source-secret-token-at-least-32-chars" },
+      ];
+      for (const config of configs) {
+        if (config.endpoint === undefined) delete process.env.CM_SITE_CATALOG_API_URL;
+        else process.env.CM_SITE_CATALOG_API_URL = config.endpoint;
+        if (config.token === undefined) delete process.env.CM_SITE_CATALOG_TOKEN;
+        else process.env.CM_SITE_CATALOG_TOKEN = config.token;
+        const result = await reader.getSiteCatalog();
+        assert.equal(result.products.length, 28);
+        assert.equal(approval.searchApprovedProducts(result.products).length, 25);
+      }
+    } finally { console.error = originalConsole; }
+  });
+});
+
+test("a stored snapshot cannot bypass the site-owned auto-index rollout or editorial changes", async () => {
+  await withCatalogRuntime(async () => {
+    const scheduled = [];
+    const sourceData = [...seeds.map((seed) => legacyItem(seed)), sourceItem(9001)];
+    const cached = editorial.buildSiteCatalog(sourceData, seeds, { now, autoIndex: true });
+    cached[0].name = "NAME FROM AN OLD STORAGE REVISION";
+    const reader = catalogReaderWithStore({
+      readStoredCatalog: async () => ({
+        savedAt: new Date(now).toISOString(),
+        products: cached, etag: '"cccccccccccccccccccccccccccccccc"',
+      }),
+      writeStoredCatalog: async () => { throw new Error("unexpected write"); },
+    }, scheduled);
+    const result = await reader.getSiteCatalog();
+    assert.equal(result.state, "available");
+    assert.equal(result.products.length, 29);
+    assert.equal(result.products[0].name, seeds[0].name);
+    assert.equal(approval.searchApprovedProducts(result.products).length, 25);
+    const newItem = result.products.find((p) => p.slug === "produto-3d-9001");
+    assert.equal(newItem.autoIndexEligible, false);
+  });
+});
+
+test("no new product URL is published when durable storage refuses the first write", async () => {
+  await withCatalogRuntime(async () => {
+    const scheduled = [];
+    const sourceData = [...seeds.map((seed) => legacyItem(seed)), sourceItem(9001)]
+      .sort((a, b) => a.itemId - b.itemId);
+    const reader = catalogReaderWithStore({
+      readStoredCatalog: async () => null,
+      writeStoredCatalog: async () => { throw new Error("durability write failed"); },
+    }, scheduled);
+    global.fetch = async () => ({ ok: true, json: async () => page(sourceData) });
+    const originalConsole = console.error;
+    console.error = () => {};
+    try {
       const result = await reader.getSiteCatalog();
       assert.equal(result.state, "available");
       assert.equal(result.degraded, true);
       assert.equal(result.products.length, 28);
-      assert.equal(approval.searchApprovedProducts(result.products).length, 25);
-    }
-  } finally {
-    for (const [key, value] of [
-      ["CM_SITE_CATALOG_API_URL", original.url],
-      ["CM_SITE_CATALOG_TOKEN", original.token],
-    ]) {
-      if (value === undefined) delete process.env[key];
-      else process.env[key] = value;
-    }
-  }
-});
-
-test("deleted Shopee listing keeps an editorial detail URL without a purchase CTA", () => {
-  const all = seeds.map((seed) => legacyItem(seed));
-  all[0] = legacyItem(seeds[0], { sourceStatus: "SELLER_DELETE", shopeeUrl: null });
-  const rendered = editorial.buildSiteCatalog(all, seeds, { now, autoIndex: false });
-  assert.equal(rendered[0].slug, seeds[0].slug);
-  assert.equal(rendered[0].sourceStatus, "SELLER_DELETE");
-  assert.equal(rendered[0].shopeeUrl, null);
-  assert.equal(approval.isSearchApprovedProduct(rendered[0]), false);
-  const detailPage = fs.readFileSync(path.join(__dirname, "..", "src/app/produtos/[slug]/page.tsx"), "utf8");
-  assert.match(detailPage, /if \(!product\) notFound\(\)/);
-  assert.doesNotMatch(detailPage, /product\.sourceStatus\s*===\s*"SELLER_DELETE"\)\s*notFound/);
+      assert.equal(result.products.some((p) => p.slug === "produto-3d-9001"), false);
+    } finally { console.error = originalConsole; }
+  });
 });

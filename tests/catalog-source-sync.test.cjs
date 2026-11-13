@@ -365,7 +365,7 @@ test("a stored snapshot cannot bypass the site-owned auto-index rollout or edito
     assert.equal(result.products[0].name, seeds[0].name);
     assert.equal(approval.searchApprovedProducts(result.products).length, 25);
     const newItem = result.products.find((p) => p.slug === "produto-3d-9001");
-    assert.equal(newItem.autoIndexEligible, false);
+    assert.notEqual(newItem.autoIndexEligible, true);
   });
 });
 

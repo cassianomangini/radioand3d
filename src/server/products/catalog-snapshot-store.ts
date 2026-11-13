@@ -60,7 +60,8 @@ function signRequest(
   const signature = createHmac("sha256", signingKey)
     .update("AWS4-HMAC-SHA256\n" + timestamp + "\n" + scope + "\n" + digest(canonicalRequest))
     .digest("hex");
-  const { host: _host, ...wireHeaders } = headers;
+  const wireHeaders = { ...headers };
+  delete wireHeaders.host;
   return {
     url: config.endpoint + pathname,
     headers: {

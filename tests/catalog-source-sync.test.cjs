@@ -218,3 +218,69 @@ test("site source reader fetches the full feed and never falls back silently aft
     }
   }
 });
+
+test("reads a 70-item catalog with a real second cursor and rejects a partial page", async () => {
+  const previous = {
+    url: process.env.CM_SITE_CATALOG_API_URL,
+    token: process.env.CM_SITE_CATALOG_TOKEN,
+    auto: process.env.CM_SITE_AUTO_INDEX_ENABLED,
+    fetch: global.fetch,
+  };
+  process.env.CM_SITE_CATALOG_API_URL = "https://admin.example/api/internal/site-catalog";
+  process.env.CM_SITE_CATALOG_TOKEN = "site-source-secret-token-at-least-32-chars";
+  process.env.CM_SITE_AUTO_INDEX_ENABLED = "false";
+
+  const all = [
+    ...seeds.map((seed) => legacyItem(seed)),
+    ...Array.from({ length: 42 }, (_, index) => sourceItem(60000000000 + index)),
+  ].sort((a, b) => a.itemId - b.itemId);
+  const cursor = all[49].itemId;
+  const seen = [];
+  let secondPageShouldFail = false;
+  global.fetch = async (url) => {
+    const requestUrl = new URL(url);
+    const after = requestUrl.searchParams.get("after");
+    seen.push(after);
+    if (after === null) {
+      return { ok: true, json: async () => page(all.slice(0, 50), true) };
+    }
+    assert.equal(after, String(cursor));
+    if (secondPageShouldFail) return { ok: false, status: 503 };
+    return { ok: true, json: async () => page(all.slice(50)) };
+  };
+
+  try {
+    const catalog = loadTypeScript("src/server/products/catalog.ts", {
+      "@/features/products/catalog-contract": contract,
+      "@/features/products/catalog-source-contract": source,
+      "@/features/products/catalog-source-editorial": editorial,
+      "./published-catalog-snapshot.json": { default: seeds },
+    });
+    const originalNow = Date.now;
+    Date.now = () => now;
+    try {
+      const response = await catalog.getSiteCatalog();
+      assert.equal(response.state, "available");
+      assert.equal(response.products.length, 70);
+      assert.deepEqual(seen, [null, String(cursor)]);
+      assert.equal(approval.searchApprovedProducts(response.products).length, 25);
+
+      secondPageShouldFail = true;
+      const failed = await catalog.getSiteCatalog();
+      assert.equal(failed.state, "unavailable");
+      assert.deepEqual(failed.products, []);
+    } finally {
+      Date.now = originalNow;
+    }
+  } finally {
+    global.fetch = previous.fetch;
+    for (const [key, value] of [
+      ["CM_SITE_CATALOG_API_URL", previous.url],
+      ["CM_SITE_CATALOG_TOKEN", previous.token],
+      ["CM_SITE_AUTO_INDEX_ENABLED", previous.auto],
+    ]) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+});

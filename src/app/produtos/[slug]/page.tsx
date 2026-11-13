@@ -50,7 +50,9 @@ export default async function ProductPage({ params }: Props) {
     throw new Error("site_catalog_unavailable_for_product_detail");
   }
   const product = catalog.products.find((entry) => entry.slug === slug);
-  if (!product || product.sourceStatus === "SELLER_DELETE") notFound();
+  // Keep an existing editorial product URL available even when its Shopee
+  // listing is removed. Purchase CTA and indexability are gated separately.
+  if (!product) notFound();
   const subtitle = getProductSubtitle(product.slug);
   const editorial = getCatalogProductEditorial(product.slug);
   const breadcrumbJsonLd = isIndexableDeployment() && isSearchApprovedProduct(product)
